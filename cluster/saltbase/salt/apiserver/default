@@ -55,5 +55,10 @@
   {%- set minion_regexp = "" %}
 {% endif %}
 {% endif %}
+{% if grains.portal_net is defined %}
+  {% set portal_net = "-portal_net=" + grains.portal_net %}
+{% endif %}
+#FIXME: hack because I have no idea where to put this properly or get it out of the configs
+{% set portal_net = "-portal_net=10.0.0.0/16" %}
 
-DAEMON_ARGS="{{daemon_args}} {{address}} {{machines}} {{etcd_servers}} {{ minion_regexp }} {{ cloud_provider }} --allow_privileged={{pillar['allow_privileged']}}"
+DAEMON_ARGS="{{daemon_args}} {{address}} {{machines}} {{etcd_servers}} {{ minion_regexp }} {{ cloud_provider }} --allow_privileged={{pillar['allow_privileged']}} {{portal_net}}"
