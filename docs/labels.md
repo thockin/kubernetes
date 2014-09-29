@@ -11,7 +11,7 @@ Each pod can have a set of key/value labels set on it, with at most one label wi
 Via a "label selector" the user can identify a set of `pods`. The label selector is the core grouping primitive in Kubernetes. It could be used to identify service replicas or shards, worker pool members, or peers in a distributed application.
 
 Kubernetes currently supports two objects that use label selectors to keep track of their members, `service`s and `replicationController`s:
-- `service`: A service is a configuration unit for the proxies that run on every worker node.  It is named and points to one or more pods.
+- `service`: A [service](services.md) is a configuration unit for the proxies that run on every worker node.  It is named and points to one or more pods.
 - `replicationController`: A [replication controller](replication-controller.md) ensures that a specified number of pod "replicas" are running at any one time.  If there are too many, it'll kill some.  If there are too few, it'll start more.
 
 The set of pods that a `service` targets is defined with a label selector. Similarly, the population of pods that a `replicationController` is monitoring is also defined with a label selector. 
