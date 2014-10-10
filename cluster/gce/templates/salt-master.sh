@@ -26,6 +26,7 @@ grains:
   roles:
     - kubernetes-master
   cloud: gce
+  portal_net: $PORTAL_NET
 EOF
 
 cat <<EOF >/srv/pillar/cluster-params.sls
