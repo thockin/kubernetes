@@ -26,11 +26,11 @@ grains:
   roles:
     - kubernetes-master
   cloud: gce
-  portal_net: $PORTAL_NET
 EOF
 
 cat <<EOF >/srv/pillar/cluster-params.sls
 node_instance_prefix: $NODE_INSTANCE_PREFIX
+portal_net: $PORTAL_NET
 EOF
 
 # Auto accept all keys from minions that try to join
