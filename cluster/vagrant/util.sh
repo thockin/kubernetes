@@ -143,3 +143,17 @@ function get-password {
   export KUBE_PASSWORD=vagrant
   echo "Using credentials: $KUBE_USER:$KUBE_PASSWORD"
 }
+
+# SSH to a node by name ($1)
+function ssh-to-node {
+  node="$1"
+  shift
+  vagrant ssh ${node} "$@"
+}
+
+# Restart the kube-proxy on a node ($1)
+function restart-kube-proxy {
+  #FIXME: this doesn't work if the caller passes an IP
+  ssh-to-node "$1" "sudo systemctl restart kube-proxy"
+}
+
