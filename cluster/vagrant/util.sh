@@ -147,8 +147,9 @@ function get-password {
 # SSH to a node by name ($1)
 function ssh-to-node {
   node="$1"
+  local machine=${VAGRANT_MINION_NAMES_BY_IP[$node]}  
   shift
-  vagrant ssh ${node} "$@"
+  vagrant ssh ${machine} "$@"
 }
 
 # Restart the kube-proxy on a node ($1)
