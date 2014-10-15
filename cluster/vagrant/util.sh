@@ -144,26 +144,16 @@ function get-password {
   echo "Using credentials: $KUBE_USER:$KUBE_PASSWORD"
 }
 
-# Given an IP ($1) produce a vagrant hostname.
-function ip_to_hostname {
-  local i
-  for (( i=0; i<${#MINION_NAMES[@]}; i++ )); do
-    if [[ "${MINION_NAMES[$i]}" == "$1" ]]; then
-      echo "${VAGRANT_MINION_NAMES[$i]}"
-      return 0
-    fi
-  done
-  return 1
-}
-
-# SSH to a node by name ($1) and run a command.
+# SSH to a node by name ($1)
 function ssh-to-node {
   node="$1"
+  local machine="${VAGRANT_MINION_NAMES_BY_IP[${node}]}"
   shift
-  vagrant ssh "$(ip_to_hostname ${node})" -c "$@"
+  vagrant ssh ${machine} -c "$@"
 }
 
 # Restart the kube-proxy on a node ($1)
 function restart-kube-proxy {
   ssh-to-node "$1" "sudo systemctl restart kube-proxy"
 }
+
