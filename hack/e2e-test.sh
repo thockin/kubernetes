@@ -65,7 +65,17 @@ if [[ ${LEAVE_UP} -ne 1 ]]; then
 fi
 
 any_failed=0
+TEST_PATTERN=${TEST_PATTERN:-}
+
 for test_file in $(ls "${KUBE_ROOT}/hack/e2e-suite/"); do
+  if [ "${TEST_PATTERN}" != "" ]; then
+    check=".*${TEST_PATTERN}.*"
+    if [[ ! "$test_file" =~ $check ]]; then
+        echo "skipping $test_file"
+        continue
+    fi
+  fi
+
   "${KUBE_ROOT}/hack/e2e-suite/${test_file}"
   result="$?"
   if [[ "${result}" -eq "0" ]]; then
