@@ -241,6 +241,8 @@ type KubeletConfig struct {
 	RegistryBurst           int
 	MinimumGCAge            time.Duration
 	MaxContainerCount       int
+	ClusterDomain           string
+	ClusterDNS              util.IP
 	EnableServer            bool
 	EnableDebuggingHandlers bool
 	Port                    uint
@@ -261,7 +263,9 @@ func createAndInitKubelet(kc *KubeletConfig) *kubelet.Kubelet {
 		float32(kc.RegistryPullQPS),
 		kc.RegistryBurst,
 		kc.MinimumGCAge,
-		kc.MaxContainerCount)
+		kc.MaxContainerCount,
+		kc.ClusterDomain,
+		net.IP(kc.ClusterDNS))
 
 	k.BirthCry()
 

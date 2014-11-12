@@ -324,6 +324,7 @@ func ValidateManifest(manifest *api.ContainerManifest) errs.ValidationErrorList 
 	allErrs = append(allErrs, vErrs.Prefix("volumes")...)
 	allErrs = append(allErrs, validateContainers(manifest.Containers, allVolumes).Prefix("containers")...)
 	allErrs = append(allErrs, validateRestartPolicy(&manifest.RestartPolicy).Prefix("restartPolicy")...)
+	allErrs = append(allErrs, validateDNSPolicy(&manifest.DNSPolicy).Prefix("dnsPolicy")...)
 	return allErrs
 }
 
@@ -344,6 +345,19 @@ func validateRestartPolicy(restartPolicy *api.RestartPolicy) errs.ValidationErro
 	}
 	if numPolicies > 1 {
 		allErrors = append(allErrors, errs.NewFieldInvalid("", restartPolicy, "only 1 policy is allowed"))
+	}
+	return allErrors
+}
+
+func validateDNSPolicy(dnsPolicy *api.DNSPolicy) errs.ValidationErrorList {
+	allErrors := errs.ValidationErrorList{}
+	switch *dnsPolicy {
+	case "":
+		*dnsPolicy = api.DNSClusterFirst // Default value.
+	case api.DNSClusterFirst, api.DNSDefault:
+		break
+	default:
+		allErrors = append(allErrors, errs.NewFieldNotSupported("", dnsPolicy))
 	}
 	return allErrors
 }
@@ -378,6 +392,7 @@ func ValidatePodSpec(spec *api.PodSpec) errs.ValidationErrorList {
 	allErrs = append(allErrs, vErrs.Prefix("volumes")...)
 	allErrs = append(allErrs, validateContainers(spec.Containers, allVolumes).Prefix("containers")...)
 	allErrs = append(allErrs, validateRestartPolicy(&spec.RestartPolicy).Prefix("restartPolicy")...)
+	allErrs = append(allErrs, validateDNSPolicy(&spec.DNSPolicy).Prefix("dnsPolicy")...)
 	allErrs = append(allErrs, validateLabels(spec.NodeSelector, "nodeSelector")...)
 	return allErrs
 }
