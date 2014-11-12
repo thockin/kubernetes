@@ -19,6 +19,8 @@ package kubelet
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -66,7 +68,9 @@ func NewMainKubelet(
 	pullQPS float32,
 	pullBurst int,
 	minimumGCAge time.Duration,
-	maxContainerCount int) *Kubelet {
+	maxContainerCount int,
+	clusterDomain string,
+	clusterDNS net.IP) *Kubelet {
 	return &Kubelet{
 		hostname:              hn,
 		dockerClient:          dc,
@@ -82,6 +86,8 @@ func NewMainKubelet(
 		pullBurst:             pullBurst,
 		minimumGCAge:          minimumGCAge,
 		maxContainerCount:     maxContainerCount,
+		clusterDomain:         clusterDomain,
+		clusterDNS:            clusterDNS,
 	}
 }
 
@@ -143,6 +149,12 @@ type Kubelet struct {
 	// Optional, minimum age required for garbage collection.  If zero, no limit.
 	minimumGCAge      time.Duration
 	maxContainerCount int
+
+	// If non-empty, use this for container DNS search.
+	clusterDomain string
+
+	// If non-nil, use this for container DNS server.
+	clusterDNS net.IP
 }
 
 type ByCreated []*docker.Container
@@ -497,12 +509,31 @@ func (kl *Kubelet) runContainer(pod *api.BoundPod, container *api.Container, pod
 	} else if container.Privileged {
 		return "", fmt.Errorf("container requested privileged mode, but it is disallowed globally.")
 	}
-	err = kl.dockerClient.StartContainer(dockerContainer.ID, &docker.HostConfig{
+	hc := &docker.HostConfig{
 		PortBindings: portBindings,
 		Binds:        binds,
 		NetworkMode:  netMode,
 		Privileged:   privileged,
-	})
+	}
+	if pod.Spec.DNSPolicy == api.DNSClusterFirst {
+		// Get host DNS settings and append them to cluster DNS settings.
+		f, err := os.Open("/etc/resolv.conf")
+		if err != nil {
+			return "", err
+		}
+		hostDNS, hostSearch, err := parseResolvConf(f)
+		if err != nil {
+			return "", err
+		}
+		if kl.clusterDNS != nil {
+			hc.Dns = append([]string{kl.clusterDNS.String()}, hostDNS...)
+		}
+		if kl.clusterDomain != "" {
+			nsDomain := fmt.Sprintf("%s.%s", pod.Namespace, kl.clusterDomain)
+			hc.DnsSearch = append([]string{nsDomain, kl.clusterDomain}, hostSearch...)
+		}
+	}
+	err = kl.dockerClient.StartContainer(dockerContainer.ID, hc)
 	if err != nil {
 		if ref != nil {
 			record.Eventf(ref, "failed", "failed",
@@ -522,6 +553,39 @@ func (kl *Kubelet) runContainer(pod *api.BoundPod, container *api.Container, pod
 		}
 	}
 	return dockertools.DockerID(dockerContainer.ID), err
+}
+
+// Returns the list of DNS servers and DNS search domains.
+func parseResolvConf(reader io.Reader) ([]string, []string, error) {
+	file, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Lines of the form "nameserver 1.2.3.4" accumulate.
+	nameservers := []string{}
+
+	// Lines of the form "search example.com" overrule - last one wins.
+	searches := []string{}
+
+	lines := strings.Split(string(file), "\n")
+	for l := range lines {
+		trimmed := strings.TrimSpace(lines[l])
+		if strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		fields := strings.Fields(trimmed)
+		if len(fields) == 0 {
+			continue
+		}
+		if fields[0] == "nameserver" {
+			nameservers = append(nameservers, fields[1:]...)
+		}
+		if fields[0] == "search" {
+			searches = fields[1:]
+		}
+	}
+	return nameservers, searches, nil
 }
 
 // Kill a docker container

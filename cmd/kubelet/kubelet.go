@@ -74,6 +74,8 @@ var (
 	maxContainerCount       = flag.Int("maximum_dead_containers_per_container", 5, "Maximum number of old instances of a container to retain per container.  Each container takes up some disk space.  Default: 5.")
 	authPath                = flag.String("auth_path", "", "Path to .kubernetes_auth file, specifying how to authenticate to API server.")
 	apiServerList           util.StringList
+	clusterDomain           = flag.String("cluster_domain", "", "Domain for this cluster.  If set, kubelet will configure all containers to search this domain in addition to the host's search domains")
+	clusterDNS              = flag.String("cluster_dns", "", "IP address for a cluster DNS server.  If set, kubelet will configure all containers to use this for DNS resolution in addition to the host's DNS servers")
 )
 
 func init() {
@@ -230,7 +232,9 @@ func main() {
 		float32(*registryPullQPS),
 		*registryBurst,
 		*minimumGCAge,
-		*maxContainerCount)
+		*maxContainerCount,
+		*clusterDomain,
+		net.ParseIP(*clusterDNS))
 
 	k.BirthCry()
 
