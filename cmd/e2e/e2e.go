@@ -18,7 +18,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"runtime"
 	"strconv"
@@ -248,6 +250,84 @@ func TestKubeletSendsEvent(c *client.Client) bool {
 	return true
 }
 
+// TestClusterDNS checks that cluster DNS works.
+func TestClusterDNS(c *client.Client) bool {
+	podClient := c.Pods(api.NamespaceDefault)
+
+	pingCmd := `
+	ping -c 1 kubernetes && echo OK > /kubernetes;
+	ping -c 1 kubernetes.default && echo OK > /kubernetes.default;
+	ping -c 1 kubernetes.default.kubernetes.local && echo OK > /kubernetes.default.kubernetes.local;
+	ping -c 1 google.com && echo OK > /google.com;
+	sleep 1000000
+	`
+	pod := &api.Pod{
+		TypeMeta: api.TypeMeta{
+			Kind:       "Pod",
+			APIVersion: "v1beta1",
+		},
+		ObjectMeta: api.ObjectMeta{
+			Name: "dns-test",
+		},
+		Spec: api.PodSpec{
+			Containers: []api.Container{
+				{
+					Name:  "webserver",
+					Image: "kubernetes/test-webserver",
+				},
+				{
+					Name:    "pinger",
+					Image:   "busybox",
+					Command: []string{"sh", "-c", pingCmd},
+				},
+			},
+		},
+	}
+
+	_, err := podClient.Create(pod)
+	if err != nil {
+		glog.Errorf("Failed to create dns-test pod: %v", err)
+		return false
+	}
+	defer podClient.Delete(pod.Name)
+	waitForPodRunning(c, pod.Name)
+
+	pod, err = podClient.Get(pod.Name)
+	if err != nil {
+		glog.Errorf("Failed to get pod: %v", err)
+		return false
+	}
+
+	httpClient := &http.Client{}
+	paths := []string{
+		"kubernetes",
+		"kubernetes.default",
+		"kubernetes.default.kubernetes.local",
+		"google.com",
+	}
+	var failed string
+	for try := 1; try < 5; try++ {
+		failed = ""
+		for _, p := range paths {
+			_, err := httpClient.Get(fmt.Sprintf("http://%s/%s", pod.Status.PodIP, p))
+			if err != nil {
+				failed = p
+				break
+			}
+		}
+		if failed != "" {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+	if failed != "" {
+		glog.Errorf("DNS failed for %s", failed)
+		return false
+	}
+	glog.Info("DNS probes succeeded")
+	return true
+}
+
 func main() {
 	flag.Parse()
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -266,6 +346,7 @@ func main() {
 	tests := []func(c *client.Client) bool{
 		TestKubernetesROService,
 		TestKubeletSendsEvent,
+		TestClusterDNS,
 		// TODO(brendandburns): fix this test and re-add it: TestPodUpdate,
 	}
 
