@@ -8,6 +8,9 @@ base:
     - docker
     - kubelet
     - kube-proxy
+{% if pillar['enable_cluster_dns'] is defined and pillar['enable_cluster_dns'] %}
+    - node-resolv-conf
+{% endif %}
 {% if pillar['enable_node_monitoring'] is defined and pillar['enable_node_monitoring'] %}
     - cadvisor
 {% endif %}
