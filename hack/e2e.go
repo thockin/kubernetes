@@ -204,13 +204,13 @@ func run(stepName, cmdPath string) bool {
 
 func finishRunning(stepName string, cmd *exec.Cmd) bool {
 	log.Printf("Running: %v", stepName)
-	stdout, stderr := bytes.NewBuffer(nil), bytes.NewBuffer(nil)
+	out := bytes.NewBuffer(nil)
 	if *verbose {
 		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+		cmd.Stderr = os.Stdout
 	} else {
-		cmd.Stdout = stdout
-		cmd.Stderr = stderr
+		cmd.Stdout = out
+		cmd.Stderr = out
 	}
 
 	done := make(chan struct{})
@@ -229,8 +229,7 @@ func finishRunning(stepName string, cmd *exec.Cmd) bool {
 	if err := cmd.Run(); err != nil {
 		log.Printf("Error running %v: %v", stepName, err)
 		if !*verbose {
-			fmt.Printf("stdout:\n------\n%v\n------\n", string(stdout.Bytes()))
-			fmt.Printf("stderr:\n------\n%v\n------\n", string(stderr.Bytes()))
+			fmt.Printf("output:\n------\n%v\n------\n", string(out.Bytes()))
 		}
 		return false
 	}
