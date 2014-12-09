@@ -54,7 +54,7 @@ func TestErrorNew(t *testing.T) {
 
 func TestNewInvalid(t *testing.T) {
 	testCases := []struct {
-		Err     ValidationError
+		Err     *ValidationError
 		Details *api.StatusDetails
 	}{
 		{
@@ -69,7 +69,7 @@ func TestNewInvalid(t *testing.T) {
 			},
 		},
 		{
-			NewFieldInvalid("field[0].name", "bar"),
+			NewFieldInvalid("field[0].name", "bar", "detail"),
 			&api.StatusDetails{
 				Kind: "kind",
 				ID:   "name",
@@ -116,8 +116,8 @@ func TestNewInvalid(t *testing.T) {
 	for i, testCase := range testCases {
 		vErr, expected := testCase.Err, testCase.Details
 		expected.Causes[0].Message = vErr.Error()
-		err := NewInvalid("kind", "name", ErrorList{vErr})
-		status := err.(*statusError).Status()
+		err := NewInvalid("kind", "name", ValidationErrorList{vErr})
+		status := err.(*StatusError).ErrStatus
 		if status.Code != 422 || status.Reason != api.StatusReasonInvalid {
 			t.Errorf("%d: unexpected status: %#v", i, status)
 		}

@@ -32,17 +32,20 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/capabilities"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/client/record"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/clientauth"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/health"
 	_ "github.com/GoogleCloudPlatform/kubernetes/pkg/healthz"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubelet"
 	kconfig "github.com/GoogleCloudPlatform/kubernetes/pkg/kubelet/config"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/master"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/master/ports"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/version/verflag"
 	"github.com/coreos/go-etcd/etcd"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/golang/glog"
-	"github.com/google/cadvisor/client"
+	cadvisor "github.com/google/cadvisor/client"
 )
 
 const defaultRootDir = "/var/lib/kubelet"
@@ -55,7 +58,7 @@ var (
 	manifestURL             = flag.String("manifest_url", "", "URL for accessing the container manifest")
 	enableServer            = flag.Bool("enable_server", true, "Enable the info server")
 	address                 = util.IP(net.ParseIP("127.0.0.1"))
-	port                    = flag.Uint("port", master.KubeletPort, "The port for the info server to serve on")
+	port                    = flag.Uint("port", ports.KubeletPort, "The port for the info server to serve on")
 	hostnameOverride        = flag.String("hostname_override", "", "If non-empty, will use this string as identification instead of the actual hostname.")
 	networkContainerImage   = flag.String("network_container_image", kubelet.NetworkContainerImage, "The image that network containers in each pod will use.")
 	dockerEndpoint          = flag.String("docker_endpoint", "", "If non-empty, use this for the docker endpoint to communicate with")
@@ -67,11 +70,18 @@ var (
 	registryBurst           = flag.Int("registry_burst", 10, "Maximum size of a bursty pulls, temporarily allows pulls to burst to this number, while still not exceeding registry_qps.  Only used if --registry_qps > 0")
 	runonce                 = flag.Bool("runonce", false, "If true, exit after spawning pods from local manifests or remote urls. Exclusive with --etcd_servers and --enable-server")
 	enableDebuggingHandlers = flag.Bool("enable_debugging_handlers", true, "Enables server endpoints for log collection and local running of containers and commands")
+	minimumGCAge            = flag.Duration("minimum_container_ttl_duration", 0, "Minimum age for a finished container before it is garbage collected.  Examples: '300ms', '10s' or '2h45m'")
+	maxContainerCount       = flag.Int("maximum_dead_containers_per_container", 5, "Maximum number of old instances of a container to retain per container.  Each container takes up some disk space.  Default: 5.")
+	authPath                = flag.String("auth_path", "", "Path to .kubernetes_auth file, specifying how to authenticate to API server.")
+	apiServerList           util.StringList
+	clusterDomain           = flag.String("cluster_domain", "", "Domain for this cluster.  If set, kubelet will configure all containers to search this domain in addition to the host's search domains")
+	clusterDNS              = flag.String("cluster_dns", "", "IP address for a cluster DNS server.  If set, kubelet will configure all containers to use this for DNS resolution in addition to the host's DNS servers")
 )
 
 func init() {
 	flag.Var(&etcdServerList, "etcd_servers", "List of etcd servers to watch (http://ip:port), comma separated. Mutually exclusive with -etcd_config")
 	flag.Var(&address, "address", "The IP address for the info server to serve on (set to 0.0.0.0 for all interfaces)")
+	flag.Var(&apiServerList, "api_servers", "List of Kubernetes API servers to publish events to. (ip:port), comma separated.")
 }
 
 func getDockerEndpoint() string {
@@ -102,6 +112,27 @@ func getHostname() string {
 	return strings.TrimSpace(string(hostname))
 }
 
+func getApiserverClient() (*client.Client, error) {
+	authInfo, err := clientauth.LoadFromFile(*authPath)
+	if err != nil {
+		return nil, err
+	}
+	clientConfig, err := authInfo.MergeWithConfig(client.Config{})
+	if err != nil {
+		return nil, err
+	}
+	// TODO: adapt Kube client to support LB over several servers
+	if len(apiServerList) > 1 {
+		glog.Infof("Mulitple api servers specified.  Picking first one")
+	}
+	clientConfig.Host = apiServerList[0]
+	if c, err := client.New(&clientConfig); err != nil {
+		return nil, err
+	} else {
+		return c, nil
+	}
+}
+
 func main() {
 	flag.Parse()
 	util.InitLogs()
@@ -123,6 +154,22 @@ func main() {
 
 	etcd.SetLogger(util.NewLogger("etcd "))
 
+	// Make an API client if possible.
+	if len(apiServerList) < 1 {
+		glog.Info("No api servers specified.")
+	} else {
+		if apiClient, err := getApiserverClient(); err != nil {
+			glog.Errorf("Unable to make apiserver client: %v", err)
+		} else {
+			// Send events to APIserver if there is a client.
+			glog.Infof("Sending events to APIserver.")
+			record.StartRecording(apiClient.Events(""), "kubelet")
+		}
+	}
+
+	// Log the events locally too.
+	record.StartLogging(glog.Infof)
+
 	capabilities.Initialize(capabilities.Capabilities{
 		AllowPrivileged: *allowPrivileged,
 	})
@@ -139,7 +186,7 @@ func main() {
 	}
 	*rootDirectory = path.Clean(*rootDirectory)
 	if err := os.MkdirAll(*rootDirectory, 0750); err != nil {
-		glog.Warningf("Error creating root directory: %v", err)
+		glog.Fatalf("Error creating root directory: %v", err)
 	}
 
 	// source of all configuration
@@ -183,7 +230,22 @@ func main() {
 		*networkContainerImage,
 		*syncFrequency,
 		float32(*registryPullQPS),
-		*registryBurst)
+		*registryBurst,
+		*minimumGCAge,
+		*maxContainerCount,
+		*clusterDomain,
+		net.ParseIP(*clusterDNS))
+
+	k.BirthCry()
+
+	go func() {
+		util.Forever(func() {
+			err := k.GarbageCollectContainers()
+			if err != nil {
+				glog.Errorf("Garbage collect failed: %v", err)
+			}
+		}, time.Minute*1)
+	}()
 
 	go func() {
 		defer util.HandleCrash()

@@ -14,12 +14,9 @@
 
 # This file creates a standard build environment for building Kubernetes
 
-FROM  golang:cross
+FROM kube-build:cross
 MAINTAINER  Joe Beda <jbeda@google.com>
 
-ENV KUBE_CROSSPLATFORMS \
-  linux/386 linux/arm \
-  darwin/amd64 darwin/386
 # (set an explicit GOARM of 5 for maximum compatibility)
 ENV GOARM 5
 ENV GOOS    linux
@@ -27,6 +24,10 @@ ENV GOARCH  amd64
 
 # Get the code coverage tool and godep
 RUN go get code.google.com/p/go.tools/cmd/cover github.com/tools/godep
+
+# We use rsync to copy some binaries around.  It is faster (0.3s vs. 1.1s) on my
+# machine vs. `install`
+RUN apt-get update && apt-get install -y rsync
 
 # Download and symlink etcd.  We need this for our integration tests.
 RUN mkdir -p /usr/local/src/etcd &&\
@@ -42,6 +43,10 @@ WORKDIR /go/src/github.com/GoogleCloudPlatform/kubernetes
 
 # Propagate the git tree version into the build image
 ADD kube-version-defs /kube-version-defs
+ENV KUBE_GIT_VERSION_FILE /kube-version-defs
+
+# Make output from the dockerized build go someplace else
+ENV KUBE_OUTPUT_SUBPATH _output/dockerized
 
 # Upload Kubernetes source
 ADD kube-source.tar.gz /go/src/github.com/GoogleCloudPlatform/kubernetes

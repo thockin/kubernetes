@@ -3,7 +3,8 @@
 ### Prerequisites
 1. Install latest version >= 1.6.2 of vagrant from http://www.vagrantup.com/downloads.html
 2. Install latest version of Virtual Box from https://www.virtualbox.org/wiki/Downloads
-3. Get or build a [binary release](binary_release.md)
+3. Install the `net-tools` package for your distribution for VirtualBox's private networks.
+4. Get or build a [binary release](binary_release.md)
 
 ### Setup
 
@@ -30,11 +31,11 @@ vagrant ssh minion-3
 To view the service status and/or logs on the kubernetes-master:
 ```
 vagrant ssh master
-[vagrant@kubernetes-master ~] $ sudo systemctl status apiserver
-[vagrant@kubernetes-master ~] $ sudo journalctl -r -u apiserver
+[vagrant@kubernetes-master ~] $ sudo systemctl status kube-apiserver
+[vagrant@kubernetes-master ~] $ sudo journalctl -r -u kube-apiserver
 
-[vagrant@kubernetes-master ~] $ sudo systemctl status controller-manager
-[vagrant@kubernetes-master ~] $ sudo journalctl -r -u controller-manager
+[vagrant@kubernetes-master ~] $ sudo systemctl status kube-controller-manager
+[vagrant@kubernetes-master ~] $ sudo journalctl -r -u kube-controller-manager
 
 [vagrant@kubernetes-master ~] $ sudo systemctl status etcd
 [vagrant@kubernetes-master ~] $ sudo systemctl status nginx
@@ -77,11 +78,11 @@ You may need to build the binaries first, you can do this with ```make```
 ```
 $ export KUBERNETES_PROVIDER=vagrant
 $ ./cluster/kubecfg.sh list /minions
-Minion identifier
-----------
-10.245.2.4
-10.245.2.3
-10.245.2.2
+Minion identifier    Labels
+----------           ----------
+10.245.2.4           <none>
+10.245.2.3           <none>
+10.245.2.2           <none>
 ```
 
 ### Interacting with your Kubernetes cluster with the `kube-*` scripts.
@@ -120,10 +121,10 @@ cluster/kubecfg.sh
 
 ### Authenticating with your master
 
-When using the vagrant provider in Kubernetes, the `cluster/kubecfg.sh` script will cache your credentials in a `~/.kubernetes_auth_vagrant` file so you will not be prompted for them in the future.
+When using the vagrant provider in Kubernetes, the `cluster/kubecfg.sh` script will cache your credentials in a `~/.kubernetes_vagrant_auth` file so you will not be prompted for them in the future.
 
 ```
-cat ~/.kubernetes_auth_vagrant
+cat ~/.kubernetes_vagrant_auth
 { "User": "vagrant",
   "Password": "vagrant"}
 ```
@@ -140,11 +141,11 @@ Your cluster is running, you can list the minions in your cluster:
 
 ```
 $ cluster/kubecfg.sh list /minions
-Minion identifier
-----------
-10.245.2.4
-10.245.2.3
-10.245.2.2
+Minion identifier    Labels
+----------           ----------
+10.245.2.4           <none>
+10.245.2.3           <none>
+10.245.2.2           <none>
 ```
 
 Now start running some containers!
@@ -169,7 +170,7 @@ ID                  Image(s)            Selector            Replicas
 Start a container running nginx with a replication controller and three replicas:
 
 ```
-$cluster/kubecfg.sh -p 8080:80 run dockerfile/nginx 3 myNginx
+$ cluster/kubecfg.sh -p 8080:80 run dockerfile/nginx 3 myNginx
 ```
 
 When listing the pods, you will see that three containers have been started and are in Waiting state:
@@ -183,26 +184,27 @@ ID                                     Image(s)            Host                 
 78140853-3ffe-11e4-9036-0800279696e1   dockerfile/nginx    10.245.2.3/10.245.2.3   replicationController=myNginx   Waiting
 ```
 
-You need to wait for the provisioning to complete, you can monitor the minions by doing
+You need to wait for the provisioning to complete, you can monitor the minions by doing:
 
 ```
-$ vagrant ssh minion-1
-$ sudo docker images
-REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-<none>              <none>              96864a7d2df3        26 hours ago        204.4 MB
-google/cadvisor     latest              e0575e677c50        13 days ago         12.64 MB
-kubernetes/pause    latest              6c4579af347b        8 weeks ago         239.8 kB
+$ sudo salt '*minion-1' cmd.run 'docker images'
+kubernetes-minion-1:
+    REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+    <none>              <none>              96864a7d2df3        26 hours ago        204.4 MB
+    google/cadvisor     latest              e0575e677c50        13 days ago         12.64 MB
+    kubernetes/pause    latest              6c4579af347b        8 weeks ago         239.8 kB
 ```
 
 Once the docker image for nginx has been downloaded, the container will start and you can list it:
 
 ```
-$ sudo docker ps
-CONTAINER ID        IMAGE                     COMMAND                CREATED             STATUS              PORTS                    NAMES
-dbe79bf6e25b        dockerfile/nginx:latest   "nginx"                21 seconds ago      Up 19 seconds                                k8s--mynginx.8c5b8a3a--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1.etcd--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1--fcfa837f
-fa0e29c94501        kubernetes/pause:latest   "/pause"               8 minutes ago       Up 8 minutes        0.0.0.0:8080->80/tcp     k8s--net.a90e7ce4--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1.etcd--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1--baf5b21b
-aa2ee3ed844a        google/cadvisor:latest    "/usr/bin/cadvisor -   38 minutes ago      Up 38 minutes                                k8s--cadvisor.9e90d182--cadvisor_-_agent.file--4626b3a2
-65a3a926f357        kubernetes/pause:latest   "/pause"               39 minutes ago      Up 39 minutes       0.0.0.0:4194->8080/tcp   k8s--net.c5ba7f0e--cadvisor_-_agent.file--342fd561
+$ sudo salt '*minion-1' cmd.run 'docker ps'
+kubernetes-minion-1:
+    CONTAINER ID        IMAGE                     COMMAND                CREATED             STATUS              PORTS                    NAMES
+    dbe79bf6e25b        dockerfile/nginx:latest   "nginx"                21 seconds ago      Up 19 seconds                                k8s--mynginx.8c5b8a3a--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1.etcd--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1--fcfa837f
+    fa0e29c94501        kubernetes/pause:latest   "/pause"               8 minutes ago       Up 8 minutes        0.0.0.0:8080->80/tcp     k8s--net.a90e7ce4--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1.etcd--7813c8bd_-_3ffe_-_11e4_-_9036_-_0800279696e1--baf5b21b
+    aa2ee3ed844a        google/cadvisor:latest    "/usr/bin/cadvisor -   38 minutes ago      Up 38 minutes                                k8s--cadvisor.9e90d182--cadvisor_-_agent.file--4626b3a2
+    65a3a926f357        kubernetes/pause:latest   "/pause"               39 minutes ago      Up 39 minutes       0.0.0.0:4194->8080/tcp   k8s--net.c5ba7f0e--cadvisor_-_agent.file--342fd561
 ```
 
 Going back to listing the pods, services and replicationControllers, you now have:
@@ -226,7 +228,7 @@ myNginx             dockerfile/nginx    replicationController=myNginx   3
 ```
 
 We did not start any services, hence there is none listed. But we see three replicas displayed properly.
-Check the [guestbook](examples/guestbook/README.md) application to learn how to create a service.
+Check the [guestbook](../../examples/guestbook/README.md) application to learn how to create a service.
 You can already play with resizing the replicas with:
 
 ```
@@ -252,10 +254,10 @@ hack/e2e-test.sh
 
 #### I just created the cluster, but I am getting authorization errors!
 
-You probably have an incorrect ~/.kubernetes_auth_vagrant file for the cluster you are attempting to contact.
+You probably have an incorrect ~/.kubernetes_vagrant_auth file for the cluster you are attempting to contact.
 
 ```
-rm ~/.kubernetes_auth_vagrant
+rm ~/.kubernetes_vagrant_auth
 ```
 
 After using kubecfg.sh make sure that the correct credentials are set:
@@ -276,6 +278,10 @@ If this is your first time creating the cluster, the kubelet on each minion sche
 
 Are you sure there was no build error?  After running `$ vagrant provision`, scroll up and ensure that each Salt state was completed successfully on each box in the cluster.
 It's very likely you see a build error due to an error in your source files!
+
+#### I have brought Vagrant up but the minions won't validate !
+
+Are you sure you built a release first? Did you install `net-tools`? For more clues, login to one of the minions (`vagrant ssh minion-1`) and inspect the salt minion log (`sudo cat /var/log/salt/minion`).
 
 #### I want to change the number of minions !
 

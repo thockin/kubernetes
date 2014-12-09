@@ -40,6 +40,7 @@ func ExampleManifestAndPod(id string) (api.ContainerManifest, api.BoundPod) {
 			{
 				Name:  "c" + id,
 				Image: "foo",
+				TerminationMessagePath: "/somepath",
 			},
 		},
 		Volumes: []api.Volume{
@@ -52,8 +53,8 @@ func ExampleManifestAndPod(id string) (api.ContainerManifest, api.BoundPod) {
 		},
 	}
 	expectedPod := api.BoundPod{
-		TypeMeta: api.TypeMeta{
-			ID:        id,
+		ObjectMeta: api.ObjectMeta{
+			Name:      id,
 			UID:       "uid",
 			Namespace: "default",
 		},
@@ -62,6 +63,7 @@ func ExampleManifestAndPod(id string) (api.ContainerManifest, api.BoundPod) {
 				{
 					Name:  "c" + id,
 					Image: "foo",
+					TerminationMessagePath: "/somepath",
 				},
 			},
 			Volumes: []api.Volume{
@@ -79,7 +81,7 @@ func ExampleManifestAndPod(id string) (api.ContainerManifest, api.BoundPod) {
 
 func TestExtractFromNonExistentFile(t *testing.T) {
 	ch := make(chan interface{}, 1)
-	c := SourceFile{"/some/fake/file", ch}
+	c := sourceFile{"/some/fake/file", ch}
 	err := c.extractFromPath()
 	if err == nil {
 		t.Errorf("Expected error")
@@ -118,13 +120,13 @@ func TestReadFromFile(t *testing.T) {
 	case got := <-ch:
 		update := got.(kubelet.PodUpdate)
 		expected := CreatePodUpdate(kubelet.SET, api.BoundPod{
-			TypeMeta: api.TypeMeta{
-				ID:        simpleSubdomainSafeHash(file.Name()),
+			ObjectMeta: api.ObjectMeta{
+				Name:      simpleSubdomainSafeHash(file.Name()),
 				UID:       simpleSubdomainSafeHash(file.Name()),
 				Namespace: "default",
 			},
 			Spec: api.PodSpec{
-				Containers: []api.Container{{Image: "test/image"}},
+				Containers: []api.Container{{Image: "test/image", TerminationMessagePath: "/dev/termination-log"}},
 			},
 		})
 		if !reflect.DeepEqual(expected, update) {
@@ -141,7 +143,7 @@ func TestExtractFromBadDataFile(t *testing.T) {
 	defer os.Remove(file.Name())
 
 	ch := make(chan interface{}, 1)
-	c := SourceFile{file.Name(), ch}
+	c := sourceFile{file.Name(), ch}
 	err := c.extractFromPath()
 	if err == nil {
 		t.Fatalf("Expected error")
@@ -159,10 +161,10 @@ func TestExtractFromValidDataFile(t *testing.T) {
 	file := writeTestFile(t, os.TempDir(), "test_pod_config", string(text))
 	defer os.Remove(file.Name())
 
-	expectedPod.ID = simpleSubdomainSafeHash(file.Name())
+	expectedPod.Name = simpleSubdomainSafeHash(file.Name())
 
 	ch := make(chan interface{}, 1)
-	c := SourceFile{file.Name(), ch}
+	c := sourceFile{file.Name(), ch}
 	err = c.extractFromPath()
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -182,7 +184,7 @@ func TestExtractFromEmptyDir(t *testing.T) {
 	defer os.RemoveAll(dirName)
 
 	ch := make(chan interface{}, 1)
-	c := SourceFile{dirName, ch}
+	c := sourceFile{dirName, ch}
 	err = c.extractFromPath()
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
@@ -226,11 +228,11 @@ func TestExtractFromDir(t *testing.T) {
 		}
 		ioutil.WriteFile(name, data, 0755)
 		files[i] = file
-		pods[i].ID = simpleSubdomainSafeHash(name)
+		pods[i].Name = simpleSubdomainSafeHash(name)
 	}
 
 	ch := make(chan interface{}, 1)
-	c := SourceFile{dirName, ch}
+	c := sourceFile{dirName, ch}
 	err = c.extractFromPath()
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)

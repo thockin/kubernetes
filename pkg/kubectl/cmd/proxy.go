@@ -24,15 +24,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCmdProxy(out io.Writer) *cobra.Command {
+func (f *Factory) NewCmdProxy(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "proxy",
 		Short: "Run a proxy to the Kubernetes API server",
 		Long:  `Run a proxy to the Kubernetes API server.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			port := getFlagInt(cmd, "port")
+			port := GetFlagInt(cmd, "port")
 			glog.Infof("Starting to serve on localhost:%d", port)
-			server := kubectl.NewProxyServer(getFlagString(cmd, "www"), getKubeClient(cmd), port)
+
+			clientConfig, err := f.ClientBuilder.Config()
+			checkErr(err)
+
+			server, err := kubectl.NewProxyServer(GetFlagString(cmd, "www"), clientConfig, port)
+			checkErr(err)
 			glog.Fatal(server.Serve())
 		},
 	}

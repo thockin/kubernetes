@@ -17,161 +17,193 @@ limitations under the License.
 package controller
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
 	fake_cloud "github.com/GoogleCloudPlatform/kubernetes/pkg/cloudprovider/fake"
-	etcdregistry "github.com/GoogleCloudPlatform/kubernetes/pkg/registry/etcd"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/pod"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/registrytest"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/tools"
-
-	etcd "github.com/coreos/go-etcd/etcd"
 )
 
-func NewTestEtcdRegistry(client tools.EtcdClient) *etcdregistry.Registry {
-	registry := etcdregistry.NewRegistry(
-		tools.EtcdHelper{client, latest.Codec, tools.RuntimeVersionAdapter{latest.ResourceVersioner}},
-		&pod.BasicBoundPodFactory{
-			ServiceRegistry: &registrytest.ServiceRegistry{},
-		},
-	)
-	return registry
+func newMinion(name string) *api.Minion {
+	return &api.Minion{ObjectMeta: api.ObjectMeta{Name: name}}
 }
 
-func TestSyncCreateMinion(t *testing.T) {
-	ctx := api.NewContext()
-	fakeClient := tools.NewFakeEtcdClient(t)
-	m1 := runtime.EncodeOrDie(latest.Codec, &api.Minion{TypeMeta: api.TypeMeta{ID: "m1"}})
-	m2 := runtime.EncodeOrDie(latest.Codec, &api.Minion{TypeMeta: api.TypeMeta{ID: "m2"}})
-	fakeClient.Set("/registry/minions/m1", m1, 0)
-	fakeClient.Set("/registry/minions/m2", m2, 0)
-	fakeClient.ExpectNotFoundGet("/registry/minions/m3")
-	fakeClient.Data["/registry/minions"] = tools.EtcdResponseWithError{
-		R: &etcd.Response{
-			Node: &etcd.Node{
-				Nodes: []*etcd.Node{
-					{Value: m1},
-					{Value: m2},
-				},
-			},
-		},
-		E: nil,
-	}
+type FakeMinionHandler struct {
+	client.Fake
+	client.FakeMinions
 
-	registry := NewTestEtcdRegistry(fakeClient)
-	instances := []string{"m1", "m2", "m3"}
-	fakeCloud := fake_cloud.FakeCloud{
-		Machines: instances,
-	}
-	minionController := NewMinionController(&fakeCloud, ".*", nil, registry, time.Second)
+	// Input: Hooks determine if request is valid or not
+	CreateHook func(*FakeMinionHandler, *api.Minion) bool
+	Existing   []*api.Minion
 
-	minion, err := registry.GetMinion(ctx, "m3")
-	if minion != nil {
-		t.Errorf("Unexpected contains")
-	}
+	// Output
+	CreatedMinions []*api.Minion
+	DeletedMinions []*api.Minion
+	RequestCount   int
+}
 
-	err = minionController.Sync()
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
+func (c *FakeMinionHandler) Minions() client.MinionInterface {
+	return c
+}
 
-	minion, err = registry.GetMinion(ctx, "m3")
-	if minion == nil {
-		t.Errorf("Unexpected !contains")
+func (m *FakeMinionHandler) Create(minion *api.Minion) (*api.Minion, error) {
+	defer func() { m.RequestCount++ }()
+	if m.CreateHook == nil || m.CreateHook(m, minion) {
+		m.CreatedMinions = append(m.CreatedMinions, minion)
+		return minion, nil
+	} else {
+		return nil, fmt.Errorf("Create error.")
 	}
 }
 
-func TestSyncDeleteMinion(t *testing.T) {
-	ctx := api.NewContext()
-	fakeClient := tools.NewFakeEtcdClient(t)
-	m1 := runtime.EncodeOrDie(latest.Codec, &api.Minion{TypeMeta: api.TypeMeta{ID: "m1"}})
-	m2 := runtime.EncodeOrDie(latest.Codec, &api.Minion{TypeMeta: api.TypeMeta{ID: "m2"}})
-	m3 := runtime.EncodeOrDie(latest.Codec, &api.Minion{TypeMeta: api.TypeMeta{ID: "m3"}})
-	fakeClient.Set("/registry/minions/m1", m1, 0)
-	fakeClient.Set("/registry/minions/m2", m2, 0)
-	fakeClient.Set("/registry/minions/m3", m3, 0)
-	fakeClient.Data["/registry/minions"] = tools.EtcdResponseWithError{
-		R: &etcd.Response{
-			Node: &etcd.Node{
-				Nodes: []*etcd.Node{
-					{Value: m1},
-					{Value: m2},
-					{Value: m3},
-				},
-			},
+func (m *FakeMinionHandler) List() (*api.MinionList, error) {
+	defer func() { m.RequestCount++ }()
+	minions := []api.Minion{}
+	for i := 0; i < len(m.Existing); i++ {
+		if !contains(m.Existing[i], m.DeletedMinions) {
+			minions = append(minions, *m.Existing[i])
+		}
+	}
+	for i := 0; i < len(m.CreatedMinions); i++ {
+		if !contains(m.Existing[i], m.DeletedMinions) {
+			minions = append(minions, *m.CreatedMinions[i])
+		}
+	}
+	return &api.MinionList{Items: minions}, nil
+}
+
+func (m *FakeMinionHandler) Delete(id string) error {
+	m.DeletedMinions = append(m.DeletedMinions, newMinion(id))
+	m.RequestCount++
+	return nil
+}
+
+func TestSyncStaticCreateMinion(t *testing.T) {
+	fakeMinionHandler := &FakeMinionHandler{
+		CreateHook: func(fake *FakeMinionHandler, minion *api.Minion) bool {
+			return true
 		},
-		E: nil,
 	}
-
-	registry := NewTestEtcdRegistry(fakeClient)
-	instances := []string{"m1", "m2"}
-	fakeCloud := fake_cloud.FakeCloud{
-		Machines: instances,
-	}
-	minionController := NewMinionController(&fakeCloud, ".*", nil, registry, time.Second)
-
-	minion, err := registry.GetMinion(ctx, "m3")
-	if minion == nil {
-		t.Errorf("Unexpected !contains")
-	}
-
-	err = minionController.Sync()
-	if err != nil {
+	minionController := NewMinionController(nil, ".*", []string{"minion0"}, &api.NodeResources{}, fakeMinionHandler)
+	if err := minionController.SyncStatic(time.Millisecond); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	minion, err = registry.GetMinion(ctx, "m3")
-	if minion != nil {
-		t.Errorf("Unexpected contains")
+	if fakeMinionHandler.RequestCount != 1 {
+		t.Errorf("Expected 1 call, but got %v.", fakeMinionHandler.RequestCount)
+	}
+	if len(fakeMinionHandler.CreatedMinions) != 1 {
+		t.Errorf("expect only 1 minion created, got %v", len(fakeMinionHandler.CreatedMinions))
+	}
+	if fakeMinionHandler.CreatedMinions[0].Name != "minion0" {
+		t.Errorf("unexpect minion %v created", fakeMinionHandler.CreatedMinions[0].Name)
 	}
 }
 
-func TestSyncMinionRegexp(t *testing.T) {
-	ctx := api.NewContext()
-	fakeClient := tools.NewFakeEtcdClient(t)
-	fakeClient.Data["/registry/minions"] = tools.EtcdResponseWithError{
-		R: &etcd.Response{
-			Node: &etcd.Node{
-				Nodes: []*etcd.Node{},
-			},
+func TestSyncStaticCreateMinionWithError(t *testing.T) {
+	fakeMinionHandler := &FakeMinionHandler{
+		CreateHook: func(fake *FakeMinionHandler, minion *api.Minion) bool {
+			if fake.RequestCount == 0 {
+				return false
+			}
+			return true
 		},
-		E: nil,
 	}
-
-	registry := NewTestEtcdRegistry(fakeClient)
-	instances := []string{"m1", "m2", "n1", "n2"}
-	fakeCloud := fake_cloud.FakeCloud{
-		Machines: instances,
-	}
-	minionController := NewMinionController(&fakeCloud, "m[0-9]+", nil, registry, time.Second)
-
-	err := minionController.Sync()
-	if err != nil {
+	minionController := NewMinionController(nil, ".*", []string{"minion0"}, &api.NodeResources{}, fakeMinionHandler)
+	if err := minionController.SyncStatic(time.Millisecond); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	var minion *api.Minion
-	fakeClient.ExpectNotFoundGet("/registry/minions/n1")
-	fakeClient.ExpectNotFoundGet("/registry/minions/n2")
+	if fakeMinionHandler.RequestCount != 2 {
+		t.Errorf("Expected 2 call, but got %v.", fakeMinionHandler.RequestCount)
+	}
+	if len(fakeMinionHandler.CreatedMinions) != 1 {
+		t.Errorf("expect only 1 minion created, got %v", len(fakeMinionHandler.CreatedMinions))
+	}
+	if fakeMinionHandler.CreatedMinions[0].Name != "minion0" {
+		t.Errorf("unexpect minion %v created", fakeMinionHandler.CreatedMinions[0].Name)
+	}
+}
 
-	minion, err = registry.GetMinion(ctx, "m1")
-	if minion == nil {
-		t.Errorf("Unexpected !contains")
+func TestSyncCloudCreateMinion(t *testing.T) {
+	fakeMinionHandler := &FakeMinionHandler{
+		Existing: []*api.Minion{newMinion("minion0")},
 	}
-	minion, err = registry.GetMinion(ctx, "m2")
-	if minion == nil {
-		t.Errorf("Unexpected !contains")
+	instances := []string{"minion0", "minion1"}
+	fakeCloud := fake_cloud.FakeCloud{
+		Machines: instances,
 	}
-	minion, err = registry.GetMinion(ctx, "n1")
-	if minion != nil {
-		t.Errorf("Unexpected !contains")
+	minionController := NewMinionController(&fakeCloud, ".*", nil, nil, fakeMinionHandler)
+	if err := minionController.SyncCloud(); err != nil {
+		t.Errorf("unexpected error: %v", err)
 	}
-	minion, err = registry.GetMinion(ctx, "n2")
-	if minion != nil {
-		t.Errorf("Unexpected !contains")
+
+	if fakeMinionHandler.RequestCount != 2 {
+		t.Errorf("Expected 2 call, but got %v.", fakeMinionHandler.RequestCount)
 	}
+	if len(fakeMinionHandler.CreatedMinions) != 1 {
+		t.Errorf("expect only 1 minion created, got %v", len(fakeMinionHandler.CreatedMinions))
+	}
+	if fakeMinionHandler.CreatedMinions[0].Name != "minion1" {
+		t.Errorf("unexpect minion %v created", fakeMinionHandler.CreatedMinions[0].Name)
+	}
+}
+
+func TestSyncCloudDeleteMinion(t *testing.T) {
+	fakeMinionHandler := &FakeMinionHandler{
+		Existing: []*api.Minion{newMinion("minion0"), newMinion("minion1")},
+	}
+	instances := []string{"minion0"}
+	fakeCloud := fake_cloud.FakeCloud{
+		Machines: instances,
+	}
+	minionController := NewMinionController(&fakeCloud, ".*", nil, nil, fakeMinionHandler)
+	if err := minionController.SyncCloud(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if fakeMinionHandler.RequestCount != 2 {
+		t.Errorf("Expected 2 call, but got %v.", fakeMinionHandler.RequestCount)
+	}
+	if len(fakeMinionHandler.DeletedMinions) != 1 {
+		t.Errorf("expect only 1 minion deleted, got %v", len(fakeMinionHandler.DeletedMinions))
+	}
+	if fakeMinionHandler.DeletedMinions[0].Name != "minion1" {
+		t.Errorf("unexpect minion %v created", fakeMinionHandler.DeletedMinions[0].Name)
+	}
+}
+
+func TestSyncCloudRegexp(t *testing.T) {
+	fakeMinionHandler := &FakeMinionHandler{
+		Existing: []*api.Minion{newMinion("minion0")},
+	}
+	instances := []string{"minion0", "minion1", "node0"}
+	fakeCloud := fake_cloud.FakeCloud{
+		Machines: instances,
+	}
+	minionController := NewMinionController(&fakeCloud, "minion[0-9]+", nil, nil, fakeMinionHandler)
+	if err := minionController.SyncCloud(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	if fakeMinionHandler.RequestCount != 2 {
+		t.Errorf("Expected 2 call, but got %v.", fakeMinionHandler.RequestCount)
+	}
+	if len(fakeMinionHandler.CreatedMinions) != 1 {
+		t.Errorf("expect only 1 minion created, got %v", len(fakeMinionHandler.CreatedMinions))
+	}
+	if fakeMinionHandler.CreatedMinions[0].Name != "minion1" {
+		t.Errorf("unexpect minion %v created", fakeMinionHandler.CreatedMinions[0].Name)
+	}
+}
+
+func contains(minion *api.Minion, minions []*api.Minion) bool {
+	for i := 0; i < len(minions); i++ {
+		if minion.Name == minions[i].Name {
+			return true
+		}
+	}
+	return false
 }

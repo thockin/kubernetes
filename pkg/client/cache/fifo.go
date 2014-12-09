@@ -28,28 +28,28 @@ import (
 // processed once, and when it is processed, the most recent version will be
 // processed. This can't be done with a channel.
 type FIFO struct {
-	lock  sync.RWMutex
-	cond  sync.Cond
+	lock sync.RWMutex
+	cond sync.Cond
+	// We depend on the property that items in the set are in the queue and vice versa.
 	items map[string]interface{}
 	queue []string
 }
 
-// Add inserts an item, and puts it in the queue.
+// Add inserts an item, and puts it in the queue. The item is only enqueued
+// if it doesn't already exist in the set.
 func (f *FIFO) Add(id string, obj interface{}) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
+	if _, exists := f.items[id]; !exists {
+		f.queue = append(f.queue, id)
+	}
 	f.items[id] = obj
-	f.queue = append(f.queue, id)
 	f.cond.Broadcast()
 }
 
-// Update updates an item, and adds it to the queue.
+// Update is the same as Add in this implementation.
 func (f *FIFO) Update(id string, obj interface{}) {
-	f.lock.Lock()
-	defer f.lock.Unlock()
-	f.items[id] = obj
-	f.queue = append(f.queue, id)
-	f.cond.Broadcast()
+	f.Add(id, obj)
 }
 
 // Delete removes an item. It doesn't add it to the queue, because
@@ -72,10 +72,10 @@ func (f *FIFO) List() []interface{} {
 	return list
 }
 
-// Contains returns a util.StringSet containing all IDs of stored the items.
+// ContainedIDs returns a util.StringSet containing all IDs of the stored items.
 // This is a snapshot of a moment in time, and one should keep in mind that
 // other go routines can add or remove items after you call this.
-func (c *FIFO) Contains() util.StringSet {
+func (c *FIFO) ContainedIDs() util.StringSet {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 	set := util.StringSet{}

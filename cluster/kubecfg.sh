@@ -58,17 +58,21 @@ case "$(uname -m)" in
     ;;
 esac
 
-kubecfg="${KUBE_ROOT}/_output/build/${host_os}/${host_arch}/kubecfg"
-if [[ ! -x "$kubecfg" ]]; then
-  kubecfg="${KUBE_ROOT}/platforms/${host_os}/${host_arch}/kubecfg"
-fi
+# Gather up the list of likely places and use ls to find the latest one.
+locations=(
+  "${KUBE_ROOT}/_output/dockerized/bin/${host_os}/${host_arch}/kubecfg"
+  "${KUBE_ROOT}/_output/local/bin/${host_os}/${host_arch}/kubecfg"
+  "${KUBE_ROOT}/platforms/${host_os}/${host_arch}/kubecfg"
+)
+kubecfg=$( (ls -t "${locations[@]}" 2>/dev/null || true) | head -1 )
 
 if [[ ! -x "$kubecfg" ]]; then
   {
     echo "It looks as if you don't have a compiled kubecfg binary."
     echo
     echo "If you are running from a clone of the git repo, please run"
-    echo "'./build/make-client.sh'. Note that this requires having Docker installed."
+    echo "'./build/run.sh hack/build-cross.sh'. Note that this requires having"
+    echo "Docker installed."
     echo
     echo "If you are running from a binary release tarball, something is wrong. "
     echo "Look at http://kubernetes.io/ for information on how to contact the "
@@ -79,16 +83,9 @@ fi
 
 # When we are using vagrant it has hard coded auth.  We repeat that here so that
 # we don't clobber auth that might be used for a publicly facing cluster.
-if [ "$KUBERNETES_PROVIDER" == "vagrant" ]; then
-  cat >~/.kubernetes_vagrant_auth <<EOF
-{
-  "User": "vagrant",
-  "Password": "vagrant"
-}
-EOF
+if [[ "$KUBERNETES_PROVIDER" == "vagrant" ]]; then
   auth_config=(
     "-auth" "$HOME/.kubernetes_vagrant_auth"
-    "-insecure_skip_tls_verify"
   )
 else
   auth_config=()

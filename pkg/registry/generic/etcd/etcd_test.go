@@ -36,7 +36,7 @@ import (
 func NewTestGenericEtcdRegistry(t *testing.T) (*tools.FakeEtcdClient, *Etcd) {
 	f := tools.NewFakeEtcdClient(t)
 	f.TestIndex = true
-	h := tools.EtcdHelper{f, testapi.Codec(), tools.RuntimeVersionAdapter{testapi.ResourceVersioner()}}
+	h := tools.EtcdHelper{f, testapi.Codec(), tools.RuntimeVersionAdapter{testapi.MetadataAccessor()}}
 	return f, &Etcd{
 		NewFunc:      func() runtime.Object { return &api.Pod{} },
 		NewListFunc:  func() runtime.Object { return &api.PodList{} },
@@ -60,7 +60,7 @@ func (sm SetMatcher) Matches(obj runtime.Object) (bool, error) {
 	if !ok {
 		return false, fmt.Errorf("wrong object")
 	}
-	return sm.Has(pod.ID), nil
+	return sm.Has(pod.Name), nil
 }
 
 // EverythingMatcher matches everything
@@ -72,12 +72,12 @@ func (EverythingMatcher) Matches(obj runtime.Object) (bool, error) {
 
 func TestEtcdList(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	podB := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "bar"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "bar"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 
 	normalListResp := &etcd.Response{
@@ -154,12 +154,12 @@ func TestEtcdList(t *testing.T) {
 
 func TestEtcdCreate(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	podB := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine2"},
+		ObjectMeta: api.ObjectMeta{Name: "foo"},
+		Status:     api.PodStatus{Host: "machine2"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -217,12 +217,12 @@ func TestEtcdCreate(t *testing.T) {
 
 func TestEtcdUpdate(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	podB := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine2"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine2"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -292,8 +292,8 @@ func TestEtcdUpdate(t *testing.T) {
 
 func TestEtcdGet(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -348,8 +348,8 @@ func TestEtcdGet(t *testing.T) {
 
 func TestEtcdDelete(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -404,8 +404,8 @@ func TestEtcdDelete(t *testing.T) {
 
 func TestEtcdWatch(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	respWithPodA := &etcd.Response{
 		Node: &etcd.Node{
@@ -417,7 +417,7 @@ func TestEtcdWatch(t *testing.T) {
 	}
 
 	fakeClient, registry := NewTestGenericEtcdRegistry(t)
-	wi, err := registry.Watch(api.NewContext(), EverythingMatcher{}, 1)
+	wi, err := registry.Watch(api.NewContext(), EverythingMatcher{}, "1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

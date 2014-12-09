@@ -35,16 +35,16 @@ type ReplicationManager struct {
 	syncTime   <-chan time.Time
 
 	// To allow injection of syncReplicationController for testing.
-	syncHandler func(controllerSpec api.ReplicationController) error
+	syncHandler func(controller api.ReplicationController) error
 }
 
 // PodControlInterface is an interface that knows how to add or delete pods
 // created as an interface to allow testing.
 type PodControlInterface interface {
 	// createReplica creates new replicated pods according to the spec.
-	createReplica(ctx api.Context, controllerSpec api.ReplicationController)
+	createReplica(namespace string, controller api.ReplicationController)
 	// deletePod deletes the pod identified by podID.
-	deletePod(ctx api.Context, podID string) error
+	deletePod(namespace string, podID string) error
 }
 
 // RealPodControl is the default implementation of PodControllerInterface.
@@ -52,24 +52,31 @@ type RealPodControl struct {
 	kubeClient client.Interface
 }
 
-func (r RealPodControl) createReplica(ctx api.Context, controllerSpec api.ReplicationController) {
-	labels := controllerSpec.DesiredState.PodTemplate.Labels
-	// TODO: don't fail to set this label just because the map isn't created.
-	if labels != nil {
-		labels["replicationController"] = controllerSpec.ID
+func (r RealPodControl) createReplica(namespace string, controller api.ReplicationController) {
+	desiredLabels := make(labels.Set)
+	for k, v := range controller.Spec.Template.Labels {
+		desiredLabels[k] = v
 	}
 	pod := &api.Pod{
-		DesiredState: controllerSpec.DesiredState.PodTemplate.DesiredState,
-		Labels:       controllerSpec.DesiredState.PodTemplate.Labels,
+		ObjectMeta: api.ObjectMeta{
+			Labels: desiredLabels,
+		},
 	}
-	_, err := r.kubeClient.CreatePod(ctx, pod)
-	if err != nil {
-		glog.Errorf("%#v\n", err)
+	if err := api.Scheme.Convert(&controller.Spec.Template.Spec, &pod.Spec); err != nil {
+		glog.Errorf("Unable to convert pod template: %v", err)
+		return
+	}
+	if labels.Set(pod.Labels).AsSelector().Empty() {
+		glog.Errorf("Unable to create pod replica, no labels")
+		return
+	}
+	if _, err := r.kubeClient.Pods(namespace).Create(pod); err != nil {
+		glog.Errorf("Unable to create pod replica: %v", err)
 	}
 }
 
-func (r RealPodControl) deletePod(ctx api.Context, podID string) error {
-	return r.kubeClient.DeletePod(ctx, podID)
+func (r RealPodControl) deletePod(namespace, podID string) error {
+	return r.kubeClient.Pods(namespace).Delete(podID)
 }
 
 // NewReplicationManager creates a new ReplicationManager.
@@ -93,9 +100,7 @@ func (rm *ReplicationManager) Run(period time.Duration) {
 
 // resourceVersion is a pointer to the resource version to use/update.
 func (rm *ReplicationManager) watchControllers(resourceVersion *string) {
-	ctx := api.NewContext()
-	watching, err := rm.kubeClient.WatchReplicationControllers(
-		ctx,
+	watching, err := rm.kubeClient.ReplicationControllers(api.NamespaceAll).Watch(
 		labels.Everything(),
 		labels.Everything(),
 		*resourceVersion,
@@ -127,8 +132,10 @@ func (rm *ReplicationManager) watchControllers(resourceVersion *string) {
 			*resourceVersion = rc.ResourceVersion
 			// Sync even if this is a deletion event, to ensure that we leave
 			// it in the desired state.
-			glog.V(4).Infof("About to sync from watch: %v", rc.ID)
-			rm.syncHandler(*rc)
+			glog.V(4).Infof("About to sync from watch: %v", rc.Name)
+			if err := rm.syncHandler(*rc); err != nil {
+				glog.Errorf("unexpected sync. error: %v", err)
+			}
 		}
 	}
 }
@@ -136,22 +143,22 @@ func (rm *ReplicationManager) watchControllers(resourceVersion *string) {
 func (rm *ReplicationManager) filterActivePods(pods []api.Pod) []api.Pod {
 	var result []api.Pod
 	for _, value := range pods {
-		if api.PodTerminated != value.CurrentState.Status {
+		if api.PodSucceeded != value.Status.Phase &&
+			api.PodFailed != value.Status.Phase {
 			result = append(result, value)
 		}
 	}
 	return result
 }
 
-func (rm *ReplicationManager) syncReplicationController(controllerSpec api.ReplicationController) error {
-	s := labels.Set(controllerSpec.DesiredState.ReplicaSelector).AsSelector()
-	ctx := api.WithNamespace(api.NewContext(), controllerSpec.Namespace)
-	podList, err := rm.kubeClient.ListPods(ctx, s)
+func (rm *ReplicationManager) syncReplicationController(controller api.ReplicationController) error {
+	s := labels.Set(controller.Spec.Selector).AsSelector()
+	podList, err := rm.kubeClient.Pods(controller.Namespace).List(s)
 	if err != nil {
 		return err
 	}
 	filteredList := rm.filterActivePods(podList.Items)
-	diff := len(filteredList) - controllerSpec.DesiredState.Replicas
+	diff := len(filteredList) - controller.Spec.Replicas
 	if diff < 0 {
 		diff *= -1
 		wait := sync.WaitGroup{}
@@ -160,7 +167,7 @@ func (rm *ReplicationManager) syncReplicationController(controllerSpec api.Repli
 		for i := 0; i < diff; i++ {
 			go func() {
 				defer wait.Done()
-				rm.podControl.createReplica(ctx, controllerSpec)
+				rm.podControl.createReplica(controller.Namespace, controller)
 			}()
 		}
 		wait.Wait()
@@ -171,7 +178,7 @@ func (rm *ReplicationManager) syncReplicationController(controllerSpec api.Repli
 		for i := 0; i < diff; i++ {
 			go func(ix int) {
 				defer wait.Done()
-				rm.podControl.deletePod(ctx, filteredList[ix].ID)
+				rm.podControl.deletePod(controller.Namespace, filteredList[ix].Name)
 			}(i)
 		}
 		wait.Wait()
@@ -182,23 +189,22 @@ func (rm *ReplicationManager) syncReplicationController(controllerSpec api.Repli
 func (rm *ReplicationManager) synchronize() {
 	// TODO: remove this method completely and rely on the watch.
 	// Add resource version tracking to watch to make this work.
-	var controllerSpecs []api.ReplicationController
-	ctx := api.NewContext()
-	list, err := rm.kubeClient.ListReplicationControllers(ctx, labels.Everything())
+	var controllers []api.ReplicationController
+	list, err := rm.kubeClient.ReplicationControllers(api.NamespaceAll).List(labels.Everything())
 	if err != nil {
 		glog.Errorf("Synchronization error: %v (%#v)", err, err)
 		return
 	}
-	controllerSpecs = list.Items
+	controllers = list.Items
 	wg := sync.WaitGroup{}
-	wg.Add(len(controllerSpecs))
-	for ix := range controllerSpecs {
+	wg.Add(len(controllers))
+	for ix := range controllers {
 		go func(ix int) {
 			defer wg.Done()
-			glog.V(4).Infof("periodic sync of %v", controllerSpecs[ix].ID)
-			err := rm.syncHandler(controllerSpecs[ix])
+			glog.V(4).Infof("periodic sync of %v", controllers[ix].Name)
+			err := rm.syncHandler(controllers[ix])
 			if err != nil {
-				glog.Errorf("Error synchronizing: %#v", err)
+				glog.Errorf("Error synchronizing: %v", err)
 			}
 		}(ix)
 	}

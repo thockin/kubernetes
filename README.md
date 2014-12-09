@@ -16,24 +16,26 @@ While the concepts and architecture in Kubernetes represent years of experience 
 ### Contents
 * Getting Started Guides
   * [Google Compute Engine](docs/getting-started-guides/gce.md)
+  * [Locally](docs/getting-started-guides/locally.md)
   * [Vagrant](docs/getting-started-guides/vagrant.md)
+  * [AWS with CoreOS and Cloud Formation](docs/getting-started-guides/aws-coreos.md)
+  * [AWS](docs/getting-started-guides/aws.md)
   * Fedora (w/ [Ansible](docs/getting-started-guides/fedora/fedora_ansible_config.md) or [manual](docs/getting-started-guides/fedora/fedora_manual_config.md))
   * [Circle CI](https://circleci.com/docs/docker#google-compute-engine-and-kubernetes)
   * [Digital Ocean](https://github.com/bketelsen/coreos-kubernetes-digitalocean)
   * [CoreOS](docs/getting-started-guides/coreos.md)
   * [OpenStack](https://developer.rackspace.com/blog/running-coreos-and-kubernetes/)
   * [CloudStack](docs/getting-started-guides/cloudstack.md)
-* The following clouds are currently broken at Kubernetes head.  Please sync your client to `v0.3` (`git checkout v0.3`) to use these:
-  * [Locally](docs/getting-started-guides/locally.md)
+  * [Rackspace](docs/getting-started-guides/rackspace.md)
   * [vSphere](docs/getting-started-guides/vsphere.md)
   * [Microsoft Azure](docs/getting-started-guides/azure.md)
-  * [Rackspace](docs/getting-started-guides/rackspace.md)
-* [Kubernetes 101](https://github.com/GoogleCloudPlatform/kubernetes/tree/master/examples/walkthrough)
-* [kubecfg command line tool](https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/cli.md)
+
+* [Kubernetes 101](examples/walkthrough)
+* [kubecfg command line tool](docs/cli.md)
 * [Kubernetes API Documentation](http://cdn.rawgit.com/GoogleCloudPlatform/kubernetes/31a0daae3627c91bc96e1f02a6344cd76e294791/api/kubernetes.html)
 * [Kubernetes Client Libraries](docs/client-libraries.md)
 * [Discussion and Community Support](#community-discussion-and-support)
-* [Hacking on Kubernetes](#development)
+* [Hacking on Kubernetes](CONTRIBUTING.md)
 * [Hacking on Kubernetes Salt configuration](docs/salt.md)
 * [Kubernetes User Interface](docs/ux.md)
 
@@ -42,11 +44,13 @@ While the concepts and architecture in Kubernetes represent years of experience 
 Check out examples of Kubernetes in action, and community projects in the larger ecosystem:
 
 * [Kubernetes 101](examples/walkthrough/README.md)
+* [Kubernetes 201](examples/walkthrough/k8s201.md)
 * [Detailed example application](examples/guestbook/README.md)
 * [Example of dynamic updates](examples/update-demo/README.md)
 * [Cluster monitoring with heapster and cAdvisor](https://github.com/GoogleCloudPlatform/heapster)
 * [Community projects](https://github.com/GoogleCloudPlatform/kubernetes/wiki/Kubernetes-Community)
 * [Development guide](docs/devel/development.md)
+* [User contributed recipes](contrib/recipes)
 
 Or fork and start hacking!
 

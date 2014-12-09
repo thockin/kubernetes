@@ -17,13 +17,18 @@ limitations under the License.
 package minion
 
 import (
+	"errors"
 	"fmt"
+	"net"
+	"strconv"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
+	kerrors "github.com/GoogleCloudPlatform/kubernetes/pkg/api/errors"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/apiserver"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/master/ports"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 )
 
 // REST implements the RESTStorage interface, backed by a MinionRegistry.
@@ -38,29 +43,23 @@ func NewREST(m Registry) *REST {
 	}
 }
 
-var ErrDoesNotExist = fmt.Errorf("The requested resource does not exist.")
-var ErrNotHealty = fmt.Errorf("The requested minion is not healthy.")
+var ErrDoesNotExist = errors.New("The requested resource does not exist.")
+var ErrNotHealty = errors.New("The requested minion is not healthy.")
 
-func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
+func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan apiserver.RESTResult, error) {
 	minion, ok := obj.(*api.Minion)
 	if !ok {
 		return nil, fmt.Errorf("not a minion: %#v", obj)
 	}
-	if minion.ID == "" {
-		return nil, fmt.Errorf("ID should not be empty: %#v", minion)
+
+	if errs := validation.ValidateMinion(minion); len(errs) > 0 {
+		return nil, kerrors.NewInvalid("minion", minion.Name, errs)
 	}
 
-	minion.CreationTimestamp = util.Now()
+	api.FillObjectMetaSystemFields(ctx, &minion.ObjectMeta)
 
 	return apiserver.MakeAsync(func() (runtime.Object, error) {
 		err := rs.registry.CreateMinion(ctx, minion)
-		if err != nil {
-			return nil, err
-		}
-		minion, err := rs.registry.GetMinion(ctx, minion.ID)
-		if minion == nil {
-			return nil, ErrDoesNotExist
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +67,7 @@ func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Obje
 	}), nil
 }
 
-func (rs *REST) Delete(ctx api.Context, id string) (<-chan runtime.Object, error) {
+func (rs *REST) Delete(ctx api.Context, id string) (<-chan apiserver.RESTResult, error) {
 	minion, err := rs.registry.GetMinion(ctx, id)
 	if minion == nil {
 		return nil, ErrDoesNotExist
@@ -97,10 +96,45 @@ func (rs *REST) New() runtime.Object {
 	return &api.Minion{}
 }
 
-func (rs *REST) Update(ctx api.Context, minion runtime.Object) (<-chan runtime.Object, error) {
-	return nil, fmt.Errorf("Minions can only be created (inserted) and deleted.")
+func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan apiserver.RESTResult, error) {
+	minion, ok := obj.(*api.Minion)
+	if !ok {
+		return nil, fmt.Errorf("not a minion: %#v", obj)
+	}
+
+	// TODO: GetMinion will health check the minion, but we shouldn't require the minion to be
+	// running for updating labels.
+	oldMinion, err := rs.registry.GetMinion(ctx, minion.Name)
+	if err != nil {
+		return nil, err
+	}
+	if errs := validation.ValidateMinionUpdate(oldMinion, minion); len(errs) > 0 {
+		return nil, kerrors.NewInvalid("minion", minion.Name, errs)
+	}
+
+	return apiserver.MakeAsync(func() (runtime.Object, error) {
+		err := rs.registry.UpdateMinion(ctx, minion)
+		if err != nil {
+			return nil, err
+		}
+		return rs.registry.GetMinion(ctx, minion.Name)
+	}), nil
 }
 
 func (rs *REST) toApiMinion(name string) *api.Minion {
-	return &api.Minion{TypeMeta: api.TypeMeta{ID: name}}
+	return &api.Minion{ObjectMeta: api.ObjectMeta{Name: name}}
+}
+
+// ResourceLocation returns a URL to which one can send traffic for the specified minion.
+func (rs *REST) ResourceLocation(ctx api.Context, id string) (string, error) {
+	minion, err := rs.registry.GetMinion(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	host := minion.Status.HostIP
+	if host == "" {
+		host = minion.Name
+	}
+	// TODO: Minion webservers should be secure!
+	return "http://" + net.JoinHostPort(host, strconv.Itoa(ports.KubeletPort)), nil
 }

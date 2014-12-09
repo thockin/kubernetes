@@ -18,7 +18,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"runtime"
 	"strconv"
@@ -27,7 +29,7 @@ import (
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubecfg"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/clientauth"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 	"github.com/golang/glog"
@@ -40,17 +42,16 @@ var (
 
 func waitForPodRunning(c *client.Client, id string) {
 	for {
-		ctx := api.NewContext()
 		time.Sleep(5 * time.Second)
-		pod, err := c.GetPod(ctx, id)
+		pod, err := c.Pods(api.NamespaceDefault).Get(id)
 		if err != nil {
 			glog.Warningf("Get pod failed: %v", err)
 			continue
 		}
-		if pod.CurrentState.Status == api.PodRunning {
+		if pod.Status.Phase == api.PodRunning {
 			break
 		}
-		glog.Infof("Waiting for pod status to be running (%s)", pod.CurrentState.Status)
+		glog.Infof("Waiting for pod status to be running (%s)", pod.Status.Phase)
 	}
 }
 
@@ -79,17 +80,13 @@ func loadClientOrDie() *client.Client {
 	config := client.Config{
 		Host: *host,
 	}
-	auth, err := kubecfg.LoadAuthInfo(*authConfig, os.Stdin)
+	auth, err := clientauth.LoadFromFile(*authConfig)
 	if err != nil {
 		glog.Fatalf("Error loading auth: %v", err)
 	}
-	config.Username = auth.User
-	config.Password = auth.Password
-	config.CAFile = auth.CAFile
-	config.CertFile = auth.CertFile
-	config.KeyFile = auth.KeyFile
-	if auth.Insecure != nil {
-		config.Insecure = *auth.Insecure
+	config, err = auth.MergeWithConfig(config)
+	if err != nil {
+		glog.Fatalf("Error creating client")
 	}
 	c, err := client.New(&config)
 	if err != nil {
@@ -98,27 +95,59 @@ func loadClientOrDie() *client.Client {
 	return c
 }
 
+func TestKubernetesROService(c *client.Client) bool {
+	svc := api.ServiceList{}
+	err := c.Get().
+		Namespace("default").
+		AbsPath("/api/v1beta1/proxy/services/kubernetes-ro/api/v1beta1/services").
+		Do().
+		Into(&svc)
+	if err != nil {
+		glog.Errorf("unexpected error listing services using ro service: %v", err)
+		return false
+	}
+	var foundRW, foundRO bool
+	for i := range svc.Items {
+		if svc.Items[i].Name == "kubernetes" {
+			foundRW = true
+		}
+		if svc.Items[i].Name == "kubernetes-ro" {
+			foundRO = true
+		}
+	}
+	if !foundRW {
+		glog.Error("no RW service found")
+	}
+	if !foundRO {
+		glog.Error("no RO service found")
+	}
+	if !foundRW || !foundRO {
+		return false
+	}
+	return true
+}
+
 func TestPodUpdate(c *client.Client) bool {
-	ctx := api.NewContext()
+	podClient := c.Pods(api.NamespaceDefault)
 
 	pod := loadPodOrDie("./api/examples/pod.json")
 	value := strconv.Itoa(time.Now().Nanosecond())
 	pod.Labels["time"] = value
 
-	_, err := c.CreatePod(ctx, pod)
+	_, err := podClient.Create(pod)
 	if err != nil {
 		glog.Errorf("Failed to create pod: %v", err)
 		return false
 	}
-	defer c.DeletePod(ctx, pod.ID)
-	waitForPodRunning(c, pod.ID)
-	pods, err := c.ListPods(ctx, labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
+	defer podClient.Delete(pod.Name)
+	waitForPodRunning(c, pod.Name)
+	pods, err := podClient.List(labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
 	if len(pods.Items) != 1 {
 		glog.Errorf("Failed to find the correct pod")
 		return false
 	}
 
-	podOut, err := c.GetPod(ctx, pod.ID)
+	podOut, err := podClient.Get(pod.Name)
 	if err != nil {
 		glog.Errorf("Failed to get pod: %v", err)
 		return false
@@ -126,19 +155,176 @@ func TestPodUpdate(c *client.Client) bool {
 	value = "time" + value
 	pod.Labels["time"] = value
 	pod.ResourceVersion = podOut.ResourceVersion
-	pod.DesiredState.Manifest.UUID = podOut.DesiredState.Manifest.UUID
-	pod, err = c.UpdatePod(ctx, pod)
+	pod.UID = podOut.UID
+	pod, err = podClient.Update(pod)
 	if err != nil {
 		glog.Errorf("Failed to update pod: %v", err)
 		return false
 	}
-	waitForPodRunning(c, pod.ID)
-	pods, err = c.ListPods(ctx, labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
+	waitForPodRunning(c, pod.Name)
+	pods, err = podClient.List(labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
 	if len(pods.Items) != 1 {
 		glog.Errorf("Failed to find the correct pod after update.")
 		return false
 	}
 	glog.Infof("pod update OK")
+	return true
+}
+
+// TestKubeletSendsEvent checks that kubelets and scheduler send events about pods scheduling and running.
+func TestKubeletSendsEvent(c *client.Client) bool {
+	provider := os.Getenv("KUBERNETES_PROVIDER")
+	if provider != "gce" {
+		glog.Infof("skipping TestKubeletSendsEvent on cloud provider %s", provider)
+		return true
+	}
+	if provider == "" {
+		glog.Info("KUBERNETES_PROVIDER is unset assuming \"gce\"")
+	}
+
+	podClient := c.Pods(api.NamespaceDefault)
+
+	pod := loadPodOrDie("./cmd/e2e/pod.json")
+	value := strconv.Itoa(time.Now().Nanosecond())
+	pod.Labels["time"] = value
+
+	_, err := podClient.Create(pod)
+	if err != nil {
+		glog.Errorf("Failed to create pod: %v", err)
+		return false
+	}
+	defer podClient.Delete(pod.Name)
+	waitForPodRunning(c, pod.Name)
+	pods, err := podClient.List(labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
+	if len(pods.Items) != 1 {
+		glog.Errorf("Failed to find the correct pod")
+		return false
+	}
+
+	_, err = podClient.Get(pod.Name)
+	if err != nil {
+		glog.Errorf("Failed to get pod: %v", err)
+		return false
+	}
+
+	// Check for scheduler event about the pod.
+	events, err := c.Events(api.NamespaceDefault).List(
+		labels.Everything(),
+		labels.Set{
+			"involvedObject.name":      pod.Name,
+			"involvedObject.kind":      "Pod",
+			"involvedObject.namespace": api.NamespaceDefault,
+			"source":                   "scheduler",
+			"time":                     value,
+		}.AsSelector(),
+	)
+	if err != nil {
+		glog.Error("Error while listing events:", err)
+		return false
+	}
+	if len(events.Items) == 0 {
+		glog.Error("Didn't see any scheduler events even though pod was running.")
+		return false
+	}
+	glog.Info("Saw scheduler event for our pod.")
+
+	// Check for kubelet event about the pod.
+	events, err = c.Events(api.NamespaceDefault).List(
+		labels.Everything(),
+		labels.Set{
+			"involvedObject.name":      pod.Name,
+			"involvedObject.kind":      "BoundPod",
+			"involvedObject.namespace": api.NamespaceDefault,
+			"source":                   "kubelet",
+		}.AsSelector(),
+	)
+	if err != nil {
+		glog.Error("Error while listing events:", err)
+		return false
+	}
+	if len(events.Items) == 0 {
+		glog.Error("Didn't see any kubelet events even though pod was running.")
+		return false
+	}
+	glog.Info("Saw kubelet event for our pod.")
+	return true
+}
+
+// TestClusterDNS checks that cluster DNS works.
+func TestClusterDNS(c *client.Client) bool {
+	podClient := c.Pods(api.NamespaceDefault)
+
+	pingCmd := `
+	ping -c 1 kubernetes && echo OK > /kubernetes;
+	ping -c 1 kubernetes.default && echo OK > /kubernetes.default;
+	ping -c 1 kubernetes.default.kubernetes.local && echo OK > /kubernetes.default.kubernetes.local;
+	ping -c 1 google.com && echo OK > /google.com;
+	sleep 1000000
+	`
+	pod := &api.Pod{
+		TypeMeta: api.TypeMeta{
+			Kind:       "Pod",
+			APIVersion: "v1beta1",
+		},
+		ObjectMeta: api.ObjectMeta{
+			Name: "dns-test",
+		},
+		Spec: api.PodSpec{
+			Containers: []api.Container{
+				{
+					Name:  "webserver",
+					Image: "kubernetes/test-webserver",
+				},
+				{
+					Name:    "pinger",
+					Image:   "busybox",
+					Command: []string{"sh", "-c", pingCmd},
+				},
+			},
+		},
+	}
+
+	_, err := podClient.Create(pod)
+	if err != nil {
+		glog.Errorf("Failed to create dns-test pod: %v", err)
+		return false
+	}
+	defer podClient.Delete(pod.Name)
+	waitForPodRunning(c, pod.Name)
+
+	pod, err = podClient.Get(pod.Name)
+	if err != nil {
+		glog.Errorf("Failed to get pod: %v", err)
+		return false
+	}
+
+	httpClient := &http.Client{}
+	paths := []string{
+		"kubernetes",
+		"kubernetes.default",
+		"kubernetes.default.kubernetes.local",
+		"google.com",
+	}
+	var failed string
+	for try := 1; try < 5; try++ {
+		failed = ""
+		for _, p := range paths {
+			_, err := httpClient.Get(fmt.Sprintf("http://%s/%s", pod.Status.PodIP, p))
+			if err != nil {
+				failed = p
+				break
+			}
+		}
+		if failed != "" {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+	if failed != "" {
+		glog.Errorf("DNS failed for %s", failed)
+		return false
+	}
+	glog.Info("DNS probes succeeded")
 	return true
 }
 
@@ -158,7 +344,10 @@ func main() {
 	c := loadClientOrDie()
 
 	tests := []func(c *client.Client) bool{
-		TestPodUpdate,
+		TestKubernetesROService,
+		TestKubeletSendsEvent,
+		TestClusterDNS,
+		// TODO(brendandburns): fix this test and re-add it: TestPodUpdate,
 	}
 
 	passed := true
@@ -167,6 +356,8 @@ func main() {
 		if !testPassed {
 			passed = false
 		}
+		// TODO: clean up objects created during a test after the test, so cases
+		// are independent.
 	}
 	if !passed {
 		glog.Fatalf("Tests failed")

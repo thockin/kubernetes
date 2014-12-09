@@ -47,8 +47,8 @@ function do_teardown() {
 #   $3: service replica count
 function start_service() {
   echo "Starting service '$1' on port $2 with $3 replicas"
-  ${KUBECFG} -s "$2" -p 9376 run kubernetes/serve_hostname "$3" "$1"
   svcs_to_clean+=("$1")
+  ${KUBECFG} -s "$2" -p 9376 run kubernetes/serve_hostname "$3" "$1"
 }
 
 # Args:
@@ -69,8 +69,8 @@ function query_pods() {
   local i
   for i in $(seq 1 10); do
     pods_unsorted=($(${KUBECFG} \
-        '-template={{range.Items}}{{.ID}} {{end}}' \
-        -l replicationController="$1" list pods))
+        '-template={{range.items}}{{.id}} {{end}}' \
+        -l name="$1" list pods))
     found="${#pods_unsorted[*]}"
     if [[ "${found}" == "$2" ]]; then
       break
@@ -103,7 +103,7 @@ function wait_for_pods() {
     echo "Waiting for ${pods_needed} pods to become 'running'"
     pods_needed="$2"
     for id in ${pods_sorted}; do
-      status=$(${KUBECFG} -template '{{.CurrentState.Status}}' get "pods/${id}")
+      status=$(${KUBECFG} -template '{{.currentState.status}}' get "pods/${id}")
       if [[ "${status}" == "Running" ]]; then
         pods_needed=$((pods_needed-1))
       fi
@@ -213,9 +213,9 @@ svc1_pods=$(query_pods "${svc1_name}" "${svc1_count}")
 svc2_pods=$(query_pods "${svc2_name}" "${svc2_count}")
 
 # Get the portal IPs.
-svc1_ip=$(${KUBECFG} -template '{{.PortalIP}}' get "services/${svc1_name}")
+svc1_ip=$(${KUBECFG} -template '{{.portalIP}}' get "services/${svc1_name}")
 test -n "${svc1_ip}" || error "Service1 IP is blank"
-svc2_ip=$(${KUBECFG} -template '{{.PortalIP}}' get "services/${svc2_name}")
+svc2_ip=$(${KUBECFG} -template '{{.portalIP}}' get "services/${svc2_name}")
 test -n "${svc2_ip}" || error "Service2 IP is blank"
 if [[ "${svc1_ip}" == "${svc2_ip}" ]]; then
   error "Portal IPs conflict: ${svc1_ip}"
@@ -258,7 +258,8 @@ stop_service "${svc1_name}"
 wait_for_service_down "${svc1_name}" "${svc1_ip}" "${svc1_port}"
 
 #
-# Test 4: Bring up another service, make sure it re-uses Portal IPs.
+# Test 4: Bring up another service.
+# TODO: Actually add a test to force re-use.
 #
 svc3_name="service3"
 svc3_port=80
@@ -272,11 +273,8 @@ wait_for_pods "${svc3_name}" "${svc3_count}"
 svc3_pods=$(query_pods "${svc3_name}" "${svc3_count}")
 
 # Get the portal IP.
-svc3_ip=$(${KUBECFG} -template '{{.PortalIP}}' get "services/${svc3_name}")
+svc3_ip=$(${KUBECFG} -template '{{.portalIP}}' get "services/${svc3_name}")
 test -n "${svc3_ip}" || error "Service3 IP is blank"
-if [[ "${svc3_ip}" != "${svc1_ip}" ]]; then
-  error "Portal IPs not resued: ${svc3_ip} != ${svc1_ip}"
-fi
 
 echo "Verifying the portals from the host"
 wait_for_service_up "${svc3_name}" "${svc3_ip}" "${svc3_port}" \
@@ -289,7 +287,8 @@ verify_from_container "${svc3_name}" "${svc3_ip}" "${svc3_port}" \
 # Test 5: Remove the iptables rules, make sure they come back.
 #
 echo "Manually removing iptables rules"
-ssh-to-node "${test_node}" "sudo iptables -t nat -F KUBE-PROXY"
+ssh-to-node "${test_node}" "sudo iptables -t nat -F KUBE-PORTALS-HOST"
+ssh-to-node "${test_node}" "sudo iptables -t nat -F KUBE-PORTALS-CONTAINER"
 echo "Verifying the portals from the host"
 wait_for_service_up "${svc3_name}" "${svc3_ip}" "${svc3_port}" \
     "${svc3_count}" "${svc3_pods}"
@@ -301,7 +300,7 @@ verify_from_container "${svc3_name}" "${svc3_ip}" "${svc3_port}" \
 # Test 6: Restart the master, make sure portals come back.
 #
 echo "Restarting the master"
-ssh-to-node "${master}" "sudo /etc/init.d/apiserver restart"
+ssh-to-node "${master}" "sudo /etc/init.d/kube-apiserver restart"
 sleep 5
 echo "Verifying the portals from the host"
 wait_for_service_up "${svc3_name}" "${svc3_ip}" "${svc3_port}" \
@@ -325,7 +324,7 @@ wait_for_pods "${svc4_name}" "${svc4_count}"
 svc4_pods=$(query_pods "${svc4_name}" "${svc4_count}")
 
 # Get the portal IP.
-svc4_ip=$(${KUBECFG} -template '{{.PortalIP}}' get "services/${svc4_name}")
+svc4_ip=$(${KUBECFG} -template '{{.portalIP}}' get "services/${svc4_name}")
 test -n "${svc4_ip}" || error "Service4 IP is blank"
 if [[ "${svc4_ip}" == "${svc2_ip}" || "${svc4_ip}" == "${svc3_ip}" ]]; then
   error "Portal IPs conflict: ${svc4_ip}"

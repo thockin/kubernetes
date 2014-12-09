@@ -35,17 +35,17 @@ $KUBECFG -c "${GUESTBOOK}/redis-slave-controller.json" create /replicationContro
 
 sleep 5
 
-POD_LIST_1=$($KUBECFG '-template={{range.Items}}{{.ID}} {{end}}' list pods)
+POD_LIST_1=$($KUBECFG '-template={{range.items}}{{.id}} {{end}}' list pods)
 echo "Pods running: ${POD_LIST_1}"
 
 $KUBECFG stop redisSlaveController
 # Needed until issue #103 gets fixed
 sleep 25
 $KUBECFG rm redisSlaveController
-$KUBECFG delete services/redismaster
-$KUBECFG delete pods/redis-master-2
+$KUBECFG delete services/redis-master
+$KUBECFG delete pods/redis-master
 
-POD_LIST_2=$($KUBECFG '-template={{range.Items}}{{.ID}} {{end}}' list pods)
+POD_LIST_2=$($KUBECFG '-template={{range.items}}{{.id}} {{end}}' list pods)
 echo "Pods running after shutdown: ${POD_LIST_2}"
 
 exit 0

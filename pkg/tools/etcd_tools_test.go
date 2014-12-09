@@ -24,9 +24,9 @@ import (
 	"testing"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/meta"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/testapi"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 	"github.com/coreos/go-etcd/etcd"
 )
 
@@ -36,15 +36,16 @@ type fakeClientGetSet struct {
 }
 
 type TestResource struct {
-	api.TypeMeta `json:",inline" yaml:",inline"`
-	Value        int `json:"value" yaml:"value,omitempty"`
+	api.TypeMeta   `json:",inline" yaml:",inline"`
+	api.ObjectMeta `json:"metadata" yaml:"metadata"`
+	Value          int `json:"value" yaml:"value,omitempty"`
 }
 
 func (*TestResource) IsAnAPIObject() {}
 
 var scheme *runtime.Scheme
 var codec runtime.Codec
-var versioner = RuntimeVersionAdapter{runtime.NewTypeMetaResourceVersioner()}
+var versioner = RuntimeVersionAdapter{meta.NewAccessor()}
 
 func init() {
 	scheme = runtime.NewScheme()
@@ -73,15 +74,15 @@ func TestExtractToList(t *testing.T) {
 			Node: &etcd.Node{
 				Nodes: []*etcd.Node{
 					{
-						Value:         `{"id":"foo"}`,
+						Value:         `{"id":"foo","kind":"Pod","apiVersion":"v1beta1"}`,
 						ModifiedIndex: 1,
 					},
 					{
-						Value:         `{"id":"bar"}`,
+						Value:         `{"id":"bar","kind":"Pod","apiVersion":"v1beta1"}`,
 						ModifiedIndex: 2,
 					},
 					{
-						Value:         `{"id":"baz"}`,
+						Value:         `{"id":"baz","kind":"Pod","apiVersion":"v1beta1"}`,
 						ModifiedIndex: 3,
 					},
 				},
@@ -89,16 +90,16 @@ func TestExtractToList(t *testing.T) {
 		},
 	}
 	expect := api.PodList{
-		TypeMeta: api.TypeMeta{ResourceVersion: "10"},
+		ListMeta: api.ListMeta{ResourceVersion: "10"},
 		Items: []api.Pod{
-			{TypeMeta: api.TypeMeta{ID: "foo", ResourceVersion: "1"}},
-			{TypeMeta: api.TypeMeta{ID: "bar", ResourceVersion: "2"}},
-			{TypeMeta: api.TypeMeta{ID: "baz", ResourceVersion: "3"}},
+			{ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"}},
+			{ObjectMeta: api.ObjectMeta{Name: "bar", ResourceVersion: "2"}},
+			{ObjectMeta: api.ObjectMeta{Name: "baz", ResourceVersion: "3"}},
 		},
 	}
 
 	var got api.PodList
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	err := helper.ExtractToList("/some/key", &got)
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
@@ -117,21 +118,21 @@ func TestExtractToListAcrossDirectories(t *testing.T) {
 			Node: &etcd.Node{
 				Nodes: []*etcd.Node{
 					{
-						Value: `{"id": "directory1"}`,
+						Value: `{"name": "directory1"}`,
 						Dir:   true,
 						Nodes: []*etcd.Node{
 							{
-								Value:         `{"id":"foo"}`,
+								Value:         `{"id":"foo","kind":"Pod","apiVersion":"v1beta1"}`,
 								ModifiedIndex: 1,
 							},
 						},
 					},
 					{
-						Value: `{"id": "directory2"}`,
+						Value: `{"name": "directory2"}`,
 						Dir:   true,
 						Nodes: []*etcd.Node{
 							{
-								Value:         `{"id":"bar"}`,
+								Value:         `{"id":"bar","kind":"Pod","apiVersion":"v1beta1"}`,
 								ModifiedIndex: 2,
 							},
 						},
@@ -141,15 +142,15 @@ func TestExtractToListAcrossDirectories(t *testing.T) {
 		},
 	}
 	expect := api.PodList{
-		TypeMeta: api.TypeMeta{ResourceVersion: "10"},
+		ListMeta: api.ListMeta{ResourceVersion: "10"},
 		Items: []api.Pod{
-			{TypeMeta: api.TypeMeta{ID: "foo", ResourceVersion: "1"}},
-			{TypeMeta: api.TypeMeta{ID: "bar", ResourceVersion: "2"}},
+			{ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"}},
+			{ObjectMeta: api.ObjectMeta{Name: "bar", ResourceVersion: "2"}},
 		},
 	}
 
 	var got api.PodList
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	err := helper.ExtractToList("/some/key", &got)
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
@@ -167,19 +168,19 @@ func TestExtractToListExcludesDirectories(t *testing.T) {
 			Node: &etcd.Node{
 				Nodes: []*etcd.Node{
 					{
-						Value:         `{"id":"foo"}`,
+						Value:         `{"id":"foo","kind":"Pod","apiVersion":"v1beta1"}`,
 						ModifiedIndex: 1,
 					},
 					{
-						Value:         `{"id":"bar"}`,
+						Value:         `{"id":"bar","kind":"Pod","apiVersion":"v1beta1"}`,
 						ModifiedIndex: 2,
 					},
 					{
-						Value:         `{"id":"baz"}`,
+						Value:         `{"id":"baz","kind":"Pod","apiVersion":"v1beta1"}`,
 						ModifiedIndex: 3,
 					},
 					{
-						Value: `{"id": "directory"}`,
+						Value: `{"name": "directory"}`,
 						Dir:   true,
 					},
 				},
@@ -187,16 +188,16 @@ func TestExtractToListExcludesDirectories(t *testing.T) {
 		},
 	}
 	expect := api.PodList{
-		TypeMeta: api.TypeMeta{ResourceVersion: "10"},
+		ListMeta: api.ListMeta{ResourceVersion: "10"},
 		Items: []api.Pod{
-			{TypeMeta: api.TypeMeta{ID: "foo", ResourceVersion: "1"}},
-			{TypeMeta: api.TypeMeta{ID: "bar", ResourceVersion: "2"}},
-			{TypeMeta: api.TypeMeta{ID: "baz", ResourceVersion: "3"}},
+			{ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"}},
+			{ObjectMeta: api.ObjectMeta{Name: "bar", ResourceVersion: "2"}},
+			{ObjectMeta: api.ObjectMeta{Name: "baz", ResourceVersion: "3"}},
 		},
 	}
 
 	var got api.PodList
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	err := helper.ExtractToList("/some/key", &got)
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
@@ -208,9 +209,9 @@ func TestExtractToListExcludesDirectories(t *testing.T) {
 
 func TestExtractObj(t *testing.T) {
 	fakeClient := NewFakeEtcdClient(t)
-	expect := api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}}
-	fakeClient.Set("/some/key", util.EncodeJSON(expect), 0)
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	expect := api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}}
+	fakeClient.Set("/some/key", runtime.EncodeOrDie(testapi.Codec(), &expect), 0)
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	var got api.Pod
 	err := helper.ExtractObj("/some/key", &got, false)
 	if err != nil {
@@ -262,14 +263,14 @@ func TestExtractObjNotFoundErr(t *testing.T) {
 }
 
 func TestCreateObj(t *testing.T) {
-	obj := &api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}}
+	obj := &api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}}
 	fakeClient := NewFakeEtcdClient(t)
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	err := helper.CreateObj("/some/key", obj, 5)
 	if err != nil {
 		t.Errorf("Unexpected error %#v", err)
 	}
-	data, err := latest.Codec.Encode(obj)
+	data, err := testapi.Codec().Encode(obj)
 	if err != nil {
 		t.Errorf("Unexpected error %#v", err)
 	}
@@ -283,14 +284,14 @@ func TestCreateObj(t *testing.T) {
 }
 
 func TestSetObj(t *testing.T) {
-	obj := &api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}}
+	obj := &api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}}
 	fakeClient := NewFakeEtcdClient(t)
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	err := helper.SetObj("/some/key", obj)
 	if err != nil {
 		t.Errorf("Unexpected error %#v", err)
 	}
-	data, err := latest.Codec.Encode(obj)
+	data, err := testapi.Codec().Encode(obj)
 	if err != nil {
 		t.Errorf("Unexpected error %#v", err)
 	}
@@ -302,24 +303,24 @@ func TestSetObj(t *testing.T) {
 }
 
 func TestSetObjWithVersion(t *testing.T) {
-	obj := &api.Pod{TypeMeta: api.TypeMeta{ID: "foo", ResourceVersion: "1"}}
+	obj := &api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"}}
 	fakeClient := NewFakeEtcdClient(t)
 	fakeClient.TestIndex = true
 	fakeClient.Data["/some/key"] = EtcdResponseWithError{
 		R: &etcd.Response{
 			Node: &etcd.Node{
-				Value:         runtime.EncodeOrDie(latest.Codec, obj),
+				Value:         runtime.EncodeOrDie(testapi.Codec(), obj),
 				ModifiedIndex: 1,
 			},
 		},
 	}
 
-	helper := EtcdHelper{fakeClient, latest.Codec, versioner}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), versioner}
 	err := helper.SetObj("/some/key", obj)
 	if err != nil {
 		t.Fatalf("Unexpected error %#v", err)
 	}
-	data, err := latest.Codec.Encode(obj)
+	data, err := testapi.Codec().Encode(obj)
 	if err != nil {
 		t.Fatalf("Unexpected error %#v", err)
 	}
@@ -331,14 +332,14 @@ func TestSetObjWithVersion(t *testing.T) {
 }
 
 func TestSetObjWithoutResourceVersioner(t *testing.T) {
-	obj := &api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}}
+	obj := &api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}}
 	fakeClient := NewFakeEtcdClient(t)
-	helper := EtcdHelper{fakeClient, latest.Codec, nil}
+	helper := EtcdHelper{fakeClient, testapi.Codec(), nil}
 	err := helper.SetObj("/some/key", obj)
 	if err != nil {
 		t.Errorf("Unexpected error %#v", err)
 	}
-	data, err := latest.Codec.Encode(obj)
+	data, err := testapi.Codec().Encode(obj)
 	if err != nil {
 		t.Errorf("Unexpected error %#v", err)
 	}
@@ -356,7 +357,7 @@ func TestAtomicUpdate(t *testing.T) {
 
 	// Create a new node.
 	fakeClient.ExpectNotFoundGet("/some/key")
-	obj := &TestResource{TypeMeta: api.TypeMeta{ID: "foo"}, Value: 1}
+	obj := &TestResource{ObjectMeta: api.ObjectMeta{Name: "foo"}, Value: 1}
 	err := helper.AtomicUpdate("/some/key", &TestResource{}, func(in runtime.Object) (runtime.Object, error) {
 		return obj, nil
 	})
@@ -375,7 +376,7 @@ func TestAtomicUpdate(t *testing.T) {
 
 	// Update an existing node.
 	callbackCalled := false
-	objUpdate := &TestResource{TypeMeta: api.TypeMeta{ID: "foo"}, Value: 2}
+	objUpdate := &TestResource{ObjectMeta: api.ObjectMeta{Name: "foo"}, Value: 2}
 	err = helper.AtomicUpdate("/some/key", &TestResource{}, func(in runtime.Object) (runtime.Object, error) {
 		callbackCalled = true
 
@@ -410,7 +411,7 @@ func TestAtomicUpdateNoChange(t *testing.T) {
 
 	// Create a new node.
 	fakeClient.ExpectNotFoundGet("/some/key")
-	obj := &TestResource{TypeMeta: api.TypeMeta{ID: "foo"}, Value: 1}
+	obj := &TestResource{ObjectMeta: api.ObjectMeta{Name: "foo"}, Value: 1}
 	err := helper.AtomicUpdate("/some/key", &TestResource{}, func(in runtime.Object) (runtime.Object, error) {
 		return obj, nil
 	})
@@ -420,7 +421,7 @@ func TestAtomicUpdateNoChange(t *testing.T) {
 
 	// Update an existing node with the same data
 	callbackCalled := false
-	objUpdate := &TestResource{TypeMeta: api.TypeMeta{ID: "foo"}, Value: 1}
+	objUpdate := &TestResource{ObjectMeta: api.ObjectMeta{Name: "foo"}, Value: 1}
 	fakeClient.Err = errors.New("should not be called")
 	err = helper.AtomicUpdate("/some/key", &TestResource{}, func(in runtime.Object) (runtime.Object, error) {
 		callbackCalled = true
@@ -463,7 +464,7 @@ func TestAtomicUpdate_CreateCollision(t *testing.T) {
 				}
 
 				currValue := in.(*TestResource).Value
-				obj := &TestResource{TypeMeta: api.TypeMeta{ID: "foo"}, Value: currValue + 1}
+				obj := &TestResource{ObjectMeta: api.ObjectMeta{Name: "foo"}, Value: currValue + 1}
 				return obj, nil
 			})
 			if err != nil {

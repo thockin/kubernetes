@@ -22,7 +22,27 @@ mkdir -p /srv/salt-overlay/pillar
 cat <<EOF >/srv/salt-overlay/pillar/cluster-params.sls
 node_instance_prefix: $NODE_INSTANCE_PREFIX
 portal_net: $PORTAL_NET
+enable_node_monitoring: $ENABLE_NODE_MONITORING
+enable_node_logging: $ENABLE_NODE_LOGGING
+logging_destination: $LOGGING_DESTINATION
+enable_cluster_dns: $ENABLE_CLUSTER_DNS
+dns_server: $DNS_SERVER_IP
+dns_domain: $DNS_DOMAIN
 EOF
 
 mkdir -p /srv/salt-overlay/salt/nginx
 echo $MASTER_HTPASSWD > /srv/salt-overlay/salt/nginx/htpasswd
+
+# Generate and distribute a shared secret (bearer token) to
+# apiserver and kubelet so that kubelet can authenticate to
+# apiserver to send events.
+# This works on CoreOS, so it should work on a lot of distros.
+kubelet_token=$(cat /dev/urandom | base64 | tr -d "=+/" | dd bs=32 count=1 2> /dev/null)
+
+mkdir -p /srv/salt-overlay/salt/kube-apiserver
+known_tokens_file="/srv/salt-overlay/salt/kube-apiserver/known_tokens.csv"
+(umask u=rw,go= ; echo "$kubelet_token,kubelet,kubelet" > $known_tokens_file)
+
+mkdir -p /srv/salt-overlay/salt/kubelet
+kubelet_auth_file="/srv/salt-overlay/salt/kubelet/kubernetes_auth"
+(umask u=rw,go= ; echo "{\"BearerToken\": \"$kubelet_token\", \"Insecure\": true }" > $kubelet_auth_file)

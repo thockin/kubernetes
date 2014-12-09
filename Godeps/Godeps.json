@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/GoogleCloudPlatform/kubernetes",
-	"GoVersion": "go1.3.1",
+	"GoVersion": "go1.3",
 	"Packages": [
 		"./..."
 	],
@@ -15,21 +15,6 @@
 			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
 		},
 		{
-			"ImportPath": "code.google.com/p/go.net/context",
-			"Comment": "null-144",
-			"Rev": "ad01a6fcc8a19d3a4478c836895ffe883bd2ceab"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.net/html",
-			"Comment": "null-144",
-			"Rev": "ad01a6fcc8a19d3a4478c836895ffe883bd2ceab"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.net/websocket",
-			"Comment": "null-144",
-			"Rev": "ad01a6fcc8a19d3a4478c836895ffe883bd2ceab"
-		},
-		{
 			"ImportPath": "code.google.com/p/goauth2/compute/serviceaccount",
 			"Comment": "weekly-50",
 			"Rev": "7fc9d958c83464bd7650240569bf93a102266e6a"
@@ -42,12 +27,17 @@
 		{
 			"ImportPath": "code.google.com/p/google-api-go-client/compute/v1",
 			"Comment": "release-96",
-			"Rev": "0923cdda5b82a7dd0dd5c689f824ca5e7d9b60de"
+			"Rev": "98c78185197025f935947caac56a7b6d022f89d2"
+		},
+		{
+			"ImportPath": "code.google.com/p/google-api-go-client/container/v1beta1",
+			"Comment": "release-105",
+			"Rev": "98c78185197025f935947caac56a7b6d022f89d2"
 		},
 		{
 			"ImportPath": "code.google.com/p/google-api-go-client/googleapi",
 			"Comment": "release-96",
-			"Rev": "0923cdda5b82a7dd0dd5c689f824ca5e7d9b60de"
+			"Rev": "98c78185197025f935947caac56a7b6d022f89d2"
 		},
 		{
 			"ImportPath": "github.com/coreos/go-etcd/etcd",
@@ -59,23 +49,28 @@
 			"Rev": "ae4665cf2d188c65764c73fe4af5378acc549510"
 		},
 		{
+			"ImportPath": "github.com/emicklei/go-restful",
+			"Comment": "v1.1.2-38-gab99062",
+			"Rev": "ab990627e3546d3c6c8ab45c4d887a3d66b1b6ab"
+		},
+		{
 			"ImportPath": "github.com/fsouza/go-dockerclient",
 			"Comment": "0.2.1-267-g15d2c6e",
 			"Rev": "15d2c6e3eb670c545d0af0604d7f9aff3871af04"
 		},
 		{
 			"ImportPath": "github.com/golang/glog",
-			"Rev": "d1c4472bf2efd3826f2b5bdcc02d8416798d678c"
+			"Rev": "44145f04b68cf362d9c4df2182967c2275eaefed"
 		},
 		{
 			"ImportPath": "github.com/google/cadvisor/client",
-			"Comment": "0.4.0",
-			"Rev": "5a6d06c02600b1e57e55a9d9f71dbac1bfc9fe6c"
+			"Comment": "0.5.0",
+			"Rev": "8c4f650e62f096710da794e536de86e34447fca9"
 		},
 		{
 			"ImportPath": "github.com/google/cadvisor/info",
-			"Comment": "0.4.0",
-			"Rev": "5a6d06c02600b1e57e55a9d9f71dbac1bfc9fe6c"
+			"Comment": "0.5.0",
+			"Rev": "8c4f650e62f096710da794e536de86e34447fca9"
 		},
 		{
 			"ImportPath": "github.com/google/gofuzz",
@@ -139,6 +134,21 @@
 		{
 			"ImportPath": "github.com/vaughan0/go-ini",
 			"Rev": "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Comment": "null-214",
+			"Rev": "c043f0dc72e4cdd23ae039470ea9d63e6680a1b2"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Comment": "null-214",
+			"Rev": "c043f0dc72e4cdd23ae039470ea9d63e6680a1b2"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Comment": "null-214",
+			"Rev": "c043f0dc72e4cdd23ae039470ea9d63e6680a1b2"
 		},
 		{
 			"ImportPath": "gopkg.in/v1/yaml",

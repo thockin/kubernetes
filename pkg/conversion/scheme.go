@@ -148,9 +148,9 @@ func (s *Scheme) NewObject(versionName, typeName string) (interface{}, error) {
 		if t, ok := types[typeName]; ok {
 			return reflect.New(t).Interface(), nil
 		}
-		return nil, fmt.Errorf("No type '%v' for version '%v'", typeName, versionName)
+		return nil, fmt.Errorf("no type '%v' for version '%v'", typeName, versionName)
 	}
-	return nil, fmt.Errorf("No version '%v'", versionName)
+	return nil, fmt.Errorf("no version '%v'", versionName)
 }
 
 // AddConversionFuncs adds functions to the list of conversion functions. The given
@@ -193,6 +193,14 @@ func (s *Scheme) AddConversionFuncs(conversionFuncs ...interface{}) error {
 	return nil
 }
 
+// AddStructFieldConversion allows you to specify a mechanical copy for a moved
+// or renamed struct field without writing an entire conversion function. See
+// the comment in Converter.SetStructFieldCopy for parameter details.
+// Call as many times as needed, even on the same fields.
+func (s *Scheme) AddStructFieldConversion(srcFieldType interface{}, srcFieldName string, destFieldType interface{}, destFieldName string) error {
+	return s.converter.SetStructFieldCopy(srcFieldType, srcFieldName, destFieldType, destFieldName)
+}
+
 // Convert will attempt to convert in into out. Both must be pointers. For easy
 // testing of conversion functions. Returns an error if the conversion isn't
 // possible. You can call this with types that haven't been registered (for example,
@@ -208,7 +216,47 @@ func (s *Scheme) Convert(in, out interface{}) error {
 	if v, _, err := s.ObjectVersionAndKind(out); err == nil {
 		outVersion = v
 	}
-	return s.converter.Convert(in, out, 0, s.generateConvertMeta(inVersion, outVersion))
+	return s.converter.Convert(in, out, AllowDifferentFieldTypeNames, s.generateConvertMeta(inVersion, outVersion))
+}
+
+// ConvertToVersion attempts to convert an input object to its matching Kind in another
+// version within this scheme. Will return an error if the provided version does not
+// contain the inKind (or a mapping by name defined with AddKnownTypeWithName).
+func (s *Scheme) ConvertToVersion(in interface{}, outVersion string) (interface{}, error) {
+	t := reflect.TypeOf(in)
+	if t.Kind() != reflect.Ptr {
+		return nil, fmt.Errorf("only pointer types may be converted: %v", t)
+	}
+	t = t.Elem()
+	if t.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("only pointers to struct types may be converted: %v", t)
+	}
+
+	kinds, ok := s.typeToKind[t]
+	if !ok {
+		return nil, fmt.Errorf("%v cannot be converted into version %q", t, outVersion)
+	}
+	outKind := kinds[0]
+
+	inVersion, _, err := s.ObjectVersionAndKind(in)
+	if err != nil {
+		return nil, err
+	}
+
+	out, err := s.NewObject(outVersion, outKind)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.converter.Convert(in, out, 0, s.generateConvertMeta(inVersion, outVersion)); err != nil {
+		return nil, err
+	}
+
+	if err := s.SetVersionAndKind(outVersion, outKind, out); err != nil {
+		return nil, err
+	}
+
+	return out, nil
 }
 
 // generateConvertMeta constructs the meta value we pass to Convert.
@@ -220,7 +268,7 @@ func (s *Scheme) generateConvertMeta(srcVersion, destVersion string) *Meta {
 }
 
 // DataVersionAndKind will return the APIVersion and Kind of the given wire-format
-// enconding of an API Object, or an error.
+// encoding of an API Object, or an error.
 func (s *Scheme) DataVersionAndKind(data []byte) (version, kind string, err error) {
 	return s.MetaFactory.Interpret(data)
 }
@@ -236,7 +284,7 @@ func (s *Scheme) ObjectVersionAndKind(obj interface{}) (apiVersion, kind string,
 	version, vOK := s.typeToVersion[t]
 	kinds, kOK := s.typeToKind[t]
 	if !vOK || !kOK {
-		return "", "", fmt.Errorf("Unregistered type: %v", t)
+		return "", "", fmt.Errorf("unregistered type: %v", t)
 	}
 	apiVersion = version
 	kind = kinds[0]

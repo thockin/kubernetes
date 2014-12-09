@@ -17,8 +17,12 @@
              "ports": [{"containerPort": 6379, "hostPort": 6380}]
            }]
          }
-       },
-       "labels": {"name": "redisslave"}
-      }},
+      },
+      "labels": {
+        "name": "redisslave",
+        "uses": "redis-master"
+      }
+    }
+  },
   "labels": {"name": "redisslave"}
 }

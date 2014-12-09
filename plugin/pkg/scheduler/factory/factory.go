@@ -74,6 +74,8 @@ func (factory *ConfigFactory) Create() *scheduler.Config {
 			algorithm.NewResourceFitPredicate(minionLister),
 			// Fit is determined by non-conflicting disk volumes
 			algorithm.NoDiskConflict,
+			// Fit is determined by node selector query
+			algorithm.NewSelectorMatchPredicate(minionLister),
 		},
 		// Prioritize nodes by least requested utilization.
 		algorithm.LeastRequestedPriority,
@@ -93,7 +95,7 @@ func (factory *ConfigFactory) Create() *scheduler.Config {
 			glog.V(2).Infof("About to try and schedule pod %v\n"+
 				"\tknown minions: %v\n"+
 				"\tknown scheduled pods: %v\n",
-				pod.ID, minionCache.Contains(), podCache.Contains())
+				pod.Name, minionCache.ContainedIDs(), podCache.ContainedIDs())
 			return pod
 		},
 		Error: factory.makeDefaultErrorFunc(&podBackoff, podQueue),
@@ -143,7 +145,7 @@ func parseSelectorOrDie(s string) labels.Selector {
 	return selector
 }
 
-// createUnassignedPodLW returns a listWatch that finds all pods that are
+// createAssignedPodLW returns a listWatch that finds all pods that are
 // already scheduled.
 func (factory *ConfigFactory) createAssignedPodLW() *listWatch {
 	return &listWatch{
@@ -174,24 +176,24 @@ func (factory *ConfigFactory) pollMinions() (cache.Enumerator, error) {
 
 func (factory *ConfigFactory) makeDefaultErrorFunc(backoff *podBackoff, podQueue *cache.FIFO) func(pod *api.Pod, err error) {
 	return func(pod *api.Pod, err error) {
-		glog.Errorf("Error scheduling %v: %v; retrying", pod.ID, err)
+		glog.Errorf("Error scheduling %v: %v; retrying", pod.Name, err)
 		backoff.gc()
 		// Retry asynchronously.
 		// Note that this is extremely rudimentary and we need a more real error handling path.
 		go func() {
 			defer util.HandleCrash()
-			podID := pod.ID
+			podID := pod.Name
+			podNamespace := pod.Namespace
 			backoff.wait(podID)
 			// Get the pod again; it may have changed/been scheduled already.
 			pod = &api.Pod{}
-			ctx := api.WithNamespace(api.NewContext(), pod.Namespace)
-			err := factory.Client.Get().Namespace(api.Namespace(ctx)).Path("pods").Path(podID).Do().Into(pod)
+			err := factory.Client.Get().Namespace(podNamespace).Path("pods").Path(podID).Do().Into(pod)
 			if err != nil {
 				glog.Errorf("Error getting pod %v for retry: %v; abandoning", podID, err)
 				return
 			}
-			if pod.DesiredState.Host == "" {
-				podQueue.Add(pod.ID, pod)
+			if pod.Status.Host == "" {
+				podQueue.Add(pod.Name, pod)
 			}
 		}()
 	}
@@ -247,7 +249,7 @@ func (me *minionEnumerator) Len() int {
 
 // Get returns the item (and ID) with the particular index.
 func (me *minionEnumerator) Get(index int) (string, interface{}) {
-	return me.Items[index].ID, &me.Items[index]
+	return me.Items[index].Name, &me.Items[index]
 }
 
 type binder struct {

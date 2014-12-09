@@ -25,14 +25,15 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/httplog"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 
-	"code.google.com/p/go.net/html"
 	"github.com/golang/glog"
+	"golang.org/x/net/html"
 )
 
 // tagsToAttrs states which attributes of which tags require URL substitution.
@@ -77,7 +78,14 @@ type ProxyHandler struct {
 }
 
 func (r *ProxyHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	ctx := api.NewContext()
+	// use the default namespace to address the service
+	ctx := api.NewDefaultContext()
+	// if not in default namespace, provide the query parameter
+	// TODO this will need to go in the path in the future and not as a query parameter
+	namespace := req.URL.Query().Get("namespace")
+	if len(namespace) > 0 {
+		ctx = api.WithNamespace(ctx, namespace)
+	}
 	parts := strings.SplitN(req.URL.Path, "/", 3)
 	if len(parts) < 2 {
 		notFound(w, req)
@@ -105,8 +113,14 @@ func (r *ProxyHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	location, err := redirector.ResourceLocation(ctx, id)
 	if err != nil {
+		httplog.LogOf(req, w).Addf("Error getting ResourceLocation: %v", err)
 		status := errToAPIStatus(err)
 		writeJSON(status.Code, r.codec, status, w)
+		return
+	}
+	if location == "" {
+		httplog.LogOf(req, w).Addf("ResourceLocation for %v returned ''", id)
+		notFound(w, req)
 		return
 	}
 
@@ -116,11 +130,19 @@ func (r *ProxyHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		writeJSON(status.Code, r.codec, status, w)
 		return
 	}
+	if destURL.Scheme == "" {
+		// If no scheme was present in location, url.Parse sometimes mistakes
+		// hosts for paths.
+		destURL.Host = location
+	}
 	destURL.Path = rest
 	destURL.RawQuery = req.URL.RawQuery
 	newReq, err := http.NewRequest(req.Method, destURL.String(), req.Body)
 	if err != nil {
-		glog.Errorf("Failed to create request: %s", err)
+		status := errToAPIStatus(err)
+		writeJSON(status.Code, r.codec, status, w)
+		notFound(w, req)
+		return
 	}
 	newReq.Header = req.Header
 
@@ -130,6 +152,7 @@ func (r *ProxyHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		proxyHost:        req.URL.Host,
 		proxyPathPrepend: path.Join(r.prefix, resourceName, id),
 	}
+	proxy.FlushInterval = 200 * time.Millisecond
 	proxy.ServeHTTP(w, newReq)
 }
 

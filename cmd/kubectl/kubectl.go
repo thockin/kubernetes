@@ -19,9 +19,11 @@ package main
 import (
 	"os"
 
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/client/clientcmd"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
 )
 
 func main() {
-	cmd.RunKubectl(os.Stdout)
+	clientBuilder := clientcmd.NewBuilder(clientcmd.NewPromptingAuthLoader(os.Stdin))
+	cmd.NewFactory(clientBuilder).Run(os.Stdout)
 }

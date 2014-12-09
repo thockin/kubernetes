@@ -2,7 +2,7 @@
 
 # Releases and Official Builds
 
-Official releases are built in Docker containers.  Details are [here](build/README.md).  You can do simple builds and development with just a local Docker installation.  If want to build go locally outside of docker, please continue below.
+Official releases are built in Docker containers.  Details are [here](../../build/README.md).  You can do simple builds and development with just a local Docker installation.  If want to build go locally outside of docker, please continue below.
 
 ## Go development environment
 
@@ -17,7 +17,7 @@ $ echo $GOPATH
 /home/user/goproj
 $ mkdir -p $GOPATH/src/github.com/GoogleCloudPlatform/
 $ cd $GOPATH/src/github.com/GoogleCloudPlatform/
-$ git clone git@github.com:GoogleCloudPlatform/kubernetes.git
+$ git clone https://github.com/GoogleCloudPlatform/kubernetes.git
 ```
 
 The commands above will not work if there are more than one directory in ``$GOPATH``.
@@ -62,9 +62,9 @@ Before committing any changes, please link/copy these hooks into your .git
 directory. This will keep you from accidentally committing non-gofmt'd go code.
 
 ```
-cd kubernetes
-ln -s hooks/prepare-commit-msg .git/hooks/prepare-commit-msg
-ln -s hooks/commit-msg .git/hooks/commit-msg
+cd kubernetes/.git/hooks/
+ln -s ../../hooks/prepare-commit-msg .
+ln -s ../../hooks/commit-msg .
 ```
 
 ## Unit tests
@@ -100,18 +100,7 @@ godep go tool cover -html=target/c.out
 
 ## Integration tests
 
-You need an etcd somewhere in your PATH. To install etcd, run:
-
-```
-cd kubernetes
-hack/install-etcd.sh
-sudo ln -s $(pwd)/third_party/etcd/bin/etcd /usr/bin/etcd
-```
-
-```
-cd kubernetes
-hack/test-integration.sh
-```
+You need an [etcd](https://github.com/coreos/etcd/releases/tag/v0.4.6) in your path, please make sure it is installed and in your ``$PATH``.
 
 ## End-to-End tests
 
@@ -121,10 +110,12 @@ cd kubernetes
 hack/e2e-test.sh
 ```
 
-Pressing control-C should result in an orderly shutdown but if something goes wrong and you still have some VMs running you can force a cleanup with the magical incantation:
+Pressing control-C should result in an orderly shutdown but if something goes wrong and you still have some VMs running you can force a cleanup with this command:
 ```
-hack/e2e-test.sh 1 1 1
+go run e2e.go --down
 ```
+
+See the flag definitions in `hack/e2e.go` for more options, such as reusing an existing cluster.
 
 ## Testing out flaky tests
 [Instructions here](docs/devel/flaky-tests.md)

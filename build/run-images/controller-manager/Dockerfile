@@ -17,7 +17,6 @@
 FROM  kubernetes
 MAINTAINER  Joe Beda <jbeda@google.com>
 
-ENV ETCD_SERVERS http://127.0.0.1:4001
 ENV API_SERVER   127.0.0.1:8080
 
 ADD . /kubernetes

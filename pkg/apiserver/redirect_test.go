@@ -27,11 +27,13 @@ import (
 func TestRedirect(t *testing.T) {
 	simpleStorage := &SimpleRESTStorage{
 		errors: map[string]error{},
+		expectedResourceNamespace: "default",
 	}
 	handler := Handle(map[string]RESTStorage{
 		"foo": simpleStorage,
-	}, codec, "/prefix/version", selfLinker)
+	}, codec, "/prefix", "version", selfLinker)
 	server := httptest.NewServer(handler)
+	defer server.Close()
 
 	dontFollow := errors.New("don't follow")
 	client := http.Client{

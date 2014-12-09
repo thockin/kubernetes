@@ -26,7 +26,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 )
 
 func parseURLOrDie(inURL string) *url.URL {
@@ -132,15 +132,17 @@ func TestProxyTransport_fixLinks(t *testing.T) {
 
 func TestProxy(t *testing.T) {
 	table := []struct {
-		method   string
-		path     string
-		reqBody  string
-		respBody string
+		method       string
+		path         string
+		reqBody      string
+		respBody     string
+		reqNamespace string
 	}{
-		{"GET", "/some/dir", "", "answer"},
-		{"POST", "/some/other/dir", "question", "answer"},
-		{"PUT", "/some/dir/id", "different question", "answer"},
-		{"DELETE", "/some/dir/id", "", "ok"},
+		{"GET", "/some/dir", "", "answer", "default"},
+		{"POST", "/some/other/dir", "question", "answer", "default"},
+		{"PUT", "/some/dir/id", "different question", "answer", "default"},
+		{"DELETE", "/some/dir/id", "", "ok", "default"},
+		{"GET", "/some/dir/id?namespace=other", "", "answer", "other"},
 	}
 
 	for _, item := range table {
@@ -154,15 +156,18 @@ func TestProxy(t *testing.T) {
 			}
 			fmt.Fprint(w, item.respBody)
 		}))
+		defer proxyServer.Close()
 
 		simpleStorage := &SimpleRESTStorage{
-			errors:           map[string]error{},
-			resourceLocation: proxyServer.URL,
+			errors:                    map[string]error{},
+			resourceLocation:          proxyServer.URL,
+			expectedResourceNamespace: item.reqNamespace,
 		}
 		handler := Handle(map[string]RESTStorage{
 			"foo": simpleStorage,
-		}, codec, "/prefix/version", selfLinker)
+		}, codec, "/prefix", "version", selfLinker)
 		server := httptest.NewServer(handler)
+		defer server.Close()
 
 		req, err := http.NewRequest(
 			item.method,

@@ -135,20 +135,20 @@ func (s ConfigSourceEtcd) decodeServices(node *etcd.Node, retServices []api.Serv
 	var svc api.Service
 	err := latest.Codec.DecodeInto([]byte(node.Value), &svc)
 	if err != nil {
-		glog.Errorf("Failed to load Service: %s (%#v)", node.Value, err)
+		glog.Errorf("Failed to load Service: %s (%v)", node.Value, err)
 	} else {
 		// so we got a service we can handle, and now get endpoints
 		retServices = append(retServices, svc)
 		// get the endpoints
-		endpoints, err := s.GetEndpoints(svc.Namespace, svc.ID)
+		endpoints, err := s.GetEndpoints(svc.Namespace, svc.Name)
 		if err != nil {
 			if tools.IsEtcdNotFound(err) {
-				glog.V(4).Infof("Unable to get endpoints for %s %s : %v", svc.Namespace, svc.ID, err)
+				glog.V(4).Infof("Unable to get endpoints for %s %s : %v", svc.Namespace, svc.Name, err)
 			}
-			glog.Errorf("Couldn't get endpoints for %s %s : %v skipping", svc.Namespace, svc.ID, err)
+			glog.Errorf("Couldn't get endpoints for %s %s : %v skipping", svc.Namespace, svc.Name, err)
 			endpoints = api.Endpoints{}
 		} else {
-			glog.V(3).Infof("Got service: %s %s on localport %d mapping to: %s", svc.Namespace, svc.ID, svc.Port, endpoints)
+			glog.V(3).Infof("Got service: %s %s on localport %d mapping to: %s", svc.Namespace, svc.Name, svc.Spec.Port, endpoints)
 		}
 		retEndpoints = append(retEndpoints, endpoints)
 	}
@@ -182,7 +182,7 @@ func (s ConfigSourceEtcd) GetEndpoints(namespace, service string) (api.Endpoints
 	key := path.Join(registryRoot, "endpoints", namespace, service)
 	response, err := s.client.Get(key, true, false)
 	if err != nil {
-		glog.Errorf("Failed to get the key: %s %v", key, err)
+		glog.Errorf("Failed to get the key %q: %v", key, err)
 		return api.Endpoints{}, err
 	}
 	// Parse all the endpoint specifications in this value.
@@ -230,7 +230,7 @@ func (s ConfigSourceEtcd) ProcessChange(response *etcd.Response) {
 	} else if response.Action == "set" {
 		service, err := etcdResponseToService(response)
 		if err != nil {
-			glog.Errorf("Failed to parse %s Port: %s", response, err)
+			glog.Errorf("Failed to parse %#v Port: %s", response, err)
 			return
 		}
 
@@ -243,7 +243,7 @@ func (s ConfigSourceEtcd) ProcessChange(response *etcd.Response) {
 		parts := strings.Split(response.Node.Key[1:], "/")
 		if len(parts) == 4 {
 			glog.V(4).Infof("Deleting service: %s", parts[3])
-			serviceUpdate := ServiceUpdate{Op: REMOVE, Services: []api.Service{{TypeMeta: api.TypeMeta{ID: parts[3]}}}}
+			serviceUpdate := ServiceUpdate{Op: REMOVE, Services: []api.Service{{ObjectMeta: api.ObjectMeta{Name: parts[3]}}}}
 			s.serviceChannel <- serviceUpdate
 			return
 		}
@@ -256,7 +256,7 @@ func (s ConfigSourceEtcd) ProcessEndpointResponse(response *etcd.Response) {
 	var endpoints api.Endpoints
 	err := latest.Codec.DecodeInto([]byte(response.Node.Value), &endpoints)
 	if err != nil {
-		glog.Errorf("Failed to parse service out of etcd key: %v : %+v", response.Node.Value, err)
+		glog.Errorf("Failed to parse service out of etcd key: %v : %v", response.Node.Value, err)
 		return
 	}
 	endpointsUpdate := EndpointsUpdate{Op: ADD, Endpoints: []api.Endpoints{endpoints}}

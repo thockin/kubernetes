@@ -28,8 +28,6 @@ import (
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/watch"
-
-	"code.google.com/p/go-uuid/uuid"
 )
 
 // PodLister is anything that knows how to list pods.
@@ -54,37 +52,35 @@ func NewREST(registry Registry, podLister PodLister) *REST {
 }
 
 // Create registers the given ReplicationController.
-func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
+func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan apiserver.RESTResult, error) {
 	controller, ok := obj.(*api.ReplicationController)
 	if !ok {
 		return nil, fmt.Errorf("not a replication controller: %#v", obj)
 	}
-	if !api.ValidNamespace(ctx, &controller.TypeMeta) {
+	if !api.ValidNamespace(ctx, &controller.ObjectMeta) {
 		return nil, errors.NewConflict("controller", controller.Namespace, fmt.Errorf("Controller.Namespace does not match the provided context"))
 	}
 
-	if len(controller.ID) == 0 {
-		controller.ID = uuid.NewUUID().String()
+	if len(controller.Name) == 0 {
+		controller.Name = util.NewUUID().String()
 	}
-	// Pod Manifest ID should be assigned by the pod API
-	controller.DesiredState.PodTemplate.DesiredState.Manifest.ID = ""
 	if errs := validation.ValidateReplicationController(controller); len(errs) > 0 {
-		return nil, errors.NewInvalid("replicationController", controller.ID, errs)
+		return nil, errors.NewInvalid("replicationController", controller.Name, errs)
 	}
 
-	controller.CreationTimestamp = util.Now()
+	api.FillObjectMetaSystemFields(ctx, &controller.ObjectMeta)
 
 	return apiserver.MakeAsync(func() (runtime.Object, error) {
 		err := rs.registry.CreateController(ctx, controller)
 		if err != nil {
 			return nil, err
 		}
-		return rs.registry.GetController(ctx, controller.ID)
+		return rs.registry.GetController(ctx, controller.Name)
 	}), nil
 }
 
 // Delete asynchronously deletes the ReplicationController specified by its id.
-func (rs *REST) Delete(ctx api.Context, id string) (<-chan runtime.Object, error) {
+func (rs *REST) Delete(ctx api.Context, id string) (<-chan apiserver.RESTResult, error) {
 	return apiserver.MakeAsync(func() (runtime.Object, error) {
 		return &api.Status{Status: api.StatusSuccess}, rs.registry.DeleteController(ctx, id)
 	}), nil
@@ -127,23 +123,23 @@ func (*REST) New() runtime.Object {
 
 // Update replaces a given ReplicationController instance with an existing
 // instance in storage.registry.
-func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
+func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan apiserver.RESTResult, error) {
 	controller, ok := obj.(*api.ReplicationController)
 	if !ok {
 		return nil, fmt.Errorf("not a replication controller: %#v", obj)
 	}
-	if !api.ValidNamespace(ctx, &controller.TypeMeta) {
+	if !api.ValidNamespace(ctx, &controller.ObjectMeta) {
 		return nil, errors.NewConflict("controller", controller.Namespace, fmt.Errorf("Controller.Namespace does not match the provided context"))
 	}
 	if errs := validation.ValidateReplicationController(controller); len(errs) > 0 {
-		return nil, errors.NewInvalid("replicationController", controller.ID, errs)
+		return nil, errors.NewInvalid("replicationController", controller.Name, errs)
 	}
 	return apiserver.MakeAsync(func() (runtime.Object, error) {
 		err := rs.registry.UpdateController(ctx, controller)
 		if err != nil {
 			return nil, err
 		}
-		return rs.registry.GetController(ctx, controller.ID)
+		return rs.registry.GetController(ctx, controller.Name)
 	}), nil
 }
 
@@ -160,41 +156,41 @@ func (rs *REST) Watch(ctx api.Context, label, field labels.Selector, resourceVer
 	// TODO(lavalamp): remove watch.Filter, which is broken. Implement consistent way of filtering.
 	// TODO(lavalamp): this watch method needs a test.
 	return watch.Filter(incoming, func(e watch.Event) (watch.Event, bool) {
-		repController, ok := e.Object.(*api.ReplicationController)
+		controller, ok := e.Object.(*api.ReplicationController)
 		if !ok {
 			// must be an error event-- pass it on
 			return e, true
 		}
-		match := label.Matches(labels.Set(repController.Labels))
+		match := label.Matches(labels.Set(controller.Labels))
 		if match {
-			rs.fillCurrentState(ctx, repController)
+			rs.fillCurrentState(ctx, controller)
 		}
 		return e, match
 	}), nil
 }
 
-func (rs *REST) waitForController(ctx api.Context, ctrl *api.ReplicationController) (runtime.Object, error) {
+func (rs *REST) waitForController(ctx api.Context, controller *api.ReplicationController) (runtime.Object, error) {
 	for {
-		pods, err := rs.podLister.ListPods(ctx, labels.Set(ctrl.DesiredState.ReplicaSelector).AsSelector())
+		pods, err := rs.podLister.ListPods(ctx, labels.Set(controller.Spec.Selector).AsSelector())
 		if err != nil {
-			return ctrl, err
+			return controller, err
 		}
-		if len(pods.Items) == ctrl.DesiredState.Replicas {
+		if len(pods.Items) == controller.Spec.Replicas {
 			break
 		}
 		time.Sleep(rs.pollPeriod)
 	}
-	return ctrl, nil
+	return controller, nil
 }
 
-func (rs *REST) fillCurrentState(ctx api.Context, ctrl *api.ReplicationController) error {
+func (rs *REST) fillCurrentState(ctx api.Context, controller *api.ReplicationController) error {
 	if rs.podLister == nil {
 		return nil
 	}
-	list, err := rs.podLister.ListPods(ctx, labels.Set(ctrl.DesiredState.ReplicaSelector).AsSelector())
+	list, err := rs.podLister.ListPods(ctx, labels.Set(controller.Spec.Selector).AsSelector())
 	if err != nil {
 		return err
 	}
-	ctrl.CurrentState.Replicas = len(list.Items)
+	controller.Status.Replicas = len(list.Items)
 	return nil
 }

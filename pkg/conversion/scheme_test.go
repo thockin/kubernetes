@@ -169,10 +169,10 @@ func objDiff(a, b interface{}) string {
 	// An alternate diff attempt, in case json isn't showing you
 	// the difference. (reflect.DeepEqual makes a distinction between
 	// nil and empty slices, for example.)
-	return util.StringDiff(
-		fmt.Sprintf("%#v", a),
-		fmt.Sprintf("%#v", b),
-	)
+	//return util.StringDiff(
+	//	fmt.Sprintf("%#v", a),
+	//	fmt.Sprintf("%#v", b),
+	//)
 }
 
 func runTest(t *testing.T, source interface{}) {
@@ -237,6 +237,45 @@ func TestMultipleNames(t *testing.T) {
 	}
 	if !strings.Contains(string(out), `"myKindKey":"TestType1"`) {
 		t.Errorf("unexpected encoded output: %s", string(out))
+	}
+}
+
+func TestKnownTypes(t *testing.T) {
+	s := GetTestScheme()
+	if len(s.KnownTypes("v2")) != 0 {
+		t.Errorf("should have no known types for v2")
+	}
+
+	types := s.KnownTypes("v1")
+	for _, s := range []string{"TestType1", "TestType2", "TestType3", "ExternalInternalSame"} {
+		if _, ok := types[s]; !ok {
+			t.Errorf("missing type %q", s)
+		}
+	}
+}
+
+func TestConvertToVersion(t *testing.T) {
+	s := GetTestScheme()
+	tt := &TestType1{A: "I'm not a pointer object"}
+	other, err := s.ConvertToVersion(tt, "v1")
+	if err != nil {
+		t.Fatalf("Failure: %v", err)
+	}
+	converted, ok := other.(*ExternalTestType1)
+	if !ok {
+		t.Fatalf("Got wrong type")
+	}
+	if tt.A != converted.A {
+		t.Fatalf("Failed to convert object correctly: %#v", converted)
+	}
+}
+
+func TestConvertToVersionErr(t *testing.T) {
+	s := GetTestScheme()
+	tt := TestType1{A: "I'm not a pointer object"}
+	_, err := s.ConvertToVersion(tt, "v1")
+	if err == nil {
+		t.Fatalf("unexpected non-error")
 	}
 }
 

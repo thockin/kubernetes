@@ -33,30 +33,29 @@ import (
 	"gopkg.in/v1/yaml"
 )
 
-type SourceURL struct {
+type sourceURL struct {
 	url     string
 	updates chan<- interface{}
 	data    []byte
 }
 
-func NewSourceURL(url string, period time.Duration, updates chan<- interface{}) *SourceURL {
-	config := &SourceURL{
+func NewSourceURL(url string, period time.Duration, updates chan<- interface{}) {
+	config := &sourceURL{
 		url:     url,
 		updates: updates,
 		data:    nil,
 	}
 	glog.V(1).Infof("Watching URL %s", url)
 	go util.Forever(config.run, period)
-	return config
 }
 
-func (s *SourceURL) run() {
+func (s *sourceURL) run() {
 	if err := s.extractFromURL(); err != nil {
-		glog.Errorf("Failed to read URL: %s", err)
+		glog.Errorf("Failed to read URL: %v", err)
 	}
 }
 
-func (s *SourceURL) extractFromURL() error {
+func (s *sourceURL) extractFromURL() error {
 	resp, err := http.Get(s.url)
 	if err != nil {
 		return err
@@ -92,8 +91,8 @@ func (s *SourceURL) extractFromURL() error {
 		if err := api.Scheme.Convert(&manifest, &pod); err != nil {
 			return err
 		}
-		if len(pod.ID) == 0 {
-			pod.ID = "1"
+		if len(pod.Name) == 0 {
+			pod.Name = "1"
 		}
 		if len(pod.Namespace) == 0 {
 			pod.Namespace = api.NamespaceDefault
@@ -132,8 +131,8 @@ func (s *SourceURL) extractFromURL() error {
 		}
 		for i := range boundPods.Items {
 			pod := &boundPods.Items[i]
-			if len(pod.ID) == 0 {
-				pod.ID = fmt.Sprintf("%d", i+1)
+			if len(pod.Name) == 0 {
+				pod.Name = fmt.Sprintf("%d", i+1)
 			}
 			if len(pod.Namespace) == 0 {
 				pod.Namespace = api.NamespaceDefault

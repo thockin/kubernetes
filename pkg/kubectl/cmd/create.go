@@ -17,13 +17,14 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl"
 	"github.com/spf13/cobra"
 )
 
-func NewCmdCreate(out io.Writer) *cobra.Command {
+func (f *Factory) NewCmdCreate(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create -f filename",
 		Short: "Create a resource by filename or stdin",
@@ -38,15 +39,25 @@ Examples:
   $ cat pod.json | kubectl create -f -
   <create a pod based on the json passed into stdin>`,
 		Run: func(cmd *cobra.Command, args []string) {
-			filename := getFlagString(cmd, "filename")
+			filename := GetFlagString(cmd, "filename")
 			if len(filename) == 0 {
-				usageError(cmd, "Must pass a filename to update")
+				usageError(cmd, "Must specify filename to create")
 			}
-			data, err := readConfigData(filename)
+			mapping, namespace, name, data := ResourceFromFile(filename, f.Typer, f.Mapper)
+			client, err := f.Client(cmd, mapping)
 			checkErr(err)
 
-			err = kubectl.Modify(out, getKubeClient(cmd).RESTClient, kubectl.ModifyCreate, data)
+			// use the default namespace if not specified, or check for conflict with the file's namespace
+			if len(namespace) == 0 {
+				namespace = getKubeNamespace(cmd)
+			} else {
+				err = CompareNamespaceFromFile(cmd, namespace)
+				checkErr(err)
+			}
+
+			err = kubectl.NewRESTHelper(client, mapping).Create(namespace, true, data)
 			checkErr(err)
+			fmt.Fprintf(out, "%s\n", name)
 		},
 	}
 	cmd.Flags().StringP("filename", "f", "", "Filename or URL to file to use to create the resource")

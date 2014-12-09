@@ -26,11 +26,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/meta"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubecfg"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
@@ -79,6 +79,7 @@ var parser = kubecfg.NewParser(map[string]runtime.Object{
 	"services":               &api.Service{},
 	"replicationControllers": &api.ReplicationController{},
 	"minions":                &api.Minion{},
+	"events":                 &api.Event{},
 })
 
 func usage() {
@@ -198,10 +199,11 @@ func main() {
 
 	if clientConfig.Host == "" {
 		// TODO: eventually apiserver should start on 443 and be secure by default
+		// TODO: don't specify http or https in Host, and infer that from auth options.
 		clientConfig.Host = "http://localhost:8080"
 	}
-	if client.IsConfigTransportSecure(clientConfig) {
-		auth, err := kubecfg.LoadAuthInfo(*authConfig, os.Stdin)
+	if client.IsConfigTransportTLS(clientConfig) {
+		auth, err := kubecfg.LoadClientAuthInfoOrPrompt(*authConfig, os.Stdin)
 		if err != nil {
 			glog.Fatalf("Error loading auth: %v", err)
 		}
@@ -215,6 +217,9 @@ func main() {
 		}
 		if auth.KeyFile != "" {
 			clientConfig.KeyFile = auth.KeyFile
+		}
+		if auth.BearerToken != "" {
+			clientConfig.BearerToken = auth.BearerToken
 		}
 		if auth.Insecure != nil {
 			clientConfig.Insecure = *auth.Insecure
@@ -260,7 +265,10 @@ func main() {
 				open.Start("http://localhost:8001/static/")
 			}()
 		}
-		server := kubecfg.NewProxyServer(*www, kubeClient)
+		server, err := kubecfg.NewProxyServer(*www, clientConfig)
+		if err != nil {
+			glog.Fatalf("Error creating proxy server: %v", err)
+		}
 		glog.Fatal(server.Serve())
 	}
 
@@ -316,13 +324,11 @@ func getPrinter() kubecfg.ResourcePrinter {
 		} else {
 			data = []byte(*templateStr)
 		}
-		tmpl, err := template.New("output").Parse(string(data))
+		var err error
+		printer, err = kubecfg.NewTemplatePrinter(data)
 		if err != nil {
-			glog.Fatalf("Error parsing template %s, %v\n", string(data), err)
+			glog.Fatalf("Error '%v' parsing template:\n'%s'", err, string(data))
 			return nil
-		}
-		printer = &kubecfg.TemplatePrinter{
-			Template: tmpl,
 		}
 	default:
 		printer = humanReadablePrinter()
@@ -366,11 +372,11 @@ func executeAPIRequest(ctx api.Context, method string, c *client.Client) bool {
 		if err != nil {
 			glog.Fatalf("error obtaining resource version for update: %v", err)
 		}
-		jsonBase, err := runtime.FindTypeMeta(obj)
+		meta, err := meta.Accessor(obj)
 		if err != nil {
 			glog.Fatalf("error finding json base for update: %v", err)
 		}
-		version = jsonBase.ResourceVersion()
+		version = meta.ResourceVersion()
 		verb = "PUT"
 		setBody = true
 		if !validStorage || !hasSuffix {
@@ -402,7 +408,7 @@ func executeAPIRequest(ctx api.Context, method string, c *client.Client) bool {
 			if err != nil {
 				glog.Fatalf("error setting resource version: %v", err)
 			}
-			jsonBase, err := runtime.FindTypeMeta(obj)
+			jsonBase, err := meta.Accessor(obj)
 			if err != nil {
 				glog.Fatalf("error setting resource version: %v", err)
 			}

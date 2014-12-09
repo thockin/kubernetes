@@ -24,7 +24,7 @@ source "${KUBE_ROOT}/cluster/gce/${KUBE_CONFIG_FILE-"config-default.sh"}"
 # Verify prereqs
 function verify-prereqs {
   local cmd
-  for cmd in gcloud gcutil gsutil; do
+  for cmd in gcloud gsutil; do
     which "${cmd}" >/dev/null || {
       echo "Can't find ${cmd} in PATH, please fix and retry. The Google Cloud "
       echo "SDK can be downloaded from https://cloud.google.com/sdk/."
@@ -106,7 +106,7 @@ function upload-server-tars() {
   if which md5 > /dev/null 2>&1; then
     project_hash=$(md5 -q -s "$PROJECT")
   else
-    project_hash=$(echo -n "$PROJECT" | md5sum)
+    project_hash=$(echo -n "$PROJECT" | md5sum | awk '{ print $1 }')
   fi
   project_hash=${project_hash:0:5}
 
@@ -121,10 +121,16 @@ function upload-server-tars() {
   local -r staging_path="${staging_bucket}/devel"
 
   echo "+++ Staging server tars to Google Storage: ${staging_path}"
-  SERVER_BINARY_TAR_URL="${staging_path}/${SERVER_BINARY_TAR##*/}"
-  gsutil -q cp "${SERVER_BINARY_TAR}" "${SERVER_BINARY_TAR_URL}"
-  SALT_TAR_URL="${staging_path}/${SALT_TAR##*/}"
-  gsutil -q cp "${SALT_TAR}" "${SALT_TAR_URL}"
+  local server_binary_gs_url="${staging_path}/${SERVER_BINARY_TAR##*/}"
+  gsutil -q -h "Cache-Control:private, max-age=0" cp "${SERVER_BINARY_TAR}" "${server_binary_gs_url}"
+  gsutil acl ch -g all:R "${server_binary_gs_url}" >/dev/null 2>&1
+  local salt_gs_url="${staging_path}/${SALT_TAR##*/}"
+  gsutil -q -h "Cache-Control:private, max-age=0" cp "${SALT_TAR}" "${salt_gs_url}"
+  gsutil acl ch -g all:R "${salt_gs_url}" >/dev/null 2>&1
+
+  # Convert from gs:// URL to an https:// URL
+  SERVER_BINARY_TAR_URL="${server_binary_gs_url/gs:\/\//https://storage.googleapis.com/}"
+  SALT_TAR_URL="${salt_gs_url/gs:\/\//https://storage.googleapis.com/}"
 }
 
 # Detect the information about the minions
@@ -137,10 +143,9 @@ function upload-server-tars() {
 function detect-minions () {
   KUBE_MINION_IP_ADDRESSES=()
   for (( i=0; i<${#MINION_NAMES[@]}; i++)); do
-    # gcutil will print the "external-ip" column header even if no instances are found
-    local minion_ip=$(gcutil listinstances --format=csv --sort=external-ip \
-      --columns=external-ip --zone ${ZONE} --filter="name eq ${MINION_NAMES[$i]}" \
-      | tail -n '+2' | tail -n 1)
+    local minion_ip=$(gcloud compute instances describe --zone "${ZONE}" \
+      "${MINION_NAMES[$i]}" --fields networkInterfaces[0].accessConfigs[0].natIP \
+      --format=text | awk '{ print $2 }')
     if [[ -z "${minion_ip-}" ]] ; then
       echo "Did not find ${MINION_NAMES[$i]}" >&2
     else
@@ -165,10 +170,9 @@ function detect-minions () {
 function detect-master () {
   KUBE_MASTER=${MASTER_NAME}
   if [[ -z "${KUBE_MASTER_IP-}" ]]; then
-    # gcutil will print the "external-ip" column header even if no instances are found
-    KUBE_MASTER_IP=$(gcutil listinstances --format=csv --sort=external-ip \
-      --columns=external-ip --zone ${ZONE} --filter="name eq ${MASTER_NAME}" \
-      | tail -n '+2' | tail -n 1)
+    KUBE_MASTER_IP=$(gcloud compute instances describe --zone "${ZONE}" \
+      "${MASTER_NAME}" --fields networkInterfaces[0].accessConfigs[0].natIP \
+      --format=text | awk '{ print $2 }')
   fi
   if [[ -z "${KUBE_MASTER_IP-}" ]]; then
     echo "Could not detect Kubernetes master node.  Make sure you've launched a cluster with 'kube-up.sh'" >&2
@@ -193,7 +197,8 @@ function get-password {
   KUBE_USER=admin
   KUBE_PASSWORD=$(python -c 'import string,random; print "".join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(16))')
 
-  # Store password for reuse.
+  # Remove this code, since in all use cases I can see, we are overwriting this
+  # at cluster creation time.
   cat << EOF > "$file"
 {
   "User": "$KUBE_USER",
@@ -201,6 +206,20 @@ function get-password {
 }
 EOF
   chmod 0600 "$file"
+}
+
+# Generate authentication token for admin user. Will
+# read from $HOME/.kubernetes_auth if available.
+#
+# Vars set:
+#   KUBE_ADMIN_TOKEN
+function get-admin-token {
+  local file="$HOME/.kubernetes_auth"
+  if [[ -r "$file" ]]; then
+    KUBE_ADMIN_TOKEN=$(cat "$file" | python -c 'import json,sys;print json.load(sys.stdin)["BearerToken"]')
+    return
+  fi
+  KUBE_ADMIN_TOKEN=$(python -c 'import string,random; print "".join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))')
 }
 
 # Instantiate a kubernetes cluster
@@ -224,35 +243,35 @@ function kube-up {
   local htpasswd
   htpasswd=$(cat "${KUBE_TEMP}/htpasswd")
 
-  if ! gcutil getnetwork "${NETWORK}" >/dev/null 2>&1; then
-    echo "Creating new network for: ${NETWORK}"
+  if ! gcloud compute networks describe "${NETWORK}" &>/dev/null; then
+    echo "Creating new network: ${NETWORK}"
     # The network needs to be created synchronously or we have a race. The
     # firewalls can be added concurrent with instance creation.
-    gcutil addnetwork "${NETWORK}" --range "10.240.0.0/16"
-    gcutil addfirewall "${NETWORK}-default-internal" \
+    gcloud compute networks create "${NETWORK}" --range "10.240.0.0/16"
+  fi
+
+  if ! gcloud compute firewall-rules describe "${NETWORK}-default-internal" &>/dev/null; then
+    gcloud compute firewall-rules create "${NETWORK}-default-internal" \
       --project "${PROJECT}" \
-      --norespect_terminal_width \
-      --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
       --network "${NETWORK}" \
-      --allowed_ip_sources "10.0.0.0/8" \
-      --allowed "tcp:1-65535,udp:1-65535,icmp" &
-    gcutil addfirewall "${NETWORK}-default-ssh" \
+      --source-ranges "10.0.0.0/8" \
+      --allow "tcp:1-65535" "udp:1-65535" "icmp" &
+  fi
+
+  if ! gcloud compute firewall-rules describe "${NETWORK}-default-ssh" &>/dev/null; then
+    gcloud compute firewall-rules create "${NETWORK}-default-ssh" \
       --project "${PROJECT}" \
-      --norespect_terminal_width \
-      --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
       --network "${NETWORK}" \
-      --allowed_ip_sources "0.0.0.0/0" \
-      --allowed "tcp:22" &
+      --source-ranges "0.0.0.0/0" \
+      --allow "tcp:22" &
   fi
 
   echo "Starting VMs and configuring firewalls"
-  gcutil addfirewall "${MASTER_NAME}-https" \
+  gcloud compute firewall-rules create "${MASTER_NAME}-https" \
     --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
     --network "${NETWORK}" \
-    --target_tags "${MASTER_TAG}" \
-    --allowed tcp:443 &
+    --target-tags "${MASTER_TAG}" \
+    --allow tcp:443 &
 
   (
     echo "#! /bin/bash"
@@ -264,60 +283,79 @@ function kube-up {
     echo "readonly SALT_TAR_URL='${SALT_TAR_URL}'"
     echo "readonly MASTER_HTPASSWD='${htpasswd}'"
     echo "readonly PORTAL_NET='${PORTAL_NET}'"
+    echo "readonly ENABLE_NODE_MONITORING='${ENABLE_NODE_MONITORING:-false}'"
+    echo "readonly ENABLE_NODE_LOGGING='${ENABLE_NODE_LOGGING:-false}'"
+    echo "readonly LOGGING_DESTINATION='${LOGGING_DESTINATION:-}'"
+    echo "readonly ENABLE_CLUSTER_DNS='${ENABLE_CLUSTER_DNS:-false}'"
+    echo "readonly DNS_SERVER_IP='${DNS_SERVER_IP:-}'"
+    echo "readonly DNS_DOMAIN='${DNS_DOMAIN:-}'"
+    grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/common.sh"
     grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/create-dynamic-salt-files.sh"
     grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/download-release.sh"
     grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/salt-master.sh"
   ) > "${KUBE_TEMP}/master-start.sh"
 
-  gcutil addinstance "${MASTER_NAME}" \
+  # Report logging choice (if any).
+  if [[ "${ENABLE_NODE_LOGGING-}" == "true" ]]; then
+    echo "+++ Logging using Fluentd to ${LOGGING_DESTINATION:-unknown}"
+    # For logging to GCP we need to enable some minion scopes.
+    if [[ "${LOGGING_DESTINATION-}" == "gcp" ]]; then
+      MINION_SCOPES="${MINION_SCOPES}, https://www.googleapis.com/auth/logging.write"
+    fi
+  fi
+
+  gcloud compute instances create "${MASTER_NAME}" \
     --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
     --zone "${ZONE}" \
-    --machine_type "${MASTER_SIZE}" \
+    --machine-type "${MASTER_SIZE}" \
+    --image-project="${IMAGE_PROJECT}" \
     --image "${IMAGE}" \
     --tags "${MASTER_TAG}" \
     --network "${NETWORK}" \
-    --service_account_scopes="storage-ro,compute-rw" \
-    --automatic_restart \
-    --metadata_from_file "startup-script:${KUBE_TEMP}/master-start.sh" &
+    --scopes "storage-ro" "compute-rw" \
+    --metadata-from-file "startup-script=${KUBE_TEMP}/master-start.sh" &
 
   for (( i=0; i<${#MINION_NAMES[@]}; i++)); do
     (
       echo "#! /bin/bash"
+      echo "ZONE='${ZONE}'"
       echo "MASTER_NAME='${MASTER_NAME}'"
       echo "MINION_IP_RANGE='${MINION_IP_RANGES[$i]}'"
+      echo "ENABLE_DOCKER_REGISTRY_CACHE='${ENABLE_DOCKER_REGISTRY_CACHE:-false}'"
+      grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/common.sh"
       grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/salt-minion.sh"
     ) > "${KUBE_TEMP}/minion-start-${i}.sh"
 
-    gcutil addfirewall "${MINION_NAMES[$i]}-all" \
+    gcloud compute firewall-rules create "${MINION_NAMES[$i]}-all" \
       --project "${PROJECT}" \
-      --norespect_terminal_width \
-      --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
       --network "${NETWORK}" \
-      --allowed_ip_sources "${MINION_IP_RANGES[$i]}" \
-      --allowed "tcp,udp,icmp,esp,ah,sctp" &
+      --source-ranges "${MINION_IP_RANGES[$i]}" \
+      --allow tcp udp icmp esp ah sctp &
 
-    gcutil addinstance ${MINION_NAMES[$i]} \
+    local -a scope_flags=()
+    if (( "${#MINION_SCOPES[@]}" > 0 )); then
+      scope_flags=("--scopes" "${MINION_SCOPES[@]}")
+    else
+      scope_flags=("--no-scopes")
+    fi
+    gcloud compute instances create ${MINION_NAMES[$i]} \
       --project "${PROJECT}" \
-      --norespect_terminal_width \
-      --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
       --zone "${ZONE}" \
-      --machine_type "${MINION_SIZE}" \
+      --machine-type "${MINION_SIZE}" \
+      --image-project="${IMAGE_PROJECT}" \
       --image "${IMAGE}" \
       --tags "${MINION_TAG}" \
       --network "${NETWORK}" \
-      --service_account_scopes "${MINION_SCOPES}" \
-      --automatic_restart \
-      --can_ip_forward \
-      --metadata_from_file "startup-script:${KUBE_TEMP}/minion-start-${i}.sh" &
+      "${scope_flags[@]}" \
+      --can-ip-forward \
+      --metadata-from-file "startup-script=${KUBE_TEMP}/minion-start-${i}.sh" &
 
-    gcutil addroute "${MINION_NAMES[$i]}" "${MINION_IP_RANGES[$i]}" \
+    gcloud compute routes create "${MINION_NAMES[$i]}" \
       --project "${PROJECT}" \
-      --norespect_terminal_width \
-      --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
+      --destination-range "${MINION_IP_RANGES[$i]}" \
       --network "${NETWORK}" \
-      --next_hop_instance "${ZONE}/instances/${MINION_NAMES[$i]}" &
+      --next-hop-instance "${MINION_NAMES[$i]}" \
+      --next-hop-instance-zone "${ZONE}" &
   done
 
   local fail=0
@@ -330,7 +368,7 @@ function kube-up {
     exit 2
   fi
 
-  detect-master > /dev/null
+  detect-master
 
   echo "Waiting for cluster initialization."
   echo
@@ -355,7 +393,7 @@ function kube-up {
   local rc # Capture return code without exiting because of errexit bash option
   for (( i=0; i<${#MINION_NAMES[@]}; i++)); do
       # Make sure docker is installed
-      gcutil ssh "${MINION_NAMES[$i]}" which docker >/dev/null || {
+      gcloud compute ssh --zone "$ZONE" "${MINION_NAMES[$i]}" --command "which docker" >/dev/null || {
         echo "Docker failed to install on ${MINION_NAMES[$i]}. Your cluster is unlikely" >&2
         echo "to work correctly. Please run ./cluster/kube-down.sh and re-create the" >&2
         echo "cluster. (sorry!)" >&2
@@ -375,10 +413,12 @@ function kube-up {
   local kube_key=".kubecfg.key"
   local ca_cert=".kubernetes.ca.crt"
 
+  # TODO: generate ADMIN (and KUBELET) tokens and put those in the master's
+  # config file.  Distribute the same way the htpasswd is done.
   (umask 077
-   gcutil ssh "${MASTER_NAME}" sudo cat /usr/share/nginx/kubecfg.crt >"${HOME}/${kube_cert}" 2>/dev/null
-   gcutil ssh "${MASTER_NAME}" sudo cat /usr/share/nginx/kubecfg.key >"${HOME}/${kube_key}" 2>/dev/null
-   gcutil ssh "${MASTER_NAME}" sudo cat /usr/share/nginx/ca.crt >"${HOME}/${ca_cert}" 2>/dev/null
+   gcloud compute ssh --zone "$ZONE" "${MASTER_NAME}" --command "sudo cat /srv/kubernetes/kubecfg.crt" >"${HOME}/${kube_cert}" 2>/dev/null
+   gcloud compute ssh --zone "$ZONE" "${MASTER_NAME}" --command "sudo cat /srv/kubernetes/kubecfg.key" >"${HOME}/${kube_key}" 2>/dev/null
+   gcloud compute ssh --zone "$ZONE" "${MASTER_NAME}" --command "sudo cat /srv/kubernetes/ca.crt" >"${HOME}/${ca_cert}" 2>/dev/null
 
    cat << EOF > ~/.kubernetes_auth
 {
@@ -401,47 +441,34 @@ function kube-down {
   detect-project
 
   echo "Bringing down cluster"
-  gcutil deletefirewall  \
+  gcloud compute firewall-rules delete  \
     --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-    --force \
+    --quiet \
     "${MASTER_NAME}-https" &
 
-  gcutil deleteinstance \
-    --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-    --force \
-    --delete_boot_pd \
-    --zone "${ZONE}" \
-    "${MASTER_NAME}" &
+  local minion
+  for minion in "${MINION_NAMES[@]}"; do
+    gcloud compute firewall-rules delete \
+      --project "${PROJECT}" \
+      --quiet \
+      "${minion}-all" &
 
-  gcutil deletefirewall  \
-    --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-    --force \
-    "${MINION_NAMES[@]/%/-all}" &
+    gcloud compute routes delete  \
+      --project "${PROJECT}" \
+      --quiet \
+      "${minion}" &
+  done
 
-  gcutil deleteinstance \
-    --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-    --force \
-    --delete_boot_pd \
-    --zone "${ZONE}" \
-    "${MINION_NAMES[@]}" &
-
-  gcutil deleteroute  \
-    --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-    --force \
-    "${MINION_NAMES[@]}" &
+  for minion in "${MASTER_NAME}" "${MINION_NAMES[@]}"; do
+    gcloud compute instances delete \
+      --project "${PROJECT}" \
+      --quiet \
+      --delete-disks all \
+      --zone "${ZONE}" \
+      "${minion}" &
+  done
 
   wait
-
 }
 
 # Update a kubernetes cluster with latest source
@@ -459,11 +486,12 @@ function kube-push {
     echo "cd /var/cache/kubernetes-install"
     echo "readonly SERVER_BINARY_TAR_URL='${SERVER_BINARY_TAR_URL}'"
     echo "readonly SALT_TAR_URL='${SALT_TAR_URL}'"
+    grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/common.sh"
     grep -v "^#" "${KUBE_ROOT}/cluster/gce/templates/download-release.sh"
     echo "echo Executing configuration"
     echo "sudo salt '*' mine.update"
     echo "sudo salt --force-color '*' state.highstate"
-  ) | gcutil ssh --project "$PROJECT" --zone "$ZONE" "$KUBE_MASTER" sudo bash
+  ) | gcloud compute ssh --project "$PROJECT" --zone "$ZONE" "$KUBE_MASTER" --command "sudo bash"
 
   get-password
 
@@ -494,7 +522,6 @@ function test-build-release {
 #
 # Assumed vars:
 #   PROJECT
-#   ALREADY_UP
 #   Variables from config.sh
 function test-setup {
 
@@ -502,18 +529,13 @@ function test-setup {
   # gce specific
   detect-project
 
-  if [[ ${ALREADY_UP} -ne 1 ]]; then
-    # Open up port 80 & 8080 so common containers on minions can be reached
-    gcutil addfirewall \
-      --project "${PROJECT}" \
-      --norespect_terminal_width \
-      --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-      --target_tags "${MINION_TAG}" \
-      --allowed tcp:80,tcp:8080 \
-      --network "${NETWORK}" \
-      "${MINION_TAG}-${INSTANCE_PREFIX}-http-alt"
-  fi
-
+  # Open up port 80 & 8080 so common containers on minions can be reached
+  gcloud compute firewall-rules create \
+    --project "${PROJECT}" \
+    --target-tags "${MINION_TAG}" \
+    --allow tcp:80 tcp:8080 \
+    --network "${NETWORK}" \
+    "${MINION_TAG}-${INSTANCE_PREFIX}-http-alt"
 }
 
 # Execute after running tests to perform any required clean-up.  This is called
@@ -523,23 +545,82 @@ function test-setup {
 #   PROJECT
 function test-teardown {
   echo "Shutting down test cluster in background."
-  gcutil deletefirewall  \
+  gcloud compute firewall-rules delete  \
     --project "${PROJECT}" \
-    --norespect_terminal_width \
-    --sleep_between_polls "${POLL_SLEEP_INTERVAL}" \
-    --force \
-    "${MINION_TAG}-${INSTANCE_PREFIX}-http-alt" || true > /dev/null
-  "${KUBE_ROOT}/cluster/kube-down.sh" > /dev/null
+    --quiet \
+    "${MINION_TAG}-${INSTANCE_PREFIX}-http-alt" || true
+  "${KUBE_ROOT}/cluster/kube-down.sh"
 }
 
 # SSH to a node by name ($1) and run a command ($2).
 function ssh-to-node {
   local node="$1"
   local cmd="$2"
-  gcutil --log_level=WARNING ssh --ssh_arg "-o LogLevel=quiet" "${node}" "${cmd}"
+  gcloud compute ssh --ssh-flag="-o LogLevel=quiet" --zone="${ZONE}" "${node}" --command "${cmd}"
 }
 
 # Restart the kube-proxy on a node ($1)
 function restart-kube-proxy {
   ssh-to-node "$1" "sudo /etc/init.d/kube-proxy restart"
+}
+
+# Setup monitoring using heapster and InfluxDB
+function setup-monitoring {
+  if [[ "${ENABLE_CLUSTER_MONITORING}" == "true" ]]; then
+    echo "Setting up cluster monitoring using Heapster."
+
+    if ! gcloud compute firewall-rules describe monitoring-heapster &>/dev/null; then
+      if ! gcloud compute firewall-rules create monitoring-heapster \
+          --project "${PROJECT}" \
+          --target-tags="${MINION_TAG}" \
+          --allow tcp:80 tcp:8083 tcp:8086 tcp:9200; then
+        echo "Failed to set up firewall for monitoring" && false
+      fi
+    fi
+
+    # Re-use master auth for Grafana
+    get-password
+    ensure-temp-dir
+
+    cp "${KUBE_ROOT}/examples/monitoring/influx-grafana-pod.json" "${KUBE_TEMP}/influx-grafana-pod.0.json"
+    sed "s/HTTP_USER, \"value\": \"[^\"]*\"/HTTP_USER, \"value\": \"$KUBE_USER\"/g" \
+        "${KUBE_TEMP}/influx-grafana-pod.0.json" > "${KUBE_TEMP}/influx-grafana-pod.1.json"
+    sed "s/HTTP_PASS, \"value\": \"[^\"]*\"/HTTP_PASS, \"value\": \"$KUBE_PASSWORD\"/g" \
+        "${KUBE_TEMP}/influx-grafana-pod.1.json" > "${KUBE_TEMP}/influx-grafana-pod.2.json"
+    local kubectl="${KUBE_ROOT}/cluster/kubectl.sh"
+    if "${kubectl}" create -f "${KUBE_TEMP}/influx-grafana-pod.2.json" &> /dev/null \
+        && "${kubectl}" create -f "${KUBE_ROOT}/examples/monitoring/influx-grafana-service.json" &> /dev/null \
+        && "${kubectl}" create -f "${KUBE_ROOT}/examples/monitoring/heapster-pod.json" &> /dev/null; then
+      local dashboard_url="http://$(${kubectl} get -o json pod influx-grafana | grep hostIP | awk '{print $2}' | sed 's/[,|\"]//g')"
+      echo
+      echo "Grafana dashboard will be available at $dashboard_url. Wait for the monitoring dashboard to be online."
+      echo "Use the master user name and password for the dashboard."
+      echo
+    else
+      echo "Failed to Setup Monitoring"
+      teardown-monitoring
+    fi
+  fi
+}
+
+function teardown-monitoring {
+  if [[ "${ENABLE_CLUSTER_MONITORING}" == "true" ]]; then
+    detect-project
+
+    local kubectl="${KUBE_ROOT}/cluster/kubectl.sh"
+    "${kubectl}" delete pods heapster &> /dev/null || true
+    "${kubectl}" delete pods influx-grafana &> /dev/null || true
+    "${kubectl}" delete services influx-master &> /dev/null || true
+    if gcloud compute firewall-rules describe monitoring-heapster &> /dev/null; then
+      gcloud compute firewall-rules delete \
+          --project "${PROJECT}" \
+          --quiet \
+          monitoring-heapster &> /dev/null || true
+    fi
+  fi
+}
+
+# Perform preparations required to run e2e tests
+function prepare-e2e() {
+  detect-project
 }

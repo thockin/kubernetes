@@ -62,15 +62,28 @@ according to a policy, but the only policy supported for now is round-robin).
 When a `pod` is scheduled, the master adds a set of environment variables for
 each active `service`.  We support both
 [Docker-links-compatible](https://docs.docker.com/userguide/dockerlinks/)
-variables and simpler {SVCNAME}_SERVICE_HOST and {SVCNAME}_SERVICE_PORT
-variables.  This does imply an ordering requirement - any `service` that a `pod`
+variables (see [makeLinkVariables](https://github.com/GoogleCloudPlatform/kubernetes/blob/master/pkg/kubelet/envvars/envvars.go#L49)) and simpler {SVCNAME}_SERVICE_HOST and {SVCNAME}_SERVICE_PORT
+variables, where the service name is upper-cased and dashes are converted to underscores.
+For example, the service "redis-master" exposed on TCP port 6379 and allocated IP address
+10.0.0.11 produces the following environment variables:
+```
+REDIS_MASTER_SERVICE_HOST=10.0.0.11
+REDIS_MASTER_SERVICE_PORT=6379
+REDIS_MASTER_PORT=tcp://10.0.0.11:6379
+REDIS_MASTER_PORT_6379_TCP=tcp://10.0.0.11:6379
+REDIS_MASTER_PORT_6379_TCP_PROTO=tcp
+REDIS_MASTER_PORT_6379_TCP_PORT=6379
+REDIS_MASTER_PORT_6379_TCP_ADDR=10.0.0.11
+```
+
+This does imply an ordering requirement - any `service` that a `pod`
 wants to access must be created before the `pod` itself, or else the environment
 variables will not be populated.  This restriction will be removed once DNS for
 `services` is supported.
 
 A `service`, through its label selector, can resolve to 0 or more `endpoints`.
-Over the life of a `services`, the set of `pods` which comprise that
-`services` can
+Over the life of a `service`, the set of `pods` which comprise that
+`service` can
 grow, shrink, or turn over completely.  Clients will only see issues if they are
 actively using a backend when that backend is removed from the `services` (and even
 then, open connections will persist for some protocols).
@@ -112,7 +125,7 @@ when the backend `services` is created, the Kubernetes master assigns a portal
 IP address, for example 10.0.0.1.  Assuming the `service` port is 1234, the
 portal is 10.0.0.1:1234.  The master stores that information, which is then
 observed by all of the `service proxy` instances in the cluster.  When a proxy
-sees a new portal, it opens a new random port, establish an iptables redirect
+sees a new portal, it opens a new random port, establishes an iptables redirect
 from the portal to this new port, and starts accepting connections on it.
 
 When a client connects to `MYAPP_SERVICE_HOST` on the portal port (whether
@@ -127,16 +140,22 @@ being aware of which `pods` they are accessing.
 
 ![Services detailed diagram](services_detail.png)
 
+## External Services
+For some parts of your application (e.g. your frontend) you want to expose a service on an external (publically visible) IP address.
+
+If you want your service to be exposed on an external IP address, you can optionally supply a list of "publicIPs"
+which the service should respond to.  These IP address will be combined with the Service's port and will also be 
+mapped to the set of pods selected by the service.  You are then responsible for ensuring that traffic to that 
+external IP address gets sent to one or more kubernetes worker nodes. An IPTables rules on each host that maps
+packets from the specified public IP address to the service proxy in the same manner as internal service IP
+addresses.
+
+On cloud providers which support external load balancers, there is a simpler way to achieve the same thing.  On such
+providers (e.g. GCE) you can leave ```publicIPs``` empty, and instead you can set the 
+```createExternalLoadBalancer``` flag on the service.  This sets up a cloud provider specific load balancer
+(assuming that it is supported by your cloud provider) and populates the Public IP field with the appropriate value.
+
 ## Shortcomings
-
-Part of the `service` specification is a `createExternalLoadBalancer` flag,
-which tells the master to make an external load balancer that points to the
-service.  In order to do this today, the service proxy must answer on a known
-(i.e. not random) port.  In this case, the service port is promoted to the
-proxy port.  This means that is is still possible for users to collide with
-each others services or with other pods.  We expect most `services` will not
-set this flag, mitigating the exposure.
-
 We expect that using iptables for portals will work at small scale, but will
 not scale to large clusters with thousands of services.  See [the original
 design proposal for

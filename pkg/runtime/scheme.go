@@ -17,6 +17,7 @@ limitations under the License.
 package runtime
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/conversion"
@@ -174,6 +175,12 @@ func (s *Scheme) KnownTypes(version string) map[string]reflect.Type {
 	return s.raw.KnownTypes(version)
 }
 
+// DataVersionAndKind will return the APIVersion and Kind of the given wire-format
+// encoding of an API Object, or an error.
+func (s *Scheme) DataVersionAndKind(data []byte) (version, kind string, err error) {
+	return s.raw.DataVersionAndKind(data)
+}
+
 // ObjectVersionAndKind returns the version and kind of the given Object.
 func (s *Scheme) ObjectVersionAndKind(obj Object) (version, kind string, err error) {
 	return s.raw.ObjectVersionAndKind(obj)
@@ -210,11 +217,36 @@ func (s *Scheme) AddConversionFuncs(conversionFuncs ...interface{}) error {
 	return s.raw.AddConversionFuncs(conversionFuncs...)
 }
 
+// AddStructFieldConversion allows you to specify a mechanical copy for a moved
+// or renamed struct field without writing an entire conversion function. See
+// the comment in conversion.Converter.SetStructFieldCopy for parameter details.
+// Call as many times as needed, even on the same fields.
+func (s *Scheme) AddStructFieldConversion(srcFieldType interface{}, srcFieldName string, destFieldType interface{}, destFieldName string) error {
+	return s.raw.AddStructFieldConversion(srcFieldType, srcFieldName, destFieldType, destFieldName)
+}
+
 // Convert will attempt to convert in into out. Both must be pointers.
 // For easy testing of conversion functions. Returns an error if the conversion isn't
 // possible.
 func (s *Scheme) Convert(in, out interface{}) error {
 	return s.raw.Convert(in, out)
+}
+
+// ConvertToVersion attempts to convert an input object to its matching Kind in another
+// version within this scheme. Will return an error if the provided version does not
+// contain the inKind (or a mapping by name defined with AddKnownTypeWithName). Will also
+// return an error if the conversion does not result in a valid Object being
+// returned.
+func (s *Scheme) ConvertToVersion(in Object, outVersion string) (Object, error) {
+	unknown, err := s.raw.ConvertToVersion(in, outVersion)
+	if err != nil {
+		return nil, err
+	}
+	obj, ok := unknown.(Object)
+	if !ok {
+		return nil, fmt.Errorf("the provided object cannot be converted to a runtime.Object: %#v", unknown)
+	}
+	return obj, nil
 }
 
 // EncodeToVersion turns the given api object into an appropriate JSON string.

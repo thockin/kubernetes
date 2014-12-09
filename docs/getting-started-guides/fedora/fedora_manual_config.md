@@ -1,19 +1,23 @@
 ##Getting started on [Fedora](http://fedoraproject.org)
 
-This is a getting started guide for Fedora.  It is a manual configuration so you understand all the underlying packages / services / ports, etc...  The guide is broken into 2 sections:
+This is a getting started guide for Fedora.  It is a manual configuration so you understand all the underlying packages / services / ports, etc...
+
+This guide will only get ONE minion working.  Multiple minions requires a functional [networking configuration](https://github.com/GoogleCloudPlatform/kubernetes/blob/master/docs/networking.md) done outside of kubernetes.  Although the additional kubernetes configuration requirements should be obvious.
+
+The guide is broken into 3 sections:
 
 1. Prepare the hosts.
 2. Configuring the two hosts, a master and a minion.
 3. Basic functionality test.
 
-The kubernetes package provides a few services: apiserver, scheduler, controller, kubelet, proxy.  These services are managed by systemd and the configuration resides in a central location: /etc/kubernetes. We will break the services up between the hosts.  The first host, fed1, will be the kubernetes master.  This host will run the apiserver, controller, and scheduler.  In addition, the master will also run _etcd_.  The remaining host, fed2 will be the minion and run kubelet, proxy and docker.
+The kubernetes package provides a few services: kube-apiserver, kube-scheduler, kube-controller-manager, kubelet, kube-proxy.  These services are managed by systemd and the configuration resides in a central location: /etc/kubernetes. We will break the services up between the hosts.  The first host, fed-master, will be the kubernetes master.  This host will run the kube-apiserver, kube-controller-manager, and kube-scheduler.  In addition, the master will also run _etcd_.  The remaining host, fed-minion will be the minion and run kubelet, proxy, cadvisor and docker.
 
 **System Information:**
 
 Hosts:
 ```
-fed1 = 192.168.121.9
-fed2 = 192.168.121.65
+fed-master = 192.168.121.9
+fed-minion = 192.168.121.65
 ```
 
 Versions:
@@ -21,80 +25,27 @@ Versions:
 ```
 Fedora release 20 (Heisenbug)
 
-etcd-0.4.6-3.fc20.x86_64
-kubernetes-0.2-0.4.gitcc7999c.fc20.x86_64
+etcd-0.4.6-6.fc20.x86_64
+kubernetes-0.4-0.2.gitd5377e4.fc22.x86_64
 ```
 
   
 **Prepare the hosts:**
     
-* Enable the copr repos on all hosts.  Colin Walters has already built the appropriate etcd / kubernetes packages for rawhide.  You can see the copr repo [here](https://copr.fedoraproject.org/coprs/walters/atomic-next/).
+* Install kubernetes on all hosts - fed-{master,minion}.  This will also pull in etcd, docker, and cadvisor.
 
 ```
-# yum -y install dnf dnf-plugins-core
-# dnf copr enable walters/atomic-next
-# yum repolist walters-atomic-next/x86_64
-Loaded plugins: langpacks
-repo id                                     repo name                                                     status
-walters-atomic-next/x86_64       Copr repo for atomic-next owned by walters      37
-repolist: 37
+yum -y install --enablerepo=updates-testing kubernetes
 ```
 
-* Install kubernetes on all hosts - fed{1,2}.  This will also pull in etcd and cadvisor.  In addition, pull in the iptables-services package as we will not be using firewalld.
+* Add master and minion to /etc/hosts on all machines (not needed if hostnames already in DNS)
 
 ```
-yum -y install kubernetes
-yum -y install iptables-services
+echo "192.168.121.9	fed-master
+192.168.121.65	fed-minion" >> /etc/hosts
 ```
 
-* Pick a host and explore the packages. 
-
-```
-rpm -qi kubernetes
-rpm -qc kubernetes
-rpm -ql kubernetes
-rpm -ql etcd
-rpm -qi etcd
-rpm -qi cadvisor
-rpm -qc cadvisor
-rpm -ql cadvisor
-```
-
-* Install docker-io on fed2
-
-```
-# yum erase docker -y
-# yum -y install docker-io
-```
-
-** Configure the kubernetes services on fed1. For this exercise, the apiserver, controller manager, iptables and etcd will be started on fed1. **
-
-* Configure the /etc/kubernetes/apiserver to appear as such:
-
-```       
-###
-# kubernetes system config
-#
-# The following values are used to configure the kubernetes-apiserver
-#
-
-# The address on the local server to listen to.
-KUBE_API_ADDRESS="0.0.0.0"
-
-# The port on the local server to listen on.
-KUBE_API_PORT="8080"
-
-# How the replication controller and scheduler find the apiserver
-KUBE_MASTER="192.168.121.9:8080"
-
-# Comma seperated list of minions
-MINION_ADDRESSES="192.168.121.65"
-
-# Port minions listen on
-MINION_PORT="10250"
-```
-
-* Configure the /etc/kubernetes/config to appear as such:
+* Edit /etc/kubernetes/config which will be the same on all hosts
 
 ```
 ###
@@ -103,24 +54,77 @@ MINION_PORT="10250"
 # The following values are used to configure various aspects of all
 # kubernetes services, including
 #
-#   kubernetes-apiserver.service
-#   kubernetes-controller-manager.service
-#   kubernetes-kubelet.service
-#   kubernetes-proxy.service
+#   kube-apiserver.service
+#   kube-controller-manager.service
+#   kube-scheduler.service
+#   kubelet.service
+#   kube-proxy.service
 
 # Comma seperated list of nodes in the etcd cluster
-KUBE_ETCD_SERVERS="http://192.168.121.9:4001"
+KUBE_ETCD_SERVERS="--etcd_servers=http://fed-master:4001"
 
 # logging to stderr means we get it in the systemd journal
-KUBE_LOGTOSTDERR="true"
+KUBE_LOGTOSTDERR="--logtostderr=true"
 
 # journal message level, 0 is debug
-KUBE_LOG_LEVEL=0
+KUBE_LOG_LEVEL="--v=0"
 
-KUBE_ALLOW_PRIV="true"
+# Should this cluster be allowed to run privleged docker containers
+KUBE_ALLOW_PRIV="--allow_privileged=false"
 ```
 
-* Start the appropriate services on fed1:
+* Disable the firewall on both the master and minon, as docker does not play well with other firewall rule managers
+
+```
+systemctl disable iptables-services firewalld
+systemctl stop iptables-services firewalld
+```
+
+**Configure the kubernetes services on the master.**
+
+***For this you need to configure the kube-apiserver. The kube-apiserver, kube-controller-manager, and kube-scheduler along with the etcd, will need to be started***
+
+* Edit /etc/kubernetes/apiserver to appear as such:
+
+```       
+###
+# kubernetes system config
+#
+# The following values are used to configure the kube-apiserver
+#
+
+# The address on the local server to listen to.
+KUBE_API_ADDRESS="--address=0.0.0.0"
+
+# The port on the local server to listen on.
+KUBE_API_PORT="--port=8080"
+
+# How the replication controller and scheduler find the kube-apiserver
+KUBE_MASTER="--master=fed-master:8080"
+
+# Port minions listen on
+KUBELET_PORT="--kubelet_port=10250"
+
+# Address range to use for services
+KUBE_SERVICE_ADDRESSES="--portal_net=10.254.0.0/16"
+
+# Add you own!
+KUBE_API_ARGS=""
+```
+
+* Edit /etc/kubernetes/controller-manager to appear as such:
+```
+###
+# kubernetes system config
+#
+# The following values are used to configure the kube-controller-manager
+#
+
+# Comma seperated list of minions
+KUBELET_ADDRESSES="--machines=fed-minion"
+```
+
+* Start the appropriate services on master:
 
 ```
 for SERVICES in etcd kube-apiserver kube-controller-manager kube-scheduler; do 
@@ -130,76 +134,52 @@ for SERVICES in etcd kube-apiserver kube-controller-manager kube-scheduler; do
 done
 ```
 
-* Test etcd on the master (fed1) and make sure it's working (pulled from CoreOS github page):
-
-```       
-curl -L http://127.0.0.1:4001/v2/keys/mykey -XPUT -d value="this is awesome"
-curl -L http://127.0.0.1:4001/v2/keys/mykey
-curl -L http://127.0.0.1:4001/version
-```       
-
 * Take a look at what ports the services are running on.
 
 ```       
-# netstat -tulnp
+# netstat -tulnp | grep -E "(kube)|(etcd)"
 ```       
 
-* Open up the ports for etcd and the kubernetes API server on the master (fed1).
+* Test etcd on the master (fed-master)
 
 ```       
-/sbin/iptables -I INPUT 1 -p tcp --dport 8080 -j ACCEPT -m comment --comment "kube-apiserver"
-/sbin/iptables -I INPUT 1 -p tcp --dport 4001 -j ACCEPT -m comment --comment "etcd_client"
-service iptables save
-systemctl daemon-reload
-systemctl restart iptables
-systemctl status iptables
+curl -s -L http://fed-master:4001/version
+curl -s -L http://fed-master:4001/v2/keys/mykey -XPUT -d value="this is awesome" | python -mjson.tool
+curl -s -L http://fed-master:4001/v2/keys/mykey | python -mjson.tool
+curl -s -L http://fed-master:4001/v2/keys/mykey -XDELETE | python -mjson.tool
 ```       
 
-** Configure the kubernetes services on fed2. For this exercise, the kubelet, kube-proxy, and iptables fed2. **
+* Poke the kube-apiserver just a bit
+```
+curl -s -L http://fed-master:8080/version | python -mjson.tool
+curl -s -L http://fed-master:8080/api/v1beta1/pods | python -mjson.tool
+curl -s -L http://fed-master:8080/api/v1beta1/minions | python -mjson.tool
+curl -s -L http://fed-master:8080/api/v1beta1/services | python -mjson.tool
+```
+**Configure the kubernetes services on the minion.**
 
-* Configure the /etc/kubernetes/kubelet to appear as such:
+***We need to configure the kubelet and start the kubelet and proxy***
+
+* Edit /etc/kubernetes/kubelet to appear as such:
 
 ```       
 ###
-# kubernetes kublet (minion) config
+# kubernetes kubelet (minion) config
 
 # The address for the info server to serve on
-MINION_ADDRESS="192.168.121.65"
+KUBELET_ADDRESS="--address=fed-minion"
 
 # The port for the info server to serve on
-MINION_PORT="10250"
+KUBELET_PORT="--port=10250"
 
 # You may leave this blank to use the actual hostname
-MINION_HOSTNAME="192.168.121.65"
+KUBELET_HOSTNAME="--hostname_override=fed-minion"
+
+# Add your won!
+KUBELET_ARGS=""
 ```       
 
-* Configure the /etc/kubernetes/config to appear as such:
-
-```
-###
-# kubernetes system config
-#
-# The following values are used to configure various aspects of all
-# kubernetes services, including
-#
-#   kubernetes-apiserver.service
-#   kubernetes-controller-manager.service
-#   kubernetes-kubelet.service
-#   kubernetes-proxy.service
-
-# Comma seperated list of nodes in the etcd cluster
-KUBE_ETCD_SERVERS="http://192.168.121.9:4001"
-
-# logging to stderr means we get it in the systemd journal
-KUBE_LOGTOSTDERR="true"
-
-# journal message level, 0 is debug
-KUBE_LOG_LEVEL=0
-
-KUBE_ALLOW_PRIV="true"
-```
-
-* Start the appropriate services on fed2.
+* Start the appropriate services on minion (fed-minion).
 
 ```
 for SERVICES in kube-proxy kubelet docker; do 
@@ -212,95 +192,96 @@ done
 * Take a look at what ports the services are running on.
 
 ```       
-netstat -tulnp
+netstat -tulnp | grep -E "(kube)|(docker)|(cadvisor)"
 ```       
 
-* Open up the port for the kubernetes kubelet server on the minion (fed2).
+* Check to make sure the cluster can see the minion (on fed-master)
 
-```       
-/sbin/iptables -I INPUT 1 -p tcp --dport 10250 -j ACCEPT -m comment --comment "kubelet"
-service iptables save
-systemctl daemon-reload
-systemctl restart iptables
-systemctl status iptables
-```       
- 
+```
+kubectl get minions
+```
 
-* Now the two servers are set up to kick off a sample application.  In this case, we'll deploy a web server to fed2.  Start off by making a file in roots home directory on fed1 called apache.json that looks as such:
+**The cluster should be running! Launch a test pod.**
 
-```       
-cat ~/apache.json 
+* Create a file on fed-master called apache.json that looks as such:
+
+```
 {
-  "id": "apache",
-  "desiredState": {
-    "manifest": {
-      "version": "v1beta1",
-      "id": "apache-1",
-      "containers": [{
-        "name": "master",
-        "image": "fedora/apache",
-        "ports": [{
-          "containerPort": 80,
-          "hostPort": 80
-        }]
-      }]
-    }
-  },
-  "labels": {
-    "name": "apache"
-  }
+    "apiVersion": "v1beta1",
+    "kind": "Pod",
+    "id": "apache",
+    "namespace": "default",
+    "labels": {
+        "name": "apache"
+    },
+    "desiredState": {
+        "manifest": {
+            "version": "v1beta1",
+            "id": "apache",
+            "volumes": null,
+            "containers": [
+                {
+                    "name": "master",
+                    "image": "fedora/apache",
+                    "ports": [
+                        {
+                            "containerPort": 80,
+                            "hostPort": 80,
+                            "protocol": "TCP"
+                        }
+                    ],
+                }
+            ],
+            "restartPolicy": {
+                "always": {}
+            }
+        },
+    },
 }
 ```       
 
-This json file is describing the attributes of the application environment.  For example, it is giving it an "id", "name", "ports", and "image".  Since the fedora/apache images doesn't exist in our environment yet, it will be pulled down automatically as part of the deployment process.  I have seen errors though where kubernetes was looking for a cached image.  In that case I did a manual "docker pull fedora/apache" and that seemed to resolve.
+This json file is describing the attributes of the application environment.  For example, it is giving it a "kind", "id", "name", "ports", and "image".  Since the fedora/apache images doesn't exist in our environment yet, it will be pulled down automatically as part of the deployment process.
+
 For more information about which options can go in the schema, check out the docs on the kubernetes github page.
 
 * Deploy the fedora/apache image via the apache.json file.
 
 ```       
-/bin/kubecfg -c apache.json create pods
+kubectl create -f apache.json
 ```
        
 
 * You can monitor progress of the operations with these commands:
-On the master (fed1) -
+On the master (fed-master) -
 
 ```       
 journalctl -f -l -xn -u kube-apiserver -u etcd -u kube-scheduler
 ```
 
-* On the minion (fed2) -
+* On the minion (fed-minion) -
 
 ```       
-journalctl -f -l -xn -u kubelet.service -u kube-proxy -u docker
+journalctl -f -l -xn -u kubelet -u kube-proxy -u docker
 ```
        
-
-* This is what a successful expected result should look like:
-
-```       
-/bin/kubecfg -c apache.json create pods 
-ID                  Image(s)            Host                Labels              Status
-----------          ----------          ----------          ----------          ----------
-apache              fedora/apache       /                   name=apache         Waiting
-```
 
 * After the pod is deployed, you can also list the pod.
 
 ```       
-/bin/kubecfg -c apache.json list pods 
-ID                  Image(s)            Host                Labels              Status
-----------          ----------          ----------          ----------          ----------
+# /usr/bin/kubectl get pods 
+ID                  IMAGE(S)            HOST                LABELS              STATUS
 apache              fedora/apache       192.168.121.65/     name=apache         Running
 ```       
+
+The state might be 'Waiting'.  This indicates that docker is still attempting to download and launch the container.
 
 * You can get even more information about the pod like this.
 
 ```       
-/bin/kubecfg -json get pods/apache | python -mjson.tool
+kubectl get --output=json pods/apache | python -mjson.tool
 ```       
 
-* Finally, on the minion (fed2), check that the service is available, running, and functioning.
+* Finally, on the minion (fed-minion), check that the service is available, running, and functioning.
 
 ```       
 docker images
@@ -319,10 +300,9 @@ Apache
 * To delete the container.
 
 ```       
-/bin/kubecfg -h http://127.0.0.1:8080 delete /pods/apache
+# /usr/bin/kubectl --server=http://fed-master:8080 delete pod apache
 ```       
 
 Of course this just scratches the surface. I recommend you head off to the kubernetes github page and follow the guestbook example.  It's a bit more complicated but should expose you to more functionality.
 
-You can play around with other Fedora images by building from Fedora Dockerfiles. Check here at Github. 
-
+You can play around with other Fedora images by building from Fedora Dockerfiles.

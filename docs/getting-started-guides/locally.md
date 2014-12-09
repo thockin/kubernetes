@@ -1,6 +1,6 @@
 ## Getting started locally
 
-### Requirements 
+### Requirements
 
 #### Linux
 
@@ -12,7 +12,7 @@ At least [Docker](https://docs.docker.com/installation/#installation) 1.0.0+. En
 
 #### etcd
 
-You need an [etcd](https://github.com/coreos/etcd) somewhere in your path. Get the [latest release](https://github.com/coreos/etcd/releases/) and place it in `/usr/bin`.
+You need an [etcd](https://github.com/coreos/etcd/releases/tag/v0.4.6) in your path, please make sure it is installed and in your ``$PATH``.
 
 ### Starting the cluster
 
@@ -27,10 +27,11 @@ This will build and start a lightweight local cluster, consisting of a master
 and a single minion. Type Control-C to shut it down.
 
 You can use the cluster/kubecfg.sh script to interact with the local cluster.
-You must set the KUBERNETES_MASTER environment variable to let other programs
+You must set the KUBERNETES_PROVIDER and KUBERNETES_MASTER environment variables to let other programs
 know how to reach your master.
 
 ```
+export KUBERNETES_PROVIDER=local
 export KUBERNETES_MASTER=http://localhost:8080
 ```
 

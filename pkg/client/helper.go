@@ -61,6 +61,19 @@ type Config struct {
 	Transport http.RoundTripper
 }
 
+type KubeletConfig struct {
+	// ToDo: Add support for different kubelet instances exposing different ports
+	Port        uint
+	EnableHttps bool
+
+	// TLS Configuration, only applies if EnableHttps is true.
+	CertFile string
+	// TLS Configuration, only applies if EnableHttps is true.
+	KeyFile string
+	// TLS Configuration, only applies if EnableHttps is true.
+	CAFile string
+}
+
 // New creates a Kubernetes client for the given config. This client works with pods,
 // replication controllers and services. It allows operations such as list, get, update
 // and delete on these objects. An error is returned if the provided configuration
@@ -159,7 +172,7 @@ func TransportFor(config *Config) (http.RoundTripper, error) {
 // DefaultServerURL converts a host, host:port, or URL string to the default base server API path
 // to use with a Client at a given API version following the standard conventions for a
 // Kubernetes API.
-func DefaultServerURL(host, prefix, version string, defaultSecure bool) (*url.URL, error) {
+func DefaultServerURL(host, prefix, version string, defaultTLS bool) (*url.URL, error) {
 	if host == "" {
 		return nil, fmt.Errorf("host must be a URL or a host:port pair")
 	}
@@ -173,7 +186,7 @@ func DefaultServerURL(host, prefix, version string, defaultSecure bool) (*url.UR
 	}
 	if hostURL.Scheme == "" {
 		scheme := "http://"
-		if defaultSecure {
+		if defaultTLS {
 			scheme = "https://"
 		}
 		hostURL, err = url.Parse(scheme + base)
@@ -200,13 +213,13 @@ func DefaultServerURL(host, prefix, version string, defaultSecure bool) (*url.UR
 	return hostURL, nil
 }
 
-// IsConfigTransportSecure returns true iff the provided config will result in a protected
+// IsConfigTransportTLS returns true iff the provided config will result in a protected
 // connection to the server when it is passed to client.New() or client.RESTClientFor().
 // Use to determine when to send credentials over the wire.
 //
 // Note: the Insecure flag is ignored when testing for this value, so MITM attacks are
 // still possible.
-func IsConfigTransportSecure(config *Config) bool {
+func IsConfigTransportTLS(config *Config) bool {
 	baseURL, err := defaultServerUrlFor(config)
 	if err != nil {
 		return false
@@ -214,16 +227,17 @@ func IsConfigTransportSecure(config *Config) bool {
 	return baseURL.Scheme == "https"
 }
 
-// defaultServerUrlFor is shared between IsConfigSecure and RESTClientFor
+// defaultServerUrlFor is shared between IsConfigTransportTLS and RESTClientFor
 func defaultServerUrlFor(config *Config) (*url.URL, error) {
 	version := defaultVersionFor(config)
 	// TODO: move the default to secure when the apiserver supports TLS by default
-	defaultSecure := config.CertFile != ""
+	// config.Insecure is taken to mean "I want HTTPS but don't bother checking the certs against a CA."
+	defaultTLS := config.CertFile != "" || config.Insecure
 	host := config.Host
 	if host == "" {
 		host = "localhost"
 	}
-	return DefaultServerURL(host, config.Prefix, version, defaultSecure)
+	return DefaultServerURL(host, config.Prefix, version, defaultTLS)
 }
 
 // defaultVersionFor is shared between defaultServerUrlFor and RESTClientFor

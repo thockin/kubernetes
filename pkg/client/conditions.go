@@ -26,11 +26,10 @@ import (
 // for a controller's ReplicaSelector equals the Replicas count.
 func (c *Client) ControllerHasDesiredReplicas(controller api.ReplicationController) wait.ConditionFunc {
 	return func() (bool, error) {
-		ctx := api.WithNamespace(api.NewContext(), controller.Namespace)
-		pods, err := c.ListPods(ctx, labels.Set(controller.DesiredState.ReplicaSelector).AsSelector())
+		pods, err := c.Pods(controller.Namespace).List(labels.Set(controller.Spec.Selector).AsSelector())
 		if err != nil {
 			return false, err
 		}
-		return len(pods.Items) == controller.DesiredState.Replicas, nil
+		return len(pods.Items) == controller.Spec.Replicas, nil
 	}
 }

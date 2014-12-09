@@ -17,55 +17,90 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
+
 	"github.com/spf13/cobra"
 )
 
-func NewCmdGet(out io.Writer) *cobra.Command {
+func (f *Factory) NewCmdGet(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get [(-o|--output=)table|json|yaml|template] [-t <file>|--template=<file>] <resource> [<id>]",
+		Use:   "get [(-o|--output=)json|yaml|...] <resource> [<id>]",
 		Short: "Display one or many resources",
 		Long: `Display one or many resources.
 
 Possible resources include pods (po), replication controllers (rc), services
-(se) or minions (mi).
+(se), minions (mi), or events (ev).
 
-If you specify a Go template, you can use any field defined in pkg/api/types.go.
+If you specify a Go template, you can use any fields defined for the API version
+you are connecting to the server with.
 
 Examples:
   $ kubectl get pods
   <list all pods in ps output format>
 
   $ kubectl get replicationController 1234-56-7890-234234-456456
-  <list single repliaction controller in ps output format>
+  <list single replication controller in ps output format>
 
-  $ kubectl get -f json pod 1234-56-7890-234234-456456
+  $ kubectl get -o json pod 1234-56-7890-234234-456456
   <list single pod in json output format>`,
 		Run: func(cmd *cobra.Command, args []string) {
-			var resource, id string
-			if len(args) == 0 {
-				usageError(cmd, "Need to supply a resource.")
-			}
-			if len(args) >= 1 {
-				resource = args[0]
-			}
-			if len(args) >= 2 {
-				id = args[1]
-			}
-			outputFormat := getFlagString(cmd, "output")
-			templateFile := getFlagString(cmd, "template")
-			selector := getFlagString(cmd, "selector")
-			err := kubectl.Get(out, getKubeClient(cmd).RESTClient, resource, id, selector, outputFormat, getFlagBool(cmd, "no-headers"), templateFile)
+			mapping, namespace, name := ResourceOrTypeFromArgs(cmd, args, f.Mapper)
+
+			selector := GetFlagString(cmd, "selector")
+			labelSelector, err := labels.ParseSelector(selector)
 			checkErr(err)
+
+			client, err := f.Client(cmd, mapping)
+			checkErr(err)
+
+			outputFormat := GetFlagString(cmd, "output")
+			templateFile := GetFlagString(cmd, "template")
+			defaultPrinter, err := f.Printer(cmd, mapping, GetFlagBool(cmd, "no-headers"))
+			checkErr(err)
+
+			outputVersion := GetFlagString(cmd, "output-version")
+			if len(outputVersion) == 0 {
+				outputVersion = mapping.APIVersion
+			}
+
+			printer, err := kubectl.GetPrinter(outputFormat, templateFile, outputVersion, mapping.ObjectConvertor, defaultPrinter)
+			checkErr(err)
+
+			restHelper := kubectl.NewRESTHelper(client, mapping)
+			obj, err := restHelper.Get(namespace, name, labelSelector)
+			checkErr(err)
+
+			isWatch, isWatchOnly := GetFlagBool(cmd, "watch"), GetFlagBool(cmd, "watch-only")
+
+			// print the current object
+			if !isWatchOnly {
+				if err := printer.PrintObj(obj, out); err != nil {
+					checkErr(fmt.Errorf("unable to output the provided object: %v", err))
+				}
+			}
+
+			// print watched changes
+			if isWatch || isWatchOnly {
+				rv, err := mapping.MetadataAccessor.ResourceVersion(obj)
+				checkErr(err)
+
+				w, err := restHelper.Watch(namespace, rv, labelSelector, labels.Everything())
+				checkErr(err)
+
+				kubectl.WatchLoop(w, printer, out)
+			}
 		},
 	}
-	// TODO Add an --output-version lock which can ensure that regardless of the
-	// server version, the client output stays the same.
-	cmd.Flags().StringP("output", "o", "console", "Output format: console|json|yaml|template")
-	cmd.Flags().Bool("no-headers", false, "When output format is console, don't print headers")
-	cmd.Flags().StringP("template", "t", "", "Path to template file to use when --output=template")
+	cmd.Flags().StringP("output", "o", "", "Output format: json|yaml|template|templatefile")
+	cmd.Flags().String("output-version", "", "Output the formatted object with the given version (default api-version)")
+	cmd.Flags().Bool("no-headers", false, "When using the default output, don't print headers")
+	cmd.Flags().StringP("template", "t", "", "Template string or path to template file to use when --output=template or --output=templatefile")
 	cmd.Flags().StringP("selector", "l", "", "Selector (label query) to filter on")
+	cmd.Flags().BoolP("watch", "w", false, "After listing/getting the requested object, watch for changes.")
+	cmd.Flags().Bool("watch-only", false, "Watch for changes to the requseted object(s), without listing/getting first.")
 	return cmd
 }

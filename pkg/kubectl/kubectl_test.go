@@ -17,8 +17,6 @@ limitations under the License.
 package kubectl
 
 import (
-	"bytes"
-	"io"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -33,55 +31,54 @@ func validateAction(expectedAction, actualAction client.FakeAction, t *testing.T
 	}
 }
 
-func TestLoadAuthInfo(t *testing.T) {
-	loadAuthInfoTests := []struct {
-		authData string
-		authInfo *AuthInfo
-		r        io.Reader
+func TestLoadNamespaceInfo(t *testing.T) {
+	loadNamespaceInfoTests := []struct {
+		nsData string
+		nsInfo *NamespaceInfo
 	}{
 		{
-			`{"user": "user", "password": "pass"}`,
-			&AuthInfo{User: "user", Password: "pass"},
-			nil,
+			`{"Namespace":"test"}`,
+			&NamespaceInfo{Namespace: "test"},
 		},
 		{
-			"", nil, nil,
+			"", nil,
 		},
 		{
 			"missing",
-			&AuthInfo{User: "user", Password: "pass"},
-			bytes.NewBufferString("user\npass"),
+			&NamespaceInfo{Namespace: "default"},
 		},
 	}
-	for _, loadAuthInfoTest := range loadAuthInfoTests {
-		tt := loadAuthInfoTest
-		aifile, err := ioutil.TempFile("", "testAuthInfo")
+	for _, loadNamespaceInfoTest := range loadNamespaceInfoTests {
+		tt := loadNamespaceInfoTest
+		nsfile, err := ioutil.TempFile("", "testNamespaceInfo")
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
-		if tt.authData != "missing" {
-			defer os.Remove(aifile.Name())
-			defer aifile.Close()
-			_, err = aifile.WriteString(tt.authData)
+		if tt.nsData != "missing" {
+			defer os.Remove(nsfile.Name())
+			defer nsfile.Close()
+			_, err := nsfile.WriteString(tt.nsData)
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
 		} else {
-			aifile.Close()
-			os.Remove(aifile.Name())
+			nsfile.Close()
+			os.Remove(nsfile.Name())
 		}
-		authInfo, err := LoadAuthInfo(aifile.Name(), tt.r)
-		if len(tt.authData) == 0 && tt.authData != "missing" {
+		nsInfo, err := LoadNamespaceInfo(nsfile.Name())
+		if len(tt.nsData) == 0 && tt.nsData != "missing" {
 			if err == nil {
-				t.Error("LoadAuthInfo didn't fail on empty file")
+				t.Error("LoadNamespaceInfo didn't fail on an empty file")
 			}
 			continue
 		}
-		if err != nil {
-			t.Errorf("Unexpected error: %v", err)
-		}
-		if !reflect.DeepEqual(authInfo, tt.authInfo) {
-			t.Errorf("Expected %v, got %v", tt.authInfo, authInfo)
+		if tt.nsData != "missing" {
+			if err != nil {
+				t.Errorf("Unexpected error: %v, %v", tt.nsData, err)
+			}
+			if !reflect.DeepEqual(nsInfo, tt.nsInfo) {
+				t.Errorf("Expected %v, got %v", tt.nsInfo, nsInfo)
+			}
 		}
 	}
 }

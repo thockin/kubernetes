@@ -9,14 +9,14 @@ The example below creates a Kubernetes cluster with 4 worker node Virtual Machin
 2. Make sure you can start up a GCE VM.  At least make sure you can do the [Create an instance](https://developers.google.com/compute/docs/quickstart#addvm) part of the GCE Quickstart.
 3. Make sure you can ssh into the VM without interactive prompts.
   * Your GCE SSH key must either have no passcode or you need to be using `ssh-agent`.
-  * Ensure the GCE firewall isn't blocking port 22 to your VMs.  By default, this should work but if you have edited firewall rules or created a new non-default network, you'll need to expose it: `gcutil addfirewall --network=<network-name> --description "SSH allowed from anywhere" --allowed=tcp:22 default-ssh`
+  * Ensure the GCE firewall isn't blocking port 22 to your VMs.  By default, this should work but if you have edited firewall rules or created a new non-default network, you'll need to expose it: `gcloud compute firewall-rules create --network=<network-name> --description "SSH allowed from anywhere" --allow tcp:22 default-ssh`
 4. You need to have the Google Cloud Storage API, and the Google Cloud Storage JSON API enabled. This can be done in the Google Cloud Console.
 
 
 ### Prerequisites for your workstation
 
 1. Be running a Linux or Mac OS X.
-2. You must have the [Google Cloud SDK](https://developers.google.com/cloud/sdk/) installed.  This will get you `gcloud`, `gcutil` and `gsutil`.
+2. You must have the [Google Cloud SDK](https://developers.google.com/cloud/sdk/) installed.  This will get you `gcloud` and `gsutil`.
 3. Ensure that your `gcloud` components are up-to-date by running `gcloud components update`.
 4. If you want to build your own release, you need to have [Docker
 installed](https://docs.docker.com/installation/).  On Mac OS X you can use
@@ -29,9 +29,11 @@ boot2docker.
 cluster/kube-up.sh
 ```
 
-The script above relies on Google Storage to stage the kuberntes release. It
+The script above relies on Google Storage to stage the Kubernetes release. It
 then will start (by default) a single master VM along with 4 worker VMs.  You
 can tweak some of these parameters by editing `cluster/gce/config-default.sh`
+You can view a transcript of a successful cluster creation
+[here](https://gist.github.com/satnam6502/fc689d1b46db9772adea).
 
 The instances must be able to connect to each other using their private IP. The
 script uses the "default" network which should have a firewall rule called

@@ -26,12 +26,13 @@ import (
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/meta"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/v1beta1"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/v1beta2"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
-	"github.com/fsouza/go-dockerclient"
-	"github.com/google/gofuzz"
+	docker "github.com/fsouza/go-dockerclient"
+	fuzz "github.com/google/gofuzz"
 )
 
 var fuzzIters = flag.Int("fuzz_iters", 40, "How many fuzzing iterations to do.")
@@ -46,7 +47,8 @@ var apiObjectFuzzer = fuzz.New().NilChance(.5).NumElements(1, 1).Funcs(
 		// APIVersion and Kind must remain blank in memory.
 		j.APIVersion = ""
 		j.Kind = ""
-		j.ID = c.RandString()
+
+		j.Name = c.RandString()
 		// TODO: Fix JSON/YAML packages and/or write custom encoding
 		// for uint64's. Somehow the LS *byte* of this is lost, but
 		// only when all 8 bytes are set.
@@ -63,7 +65,9 @@ var apiObjectFuzzer = fuzz.New().NilChance(.5).NumElements(1, 1).Funcs(
 		// APIVersion and Kind must remain blank in memory.
 		j.APIVersion = ""
 		j.Kind = ""
-		j.ID = c.RandString()
+	},
+	func(j *api.ObjectMeta, c fuzz.Continue) {
+		j.Name = c.RandString()
 		// TODO: Fix JSON/YAML packages and/or write custom encoding
 		// for uint64's. Somehow the LS *byte* of this is lost, but
 		// only when all 8 bytes are set.
@@ -74,6 +78,34 @@ var apiObjectFuzzer = fuzz.New().NilChance(.5).NumElements(1, 1).Funcs(
 		c.Fuzz(&sec)
 		c.Fuzz(&nsec)
 		j.CreationTimestamp = util.Unix(sec, nsec).Rfc3339Copy()
+	},
+	func(j *api.ListMeta, c fuzz.Continue) {
+		// TODO: Fix JSON/YAML packages and/or write custom encoding
+		// for uint64's. Somehow the LS *byte* of this is lost, but
+		// only when all 8 bytes are set.
+		j.ResourceVersion = strconv.FormatUint(c.RandUint64()>>8, 10)
+		j.SelfLink = c.RandString()
+	},
+	func(j *api.PodPhase, c fuzz.Continue) {
+		statuses := []api.PodPhase{api.PodPending, api.PodRunning, api.PodFailed}
+		*j = statuses[c.Rand.Intn(len(statuses))]
+	},
+	func(j *api.ReplicationControllerSpec, c fuzz.Continue) {
+		// TemplateRef must be nil for round trip
+		c.Fuzz(&j.Template)
+		if j.Template == nil {
+			// TODO: v1beta1/2 can't round trip a nil template correctly, fix by having v1beta1/2
+			// conversion compare converted object to nil via DeepEqual
+			j.Template = &api.PodTemplateSpec{}
+		}
+		j.Template.ObjectMeta = api.ObjectMeta{Labels: j.Template.ObjectMeta.Labels}
+		j.Template.Spec.NodeSelector = nil
+		c.Fuzz(&j.Selector)
+		j.Replicas = int(c.RandUint64())
+	},
+	func(j *api.ReplicationControllerStatus, c fuzz.Continue) {
+		// only replicas round trips
+		j.Replicas = int(c.RandUint64())
 	},
 	func(intstr *util.IntOrString, c fuzz.Continue) {
 		// util.IntOrString will panic if its kind is set wrong.
@@ -111,7 +143,7 @@ var apiObjectFuzzer = fuzz.New().NilChance(.5).NumElements(1, 1).Funcs(
 func runTest(t *testing.T, codec runtime.Codec, source runtime.Object) {
 	name := reflect.TypeOf(source).Elem().Name()
 	apiObjectFuzzer.Fuzz(source)
-	j, err := runtime.FindTypeMeta(source)
+	j, err := meta.Accessor(source)
 	if err != nil {
 		t.Fatalf("Unexpected error %v for %#v", err, source)
 	}
@@ -128,22 +160,21 @@ func runTest(t *testing.T, codec runtime.Codec, source runtime.Object) {
 	if err != nil {
 		t.Errorf("%v: %v", name, err)
 		return
-	} else {
-		if !reflect.DeepEqual(source, obj2) {
-			t.Errorf("1: %v: diff: %v", name, util.ObjectDiff(source, obj2))
-			return
-		}
 	}
+	if !reflect.DeepEqual(source, obj2) {
+		t.Errorf("1: %v: diff: %v\nCodec: %v\nData: %s\nSource: %#v", name, util.ObjectDiff(source, obj2), codec, string(data), source)
+		return
+	}
+
 	obj3 := reflect.New(reflect.TypeOf(source).Elem()).Interface().(runtime.Object)
 	err = codec.DecodeInto(data, obj3)
 	if err != nil {
 		t.Errorf("2: %v: %v", name, err)
 		return
-	} else {
-		if !reflect.DeepEqual(source, obj3) {
-			t.Errorf("3: %v: diff: %v", name, util.ObjectDiff(source, obj3))
-			return
-		}
+	}
+	if !reflect.DeepEqual(source, obj3) {
+		t.Errorf("3: %v: diff: %v\nCodec: %v", name, util.ObjectDiff(source, obj3), codec)
+		return
 	}
 }
 
@@ -161,18 +192,21 @@ func TestSpecificKind(t *testing.T) {
 	api.Scheme.Log(nil)
 }
 
-func TestTypes(t *testing.T) {
+var nonRoundTrippableTypes = util.NewStringSet("ContainerManifest")
+
+func TestRoundTripTypes(t *testing.T) {
 	for kind := range api.Scheme.KnownTypes("") {
+		if nonRoundTrippableTypes.Has(kind) {
+			continue
+		}
 		// Try a few times, since runTest uses random values.
 		for i := 0; i < *fuzzIters; i++ {
 			item, err := api.Scheme.New("", kind)
 			if err != nil {
-				t.Errorf("Couldn't make a %v? %v", kind, err)
-				continue
+				t.Fatalf("Couldn't make a %v? %v", kind, err)
 			}
-			if _, err := runtime.FindTypeMeta(item); err != nil {
-				t.Logf("%s is not a TypeMeta and cannot be round tripped: %v", kind, err)
-				continue
+			if _, err := meta.Accessor(item); err != nil {
+				t.Fatalf("%q is not a TypeMeta and cannot be tested - add it to nonRoundTrippableTypes: %v", kind, err)
 			}
 			runTest(t, v1beta1.Codec, item)
 			runTest(t, v1beta2.Codec, item)
@@ -183,7 +217,9 @@ func TestTypes(t *testing.T) {
 
 func TestEncode_Ptr(t *testing.T) {
 	pod := &api.Pod{
-		Labels: map[string]string{"name": "foo"},
+		ObjectMeta: api.ObjectMeta{
+			Labels: map[string]string{"name": "foo"},
+		},
 	}
 	obj := runtime.Object(pod)
 	data, err := latest.Codec.Encode(obj)

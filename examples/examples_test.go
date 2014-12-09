@@ -27,6 +27,7 @@ import (
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/registrytest"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/golang/glog"
 )
@@ -35,21 +36,30 @@ func validateObject(obj runtime.Object) (errors []error) {
 	ctx := api.NewDefaultContext()
 	switch t := obj.(type) {
 	case *api.ReplicationController:
-		errors = validation.ValidateManifest(&t.DesiredState.PodTemplate.DesiredState.Manifest)
+		if t.Namespace == "" {
+			t.Namespace = api.NamespaceDefault
+		}
+		errors = validation.ValidateReplicationController(t)
 	case *api.ReplicationControllerList:
 		for i := range t.Items {
 			errors = append(errors, validateObject(&t.Items[i])...)
 		}
 	case *api.Service:
-		api.ValidNamespace(ctx, &t.TypeMeta)
-		errors = validation.ValidateService(t)
+		if t.Namespace == "" {
+			t.Namespace = api.NamespaceDefault
+		}
+		api.ValidNamespace(ctx, &t.ObjectMeta)
+		errors = validation.ValidateService(t, registrytest.NewServiceRegistry(), api.NewDefaultContext())
 	case *api.ServiceList:
 		for i := range t.Items {
 			errors = append(errors, validateObject(&t.Items[i])...)
 		}
 	case *api.Pod:
-		api.ValidNamespace(ctx, &t.TypeMeta)
-		errors = validation.ValidateManifest(&t.DesiredState.Manifest)
+		if t.Namespace == "" {
+			t.Namespace = api.NamespaceDefault
+		}
+		api.ValidNamespace(ctx, &t.ObjectMeta)
+		errors = validation.ValidatePod(t)
 	case *api.PodList:
 		for i := range t.Items {
 			errors = append(errors, validateObject(&t.Items[i])...)
@@ -109,6 +119,9 @@ func TestExampleObjectSchemas(t *testing.T) {
 		"../examples/walkthrough": {
 			"pod1": &api.Pod{},
 			"pod2": &api.Pod{},
+			"pod-with-http-healthcheck": &api.Pod{},
+			"service":                   &api.Service{},
+			"replication-controller":    &api.ReplicationController{},
 		},
 	}
 

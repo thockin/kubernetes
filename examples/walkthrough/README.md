@@ -1,7 +1,7 @@
 # Kubernetes 101 - Walkthrough
 
 ## Pods
-The first atom of Kubernetes is a _pod_.  A pod is a collection of containers that are symbiotically group.
+The first atom of Kubernetes is a _pod_.  A pod is a collection of containers that are symbiotically grouped.
 
 See [pods](../../docs/pods.md) for more details.
 
@@ -21,13 +21,13 @@ desiredState:
         image: dockerfile/nginx
 ```
 
-A pod definition is a declaration of a _desired state_.  Desired state is a really important part of Kubernetes.  Many things present a desired state to the system, and it is Kubernetes' responsibility to make sure that the current state matches the desired state.  For example, when you create a Pod, you declare that you want the containers in it to be running.  If the containers happen to not be running (program failure, ...), Kubernetes will continue to (re)create them for you until you delete the Pod.
+A pod definition is a declaration of a _desired state_.  Desired state is a very important concept in the Kubernetes model.  Many things present a desired state to the system, and it is Kubernetes' responsibility to make sure that the current state matches the desired state.  For example, when you create a Pod, you declare that you want the containers in it to be running.  If the containers happen to not be running (e.g. program failure, ...), Kubernetes will continue to (re-)create them for you in order to drive them to the desired state. This process continues until you delete the Pod.
 
 See the [design document](../../DESIGN.md) for more details.
 
 ### Volumes
 
-Now that's great for a static webserver, but what about persistent storage?  We know that the container file system only lives as long as the container does, we need more persistent storage.  To do this, you also declare a ```volume``` as part of your pod, and mount it into a container:
+Now that's great for a static web server, but what about persistent storage?  We know that the container file system only lives as long as the container does, so we need more persistent storage.  To do this, you also declare a ```volume``` as part of your pod, and mount it into a container:
 
 ```yaml
 apiVersion: v1beta1
@@ -51,6 +51,7 @@ desiredState:
 ```
 
 Ok, so what did we do?  We added a volume to our pod:
+
 ```yaml
 ...
     volumes:
@@ -102,7 +103,7 @@ desiredState:
     containers:
       - name: git-monitor
         image: kubernetes/git-monitor
-        envVar:
+        env:
           - name: GIT_REPO
             value: http://github.com/some/repo.git
         volumeMounts:
@@ -120,4 +121,5 @@ Finally, we have also introduced an environment variable to the ```git-monitor``
 
 
 ### What's next?
-For a complete application see the [guestbook example](https://github.com/GoogleCloudPlatform/kubernetes/tree/master/examples/guestbook)
+Continue on to [Kubernetes 201](https://github.com/GoogleCloudPlatform/kubernetes/tree/master/examples/walkthrough/k8s201.md) or
+for a complete application see the [guestbook example](https://github.com/GoogleCloudPlatform/kubernetes/tree/master/examples/guestbook/README.md)

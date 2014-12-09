@@ -69,16 +69,14 @@ var testParser = NewParser(map[string]runtime.Object{
 
 func TestParsePod(t *testing.T) {
 	DoParseTest(t, "pods", &api.Pod{
-		TypeMeta: api.TypeMeta{APIVersion: "v1beta1", ID: "test pod", Kind: "Pod"},
-		DesiredState: api.PodState{
-			Manifest: api.ContainerManifest{
-				ID: "My manifest",
-				Containers: []api.Container{
-					{Name: "my container"},
-				},
-				Volumes: []api.Volume{
-					{Name: "volume"},
-				},
+		TypeMeta:   api.TypeMeta{APIVersion: "v1beta1", Kind: "Pod"},
+		ObjectMeta: api.ObjectMeta{Name: "test pod"},
+		Spec: api.PodSpec{
+			Containers: []api.Container{
+				{Name: "my container"},
+			},
+			Volumes: []api.Volume{
+				{Name: "volume"},
 			},
 		},
 	}, v1beta1.Codec, testParser)
@@ -86,32 +84,35 @@ func TestParsePod(t *testing.T) {
 
 func TestParseService(t *testing.T) {
 	DoParseTest(t, "services", &api.Service{
-		TypeMeta: api.TypeMeta{APIVersion: "v1beta1", ID: "my service", Kind: "Service"},
-		Port:     8080,
-		Labels: map[string]string{
-			"area": "staging",
+		TypeMeta: api.TypeMeta{APIVersion: "v1beta1", Kind: "Service"},
+		ObjectMeta: api.ObjectMeta{
+			Name: "my service",
+			Labels: map[string]string{
+				"area": "staging",
+			},
 		},
-		Selector: map[string]string{
-			"area": "staging",
+		Spec: api.ServiceSpec{
+			Port: 8080,
+			Selector: map[string]string{
+				"area": "staging",
+			},
 		},
 	}, v1beta1.Codec, testParser)
 }
 
 func TestParseController(t *testing.T) {
 	DoParseTest(t, "replicationControllers", &api.ReplicationController{
-		TypeMeta: api.TypeMeta{APIVersion: "v1beta1", ID: "my controller", Kind: "ReplicationController"},
-		DesiredState: api.ReplicationControllerState{
+		TypeMeta:   api.TypeMeta{APIVersion: "v1beta1", Kind: "ReplicationController"},
+		ObjectMeta: api.ObjectMeta{Name: "my controller"},
+		Spec: api.ReplicationControllerSpec{
 			Replicas: 9001,
-			PodTemplate: api.PodTemplate{
-				DesiredState: api.PodState{
-					Manifest: api.ContainerManifest{
-						ID: "My manifest",
-						Containers: []api.Container{
-							{Name: "my container"},
-						},
-						Volumes: []api.Volume{
-							{Name: "volume"},
-						},
+			Template: &api.PodTemplateSpec{
+				Spec: api.PodSpec{
+					Containers: []api.Container{
+						{Name: "my container"},
+					},
+					Volumes: []api.Volume{
+						{Name: "volume"},
 					},
 				},
 			},
@@ -120,8 +121,9 @@ func TestParseController(t *testing.T) {
 }
 
 type TestParseType struct {
-	api.TypeMeta `json:",inline" yaml:",inline"`
-	Data         string `json:"data" yaml:"data"`
+	api.TypeMeta   `json:",inline" yaml:",inline"`
+	api.ObjectMeta `json:"metadata" yaml:"metadata"`
+	Data           string `json:"data" yaml:"data"`
 }
 
 func (*TestParseType) IsAnAPIObject() {}
@@ -134,7 +136,8 @@ func TestParseCustomType(t *testing.T) {
 		"custom": &TestParseType{},
 	})
 	DoParseTest(t, "custom", &TestParseType{
-		TypeMeta: api.TypeMeta{APIVersion: "", ID: "my custom object", Kind: "TestParseType"},
-		Data:     "test data",
+		TypeMeta:   api.TypeMeta{APIVersion: "", Kind: "TestParseType"},
+		ObjectMeta: api.ObjectMeta{Name: "my custom object"},
+		Data:       "test data",
 	}, v1beta1.Codec, parser)
 }

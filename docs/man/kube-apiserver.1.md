@@ -11,7 +11,7 @@ kube-apiserver \- Provides the API for kubernetes orchestration.
 
 The **kubernetes** API server validates and configures data for 3 types of objects: pods, services, and replicationControllers. Beyond just servicing REST operations, the API Server does two other things as well: 1. Schedules pods to worker nodes. Right now the scheduler is very simple. 2. Synchronize pod information (where they are, what ports they are exposing) with the service configuration.
 
-The the kube-apiserver several options. 
+The the kube-apiserver several options.
 
 # OPTIONS
 **-address**=""
@@ -53,17 +53,8 @@ The the kube-apiserver several options.
 **-logtostderr**=
 	log to standard error instead of files. Default is false.
 
-**-machines**=[]
-	List of machines to schedule onto, comma separated.
-
-**-minion_cache_ttl**=30s
-	Duration of time to cache minion information. Default 30 seconds.
-
-**-minion_port**=10250
+**-kubelet_port**=10250
 	The port at which kubelet will be listening on the minions. Default is 10250.
-
-**-minion_regexp**=""
-	If non empty, and -cloud_provider is specified, a regular expression for matching minion VMs.
 
 **-port**=8080
 	The port to listen on. Default is 8080.
@@ -84,32 +75,9 @@ The the kube-apiserver several options.
 	comma-separated list of pattern=N settings for file-filtered logging
 
 # EXAMPLES
-
-The kube-apiserver can be called manually or from systemd. An example unit file looks as such:
-
-	[Unit]
-	Description=Kubernetes API Server
-	
-	[Service]
-	EnvironmentFile=/etc/kubernetes/config
-	EnvironmentFile=/etc/kubernetes/apiserver
-	User=kube
-	ExecStart=/usr/bin/kube-apiserver \
-	        --logtostderr=${KUBE_LOGTOSTDERR} \
-	        --v=${KUBE_LOG_LEVEL} \
-	        --etcd_servers=${KUBE_ETCD_SERVERS} \
-	        --address=${KUBE_API_ADDRESS} \
-	        --port=${KUBE_API_PORT} \
-	        --machines=${MINION_ADDRESSES} \
-	        --minion_port=${MINION_PORT} \
-	        --allow_privileged=${KUBE_ALLOW_PRIV}
-	Restart=on-failure
-	
-	[Install]
-	WantedBy=multi-user.target
-
-Where the variables are stored in the /etc/kubernetes/ environment files.
-
+```
+/usr/bin/kube-apiserver --logtostderr=true --v=0 --etcd_servers=http://127.0.0.1:4001 --address=0.0.0.0 --port=8080 --kubelet_port=10250 --allow_privileged=false
+```
 # HISTORY
 October 2014, Originally compiled by Scott Collier (scollier at redhat dot com) based
  on the kubernetes source material and internal work.

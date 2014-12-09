@@ -29,12 +29,15 @@ type FakeDockerClient struct {
 	sync.Mutex
 	ContainerList []docker.APIContainers
 	Container     *docker.Container
+	ContainerMap  map[string]*docker.Container
 	Image         *docker.Image
 	Err           error
 	called        []string
 	Stopped       []string
 	pulled        []string
 	Created       []string
+	Removed       []string
+	VersionInfo   docker.Env
 }
 
 func (f *FakeDockerClient) clearCalls() {
@@ -69,6 +72,11 @@ func (f *FakeDockerClient) InspectContainer(id string) (*docker.Container, error
 	f.Lock()
 	defer f.Unlock()
 	f.called = append(f.called, "inspect_container")
+	if f.ContainerMap != nil {
+		if container, ok := f.ContainerMap[id]; ok {
+			return container, f.Err
+		}
+	}
 	return f.Container, f.Err
 }
 
@@ -101,6 +109,11 @@ func (f *FakeDockerClient) StartContainer(id string, hostConfig *docker.HostConf
 	f.Lock()
 	defer f.Unlock()
 	f.called = append(f.called, "start")
+	f.Container = &docker.Container{
+		ID:         id,
+		Config:     &docker.Config{Image: "testimage"},
+		HostConfig: hostConfig,
+	}
 	return f.Err
 }
 
@@ -121,6 +134,14 @@ func (f *FakeDockerClient) StopContainer(id string, timeout uint) error {
 	return f.Err
 }
 
+func (f *FakeDockerClient) RemoveContainer(opts docker.RemoveContainerOptions) error {
+	f.Lock()
+	defer f.Unlock()
+	f.called = append(f.called, "remove")
+	f.Removed = append(f.Removed, opts.ID)
+	return f.Err
+}
+
 // Logs is a test-spy implementation of DockerInterface.Logs.
 // It adds an entry "logs" to the internal method call record.
 func (f *FakeDockerClient) Logs(opts docker.LogsOptions) error {
@@ -138,6 +159,17 @@ func (f *FakeDockerClient) PullImage(opts docker.PullImageOptions, auth docker.A
 	f.called = append(f.called, "pull")
 	f.pulled = append(f.pulled, fmt.Sprintf("%s/%s:%s", opts.Repository, opts.Registry, opts.Tag))
 	return f.Err
+}
+
+func (f *FakeDockerClient) Version() (*docker.Env, error) {
+	return &f.VersionInfo, nil
+}
+
+func (f *FakeDockerClient) CreateExec(_ docker.CreateExecOptions) (*docker.Exec, error) {
+	return &docker.Exec{"12345678"}, nil
+}
+func (f *FakeDockerClient) StartExec(_ string, _ docker.StartExecOptions) error {
+	return nil
 }
 
 // FakeDockerPuller is a stub implementation of DockerPuller.

@@ -18,12 +18,13 @@ There is also early support for building Docker "run" containers
 
 ## Key scripts
 
-* `make-server.sh`: This will compile all of the Kubernetes server binaries for linux/amd64
-* `make-client.sh`: This will make all cross-compiled client binaries
-* `run-tests.sh`: This will run the Kubernetes unit tests
-* `run-integration.sh`: This will build and run the integration test
-* `copy-output.sh`: This will copy the contents of `_output/build` from any remote Docker container to the local `_output/build`.  Right now this is only necessary on Mac OS X with `boot2docker`.
-* `make-clean.sh`: Clean out the contents of `_output/build` and remove any local built container images.
+* `run.sh`: Run a command in a build docker container.  Common invocations:
+  *  `run.sh hack/build-go.sh`: Build just linux binaries in the container.  Pass options and packages as necessary.
+  *  `run.sh hack/build-cross.sh`: Build all binaries for all platforms
+  *  `run.sh hack/test-go.sh`: Run all unit tests
+  *  `run.sh hack/test-integration.sh`: Run integration test
+* `copy-output.sh`: This will copy the contents of `_output/dockerized/bin` from any remote Docker container to the local `_output/dockerized/bin`.  Right now this is only necessary on Mac OS X with `boot2docker` when your git repo isn't under `/Users`.
+* `make-clean.sh`: Clean out the contents of `_output/dockerized` and remove any local built container images.
 * `shell.sh`: Drop into a `bash` shell in a build container with a snapshot of the current repo code.
 * `release.sh`: Build everything, test it, and (optionally) upload the results to a GCS bucket.
 
@@ -51,11 +52,11 @@ Env Variable | Default | Description
 `KUBE_SKIP_CONFIRMATIONS` | `n` | If `y` then no questions are asked and the scripts just continue.
 `KUBE_GCS_UPLOAD_RELEASE` | `n` | Upload release artifacts to GCS
 `KUBE_GCS_RELEASE_BUCKET` | `kubernetes-releases-${project_hash}` | The bucket to upload releases to
-`KUBE_GCS_RELEASE_PREFIX` | `devel/` | The path under the release bucket to put releases
+`KUBE_GCS_RELEASE_PREFIX` | `devel` | The path under the release bucket to put releases
 `KUBE_GCS_MAKE_PUBLIC` | `y` | Make GCS links readable from anywhere
 `KUBE_GCS_NO_CACHING` | `y` | Disable HTTP caching of GCS release artifacts.  By default GCS will cache public objects for up to an hour.  When doing "devel" releases this can cause problems.
 `KUBE_BUILD_RUN_IMAGES` | `n` | *Experimental* Build Docker images for running most server components.
-`KUBE_GCS_DOCKER_REG_PREFIX` | `docker-reg/` | *Experimental* When uploading docker images, the bucket that backs the registry.
+`KUBE_GCS_DOCKER_REG_PREFIX` | `docker-reg` | *Experimental* When uploading docker images, the bucket that backs the registry.
 
 ## Basic Flow
 
@@ -81,10 +82,10 @@ If the release script is set to upload to GCS, it'll do the following:
 
 These are in no particular order
 
-* [ ] Harmonize with scripts in `hack/`.  How much do we support building outside of Docker and these scripts?
+* [X] Harmonize with scripts in `hack/`.  How much do we support building outside of Docker and these scripts?
 * [ ] Get a cluster up and running with the Docker images.  Perhaps start with a local cluster and move up to a GCE cluster.
 * [ ] Implement (#186)[https://github.com/GoogleCloudPlatform/kubernetes/issues/186].  This will make it easier to develop Kubernetes.
-* [ ] Deprecate/replace most of the stuff in the hack/
+* [X] Deprecate/replace most of the stuff in the hack/
 * [ ] Create an install script that'll let us do a `curl https://[URL] | bash` to get that tarball down and ensure that other dependencies (cloud SDK?) are installed and configured correctly.
 * [ ] Support/test Windows as a client.
 * [ ] Finish support for the Dockerized runtime. Issue (#19)[https://github.com/GoogleCloudPlatform/kubernetes/issues/19].  A key issue here is to make this fast/light enough that we can use it for development workflows.

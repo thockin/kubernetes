@@ -20,11 +20,12 @@ import (
 	"fmt"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/errors"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/apiserver"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/generic"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/watch"
 )
 
@@ -41,23 +42,31 @@ func NewREST(registry generic.Registry) *REST {
 	}
 }
 
-func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
+func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan apiserver.RESTResult, error) {
 	event, ok := obj.(*api.Event)
 	if !ok {
 		return nil, fmt.Errorf("invalid object type")
 	}
-	event.CreationTimestamp = util.Now()
+	if api.Namespace(ctx) != "" {
+		if !api.ValidNamespace(ctx, &event.ObjectMeta) {
+			return nil, errors.NewConflict("event", event.Namespace, fmt.Errorf("event.namespace does not match the provided context"))
+		}
+	}
+	if errs := validation.ValidateEvent(event); len(errs) > 0 {
+		return nil, errors.NewInvalid("event", event.Name, errs)
+	}
+	api.FillObjectMetaSystemFields(ctx, &event.ObjectMeta)
 
 	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		err := rs.registry.Create(ctx, event.ID, event)
+		err := rs.registry.Create(ctx, event.Name, event)
 		if err != nil {
 			return nil, err
 		}
-		return rs.registry.Get(ctx, event.ID)
+		return rs.registry.Get(ctx, event.Name)
 	}), nil
 }
 
-func (rs *REST) Delete(ctx api.Context, id string) (<-chan runtime.Object, error) {
+func (rs *REST) Delete(ctx api.Context, id string) (<-chan apiserver.RESTResult, error) {
 	obj, err := rs.registry.Get(ctx, id)
 	if err != nil {
 		return nil, err
@@ -88,8 +97,10 @@ func (rs *REST) getAttrs(obj runtime.Object) (objLabels, objFields labels.Set, e
 	if !ok {
 		return nil, nil, fmt.Errorf("invalid object type")
 	}
+	// TODO: internal version leaks through here. This should be versioned.
 	return labels.Set{}, labels.Set{
 		"involvedObject.kind":            event.InvolvedObject.Kind,
+		"involvedObject.namespace":       event.InvolvedObject.Namespace,
 		"involvedObject.name":            event.InvolvedObject.Name,
 		"involvedObject.uid":             event.InvolvedObject.UID,
 		"involvedObject.apiVersion":      event.InvolvedObject.APIVersion,
@@ -97,6 +108,7 @@ func (rs *REST) getAttrs(obj runtime.Object) (objLabels, objFields labels.Set, e
 		"involvedObject.fieldPath":       event.InvolvedObject.FieldPath,
 		"status":                         event.Status,
 		"reason":                         event.Reason,
+		"source":                         event.Source,
 	}, nil
 }
 
@@ -106,7 +118,7 @@ func (rs *REST) List(ctx api.Context, label, field labels.Selector) (runtime.Obj
 
 // Watch returns Events events via a watch.Interface.
 // It implements apiserver.ResourceWatcher.
-func (rs *REST) Watch(ctx api.Context, label, field labels.Selector, resourceVersion uint64) (watch.Interface, error) {
+func (rs *REST) Watch(ctx api.Context, label, field labels.Selector, resourceVersion string) (watch.Interface, error) {
 	return rs.registry.Watch(ctx, &generic.SelectionPredicate{label, field, rs.getAttrs}, resourceVersion)
 }
 
@@ -116,6 +128,6 @@ func (*REST) New() runtime.Object {
 }
 
 // Update returns an error: Events are not mutable.
-func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
+func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan apiserver.RESTResult, error) {
 	return nil, fmt.Errorf("not allowed: 'Event' objects are not mutable")
 }

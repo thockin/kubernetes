@@ -36,7 +36,7 @@ type StaticNodeInfo struct {
 
 func (nodes StaticNodeInfo) GetNodeInfo(nodeID string) (*api.Minion, error) {
 	for ix := range nodes.Items {
-		if nodes.Items[ix].ID == nodeID {
+		if nodes.Items[ix].Name == nodeID {
 			return &nodes.Items[ix], nil
 		}
 	}
@@ -48,7 +48,7 @@ type ClientNodeInfo struct {
 }
 
 func (nodes ClientNodeInfo) GetNodeInfo(nodeID string) (*api.Minion, error) {
-	return nodes.GetMinion(nodeID)
+	return nodes.Minions().Get(nodeID)
 }
 
 func isVolumeConflict(volume api.Volume, pod *api.Pod) bool {
@@ -57,7 +57,7 @@ func isVolumeConflict(volume api.Volume, pod *api.Pod) bool {
 	}
 	pdName := volume.Source.GCEPersistentDisk.PDName
 
-	manifest := &(pod.DesiredState.Manifest)
+	manifest := &(pod.Spec)
 	for ix := range manifest.Volumes {
 		if manifest.Volumes[ix].Source.GCEPersistentDisk != nil &&
 			manifest.Volumes[ix].Source.GCEPersistentDisk.PDName == pdName {
@@ -73,7 +73,7 @@ func isVolumeConflict(volume api.Volume, pod *api.Pod) bool {
 // there. This is GCE specific for now.
 // TODO: migrate this into some per-volume specific code?
 func NoDiskConflict(pod api.Pod, existingPods []api.Pod, node string) (bool, error) {
-	manifest := &(pod.DesiredState.Manifest)
+	manifest := &(pod.Spec)
 	for ix := range manifest.Volumes {
 		for podIx := range existingPods {
 			if isVolumeConflict(manifest.Volumes[ix], &existingPods[podIx]) {
@@ -95,9 +95,9 @@ type resourceRequest struct {
 
 func getResourceRequest(pod *api.Pod) resourceRequest {
 	result := resourceRequest{}
-	for ix := range pod.DesiredState.Manifest.Containers {
-		result.memory += pod.DesiredState.Manifest.Containers[ix].Memory
-		result.milliCPU += pod.DesiredState.Manifest.Containers[ix].CPU
+	for ix := range pod.Spec.Containers {
+		result.memory += pod.Spec.Containers[ix].Memory
+		result.milliCPU += pod.Spec.Containers[ix].CPU
 	}
 	return result
 }
@@ -122,8 +122,8 @@ func (r *ResourceFit) PodFitsResources(pod api.Pod, existingPods []api.Pod, node
 	}
 
 	// TODO: convert to general purpose resource matching, when pods ask for resources
-	totalMilliCPU := int(resources.GetFloatResource(info.NodeResources.Capacity, resources.CPU, 0) * 1000)
-	totalMemory := resources.GetIntegerResource(info.NodeResources.Capacity, resources.Memory, 0)
+	totalMilliCPU := int(resources.GetFloatResource(info.Spec.Capacity, resources.CPU, 0) * 1000)
+	totalMemory := resources.GetIntegerResource(info.Spec.Capacity, resources.Memory, 0)
 
 	fitsCPU := totalMilliCPU == 0 || (totalMilliCPU-milliCPURequested) >= podRequest.milliCPU
 	fitsMemory := totalMemory == 0 || (totalMemory-memoryRequested) >= podRequest.memory
@@ -139,31 +139,53 @@ func NewResourceFitPredicate(info NodeInfo) FitPredicate {
 	return fit.PodFitsResources
 }
 
+func NewSelectorMatchPredicate(info NodeInfo) FitPredicate {
+	selector := &NodeSelector{
+		info: info,
+	}
+	return selector.PodSelectorMatches
+}
+
+type NodeSelector struct {
+	info NodeInfo
+}
+
+func (n *NodeSelector) PodSelectorMatches(pod api.Pod, existingPods []api.Pod, node string) (bool, error) {
+	if len(pod.Spec.NodeSelector) == 0 {
+		return true, nil
+	}
+	selector := labels.SelectorFromSet(pod.Spec.NodeSelector)
+	minion, err := n.info.GetNodeInfo(node)
+	if err != nil {
+		return false, err
+	}
+	return selector.Matches(labels.Set(minion.Labels)), nil
+}
+
 func PodFitsPorts(pod api.Pod, existingPods []api.Pod, node string) (bool, error) {
-	for _, scheduledPod := range existingPods {
-		for _, container := range pod.DesiredState.Manifest.Containers {
-			for _, port := range container.Ports {
-				if port.HostPort == 0 {
-					continue
-				}
-				if containsPort(scheduledPod, port) {
-					return false, nil
-				}
-			}
+	existingPorts := getUsedPorts(existingPods...)
+	wantPorts := getUsedPorts(pod)
+	for wport := range wantPorts {
+		if wport == 0 {
+			continue
+		}
+		if existingPorts[wport] {
+			return false, nil
 		}
 	}
 	return true, nil
 }
 
-func containsPort(pod api.Pod, port api.Port) bool {
-	for _, container := range pod.DesiredState.Manifest.Containers {
-		for _, podPort := range container.Ports {
-			if podPort.HostPort == port.HostPort {
-				return true
+func getUsedPorts(pods ...api.Pod) map[int]bool {
+	ports := make(map[int]bool)
+	for _, pod := range pods {
+		for _, container := range pod.Spec.Containers {
+			for _, podPort := range container.Ports {
+				ports[podPort.HostPort] = true
 			}
 		}
 	}
-	return false
+	return ports
 }
 
 // MapPodsToMachines obtains a list of pods and pivots that list into a map where the keys are host names
@@ -176,7 +198,7 @@ func MapPodsToMachines(lister PodLister) (map[string][]api.Pod, error) {
 		return map[string][]api.Pod{}, err
 	}
 	for _, scheduledPod := range pods {
-		host := scheduledPod.DesiredState.Host
+		host := scheduledPod.Status.Host
 		machineToPods[host] = append(machineToPods[host], scheduledPod)
 	}
 	return machineToPods, nil
