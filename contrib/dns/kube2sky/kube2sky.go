@@ -37,6 +37,7 @@ import (
 var (
 	domain  = flag.String("domain", "kubernetes.local", "domain under which to create names")
 	verbose = flag.Bool("verbose", false, "log extra information")
+	ipType  = flag.String("type", "portal", "IP address type to use in DNS (portal or public)")
 )
 
 func removeDNS(record string, etcdClient *etcd.Client) error {
@@ -46,22 +47,42 @@ func removeDNS(record string, etcdClient *etcd.Client) error {
 }
 
 func addDNS(record string, service *kapi.Service, etcdClient *etcd.Client) error {
-	svc := skymsg.Service{
-		Host:     service.Spec.PortalIP,
-		Port:     service.Spec.Port,
-		Priority: 10,
-		Weight:   10,
-		Ttl:      30,
-	}
-	b, err := json.Marshal(svc)
-	if err != nil {
-		return err
-	}
-	// Set with no TTL, and hope that kubernetes events are accurate.
+	for i, ip := range chooseIPs(service) {
+		svc := skymsg.Service{
+			Host:     ip,
+			Port:     service.Spec.Port,
+			Priority: 10,
+			Weight:   10,
+			Ttl:      30,
+		}
+		b, err := json.Marshal(svc)
+		if err != nil {
+			return err
+		}
+		// Set with no TTL, and hope that kubernetes events are accurate.
 
-	log.Printf("Setting dns record: %v -> %s:%d\n", record, service.Spec.PortalIP, service.Spec.Port)
-	_, err = etcdClient.Set(skymsg.Path(record), string(b), uint64(0))
-	return err
+		instanceRecord := fmt.Sprintf("%d.%s", i+1, record)
+		log.Printf("Setting dns record: %v -> %s:%d\n", instanceRecord, ip, service.Spec.Port)
+		_, err = etcdClient.Set(skymsg.Path(instanceRecord), string(b), uint64(0))
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func chooseIPs(service *kapi.Service) []string {
+	switch *ipType {
+	case "portal":
+		return []string{service.Spec.PortalIP}
+	case "public":
+		return service.Spec.PublicIPs
+	}
+
+	// TODO: Do something better than fail silently
+	return []string{}
 }
 
 func newEtcdClient() (client *etcd.Client) {
