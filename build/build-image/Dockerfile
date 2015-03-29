@@ -14,26 +14,28 @@
 
 # This file creates a standard build environment for building Kubernetes
 
-FROM  golang:cross
+FROM kube-build:cross
 MAINTAINER  Joe Beda <jbeda@google.com>
 
-ENV KUBE_CROSSPLATFORMS \
-  linux/386 linux/arm \
-  darwin/amd64 darwin/386
 # (set an explicit GOARM of 5 for maximum compatibility)
 ENV GOARM 5
 ENV GOOS    linux
 ENV GOARCH  amd64
 
 # Get the code coverage tool and godep
-RUN go get code.google.com/p/go.tools/cmd/cover github.com/tools/godep
+RUN go get golang.org/x/tools/cmd/cover github.com/tools/godep
+
+# We use rsync to copy some binaries around.  It is faster (0.3s vs. 1.1s) on my
+# machine vs. `install`
+RUN rm -rf /var/lib/apt/lists/
+RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y rsync
 
 # Download and symlink etcd.  We need this for our integration tests.
 RUN mkdir -p /usr/local/src/etcd &&\
     cd /usr/local/src/etcd &&\
-    curl -L -O -s https://github.com/coreos/etcd/releases/download/v0.4.6/etcd-v0.4.6-linux-amd64.tar.gz &&\
-    tar xzf etcd-v0.4.6-linux-amd64.tar.gz &&\
-    ln -s ../src/etcd/etcd-v0.4.6-linux-amd64/etcd /usr/local/bin/
+    curl -L -O -s https://github.com/coreos/etcd/releases/download/v2.0.0/etcd-v2.0.0-linux-amd64.tar.gz &&\
+    tar xzf etcd-v2.0.0-linux-amd64.tar.gz &&\
+    ln -s ../src/etcd/etcd-v2.0.0-linux-amd64/etcd /usr/local/bin/
 
 # Mark this as a kube-build container
 RUN touch /kube-build-image
@@ -42,6 +44,10 @@ WORKDIR /go/src/github.com/GoogleCloudPlatform/kubernetes
 
 # Propagate the git tree version into the build image
 ADD kube-version-defs /kube-version-defs
+ENV KUBE_GIT_VERSION_FILE /kube-version-defs
+
+# Make output from the dockerized build go someplace else
+ENV KUBE_OUTPUT_SUBPATH _output/dockerized
 
 # Upload Kubernetes source
 ADD kube-source.tar.gz /go/src/github.com/GoogleCloudPlatform/kubernetes

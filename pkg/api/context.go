@@ -19,7 +19,8 @@ package api
 import (
 	stderrs "errors"
 
-	"code.google.com/p/go.net/context"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/auth/user"
+	"golang.org/x/net/context"
 )
 
 // Context carries values across API boundaries.
@@ -32,6 +33,9 @@ type key int
 
 // namespaceKey is the context key for the request namespace.
 const namespaceKey key = 0
+
+// userKey is the context key for the request user.
+const userKey key = 1
 
 // NewContext instantiates a base context object for request flows.
 func NewContext() Context {
@@ -63,14 +67,14 @@ func NamespaceFrom(ctx Context) (string, bool) {
 	return namespace, ok
 }
 
-// Namespace returns the value of the namespace key on the ctx, or the empty string if none
-func Namespace(ctx Context) string {
+// NamespaceValue returns the value of the namespace key on the ctx, or the empty string if none
+func NamespaceValue(ctx Context) string {
 	namespace, _ := NamespaceFrom(ctx)
 	return namespace
 }
 
 // ValidNamespace returns false if the namespace on the context differs from the resource.  If the resource has no namespace, it is set to the value in the context.
-func ValidNamespace(ctx Context, resource *TypeMeta) bool {
+func ValidNamespace(ctx Context, resource *ObjectMeta) bool {
 	ns, ok := NamespaceFrom(ctx)
 	if len(resource.Namespace) == 0 {
 		resource.Namespace = ns
@@ -85,4 +89,15 @@ func WithNamespaceDefaultIfNone(parent Context) Context {
 		return WithNamespace(parent, NamespaceDefault)
 	}
 	return parent
+}
+
+// WithUser returns a copy of parent in which the user value is set
+func WithUser(parent Context, user user.Info) Context {
+	return WithValue(parent, userKey, user)
+}
+
+// UserFrom returns the value of the user key on the ctx
+func UserFrom(ctx Context) (user.Info, bool) {
+	user, ok := ctx.Value(userKey).(user.Info)
+	return user, ok
 }

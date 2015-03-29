@@ -19,7 +19,7 @@ limitations under the License.
 package integration
 
 import (
-	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
@@ -29,8 +29,8 @@ import (
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/master"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/version"
+	"github.com/GoogleCloudPlatform/kubernetes/plugin/pkg/admission/admit"
 )
 
 func init() {
@@ -42,26 +42,33 @@ func TestClient(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	m := master.New(&master.Config{
-		EtcdHelper: helper,
+
+	var m *master.Master
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		m.Handler.ServeHTTP(w, req)
+	}))
+	defer s.Close()
+
+	m = master.New(&master.Config{
+		EtcdHelper:        helper,
+		KubeletClient:     client.FakeKubeletClient{},
+		EnableLogsSupport: false,
+		EnableProfiling:   true,
+		EnableUISupport:   false,
+		EnableV1Beta3:     true,
+		APIPrefix:         "/api",
+		Authorizer:        apiserver.NewAlwaysAllowAuthorizer(),
+		AdmissionControl:  admit.NewAlwaysAdmit(),
 	})
-	s1, c1, loc1, sl1 := m.API_v1beta1()
-	s2, c2, loc2, sl2 := m.API_v1beta2()
 
-	testCases := map[string]struct {
-		Storage    map[string]apiserver.RESTStorage
-		Codec      runtime.Codec
-		location   string
-		selfLinker runtime.SelfLinker
-	}{
-		"v1beta1": {s1, c1, loc1, sl1},
-		"v1beta2": {s2, c2, loc2, sl2},
+	testCases := []string{
+		"v1beta1",
+		"v1beta2",
+		"v1beta3",
 	}
-
-	for apiVersion, values := range testCases {
-		ctx := api.NewDefaultContext()
+	for _, apiVersion := range testCases {
+		ns := api.NamespaceDefault
 		deleteAllEtcdKeys()
-		s := httptest.NewServer(apiserver.Handle(values.Storage, values.Codec, fmt.Sprintf("/api/%s/", apiVersion), values.selfLinker))
 		client := client.NewOrDie(&client.Config{Host: s.URL, Version: apiVersion})
 
 		info, err := client.ServerVersion()
@@ -72,7 +79,7 @@ func TestClient(t *testing.T) {
 			t.Errorf("expected %#v, got %#v", e, a)
 		}
 
-		pods, err := client.ListPods(ctx, labels.Everything())
+		pods, err := client.Pods(ns).List(labels.Everything())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -82,34 +89,35 @@ func TestClient(t *testing.T) {
 
 		// get a validation error
 		pod := &api.Pod{
-			DesiredState: api.PodState{
-				Manifest: api.ContainerManifest{
-					Version: "v1beta2",
-					Containers: []api.Container{
-						{
-							Name: "test",
-						},
+			ObjectMeta: api.ObjectMeta{
+				GenerateName: "test",
+			},
+			Spec: api.PodSpec{
+				Containers: []api.Container{
+					{
+						Name: "test",
 					},
 				},
 			},
 		}
-		got, err := client.CreatePod(ctx, pod)
+
+		got, err := client.Pods(ns).Create(pod)
 		if err == nil {
-			t.Fatalf("unexpected non-error: %v", err)
+			t.Fatalf("unexpected non-error: %v", got)
 		}
 
 		// get a created pod
-		pod.DesiredState.Manifest.Containers[0].Image = "an-image"
-		got, err = client.CreatePod(ctx, pod)
+		pod.Spec.Containers[0].Image = "an-image"
+		got, err = client.Pods(ns).Create(pod)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if got.ID == "" {
-			t.Errorf("unexpected empty pod ID %v", got)
+		if got.Name == "" {
+			t.Errorf("unexpected empty pod Name %v", got)
 		}
 
 		// pod is shown, but not scheduled
-		pods, err = client.ListPods(ctx, labels.Everything())
+		pods, err = client.Pods(ns).List(labels.Everything())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -117,10 +125,10 @@ func TestClient(t *testing.T) {
 			t.Errorf("expected one pod, got %#v", pods)
 		}
 		actual := pods.Items[0]
-		if actual.ID != got.ID {
+		if actual.Name != got.Name {
 			t.Errorf("expected pod %#v, got %#v", got, actual)
 		}
-		if actual.CurrentState.Host != "" {
+		if actual.Status.Host != "" {
 			t.Errorf("expected pod to be unscheduled, got %#v", actual)
 		}
 	}

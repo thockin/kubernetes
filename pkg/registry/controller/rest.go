@@ -18,183 +18,81 @@ package controller
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/errors"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/apiserver"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/fields"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/generic"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/watch"
-
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util/fielderrors"
+	"strconv"
 )
 
-// PodLister is anything that knows how to list pods.
-type PodLister interface {
-	ListPods(ctx api.Context, labels labels.Selector) (*api.PodList, error)
+// rcStrategy implements verification logic for Replication Controllers.
+type rcStrategy struct {
+	runtime.ObjectTyper
+	api.NameGenerator
 }
 
-// REST implements apiserver.RESTStorage for the replication controller service.
-type REST struct {
-	registry   Registry
-	podLister  PodLister
-	pollPeriod time.Duration
+// Strategy is the default logic that applies when creating and updating Replication Controller objects.
+var Strategy = rcStrategy{api.Scheme, api.SimpleNameGenerator}
+
+// NamespaceScoped returns true because all Replication Controllers need to be within a namespace.
+func (rcStrategy) NamespaceScoped() bool {
+	return true
 }
 
-// NewREST returns a new apiserver.RESTStorage for the given registry and PodLister.
-func NewREST(registry Registry, podLister PodLister) *REST {
-	return &REST{
-		registry:   registry,
-		podLister:  podLister,
-		pollPeriod: time.Second * 10,
+// PrepareForCreate clears the status of a replication controller before creation.
+func (rcStrategy) PrepareForCreate(obj runtime.Object) {
+	controller := obj.(*api.ReplicationController)
+	controller.Status = api.ReplicationControllerStatus{}
+}
+
+// PrepareForUpdate clears fields that are not allowed to be set by end users on update.
+func (rcStrategy) PrepareForUpdate(obj, old runtime.Object) {
+	// TODO: once RC has a status sub-resource we can enable this.
+	//newController := obj.(*api.ReplicationController)
+	//oldController := old.(*api.ReplicationController)
+	//newController.Status = oldController.Status
+}
+
+// Validate validates a new replication controller.
+func (rcStrategy) Validate(obj runtime.Object) fielderrors.ValidationErrorList {
+	controller := obj.(*api.ReplicationController)
+	return validation.ValidateReplicationController(controller)
+}
+
+// AllowCreateOnUpdate is false for replication controllers; this means a POST is
+// needed to create one.
+func (rcStrategy) AllowCreateOnUpdate() bool {
+	return false
+}
+
+// ValidateUpdate is the default update validation for an end user.
+func (rcStrategy) ValidateUpdate(obj, old runtime.Object) fielderrors.ValidationErrorList {
+	return validation.ValidateReplicationControllerUpdate(old.(*api.ReplicationController), obj.(*api.ReplicationController))
+}
+
+// ControllerToSelectableFields returns a label set that represents the object.
+func ControllerToSelectableFields(controller *api.ReplicationController) labels.Set {
+	return labels.Set{
+		"name":            controller.Name,
+		"status.replicas": strconv.Itoa(controller.Status.Replicas),
 	}
 }
 
-// Create registers the given ReplicationController.
-func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
-	controller, ok := obj.(*api.ReplicationController)
-	if !ok {
-		return nil, fmt.Errorf("not a replication controller: %#v", obj)
-	}
-	if !api.ValidNamespace(ctx, &controller.TypeMeta) {
-		return nil, errors.NewConflict("controller", controller.Namespace, fmt.Errorf("Controller.Namespace does not match the provided context"))
-	}
-
-	if len(controller.ID) == 0 {
-		controller.ID = uuid.NewUUID().String()
-	}
-	// Pod Manifest ID should be assigned by the pod API
-	controller.DesiredState.PodTemplate.DesiredState.Manifest.ID = ""
-	if errs := validation.ValidateReplicationController(controller); len(errs) > 0 {
-		return nil, errors.NewInvalid("replicationController", controller.ID, errs)
-	}
-
-	controller.CreationTimestamp = util.Now()
-
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		err := rs.registry.CreateController(ctx, controller)
-		if err != nil {
-			return nil, err
-		}
-		return rs.registry.GetController(ctx, controller.ID)
-	}), nil
-}
-
-// Delete asynchronously deletes the ReplicationController specified by its id.
-func (rs *REST) Delete(ctx api.Context, id string) (<-chan runtime.Object, error) {
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		return &api.Status{Status: api.StatusSuccess}, rs.registry.DeleteController(ctx, id)
-	}), nil
-}
-
-// Get obtains the ReplicationController specified by its id.
-func (rs *REST) Get(ctx api.Context, id string) (runtime.Object, error) {
-	controller, err := rs.registry.GetController(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	rs.fillCurrentState(ctx, controller)
-	return controller, err
-}
-
-// List obtains a list of ReplicationControllers that match selector.
-func (rs *REST) List(ctx api.Context, label, field labels.Selector) (runtime.Object, error) {
-	if !field.Empty() {
-		return nil, fmt.Errorf("field selector not supported yet")
-	}
-	controllers, err := rs.registry.ListControllers(ctx)
-	if err != nil {
-		return nil, err
-	}
-	filtered := []api.ReplicationController{}
-	for _, controller := range controllers.Items {
-		if label.Matches(labels.Set(controller.Labels)) {
-			rs.fillCurrentState(ctx, &controller)
-			filtered = append(filtered, controller)
-		}
-	}
-	controllers.Items = filtered
-	return controllers, err
-}
-
-// New creates a new ReplicationController for use with Create and Update.
-func (*REST) New() runtime.Object {
-	return &api.ReplicationController{}
-}
-
-// Update replaces a given ReplicationController instance with an existing
-// instance in storage.registry.
-func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
-	controller, ok := obj.(*api.ReplicationController)
-	if !ok {
-		return nil, fmt.Errorf("not a replication controller: %#v", obj)
-	}
-	if !api.ValidNamespace(ctx, &controller.TypeMeta) {
-		return nil, errors.NewConflict("controller", controller.Namespace, fmt.Errorf("Controller.Namespace does not match the provided context"))
-	}
-	if errs := validation.ValidateReplicationController(controller); len(errs) > 0 {
-		return nil, errors.NewInvalid("replicationController", controller.ID, errs)
-	}
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		err := rs.registry.UpdateController(ctx, controller)
-		if err != nil {
-			return nil, err
-		}
-		return rs.registry.GetController(ctx, controller.ID)
-	}), nil
-}
-
-// Watch returns ReplicationController events via a watch.Interface.
-// It implements apiserver.ResourceWatcher.
-func (rs *REST) Watch(ctx api.Context, label, field labels.Selector, resourceVersion string) (watch.Interface, error) {
-	if !field.Empty() {
-		return nil, fmt.Errorf("no field selector implemented for controllers")
-	}
-	incoming, err := rs.registry.WatchControllers(ctx, resourceVersion)
-	if err != nil {
-		return nil, err
-	}
-	// TODO(lavalamp): remove watch.Filter, which is broken. Implement consistent way of filtering.
-	// TODO(lavalamp): this watch method needs a test.
-	return watch.Filter(incoming, func(e watch.Event) (watch.Event, bool) {
-		repController, ok := e.Object.(*api.ReplicationController)
-		if !ok {
-			// must be an error event-- pass it on
-			return e, true
-		}
-		match := label.Matches(labels.Set(repController.Labels))
-		if match {
-			rs.fillCurrentState(ctx, repController)
-		}
-		return e, match
-	}), nil
-}
-
-func (rs *REST) waitForController(ctx api.Context, ctrl *api.ReplicationController) (runtime.Object, error) {
-	for {
-		pods, err := rs.podLister.ListPods(ctx, labels.Set(ctrl.DesiredState.ReplicaSelector).AsSelector())
-		if err != nil {
-			return ctrl, err
-		}
-		if len(pods.Items) == ctrl.DesiredState.Replicas {
-			break
-		}
-		time.Sleep(rs.pollPeriod)
-	}
-	return ctrl, nil
-}
-
-func (rs *REST) fillCurrentState(ctx api.Context, ctrl *api.ReplicationController) error {
-	if rs.podLister == nil {
-		return nil
-	}
-	list, err := rs.podLister.ListPods(ctx, labels.Set(ctrl.DesiredState.ReplicaSelector).AsSelector())
-	if err != nil {
-		return err
-	}
-	ctrl.CurrentState.Replicas = len(list.Items)
-	return nil
+// MatchController is the filter used by the generic etcd backend to route
+// watch events from etcd to clients of the apiserver only interested in specific
+// labels/fields.
+func MatchController(label labels.Selector, field fields.Selector) generic.Matcher {
+	return generic.MatcherFunc(
+		func(obj runtime.Object) (bool, error) {
+			controllerObj, ok := obj.(*api.ReplicationController)
+			if !ok {
+				return false, fmt.Errorf("Given object is not a replication controller.")
+			}
+			fields := ControllerToSelectableFields(controllerObj)
+			return label.Matches(labels.Set(controllerObj.Labels)) && field.Matches(fields), nil
+		})
 }

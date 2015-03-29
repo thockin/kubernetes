@@ -19,8 +19,12 @@ package dockertools
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"sync"
+	"time"
 
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubelet/container"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 	"github.com/fsouza/go-dockerclient"
 )
 
@@ -29,18 +33,27 @@ type FakeDockerClient struct {
 	sync.Mutex
 	ContainerList []docker.APIContainers
 	Container     *docker.Container
+	ContainerMap  map[string]*docker.Container
 	Image         *docker.Image
+	Images        []docker.APIImages
 	Err           error
 	called        []string
 	Stopped       []string
 	pulled        []string
 	Created       []string
+	Removed       []string
+	RemovedImages util.StringSet
+	VersionInfo   docker.Env
 }
 
-func (f *FakeDockerClient) clearCalls() {
+func (f *FakeDockerClient) ClearCalls() {
 	f.Lock()
 	defer f.Unlock()
 	f.called = []string{}
+	f.Stopped = []string{}
+	f.pulled = []string{}
+	f.Created = []string{}
+	f.Removed = []string{}
 }
 
 func (f *FakeDockerClient) AssertCalls(calls []string) (err error) {
@@ -51,6 +64,23 @@ func (f *FakeDockerClient) AssertCalls(calls []string) (err error) {
 		err = fmt.Errorf("expected %#v, got %#v", calls, f.called)
 	}
 
+	return
+}
+
+func (f *FakeDockerClient) AssertUnorderedCalls(calls []string) (err error) {
+	f.Lock()
+	defer f.Unlock()
+
+	var actual, expected []string
+	copy(actual, calls)
+	copy(expected, f.called)
+
+	sort.StringSlice(actual).Sort()
+	sort.StringSlice(expected).Sort()
+
+	if !reflect.DeepEqual(actual, expected) {
+		err = fmt.Errorf("expected(sorted) %#v, got(sorted) %#v", expected, actual)
+	}
 	return
 }
 
@@ -69,6 +99,11 @@ func (f *FakeDockerClient) InspectContainer(id string) (*docker.Container, error
 	f.Lock()
 	defer f.Unlock()
 	f.called = append(f.called, "inspect_container")
+	if f.ContainerMap != nil {
+		if container, ok := f.ContainerMap[id]; ok {
+			return container, f.Err
+		}
+	}
 	return f.Container, f.Err
 }
 
@@ -101,6 +136,17 @@ func (f *FakeDockerClient) StartContainer(id string, hostConfig *docker.HostConf
 	f.Lock()
 	defer f.Unlock()
 	f.called = append(f.called, "start")
+	f.Container = &docker.Container{
+		ID:         id,
+		Name:       id, // For testing purpose, we set name to id
+		Config:     &docker.Config{Image: "testimage"},
+		HostConfig: hostConfig,
+		State: docker.State{
+			Running: true,
+			Pid:     42,
+		},
+		NetworkSettings: &docker.NetworkSettings{IPAddress: "1.2.3.4"},
+	}
 	return f.Err
 }
 
@@ -121,6 +167,14 @@ func (f *FakeDockerClient) StopContainer(id string, timeout uint) error {
 	return f.Err
 }
 
+func (f *FakeDockerClient) RemoveContainer(opts docker.RemoveContainerOptions) error {
+	f.Lock()
+	defer f.Unlock()
+	f.called = append(f.called, "remove")
+	f.Removed = append(f.Removed, opts.ID)
+	return f.Err
+}
+
 // Logs is a test-spy implementation of DockerInterface.Logs.
 // It adds an entry "logs" to the internal method call record.
 func (f *FakeDockerClient) Logs(opts docker.LogsOptions) error {
@@ -136,7 +190,32 @@ func (f *FakeDockerClient) PullImage(opts docker.PullImageOptions, auth docker.A
 	f.Lock()
 	defer f.Unlock()
 	f.called = append(f.called, "pull")
-	f.pulled = append(f.pulled, fmt.Sprintf("%s/%s:%s", opts.Repository, opts.Registry, opts.Tag))
+	registry := opts.Registry
+	if len(registry) != 0 {
+		registry = registry + "/"
+	}
+	f.pulled = append(f.pulled, fmt.Sprintf("%s%s:%s", registry, opts.Repository, opts.Tag))
+	return f.Err
+}
+
+func (f *FakeDockerClient) Version() (*docker.Env, error) {
+	return &f.VersionInfo, nil
+}
+
+func (f *FakeDockerClient) CreateExec(_ docker.CreateExecOptions) (*docker.Exec, error) {
+	return &docker.Exec{"12345678"}, nil
+}
+
+func (f *FakeDockerClient) StartExec(_ string, _ docker.StartExecOptions) error {
+	return nil
+}
+
+func (f *FakeDockerClient) ListImages(opts docker.ListImagesOptions) ([]docker.APIImages, error) {
+	return f.Images, f.Err
+}
+
+func (f *FakeDockerClient) RemoveImage(image string) error {
+	f.RemovedImages.Insert(image)
 	return f.Err
 }
 
@@ -177,4 +256,22 @@ func (f *FakeDockerPuller) IsImagePresent(name string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+type FakeDockerCache struct {
+	client DockerInterface
+}
+
+func NewFakeDockerCache(client DockerInterface) DockerCache {
+	return &FakeDockerCache{
+		client: client,
+	}
+}
+
+func (f *FakeDockerCache) GetPods() ([]*container.Pod, error) {
+	return GetPods(f.client, false)
+}
+
+func (f *FakeDockerCache) ForceUpdateIfOlder(time.Time) error {
+	return nil
 }

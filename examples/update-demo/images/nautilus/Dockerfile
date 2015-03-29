@@ -12,4 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM update-demo-base
+FROM kubernetes/test-webserver
+COPY html/nautilus.jpg nautilus.jpg
+COPY html/data.json data.json

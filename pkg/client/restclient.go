@@ -17,15 +17,10 @@ limitations under the License.
 package client
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/errors"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 )
 
@@ -38,6 +33,13 @@ import (
 // Most consumers should use client.New() to get a Kubernetes API client.
 type RESTClient struct {
 	baseURL *url.URL
+	// A string identifying the version of the API this client is expected to use.
+	apiVersion string
+
+	// LegacyBehavior controls if URLs should encode the namespace as a query param,
+	// and if resource case is preserved for supporting older API conventions of
+	// Kubernetes.  Newer clients should leave this false.
+	LegacyBehavior bool
 
 	// Codec is the encoding and decoding scheme that applies to a particular set of
 	// REST resources.
@@ -45,17 +47,16 @@ type RESTClient struct {
 
 	// Set specific behavior of the client.  If not set http.DefaultClient will be
 	// used.
-	Client *http.Client
+	Client HTTPClient
 
-	Sync       bool
-	PollPeriod time.Duration
-	Timeout    time.Duration
+	Timeout time.Duration
 }
 
 // NewRESTClient creates a new RESTClient. This client performs generic REST functions
 // such as Get, Put, Post, and Delete on specified paths.  Codec controls encoding and
-// decoding of responses from the server.
-func NewRESTClient(baseURL *url.URL, c runtime.Codec) *RESTClient {
+// decoding of responses from the server. If this client should use the older, legacy
+// API conventions from Kubernetes API v1beta1 and v1beta2, set legacyBehavior true.
+func NewRESTClient(baseURL *url.URL, apiVersion string, c runtime.Codec, legacyBehavior bool) *RESTClient {
 	base := *baseURL
 	if !strings.HasSuffix(base.Path, "/") {
 		base.Path += "/"
@@ -64,57 +65,13 @@ func NewRESTClient(baseURL *url.URL, c runtime.Codec) *RESTClient {
 	base.Fragment = ""
 
 	return &RESTClient{
-		baseURL: &base,
-		Codec:   c,
+		baseURL:    &base,
+		apiVersion: apiVersion,
 
-		// Make asynchronous requests by default
-		// TODO: flip me to the default
-		Sync: false,
-		// Poll frequently when asynchronous requests are provided
-		PollPeriod: time.Second * 2,
-	}
-}
+		Codec: c,
 
-// doRequest executes a request against a server
-func (c *RESTClient) doRequest(request *http.Request) ([]byte, error) {
-	client := c.Client
-	if client == nil {
-		client = http.DefaultClient
+		LegacyBehavior: legacyBehavior,
 	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return body, err
-	}
-
-	// Did the server give us a status response?
-	isStatusResponse := false
-	var status api.Status
-	if err := c.Codec.DecodeInto(body, &status); err == nil && status.Status != "" {
-		isStatusResponse = true
-	}
-
-	switch {
-	case response.StatusCode < http.StatusOK || response.StatusCode > http.StatusPartialContent:
-		if !isStatusResponse {
-			return nil, fmt.Errorf("request [%#v] failed (%d) %s: %s", request, response.StatusCode, response.Status, string(body))
-		}
-		return nil, errors.FromObject(&status)
-	}
-
-	// If the server gave us a status back, look at what it was.
-	if isStatusResponse && status.Status != api.StatusSuccess {
-		// "Working" requests need to be handled specially.
-		// "Failed" requests are clearly just an error and it makes sense to return them as such.
-		return nil, errors.FromObject(&status)
-	}
-
-	return body, err
 }
 
 // Verb begins a request with a verb (GET, POST, PUT, DELETE).
@@ -135,15 +92,7 @@ func (c *RESTClient) Verb(verb string) *Request {
 	// if c.Client != nil {
 	// 	timeout = c.Client.Timeout
 	// }
-	return &Request{
-		verb:       verb,
-		c:          c,
-		path:       c.baseURL.Path,
-		sync:       c.Sync,
-		timeout:    c.Timeout,
-		params:     map[string]string{},
-		pollPeriod: c.PollPeriod,
-	}
+	return NewRequest(c.Client, verb, c.baseURL, c.apiVersion, c.Codec, c.LegacyBehavior, c.LegacyBehavior).Timeout(c.Timeout)
 }
 
 // Post begins a POST request. Short for c.Verb("POST").
@@ -156,6 +105,11 @@ func (c *RESTClient) Put() *Request {
 	return c.Verb("PUT")
 }
 
+// Patch begins a PATCH request. Short for c.Verb("Patch").
+func (c *RESTClient) Patch() *Request {
+	return c.Verb("PATCH")
+}
+
 // Get begins a GET request. Short for c.Verb("GET").
 func (c *RESTClient) Get() *Request {
 	return c.Verb("GET")
@@ -166,7 +120,7 @@ func (c *RESTClient) Delete() *Request {
 	return c.Verb("DELETE")
 }
 
-// PollFor makes a request to do a single poll of the completion of the given operation.
-func (c *RESTClient) PollFor(operationID string) *Request {
-	return c.Get().Path("operations").Path(operationID).Sync(false).PollPeriod(0)
+// APIVersion returns the APIVersion this RESTClient is expected to use.
+func (c *RESTClient) APIVersion() string {
+	return c.apiVersion
 }

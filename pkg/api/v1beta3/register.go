@@ -28,10 +28,9 @@ func init() {
 	api.Scheme.AddKnownTypes("v1beta3",
 		&Pod{},
 		&PodList{},
+		&PodStatusResult{},
 		&PodTemplate{},
 		&PodTemplateList{},
-		&BoundPod{},
-		&BoundPods{},
 		&ReplicationController{},
 		&ReplicationControllerList{},
 		&Service{},
@@ -39,23 +38,38 @@ func init() {
 		&Endpoints{},
 		&EndpointsList{},
 		&Node{},
+		&NodeInfo{},
 		&NodeList{},
 		&Binding{},
 		&Status{},
-		&Operation{},
-		&OperationList{},
 		&Event{},
 		&EventList{},
-		&ContainerManifestList{},
+		&List{},
+		&LimitRange{},
+		&LimitRangeList{},
+		&ResourceQuota{},
+		&ResourceQuotaList{},
+		&Namespace{},
+		&NamespaceList{},
+		&Secret{},
+		&SecretList{},
+		&PersistentVolume{},
+		&PersistentVolumeList{},
+		&PersistentVolumeClaim{},
+		&PersistentVolumeClaimList{},
+		&DeleteOptions{},
+		&ListOptions{},
 	)
+	// Legacy names are supported
+	api.Scheme.AddKnownTypeWithName("v1beta3", "Minion", &Node{})
+	api.Scheme.AddKnownTypeWithName("v1beta3", "MinionList", &NodeList{})
 }
 
 func (*Pod) IsAnAPIObject()                       {}
 func (*PodList) IsAnAPIObject()                   {}
+func (*PodStatusResult) IsAnAPIObject()           {}
 func (*PodTemplate) IsAnAPIObject()               {}
 func (*PodTemplateList) IsAnAPIObject()           {}
-func (*BoundPod) IsAnAPIObject()                  {}
-func (*BoundPods) IsAnAPIObject()                 {}
 func (*ReplicationController) IsAnAPIObject()     {}
 func (*ReplicationControllerList) IsAnAPIObject() {}
 func (*Service) IsAnAPIObject()                   {}
@@ -63,11 +77,24 @@ func (*ServiceList) IsAnAPIObject()               {}
 func (*Endpoints) IsAnAPIObject()                 {}
 func (*EndpointsList) IsAnAPIObject()             {}
 func (*Node) IsAnAPIObject()                      {}
+func (*NodeInfo) IsAnAPIObject()                  {}
 func (*NodeList) IsAnAPIObject()                  {}
 func (*Binding) IsAnAPIObject()                   {}
 func (*Status) IsAnAPIObject()                    {}
-func (*Operation) IsAnAPIObject()                 {}
-func (*OperationList) IsAnAPIObject()             {}
 func (*Event) IsAnAPIObject()                     {}
 func (*EventList) IsAnAPIObject()                 {}
-func (*ContainerManifestList) IsAnAPIObject()     {}
+func (*List) IsAnAPIObject()                      {}
+func (*LimitRange) IsAnAPIObject()                {}
+func (*LimitRangeList) IsAnAPIObject()            {}
+func (*ResourceQuota) IsAnAPIObject()             {}
+func (*ResourceQuotaList) IsAnAPIObject()         {}
+func (*Namespace) IsAnAPIObject()                 {}
+func (*NamespaceList) IsAnAPIObject()             {}
+func (*Secret) IsAnAPIObject()                    {}
+func (*SecretList) IsAnAPIObject()                {}
+func (*PersistentVolume) IsAnAPIObject()          {}
+func (*PersistentVolumeList) IsAnAPIObject()      {}
+func (*PersistentVolumeClaim) IsAnAPIObject()     {}
+func (*PersistentVolumeClaimList) IsAnAPIObject() {}
+func (*DeleteOptions) IsAnAPIObject()             {}
+func (*ListOptions) IsAnAPIObject()               {}

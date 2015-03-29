@@ -1,0 +1,40 @@
+{
+  "kind": "ReplicationController",
+  "apiVersion": "v1beta3",
+  "metadata": {
+    "name": "nettest-controller",
+    "labels": {
+      "name": "nettest"
+    }
+  },
+  "spec": {
+    "replicas": 8,
+    "selector": {
+      "name": "nettest"
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "name": "nettest"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "webserver",
+            "image": "kubernetes/nettest:latest",
+            "command": [
+              "-service=nettest"
+            ],
+            "ports": [
+              {
+                "containerPort": 8080,
+                "protocol": "TCP"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # Copyright 2014 Google Inc. All rights reserved.
 #
@@ -22,6 +22,6 @@ set -o pipefail
 KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 source "$KUBE_ROOT/build/common.sh"
 
-kube::build::verify_prereqs
+kube::build::verify_prereqs clean
 kube::build::clean_output
 kube::build::clean_images

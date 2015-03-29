@@ -19,22 +19,36 @@ package cmd
 import (
 	"io"
 
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl"
 	"github.com/spf13/cobra"
+
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd/util"
 )
 
-func NewCmdVersion(out io.Writer) *cobra.Command {
+func (f *Factory) NewCmdVersion(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "Print version of client and server",
+		Short: "Print the client and server version information.",
 		Run: func(cmd *cobra.Command, args []string) {
-			if getFlagBool(cmd, "client") {
-				kubectl.GetClientVersion(out)
-			} else {
-				kubectl.GetVersion(out, getKubeClient(cmd))
-			}
+			err := RunVersion(f, out, cmd)
+			util.CheckErr(err)
 		},
 	}
-	cmd.Flags().BoolP("client", "c", false, "Client version only (no server required)")
+	cmd.Flags().BoolP("client", "c", false, "Client version only (no server required).")
 	return cmd
+}
+
+func RunVersion(f *Factory, out io.Writer, cmd *cobra.Command) error {
+	if util.GetFlagBool(cmd, "client") {
+		kubectl.GetClientVersion(out)
+		return nil
+	}
+
+	client, err := f.Client()
+	if err != nil {
+		return err
+	}
+
+	kubectl.GetVersion(out, client)
+	return nil
 }

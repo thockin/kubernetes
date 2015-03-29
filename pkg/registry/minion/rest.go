@@ -18,89 +18,103 @@ package minion
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"net/url"
+	"strconv"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/apiserver"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/fields"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/generic"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util/fielderrors"
 )
 
-// REST implements the RESTStorage interface, backed by a MinionRegistry.
-type REST struct {
-	registry Registry
+// nodeStrategy implements behavior for nodes
+type nodeStrategy struct {
+	runtime.ObjectTyper
+	api.NameGenerator
 }
 
-// NewREST returns a new REST.
-func NewREST(m Registry) *REST {
-	return &REST{
-		registry: m,
-	}
+// Nodes is the default logic that applies when creating and updating Node
+// objects.
+var Strategy = nodeStrategy{api.Scheme, api.SimpleNameGenerator}
+
+// NamespaceScoped is false for nodes.
+func (nodeStrategy) NamespaceScoped() bool {
+	return false
 }
 
-var ErrDoesNotExist = fmt.Errorf("The requested resource does not exist.")
-var ErrNotHealty = fmt.Errorf("The requested minion is not healthy.")
-
-func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
-	minion, ok := obj.(*api.Minion)
-	if !ok {
-		return nil, fmt.Errorf("not a minion: %#v", obj)
-	}
-	if minion.ID == "" {
-		return nil, fmt.Errorf("ID should not be empty: %#v", minion)
-	}
-
-	minion.CreationTimestamp = util.Now()
-
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		err := rs.registry.CreateMinion(ctx, minion)
-		if err != nil {
-			return nil, err
-		}
-		minion, err := rs.registry.GetMinion(ctx, minion.ID)
-		if minion == nil {
-			return nil, ErrDoesNotExist
-		}
-		if err != nil {
-			return nil, err
-		}
-		return minion, nil
-	}), nil
+// AllowCreateOnUpdate is false for nodes.
+func (nodeStrategy) AllowCreateOnUpdate() bool {
+	return false
 }
 
-func (rs *REST) Delete(ctx api.Context, id string) (<-chan runtime.Object, error) {
-	minion, err := rs.registry.GetMinion(ctx, id)
-	if minion == nil {
-		return nil, ErrDoesNotExist
-	}
+// PrepareForCreate clears fields that are not allowed to be set by end users on creation.
+func (nodeStrategy) PrepareForCreate(obj runtime.Object) {
+	_ = obj.(*api.Node)
+	// Nodes allow *all* fields, including status, to be set.
+}
+
+// PrepareForUpdate clears fields that are not allowed to be set by end users on update.
+func (nodeStrategy) PrepareForUpdate(obj, old runtime.Object) {
+	_ = obj.(*api.Node)
+	_ = old.(*api.Node)
+	// Nodes allow *all* fields, including status, to be set.
+}
+
+// Validate validates a new node.
+func (nodeStrategy) Validate(obj runtime.Object) fielderrors.ValidationErrorList {
+	node := obj.(*api.Node)
+	return validation.ValidateMinion(node)
+}
+
+// ValidateUpdate is the default update validation for an end user.
+func (nodeStrategy) ValidateUpdate(obj, old runtime.Object) fielderrors.ValidationErrorList {
+	return validation.ValidateMinionUpdate(old.(*api.Node), obj.(*api.Node))
+}
+
+// ResourceGetter is an interface for retrieving resources by ResourceLocation.
+type ResourceGetter interface {
+	Get(api.Context, string) (runtime.Object, error)
+}
+
+// MatchNode returns a generic matcher for a given label and field selector.
+func MatchNode(label labels.Selector, field fields.Selector) generic.Matcher {
+	return generic.MatcherFunc(func(obj runtime.Object) (bool, error) {
+		nodeObj, ok := obj.(*api.Node)
+		if !ok {
+			return false, fmt.Errorf("not a node")
+		}
+		// TODO: Add support for filtering based on field, once NodeStatus is defined.
+		return label.Matches(labels.Set(nodeObj.Labels)), nil
+	})
+}
+
+// ResourceLocation returns a URL to which one can send traffic for the specified node.
+func ResourceLocation(getter ResourceGetter, connection client.ConnectionInfoGetter, ctx api.Context, id string) (*url.URL, http.RoundTripper, error) {
+	nodeObj, err := getter.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		return &api.Status{Status: api.StatusSuccess}, rs.registry.DeleteMinion(ctx, id)
-	}), nil
-}
+	node := nodeObj.(*api.Node)
+	host := node.Name
 
-func (rs *REST) Get(ctx api.Context, id string) (runtime.Object, error) {
-	minion, err := rs.registry.GetMinion(ctx, id)
-	if minion == nil {
-		return nil, ErrDoesNotExist
+	scheme, port, transport, err := connection.GetConnectionInfo(host)
+	if err != nil {
+		return nil, nil, err
 	}
-	return minion, err
-}
 
-func (rs *REST) List(ctx api.Context, label, field labels.Selector) (runtime.Object, error) {
-	return rs.registry.ListMinions(ctx)
-}
-
-func (rs *REST) New() runtime.Object {
-	return &api.Minion{}
-}
-
-func (rs *REST) Update(ctx api.Context, minion runtime.Object) (<-chan runtime.Object, error) {
-	return nil, fmt.Errorf("Minions can only be created (inserted) and deleted.")
-}
-
-func (rs *REST) toApiMinion(name string) *api.Minion {
-	return &api.Minion{TypeMeta: api.TypeMeta{ID: name}}
+	return &url.URL{
+			Scheme: scheme,
+			Host: net.JoinHostPort(
+				host,
+				strconv.FormatUint(uint64(port), 10),
+			),
+		},
+		transport,
+		nil
 }

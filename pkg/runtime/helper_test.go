@@ -22,16 +22,32 @@ import (
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 
 	"github.com/google/gofuzz"
 )
 
+func TestIsList(t *testing.T) {
+	tests := []struct {
+		obj    runtime.Object
+		isList bool
+	}{
+		{&api.PodList{}, true},
+		{&api.Pod{}, false},
+	}
+	for _, item := range tests {
+		if e, a := item.isList, runtime.IsListType(item.obj); e != a {
+			t.Errorf("%v: Expected %v, got %v", reflect.TypeOf(item.obj), e, a)
+		}
+	}
+}
+
 func TestExtractList(t *testing.T) {
 	pl := &api.PodList{
 		Items: []api.Pod{
-			{TypeMeta: api.TypeMeta{ID: "1"}},
-			{TypeMeta: api.TypeMeta{ID: "2"}},
-			{TypeMeta: api.TypeMeta{ID: "3"}},
+			{ObjectMeta: api.ObjectMeta{Name: "1"}},
+			{ObjectMeta: api.ObjectMeta{Name: "2"}},
+			{ObjectMeta: api.ObjectMeta{Name: "3"}},
 		},
 	}
 	list, err := runtime.ExtractList(pl)
@@ -42,8 +58,76 @@ func TestExtractList(t *testing.T) {
 		t.Fatalf("Expected %v, got %v", e, a)
 	}
 	for i := range list {
-		if e, a := list[i].(*api.Pod).ID, pl.Items[i].ID; e != a {
+		if e, a := list[i].(*api.Pod).Name, pl.Items[i].Name; e != a {
 			t.Fatalf("Expected %v, got %v", e, a)
+		}
+	}
+}
+
+func TestExtractListGeneric(t *testing.T) {
+	pl := &api.List{
+		Items: []runtime.Object{
+			&api.Pod{ObjectMeta: api.ObjectMeta{Name: "1"}},
+			&api.Service{ObjectMeta: api.ObjectMeta{Name: "2"}},
+		},
+	}
+	list, err := runtime.ExtractList(pl)
+	if err != nil {
+		t.Fatalf("Unexpected error %v", err)
+	}
+	if e, a := len(list), len(pl.Items); e != a {
+		t.Fatalf("Expected %v, got %v", e, a)
+	}
+	if obj, ok := list[0].(*api.Pod); !ok {
+		t.Fatalf("Expected list[0] to be *api.Pod, it is %#v", obj)
+	}
+	if obj, ok := list[1].(*api.Service); !ok {
+		t.Fatalf("Expected list[1] to be *api.Service, it is %#v", obj)
+	}
+}
+
+type fakePtrInterfaceList struct {
+	Items *[]runtime.Object
+}
+
+func (f fakePtrInterfaceList) IsAnAPIObject() {}
+
+func TestExtractListOfInterfacePtrs(t *testing.T) {
+	pl := &fakePtrInterfaceList{
+		Items: &[]runtime.Object{},
+	}
+	list, err := runtime.ExtractList(pl)
+	if err != nil {
+		t.Fatalf("Unexpected error %v", err)
+	}
+	if len(list) > 0 {
+		t.Fatalf("Expected empty list, got %#v", list)
+	}
+}
+
+type fakePtrValueList struct {
+	Items []*api.Pod
+}
+
+func (f fakePtrValueList) IsAnAPIObject() {}
+
+func TestExtractListOfValuePtrs(t *testing.T) {
+	pl := &fakePtrValueList{
+		Items: []*api.Pod{
+			{ObjectMeta: api.ObjectMeta{Name: "1"}},
+			{ObjectMeta: api.ObjectMeta{Name: "2"}},
+		},
+	}
+	list, err := runtime.ExtractList(pl)
+	if err != nil {
+		t.Fatalf("Unexpected error %v", err)
+	}
+	if e, a := len(list), len(pl.Items); e != a {
+		t.Fatalf("Expected %v, got %v", e, a)
+	}
+	for i := range list {
+		if obj, ok := list[i].(*api.Pod); !ok {
+			t.Fatalf("Expected list[%d] to be *api.Pod, it is %#v", i, obj)
 		}
 	}
 }
@@ -51,9 +135,9 @@ func TestExtractList(t *testing.T) {
 func TestSetList(t *testing.T) {
 	pl := &api.PodList{}
 	list := []runtime.Object{
-		&api.Pod{TypeMeta: api.TypeMeta{ID: "1"}},
-		&api.Pod{TypeMeta: api.TypeMeta{ID: "2"}},
-		&api.Pod{TypeMeta: api.TypeMeta{ID: "3"}},
+		&api.Pod{ObjectMeta: api.ObjectMeta{Name: "1"}},
+		&api.Pod{ObjectMeta: api.ObjectMeta{Name: "2"}},
+		&api.Pod{ObjectMeta: api.ObjectMeta{Name: "3"}},
 	}
 	err := runtime.SetList(pl, list)
 	if err != nil {
@@ -63,8 +147,29 @@ func TestSetList(t *testing.T) {
 		t.Fatalf("Expected %v, got %v", e, a)
 	}
 	for i := range list {
-		if e, a := list[i].(*api.Pod).ID, pl.Items[i].ID; e != a {
+		if e, a := list[i].(*api.Pod).Name, pl.Items[i].Name; e != a {
 			t.Fatalf("Expected %v, got %v", e, a)
+		}
+	}
+}
+
+func TestSetListToRuntimeObjectArray(t *testing.T) {
+	pl := &api.List{}
+	list := []runtime.Object{
+		&api.Pod{ObjectMeta: api.ObjectMeta{Name: "1"}},
+		&api.Pod{ObjectMeta: api.ObjectMeta{Name: "2"}},
+		&api.Pod{ObjectMeta: api.ObjectMeta{Name: "3"}},
+	}
+	err := runtime.SetList(pl, list)
+	if err != nil {
+		t.Fatalf("Unexpected error %v", err)
+	}
+	if e, a := len(list), len(pl.Items); e != a {
+		t.Fatalf("Expected %v, got %v", e, a)
+	}
+	for i := range list {
+		if e, a := list[i], pl.Items[i]; e != a {
+			t.Fatalf("%d: unmatched: %s", i, util.ObjectDiff(e, a))
 		}
 	}
 }

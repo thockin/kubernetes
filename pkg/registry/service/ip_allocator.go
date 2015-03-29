@@ -18,18 +18,72 @@ package service
 
 import (
 	"fmt"
+	math_rand "math/rand"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/golang/glog"
 )
 
 type ipAllocator struct {
-	subnet *net.IPNet
-	// TODO: This could be smarter, but for now a bitmap will suffice.
 	lock sync.Mutex // protects 'used'
-	used []byte     // a bitmap of allocated IPs
+
+	subnet         net.IPNet
+	ipSpaceSize    int64 // Size of subnet, or -1 if it does not fit in an int64
+	used           ipAddrSet
+	randomAttempts int
+
+	random *math_rand.Rand
 }
+
+type ipAddrSet struct {
+	// We are pretty severely restricted in the types of things we can use as a key
+	ips map[string]bool
+}
+
+func (s *ipAddrSet) Init() {
+	s.ips = map[string]bool{}
+}
+
+// Gets the number of IPs in the set
+func (s *ipAddrSet) Size() int {
+	return len(s.ips)
+}
+
+// Tests whether the set holds a given IP
+func (s *ipAddrSet) Contains(ip net.IP) bool {
+	key := ip.String()
+	exists := s.ips[key]
+	return exists
+}
+
+// Adds to the ipAddrSet; returns true iff it was added (was not already in set)
+func (s *ipAddrSet) Add(ip net.IP) bool {
+	key := ip.String()
+	exists := s.ips[key]
+	if exists {
+		return false
+	}
+	s.ips[key] = true
+	return true
+}
+
+// Removes from the ipAddrSet; returns true iff it was removed (was already in set)
+func (s *ipAddrSet) Remove(ip net.IP) bool {
+	key := ip.String()
+	exists := s.ips[key]
+	if !exists {
+		return false
+	}
+	delete(s.ips, key)
+	// TODO: We probably should add this IP to an 'embargo' list for a limited amount of time
+
+	return true
+}
+
+// The smallest number of IPs we accept.
+const minIPSpace = 8
 
 // newIPAllocator creates and intializes a new ipAllocator object.
 func newIPAllocator(subnet *net.IPNet) *ipAllocator {
@@ -37,14 +91,40 @@ func newIPAllocator(subnet *net.IPNet) *ipAllocator {
 		return nil
 	}
 
+	seed := time.Now().UTC().UnixNano()
+	r := math_rand.New(math_rand.NewSource(seed))
+
+	ipSpaceSize := int64(-1)
 	ones, bits := subnet.Mask.Size()
-	numIps := 1 << uint(bits-ones)
-	ipa := &ipAllocator{
-		subnet: subnet,
-		used:   make([]byte, numIps/8),
+	if (bits - ones) < 63 {
+		ipSpaceSize = int64(1) << uint(bits-ones)
+
+		if ipSpaceSize < minIPSpace {
+			glog.Errorf("IPAllocator requires at least %d IPs", minIPSpace)
+			return nil
+		}
 	}
-	ipa.used[0] = 0x01            // block the network addr
-	ipa.used[(numIps/8)-1] = 0x80 // block the broadcast addr
+
+	ipa := &ipAllocator{
+		subnet:         *subnet,
+		ipSpaceSize:    ipSpaceSize,
+		random:         r,
+		randomAttempts: 1000,
+	}
+	ipa.used.Init()
+
+	network := make(net.IP, len(subnet.IP), len(subnet.IP))
+	for i := 0; i < len(subnet.IP); i++ {
+		network[i] = subnet.IP[i] & subnet.Mask[i]
+	}
+	ipa.used.Add(network) // block the network addr
+
+	broadcast := make(net.IP, len(subnet.IP), len(subnet.IP))
+	for i := 0; i < len(subnet.IP); i++ {
+		broadcast[i] = subnet.IP[i] | ^subnet.Mask[i]
+	}
+	ipa.used.Add(broadcast) // block the broadcast addr
+
 	return ipa
 }
 
@@ -56,13 +136,11 @@ func (ipa *ipAllocator) Allocate(ip net.IP) error {
 	if !ipa.subnet.Contains(ip) {
 		return fmt.Errorf("IP %s does not fall within subnet %s", ip, ipa.subnet)
 	}
-	offset := ipSub(ip, ipa.subnet.IP)
-	i := offset / 8
-	m := byte(1 << byte(offset%8))
-	if ipa.used[i]&m != 0 {
+
+	if !ipa.used.Add(ip) {
 		return fmt.Errorf("IP %s is already allocated", ip)
 	}
-	ipa.used[i] |= m
+
 	return nil
 }
 
@@ -71,60 +149,83 @@ func (ipa *ipAllocator) AllocateNext() (net.IP, error) {
 	ipa.lock.Lock()
 	defer ipa.lock.Unlock()
 
-	for i := range ipa.used {
-		if ipa.used[i] != 0xff {
-			freeMask := ^ipa.used[i]
-			nextBit, err := ffs(freeMask)
-			if err != nil {
-				// If this happens, something really weird is going on.
-				glog.Errorf("ffs(%#x) had an unexpected error: %s", freeMask, err)
-				return nil, err
-			}
-			ipa.used[i] |= 1 << nextBit
-			offset := (i * 8) + int(nextBit)
-			ip := ipAdd(copyIP(ipa.subnet.IP), offset)
+	if int64(ipa.used.Size()) == ipa.ipSpaceSize {
+		return nil, fmt.Errorf("can't find a free IP in %s", ipa.subnet)
+	}
+
+	// Try randomly first
+	for i := 0; i < ipa.randomAttempts; i++ {
+		ip := ipa.createRandomIp()
+
+		if ipa.used.Add(ip) {
 			return ip, nil
 		}
 	}
+
+	// If that doesn't work, try a linear search
+	ip := copyIP(ipa.subnet.IP)
+	for ipa.subnet.Contains(ip) {
+		ip = ipAdd(ip, 1)
+		if ipa.used.Add(ip) {
+			return ip, nil
+		}
+	}
+
 	return nil, fmt.Errorf("can't find a free IP in %s", ipa.subnet)
 }
 
-// This is a really dumb implementation of find-first-set-bit.
-func ffs(val byte) (uint, error) {
-	if val == 0 {
-		return 0, fmt.Errorf("Can't find-first-set on 0")
+// Returns the index-th IP from the specified subnet range.
+// For example, subnet "10.0.0.0/24" with index "2" will return the IP "10.0.0.2".
+// TODO(saad-ali): Move this (and any other functions that are independent of ipAllocator) to some
+// place more generic.
+func GetIndexedIP(subnet *net.IPNet, index int) (net.IP, error) {
+	ip := ipAdd(subnet.IP, index /* offset */)
+	if !subnet.Contains(ip) {
+		return nil, fmt.Errorf("can't generate IP with index %d from subnet. subnet too small. subnet: %q", index, subnet)
 	}
-	i := uint(0)
-	for ; i < 8 && (val&(1<<i) == 0); i++ {
+	return ip, nil
+}
+
+func (ipa *ipAllocator) createRandomIp() net.IP {
+	ip := ipa.subnet.IP
+	mask := ipa.subnet.Mask
+	n := len(ip)
+
+	randomIp := make(net.IP, n, n)
+
+	for i := 0; i < n; i++ {
+		if mask[i] == 0xff {
+			randomIp[i] = ipa.subnet.IP[i]
+		} else {
+			b := byte(ipa.random.Intn(256))
+			randomIp[i] = (ipa.subnet.IP[i] & mask[i]) | (b &^ mask[i])
+		}
 	}
-	return i, nil
+
+	return randomIp
 }
 
 // Add an offset to an IP address - used for joining network addr and host addr parts.
 func ipAdd(ip net.IP, offset int) net.IP {
-	for i := 0; offset > 0; i++ {
+	out := copyIP(simplifyIP(ip))
+	// Loop from least-significant to most.
+	for i := len(out) - 1; i >= 0 && offset > 0; i-- {
 		add := offset % 256
-		ip[len(ip)-1-i] += byte(add)
+		result := int(out[i]) + add
+		out[i] = byte(result % 256)
 		offset >>= 8
+		offset += result / 256 // carry
 	}
-	return ip
+	return out
 }
 
-// Subtract two IPs, returning the difference as an offset - used or splitting an IP into
-// network addr and host addr parts.
-func ipSub(lhs, rhs net.IP) int {
-	// If they are not the same length, normalize them.  Make copies because net.IP is
-	// a slice underneath. Sneaky sneaky.
-	if len(lhs) != len(rhs) {
-		lhs = copyIP(lhs).To16()
-		rhs = copyIP(rhs).To16()
+// Get the optimal slice for an IP. IPv4 addresses will come back in a 4 byte slice. IPv6
+// addresses will come back in a 16 byte slice. Non-IP arguments will produce nil.
+func simplifyIP(in net.IP) net.IP {
+	if ip4 := in.To4(); ip4 != nil {
+		return ip4
 	}
-	offset := 0
-	for i := range lhs {
-		offset *= 256
-		offset += int(lhs[i] - rhs[i])
-	}
-	return offset
+	return in.To16()
 }
 
 // Make a copy of a net.IP.  It appears to be a value type, but it is actually defined as a
@@ -144,9 +245,6 @@ func (ipa *ipAllocator) Release(ip net.IP) error {
 	if !ipa.subnet.Contains(ip) {
 		return fmt.Errorf("IP %s does not fall within subnet %s", ip, ipa.subnet)
 	}
-	offset := ipSub(ip, ipa.subnet.IP)
-	i := offset / 8
-	m := byte(1 << byte(offset%8))
-	ipa.used[i] &^= m
+	ipa.used.Remove(ip)
 	return nil
 }

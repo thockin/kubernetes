@@ -14,78 +14,82 @@ The **kubernetes** controller manager is really a service that is layered on top
 The kube-controller-manager has several options.
 
 # OPTIONS
-**-address**=""
+**--address**=""
 	The address on the local server to listen to. Default 127.0.0.1.
 
-**-allow_privileged**="false"
+**--allow_privileged**="false"
 	If true, allow privileged containers.
 
-**-address=**"127.0.0.1"
+**--address=**"127.0.0.1"
 	The address to serve from.
 
-**-alsologtostderr**=false
+**--alsologtostderr**=false
 	log to standard error as well as files.
 
-**-api_version**=""
+**--api_version**=""
 	The API version to use when talking to the server.
 
-**-insecure_skip_tls_verify**=false
+**--cloud_config**=""
+	The path to the cloud provider configuration file. Empty string for no configuration file.
+
+**--cloud_provider**=""
+	The provider for cloud services. Empty string for no provider.
+
+**--minion_regexp**=""
+	If non empty, and --cloud_provider is specified, a regular expression for matching minion VMs.
+
+**--insecure_skip_tls_verify**=false
 	If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure.
 
-**-log_backtrace_at**=:0
+**--log_backtrace_at**=:0
 	when logging hits line file:N, emit a stack trace.
 
-**-log_dir**=""
+**--log_dir**=""
 	If non-empty, write log files in this directory.
 
-**-log_flush_frequency**=5s
+**--log_flush_frequency**=5s
 	Maximum number of seconds between log flushes.
 
-**-logtostderr**=false
+**--logtostderr**=false
 	log to standard error instead of files.
 
-**-master**=""
+**--machines**=[]
+    List of machines to schedule onto, comma separated.
+
+**--pod_eviction_timeout**=5m
+    The grace peroid for deleting pods on failed nodes.
+
+**--sync_nodes**=true
+    If true, and --cloud_provider is specified, sync nodes from the cloud provider. Default true.
+
+**--master**=""
 	The address of the Kubernetes API server.
 
-**-port**=10252
-	The port that the controller-manager's http service runs on.
+**--node_sync_period**=10s
+    The period for syncing nodes from cloudprovider.
 
-**-stderrthreshold**=0
+**--port**=10252
+    The port that the controller-manager's http service runs on.
+
+**--resource_quota_sync_period**=10s
+    The period for syncing quota usage status in the system.
+
+**--stderrthreshold**=0
 	logs at or above this threshold go to stderr.
 
-**-v**=0
+**--v**=0
 	log level for V logs.
 
-**-version**=false
+**--version**=false
 	Print version information and quit.
 
-**-vmodule**=
+**--vmodule**=
 	comma-separated list of pattern=N settings for file-filtered logging.
 
 # EXAMPLES
-
-The kube-controller-manager can be called manually or from systemd. An example unit file looks as such:
-
-	[Unit]
-	Description=Kubernetes Controller Manager
-	
-	[Service]
-	EnvironmentFile=/etc/kubernetes/config
-	EnvironmentFile=/etc/kubernetes/apiserver
-	EnvironmentFile=/etc/kubernetes/controller-manager
-	User=kube
-	ExecStart=/usr/bin/kube-controller-manager \
-	    --logtostderr=${KUBE_LOGTOSTDERR} \
-	    --v=${KUBE_LOG_LEVEL} \
-	    --master=${KUBE_MASTER}
-	Restart=on-failure
-
-	[Install]
-	WantedBy=multi-user.target
-
-
-Where the variables are stored in the /etc/kubernetes/ enfironment files.
-
+```
+/usr/bin/kube-controller-manager --logtostderr=true --v=0 --master=127.0.0.1:8080
+```
 # HISTORY
 October 2014, Originally compiled by Scott Collier (scollier at redhat dot com) based
  on the kubernetes source material and internal work.

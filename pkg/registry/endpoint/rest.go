@@ -17,88 +17,77 @@ limitations under the License.
 package endpoint
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/apiserver"
+	endptspkg "github.com/GoogleCloudPlatform/kubernetes/pkg/api/endpoints"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/fields"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/registry/generic"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/watch"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util/fielderrors"
 )
 
-// REST adapts endpoints into apiserver's RESTStorage model.
-type REST struct {
-	registry Registry
+// endpointsStrategy implements behavior for Endpoints
+type endpointsStrategy struct {
+	runtime.ObjectTyper
+	api.NameGenerator
 }
 
-// NewREST returns a new apiserver.RESTStorage implementation for endpoints
-func NewREST(registry Registry) *REST {
-	return &REST{
-		registry: registry,
-	}
+// Strategy is the default logic that applies when creating and updating Endpoint
+// objects via the REST API.
+var Strategy = endpointsStrategy{api.Scheme, api.SimpleNameGenerator}
+
+// NamespaceScoped is true for endpoints.
+func (endpointsStrategy) NamespaceScoped() bool {
+	return true
 }
 
-// Get satisfies the RESTStorage interface.
-func (rs *REST) Get(ctx api.Context, id string) (runtime.Object, error) {
-	return rs.registry.GetEndpoints(ctx, id)
+// PrepareForCreate clears fields that are not allowed to be set by end users on creation.
+func (endpointsStrategy) PrepareForCreate(obj runtime.Object) {
+	endpoints := obj.(*api.Endpoints)
+	endpoints.Subsets = endptspkg.RepackSubsets(endpoints.Subsets)
 }
 
-// List satisfies the RESTStorage interface.
-func (rs *REST) List(ctx api.Context, label, field labels.Selector) (runtime.Object, error) {
-	if !label.Empty() || !field.Empty() {
-		return nil, errors.New("label/field selectors are not supported on endpoints")
-	}
-	return rs.registry.ListEndpoints(ctx)
+// PrepareForUpdate clears fields that are not allowed to be set by end users on update.
+func (endpointsStrategy) PrepareForUpdate(obj, old runtime.Object) {
+	newEndpoints := obj.(*api.Endpoints)
+	_ = old.(*api.Endpoints)
+	newEndpoints.Subsets = endptspkg.RepackSubsets(newEndpoints.Subsets)
 }
 
-// Watch returns Endpoint events via a watch.Interface.
-// It implements apiserver.ResourceWatcher.
-func (rs *REST) Watch(ctx api.Context, label, field labels.Selector, resourceVersion string) (watch.Interface, error) {
-	return rs.registry.WatchEndpoints(ctx, label, field, resourceVersion)
+// Validate validates a new endpoints.
+func (endpointsStrategy) Validate(obj runtime.Object) fielderrors.ValidationErrorList {
+	return validation.ValidateEndpoints(obj.(*api.Endpoints))
 }
 
-// Create satisfies the RESTStorage interface.
-func (rs *REST) Create(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
-	endpoints, ok := obj.(*api.Endpoints)
-	if !ok {
-		return nil, fmt.Errorf("not an endpoints: %#v", obj)
-	}
-	if len(endpoints.ID) == 0 {
-		return nil, fmt.Errorf("id is required: %#v", obj)
-	}
-	endpoints.CreationTimestamp = util.Now()
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		err := rs.registry.UpdateEndpoints(ctx, endpoints)
-		if err != nil {
-			return nil, err
+// AllowCreateOnUpdate is true for endpoints.
+func (endpointsStrategy) AllowCreateOnUpdate() bool {
+	return true
+}
+
+// ValidateUpdate is the default update validation for an end user.
+func (endpointsStrategy) ValidateUpdate(obj, old runtime.Object) fielderrors.ValidationErrorList {
+	return validation.ValidateEndpointsUpdate(old.(*api.Endpoints), obj.(*api.Endpoints))
+}
+
+// MatchEndpoints returns a generic matcher for a given label and field selector.
+func MatchEndpoints(label labels.Selector, field fields.Selector) generic.Matcher {
+	return generic.MatcherFunc(func(obj runtime.Object) (bool, error) {
+		endpoints, ok := obj.(*api.Endpoints)
+		if !ok {
+			return false, fmt.Errorf("not a endpoints")
 		}
-		return rs.registry.GetEndpoints(ctx, endpoints.ID)
-	}), nil
+		fields := EndpointsToSelectableFields(endpoints)
+		return label.Matches(labels.Set(endpoints.Labels)) && field.Matches(fields), nil
+	})
 }
 
-// Update satisfies the RESTStorage interface.
-func (rs *REST) Update(ctx api.Context, obj runtime.Object) (<-chan runtime.Object, error) {
-	endpoints, ok := obj.(*api.Endpoints)
-	if !ok {
-		return nil, fmt.Errorf("not an endpoints: %#v", obj)
+// EndpointsToSelectableFields returns a label set that represents the object
+// TODO: fields are not labels, and the validation rules for them do not apply.
+func EndpointsToSelectableFields(endpoints *api.Endpoints) labels.Set {
+	return labels.Set{
+		"name": endpoints.Name,
 	}
-	return apiserver.MakeAsync(func() (runtime.Object, error) {
-		err := rs.registry.UpdateEndpoints(ctx, endpoints)
-		if err != nil {
-			return nil, err
-		}
-		return rs.registry.GetEndpoints(ctx, endpoints.ID)
-	}), nil
-}
-
-// Delete satisfies the RESTStorage interface but is unimplemented.
-func (rs *REST) Delete(ctx api.Context, id string) (<-chan runtime.Object, error) {
-	return nil, errors.New("unimplemented")
-}
-
-// New implements the RESTStorage interface.
-func (rs REST) New() runtime.Object {
-	return &api.Endpoints{}
 }

@@ -18,11 +18,16 @@ package proxy
 
 import (
 	"net"
+
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/types"
 )
 
 // LoadBalancer is an interface for distributing incoming requests to service endpoints.
 type LoadBalancer interface {
 	// NextEndpoint returns the endpoint to handle a request for the given
-	// service and source address.
-	NextEndpoint(service string, srcAddr net.Addr) (string, error)
+	// service-port and source address.
+	NextEndpoint(service types.NamespacedName, port string, srcAddr net.Addr) (string, error)
+	NewService(service types.NamespacedName, port string, sessionAffinityType api.AffinityType, stickyMaxAgeMinutes int) error
+	CleanupStaleStickySessions(service types.NamespacedName, port string)
 }

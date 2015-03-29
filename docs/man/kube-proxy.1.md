@@ -14,73 +14,53 @@ The **kubernetes** network proxy runs on each node. This reflects services as de
 The kube-proxy takes several options.
 
 # OPTIONS
-**-alsologtostderr**=false
+**--alsologtostderr**=false
 	log to standard error as well as files
 
-**-api_version=**""
+**--api_version=**""
 	The API version to use when talking to the server
 
-**-bindaddress**="0.0.0.0"
+**--bindaddress**="0.0.0.0"
 	The address for the proxy server to serve on (set to 0.0.0.0 or "" for all interfaces)
 
-**-etcd_servers**=[]
+**--etcd_servers**=[]
 	List of etcd servers to watch (http://ip:port), comma separated (optional)
 
-**-insecure_skip_tls_verify**=false
+**--insecure_skip_tls_verify**=false
 	If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure.
 
-**-log_backtrace_at**=:0
+**--log_backtrace_at**=:0
 	when logging hits line file:N, emit a stack trace
 
-**-log_dir**=""
+**--log_dir**=""
 	If non-empty, write log files in this directory
 
-**-log_flush_frequency**=5s
+**--log_flush_frequency**=5s
 	Maximum number of seconds between log flushes
 
-**-logtostderr**=false
+**--logtostderr**=false
 	log to standard error instead of files
 
-**-master**=""
+**--master**=""
 	The address of the Kubernetes API server
 
-**-stderrthreshold**=0
+**--stderrthreshold**=0
 	logs at or above this threshold go to stderr
 
-**-v**=0
+**--v**=0
 	log level for V logs
 
-**-version**=false
+**--version**=false
 	Print version information and quit
 
-**-vmodule**=
+**--vmodule**=
 	comma-separated list of pattern=N settings for file-filtered logging
 
 
 # EXAMPLES
-
-The kube-proxy can be called manually or from systemd. An example unit file looks as such:
-
-	[Unit]
-	Description=Kubernetes Proxy
-	# the proxy crashes if etcd isn't reachable.
-	# https://github.com/GoogleCloudPlatform/kubernetes/issues/1206
-	After=network.target
-	
-	[Service]
-	EnvironmentFile=/etc/kubernetes/config
-	EnvironmentFile=/etc/kubernetes/proxy
-	ExecStart=/usr/bin/kube-proxy \
-		--logtostderr=${KUBE_LOGTOSTDERR} \
-		--v=${KUBE_LOG_LEVEL} \
-		--etcd_servers=${KUBE_ETCD_SERVERS}
-	Restart=on-failure
-	
-	[Install]
-	WantedBy=multi-user.target
-
-Where the variables are stored in the /etc/kubernetes/ directory.
-
+```
+/usr/bin/kube-proxy --logtostderr=true --v=0 --etcd_servers=http://127.0.0.1:4001
+```
 # HISTORY
 October 2014, Originally compiled by Scott Collier (scollier at redhat dot com) based
  on the kubernetes source material and internal work.

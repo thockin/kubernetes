@@ -5,7 +5,7 @@ A Volume is a directory, possibly with some data in it, which is accessible to a
 
 A Pod specifies which Volumes its containers need in its [ContainerManifest](https://developers.google.com/compute/docs/containers/container_vms#container_manifest) property.
 
-A process in a Container sees a filesystem view composed from two sources: a single Docker image and zero or more Volumes.  A [Docker image](https://docs.docker.com/userguide/dockerimages/) is at the root of the file hierarchy.  Any Volumes are mounted at points on the Docker image;  Volumes do not mount on other Volumes and do not have hard links to other Volumes.  Each container in the Pod independently specifies where on its its image to mount each Volume.  This is specified a VolumeMount property.
+A process in a Container sees a filesystem view composed from two sources: a single Docker image and zero or more Volumes.  A [Docker image](https://docs.docker.com/userguide/dockerimages/) is at the root of the file hierarchy.  Any Volumes are mounted at points on the Docker image;  Volumes do not mount on other Volumes and do not have hard links to other Volumes.  Each container in the Pod independently specifies where on its image to mount each Volume.  This is specified a VolumeMounts property.
 
 ## Resources
 
@@ -41,12 +41,47 @@ Watch out when using this type of volume, because:
   - When Kubernetes adds resource-aware scheduling, as is planned, it will not be able to account for resources used by a HostDir.
 
 ### GCEPersistentDisk
+__Important: You must create a PD using ```gcloud``` or the GCE API before you can use it__
+
 A Volume with a GCEPersistentDisk property allows access to files on a Google Compute Engine (GCE)
 [Persistent Disk](http://cloud.google.com/compute/docs/disks).
 
 There are some restrictions when using a GCEPersistentDisk:
   - the nodes (what the kubelet runs on) need to be GCE VMs
   - those VMs need to be in the same GCE project and zone as the PD
-  - avoid creating multiple pods that use the same Volume
-    - if multiple pods refer to the same Volume and both are scheduled on the same machine, regardless of whether they are read-only or read-write, then the second pod scheduled will fail.
-    - Replication controllers can only be created for pods that use read-only mounts.
+  - avoid creating multiple pods that use the same Volume if any mount it read/write.
+    - if a pod P already mounts a volume read/write, and a second pod Q attempts to use the volume, regardless of if it tries to use it read-only or read/write, Q will fail.
+    - if a pod P already mounts a volume read-only, and a second pod Q attempts to use the volume read/write, Q will fail.
+    - replication controllers with replicas > 1 can only be created for pods that use read-only mounts.
+
+#### Creating a PD
+Before you can use a GCE PD with a pod, you need to create it.
+
+```sh
+gcloud compute disks create --size=500GB --zone=us-central1-a my-data-disk
+```
+
+#### GCE PD Example configuration:
+```yaml
+apiVersion: v1beta1
+desiredState:
+  manifest:
+    containers:
+      - image: kubernetes/pause
+        name: testpd
+        volumeMounts:
+          - mountPath: "/testpd"
+            name: "testpd"
+    id: testpd
+    version: v1beta1
+    volumes:
+      - name: testpd
+        source:
+          persistentDisk:
+            # This GCE PD must already exist.
+            pdName: test
+            fsType: ext4
+id: testpd
+kind: Pod
+```
+

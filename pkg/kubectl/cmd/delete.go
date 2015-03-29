@@ -17,17 +17,19 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"io"
 
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl"
 	"github.com/spf13/cobra"
+
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/errors"
+	cmdutil "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd/util"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/resource"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 )
 
-func NewCmdDelete(out io.Writer) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "delete ([-f filename] | (<resource> <id>))",
-		Short: "Delete a resource by filename, stdin or resource and id",
-		Long: `Delete a resource by filename, stdin or resource and id.
+const (
+	delete_long = `Delete a resource by filename, stdin, resource and ID, or by resources and label selector.
 
 JSON and YAML formats are accepted.
 
@@ -36,45 +38,75 @@ arguments are used and the filename is ignored.
 
 Note that the delete command does NOT do resource version checks, so if someone
 submits an update to a resource right when you submit a delete, their update
-will be lost along with the rest of the resource.
+will be lost along with the rest of the resource.`
+	delete_example = `// Delete a pod using the type and ID specified in pod.json.
+$ kubectl delete -f pod.json
 
-Examples:
-  $ kubectl delete -f pod.json
-  <delete a pod using the type and id pod.json>
+// Delete a pod based on the type and ID in the JSON passed into stdin.
+$ cat pod.json | kubectl delete -f -
 
-  $ cat pod.json | kubectl delete -f -
-  <delete a pod based on the type and id in the json passed into stdin>
+// Delete pods and services with label name=myLabel.
+$ kubectl delete pods,services -l name=myLabel
 
-  $ kubectl delete pod 1234-56-7890-234234-456456
-  <delete a pod with ID 1234-56-7890-234234-456456>`,
+// Delete a pod with ID 1234-56-7890-234234-456456.
+$ kubectl delete pod 1234-56-7890-234234-456456
+
+// Delete all pods
+$ kubectl delete pods --all`
+)
+
+func (f *Factory) NewCmdDelete(out io.Writer) *cobra.Command {
+	var filenames util.StringList
+	cmd := &cobra.Command{
+		Use:     "delete ([-f FILENAME] | (RESOURCE [(ID | -l label | --all)]",
+		Short:   "Delete a resource by filename, stdin, or resource and ID.",
+		Long:    delete_long,
+		Example: delete_example,
 		Run: func(cmd *cobra.Command, args []string) {
-			// If command line args are passed in, use those preferentially.
-			if len(args) > 0 && len(args) != 2 {
-				usageError(cmd, "If passing in command line parameters, must be resource and id")
-			}
-
-			var data []byte
-			var err error
-
-			if len(args) == 2 {
-				data, err = kubectl.CreateResource(args[0], args[1])
-			} else {
-				filename := getFlagString(cmd, "filename")
-				if len(filename) > 0 {
-					data, err = readConfigData(getFlagString(cmd, "filename"))
-				}
-			}
-			checkErr(err)
-
-			if len(data) == 0 {
-				usageError(cmd, "Must specify filename or command line params")
-			}
-
-			// TODO Add ability to require a resource-version check for delete.
-			err = kubectl.Modify(out, getKubeClient(cmd).RESTClient, kubectl.ModifyDelete, data)
-			checkErr(err)
+			err := RunDelete(f, out, cmd, args, filenames)
+			cmdutil.CheckErr(err)
 		},
 	}
-	cmd.Flags().StringP("filename", "f", "", "Filename or URL to file to use to delete the resource")
+	cmd.Flags().VarP(&filenames, "filename", "f", "Filename, directory, or URL to a file containing the resource to delete")
+	cmd.Flags().StringP("selector", "l", "", "Selector (label query) to filter on")
+	cmd.Flags().Bool("all", false, "[-all] to select all the specified resources")
 	return cmd
+}
+
+func RunDelete(f *Factory, out io.Writer, cmd *cobra.Command, args []string, filenames util.StringList) error {
+	cmdNamespace, err := f.DefaultNamespace()
+	if err != nil {
+		return err
+	}
+	mapper, typer := f.Object()
+	r := resource.NewBuilder(mapper, typer, f.ClientMapperForCommand(cmd)).
+		ContinueOnError().
+		NamespaceParam(cmdNamespace).DefaultNamespace().
+		FilenameParam(filenames...).
+		SelectorParam(cmdutil.GetFlagString(cmd, "selector")).
+		SelectAllParam(cmdutil.GetFlagBool(cmd, "all")).
+		ResourceTypeOrNameArgs(false, args...).
+		Flatten().
+		Do()
+	err = r.Err()
+	if err != nil {
+		return err
+	}
+
+	found := 0
+	err = r.IgnoreErrors(errors.IsNotFound).Visit(func(r *resource.Info) error {
+		found++
+		if err := resource.NewHelper(r.Client, r.Mapping).Delete(r.Namespace, r.Name); err != nil {
+			return err
+		}
+		fmt.Fprintf(out, "%s/%s\n", r.Mapping.Resource, r.Name)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	if found == 0 {
+		fmt.Fprintf(cmd.Out(), "No resources found\n")
+	}
+	return nil
 }

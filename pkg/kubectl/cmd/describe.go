@@ -17,29 +17,51 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"io"
 
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd/util"
 	"github.com/spf13/cobra"
 )
 
-func NewCmdDescribe(out io.Writer) *cobra.Command {
+func (f *Factory) NewCmdDescribe(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "describe <resource> <id>",
+		Use:   "describe RESOURCE ID",
 		Short: "Show details of a specific resource",
 		Long: `Show details of a specific resource.
 
 This command joins many API calls together to form a detailed description of a
 given resource.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) < 2 {
-				usageError(cmd, "Need to supply a resource and an ID")
-			}
-			resource := args[0]
-			id := args[1]
-			err := kubectl.Describe(out, getKubeClient(cmd), resource, id)
-			checkErr(err)
+			err := RunDescribe(f, out, cmd, args)
+			util.CheckErr(err)
 		},
 	}
 	return cmd
+}
+
+func RunDescribe(f *Factory, out io.Writer, cmd *cobra.Command, args []string) error {
+	cmdNamespace, err := f.DefaultNamespace()
+	if err != nil {
+		return err
+	}
+
+	mapper, _ := f.Object()
+	// TODO: use resource.Builder instead
+	mapping, namespace, name, err := util.ResourceFromArgs(cmd, args, mapper, cmdNamespace)
+	if err != nil {
+		return err
+	}
+
+	describer, err := f.Describer(mapping)
+	if err != nil {
+		return err
+	}
+
+	s, err := describer.Describe(namespace, name)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(out, "%s\n", s)
+	return nil
 }

@@ -22,12 +22,14 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/validation"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util/yaml"
 	"github.com/golang/glog"
 )
 
@@ -35,21 +37,30 @@ func validateObject(obj runtime.Object) (errors []error) {
 	ctx := api.NewDefaultContext()
 	switch t := obj.(type) {
 	case *api.ReplicationController:
-		errors = validation.ValidateManifest(&t.DesiredState.PodTemplate.DesiredState.Manifest)
+		if t.Namespace == "" {
+			t.Namespace = api.NamespaceDefault
+		}
+		errors = validation.ValidateReplicationController(t)
 	case *api.ReplicationControllerList:
 		for i := range t.Items {
 			errors = append(errors, validateObject(&t.Items[i])...)
 		}
 	case *api.Service:
-		api.ValidNamespace(ctx, &t.TypeMeta)
+		if t.Namespace == "" {
+			t.Namespace = api.NamespaceDefault
+		}
+		api.ValidNamespace(ctx, &t.ObjectMeta)
 		errors = validation.ValidateService(t)
 	case *api.ServiceList:
 		for i := range t.Items {
 			errors = append(errors, validateObject(&t.Items[i])...)
 		}
 	case *api.Pod:
-		api.ValidNamespace(ctx, &t.TypeMeta)
-		errors = validation.ValidateManifest(&t.DesiredState.Manifest)
+		if t.Namespace == "" {
+			t.Namespace = api.NamespaceDefault
+		}
+		api.ValidNamespace(ctx, &t.ObjectMeta)
+		errors = validation.ValidatePod(t)
 	case *api.PodList:
 		for i := range t.Items {
 			errors = append(errors, validateObject(&t.Items[i])...)
@@ -61,54 +72,93 @@ func validateObject(obj runtime.Object) (errors []error) {
 }
 
 func walkJSONFiles(inDir string, fn func(name, path string, data []byte)) error {
-	err := filepath.Walk(inDir, func(path string, info os.FileInfo, err error) error {
+	return filepath.Walk(inDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
 		if info.IsDir() && path != inDir {
 			return filepath.SkipDir
 		}
-		name := filepath.Base(path)
-		ext := filepath.Ext(name)
-		if ext != "" {
-			name = name[:len(name)-len(ext)]
+
+		file := filepath.Base(path)
+		if ext := filepath.Ext(file); ext == ".json" || ext == ".yaml" {
+			glog.Infof("Testing %s", path)
+			data, err := ioutil.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			name := strings.TrimSuffix(file, ext)
+
+			if ext == ".yaml" {
+				out, err := yaml.ToJSON(data)
+				if err != nil {
+					return err
+				}
+				data = out
+			}
+
+			fn(name, path, data)
 		}
-		if !(ext == ".json" || ext == ".yaml") {
-			return nil
-		}
-		glog.Infof("Testing %s", path)
-		data, err := ioutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		fn(name, path, data)
 		return nil
 	})
-	return err
 }
 
 func TestExampleObjectSchemas(t *testing.T) {
 	cases := map[string]map[string]runtime.Object{
-		"../api/examples": {
-			"controller":       &api.ReplicationController{},
-			"controller-list":  &api.ReplicationControllerList{},
-			"pod":              &api.Pod{},
-			"pod-list":         &api.PodList{},
-			"service":          &api.Service{},
-			"external-service": &api.Service{},
-			"service-list":     &api.ServiceList{},
+		"../docs/getting-started-guides": {
+			"pod": &api.Pod{},
+		},
+		"../cmd/integration": {
+			"v1beta1-controller": &api.ReplicationController{},
+			"v1beta3-controller": &api.ReplicationController{},
 		},
 		"../examples/guestbook": {
+			"frontend-controller":     &api.ReplicationController{},
+			"redis-slave-controller":  &api.ReplicationController{},
+			"redis-master-controller": &api.ReplicationController{},
+			"frontend-service":        &api.Service{},
+			"redis-master-service":    &api.Service{},
+			"redis-slave-service":     &api.Service{},
+		},
+		"../examples/guestbook/v1beta3": {
 			"frontend-controller":    &api.ReplicationController{},
 			"redis-slave-controller": &api.ReplicationController{},
-			"redis-master":           &api.Pod{},
+			"redis-master":           &api.ReplicationController{},
 			"frontend-service":       &api.Service{},
 			"redis-master-service":   &api.Service{},
 			"redis-slave-service":    &api.Service{},
 		},
+		"../examples/guestbook-go": {
+			"guestbook-controller":    &api.ReplicationController{},
+			"redis-slave-controller":  &api.ReplicationController{},
+			"redis-master-controller": &api.ReplicationController{},
+			"guestbook-service":       &api.Service{},
+			"redis-master-service":    &api.Service{},
+			"redis-slave-service":     &api.Service{},
+		},
+		"../examples/guestbook-go/v1beta3": {
+			"guestbook-controller":    &api.ReplicationController{},
+			"redis-slave-controller":  &api.ReplicationController{},
+			"redis-master-controller": &api.ReplicationController{},
+			"guestbook-service":       &api.Service{},
+			"redis-master-service":    &api.Service{},
+			"redis-slave-service":     &api.Service{},
+		},
 		"../examples/walkthrough": {
 			"pod1": &api.Pod{},
 			"pod2": &api.Pod{},
+			"pod-with-http-healthcheck": &api.Pod{},
+			"service":                   &api.Service{},
+			"replication-controller":    &api.ReplicationController{},
+		},
+		"../examples/update-demo/v1beta1": {
+			"kitten-rc":   &api.ReplicationController{},
+			"nautilus-rc": &api.ReplicationController{},
+		},
+		"../examples/update-demo/v1beta3": {
+			"kitten-rc":   &api.ReplicationController{},
+			"nautilus-rc": &api.ReplicationController{},
 		},
 	}
 
@@ -175,14 +225,18 @@ func TestReadme(t *testing.T) {
 
 			//t.Logf("testing (%s): \n%s", subtype, content)
 			expectedType := &api.Pod{}
-			if err := latest.Codec.DecodeInto([]byte(content), expectedType); err != nil {
+			json, err := yaml.ToJSON([]byte(content))
+			if err != nil {
+				t.Errorf("%s could not be converted to JSON: %v\n%s", path, err, string(content))
+			}
+			if err := latest.Codec.DecodeInto(json, expectedType); err != nil {
 				t.Errorf("%s did not decode correctly: %v\n%s", path, err, string(content))
 				continue
 			}
 			if errors := validateObject(expectedType); len(errors) > 0 {
 				t.Errorf("%s did not validate correctly: %v", path, errors)
 			}
-			_, err := latest.Codec.Encode(expectedType)
+			_, err = latest.Codec.Encode(expectedType)
 			if err != nil {
 				t.Errorf("Could not encode object: %v", err)
 				continue

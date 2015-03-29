@@ -60,7 +60,7 @@ func TestSetObj(t *testing.T) {
 	helper := tools.EtcdHelper{Client: client, Codec: stringCodec{}}
 	withEtcdKey(func(key string) {
 		fakeObject := fakeAPIObject("object")
-		if err := helper.SetObj(key, &fakeObject); err != nil {
+		if err := helper.SetObj(key, &fakeObject, nil, 0); err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		resp, err := client.Get(key, false, false)
@@ -93,9 +93,9 @@ func TestExtractObj(t *testing.T) {
 
 func TestWatch(t *testing.T) {
 	client := newEtcdClient()
-	helper := tools.EtcdHelper{Client: client, Codec: latest.Codec, ResourceVersioner: tools.RuntimeVersionAdapter{latest.ResourceVersioner}}
+	helper := tools.NewEtcdHelper(client, latest.Codec)
 	withEtcdKey(func(key string) {
-		resp, err := client.Set(key, runtime.EncodeOrDie(v1beta1.Codec, &api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}}), 0)
+		resp, err := client.Set(key, runtime.EncodeOrDie(v1beta1.Codec, &api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}}), 0)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

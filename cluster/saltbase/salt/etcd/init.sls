@@ -1,7 +1,19 @@
-{% set etcd_version="v0.4.6" %}
-{% set etcd_tar_url="https://github.com/coreos/etcd/releases/download/%s/etcd-%s-linux-amd64.tar.gz"
-  | format(etcd_version, etcd_version)  %}
-{% set etcd_tar_hash="md5=2949e9163e59dc4f8db9ad92f3245b20" %}
+# We are caching the etcd tar file in GCS for reliability and speed.  To
+# update this to a new version, do the following:
+# 2. Download tar file:
+#    curl -LO https://github.com/coreos/etcd/releases/download/<ver>/etcd-<ver>-linux-amd64.tar.gz
+# 3. Upload to GCS (the cache control makes :
+#    gsutil cp <tar> gs://kubernetes-release/etcd/<tar>
+# 4. Make it world readable:
+#    gsutil -m acl ch -R -g all:R gs://kubernetes-release/etcd/
+# 5. Get a hash of the tar:
+#    shasum <tar>
+# 6. Update this file with new tar version and new hash
+
+{% set etcd_version="v2.0.5" %}
+{% set etcd_tar_url="https://storage.googleapis.com/kubernetes-release/etcd/etcd-%s-linux-amd64.tar.gz"
+  | format(etcd_version)  %}
+{% set etcd_tar_hash="sha1=34b185efa954327d6cdfe6be5b1eb5fcfb7c478c" %}
 
 etcd-tar:
   archive:
@@ -12,7 +24,9 @@ etcd-tar:
     - source_hash: {{ etcd_tar_hash }}
     - archive_format: tar
     - if_missing: /usr/local/src/etcd-{{ etcd_version }}-linux-amd64
-    - tar_options: z
+{% if grains['saltversioninfo'] <= (2014, 7, 0, 0) %}
+    - tar_options: xz
+{% endif %}
   file.directory:
     - name: /usr/local/src/etcd-{{ etcd_version }}-linux-amd64
     - user: root
@@ -66,6 +80,18 @@ etcd:
     - user: etcd
     - group: etcd
     - dir_mode: 700
+    - require:
+      - user: etcd
+      - group: etcd
+
+/var/etcd/data:
+  file.directory:
+    - user: etcd
+    - group: etcd
+    - dir_mode: 700
+    - require:
+      - user: etcd
+      - group: etcd
 
 {% if grains['os_family'] == 'RedHat' %}
 
@@ -106,4 +132,9 @@ etcd-service:
       {% endif %}
       - file: etcd-tar
       - file: etcd-symlink
+    - require:
+      - file: /var/etcd
+      - file: /var/etcd/data
+      - user: etcd
+      - group: etcd
 

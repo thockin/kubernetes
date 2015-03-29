@@ -29,19 +29,24 @@ import (
 // These are not API objects and are unversioned today.
 type watchEvent struct {
 	// The type of the watch event; added, modified, or deleted.
-	Type watch.EventType `json:"type,omitempty" yaml:"type,omitempty"`
+	Type watch.EventType `json:"type,omitempty"`
 
 	// For added or modified objects, this is the new object; for deleted objects,
 	// it's the state of the object immediately prior to its deletion.
 	// For errors, it's an api.Status.
-	Object runtime.RawExtension `json:"object,omitempty" yaml:"object,omitempty"`
+	Object runtime.RawExtension `json:"object,omitempty"`
+}
+
+// NewWatchEvent returns the serialization form of watchEvent for structured schemas
+func NewWatchEvent() interface{} {
+	return &watchEvent{}
 }
 
 // Object converts a watch.Event into an appropriately serializable JSON object
 func Object(codec runtime.Codec, event *watch.Event) (interface{}, error) {
 	obj, ok := event.Object.(runtime.Object)
 	if !ok {
-		return nil, fmt.Errorf("The event object cannot be safely converted to JSON: %v", reflect.TypeOf(event.Object).Name())
+		return nil, fmt.Errorf("the event object cannot be safely converted to JSON: %v", reflect.TypeOf(event.Object).Name())
 	}
 	data, err := codec.Encode(obj)
 	if err != nil {

@@ -1,0 +1,15 @@
+apiVersion: v1beta3
+kind: Service
+metadata: 
+  labels: 
+    name: influxGrafana
+    kubernetes.io/cluster-service: "true"
+  name: monitoring-grafana
+spec: 
+  targetPort: 80
+  port: 80
+  selector: 
+    name: influxGrafana
+    kubernetes.io/cluster-service: "true"
+
+

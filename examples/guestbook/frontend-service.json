@@ -2,9 +2,13 @@
   "id": "frontend",
   "kind": "Service",
   "apiVersion": "v1beta1",
-  "port": 9998,
-  "containerPort": 80,
+  "port": 8000,
+  "containerPort": "http-server",
   "selector": {
     "name": "frontend"
-  }
+  },
+  "labels": {
+    "name": "frontend"
+  },
+  "createExternalLoadBalancer": true
 }

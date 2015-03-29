@@ -36,13 +36,16 @@ func TestNew(t *testing.T) {
 	if ipa == nil {
 		t.Errorf("expected non-nil")
 	}
-	if len(ipa.used) != 128 { // a /22 has 1024 IPs, 8 per byte = 128
-		t.Errorf("wrong size for ipa.used")
+	if ipa.ipSpaceSize != 1024 {
+		t.Errorf("wrong size for ipa.ipSpaceSize")
 	}
-	if ipa.used[0] != 0x01 {
+	if ipa.used.Size() != 2 {
+		t.Errorf("wrong size() for ipa.used")
+	}
+	if !ipa.used.Contains(net.ParseIP("93.76.0.0")) {
 		t.Errorf("network address was not reserved")
 	}
-	if ipa.used[127] != 0x80 {
+	if !ipa.used.Contains(net.ParseIP("93.76.3.255")) {
 		t.Errorf("broadcast address was not reserved")
 	}
 }
@@ -50,6 +53,14 @@ func TestNew(t *testing.T) {
 func TestAllocate(t *testing.T) {
 	_, ipnet, _ := net.ParseCIDR("93.76.0.0/22")
 	ipa := newIPAllocator(ipnet)
+
+	if err := ipa.Allocate(net.ParseIP("93.76.0.0")); err == nil {
+		t.Errorf("expected failure")
+	}
+
+	if err := ipa.Allocate(net.ParseIP("93.76.3.255")); err == nil {
+		t.Errorf("expected failure")
+	}
 
 	if err := ipa.Allocate(net.ParseIP("93.76.0.1")); err != nil {
 		t.Errorf("expected success, got %s", err)
@@ -67,6 +78,9 @@ func TestAllocate(t *testing.T) {
 func TestAllocateNext(t *testing.T) {
 	_, ipnet, _ := net.ParseCIDR("93.76.0.0/22")
 	ipa := newIPAllocator(ipnet)
+
+	// Turn off random allocation attempts, so we just allocate in sequence
+	ipa.randomAttempts = 0
 
 	ip1, err := ipa.AllocateNext()
 	if err != nil {
@@ -128,6 +142,8 @@ func TestRelease(t *testing.T) {
 	_, ipnet, _ := net.ParseCIDR("93.76.0.0/24")
 	ipa := newIPAllocator(ipnet)
 
+	ipa.randomAttempts = 0
+
 	err := ipa.Release(net.ParseIP("1.2.3.4"))
 	if err == nil {
 		t.Errorf("Expected an error")
@@ -172,31 +188,6 @@ func TestRelease(t *testing.T) {
 	}
 }
 
-func TestFFS(t *testing.T) {
-	_, err := ffs(0)
-	if err == nil {
-		t.Errorf("Expected error")
-	}
-
-	testCases := []struct {
-		value    byte
-		expected uint
-	}{
-		{0x01, 0}, {0x02, 1}, {0x04, 2}, {0x08, 3},
-		{0x10, 4}, {0x20, 5}, {0x40, 6}, {0x80, 7},
-		{0x22, 1}, {0xa0, 5}, {0xfe, 1}, {0xff, 0},
-	}
-	for _, tc := range testCases {
-		r, err := ffs(tc.value)
-		if err != nil {
-			t.Error(err)
-		}
-		if r != tc.expected {
-			t.Errorf("Expected %d, got %d", tc.expected, r)
-		}
-	}
-}
-
 func TestIPAdd(t *testing.T) {
 	testCases := []struct {
 		ip       string
@@ -206,10 +197,14 @@ func TestIPAdd(t *testing.T) {
 		{"1.2.3.0", 0, "1.2.3.0"},
 		{"1.2.3.0", 1, "1.2.3.1"},
 		{"1.2.3.0", 255, "1.2.3.255"},
+		{"1.2.3.1", 255, "1.2.4.0"},
+		{"1.2.3.2", 255, "1.2.4.1"},
 		{"1.2.3.0", 256, "1.2.4.0"},
 		{"1.2.3.0", 257, "1.2.4.1"},
 		{"1.2.3.0", 65536, "1.3.3.0"},
 		{"1.2.3.4", 1, "1.2.3.5"},
+		{"255.255.255.255", 1, "0.0.0.0"},
+		{"255.255.255.255", 2, "0.0.0.1"},
 	}
 	for _, tc := range testCases {
 		r := ipAdd(net.ParseIP(tc.ip), tc.offset)
@@ -219,25 +214,72 @@ func TestIPAdd(t *testing.T) {
 	}
 }
 
-func TestIPSub(t *testing.T) {
+func TestGenerateFirstTwoIPsFromSubnet(t *testing.T) {
+	// Arrange
 	testCases := []struct {
-		lhs      string
-		rhs      string
-		expected int
+		subnet        string
+		expected1stIP string
+		expected2ndIP string
 	}{
-		{"1.2.3.0", "1.2.3.0", 0},
-		{"1.2.3.1", "1.2.3.0", 1},
-		{"1.2.3.255", "1.2.3.0", 255},
-		{"1.2.4.0", "1.2.3.0", 256},
-		{"1.2.4.1", "1.2.3.0", 257},
-		{"1.3.3.0", "1.2.3.0", 65536},
-		{"1.2.3.5", "1.2.3.4", 1},
+		{"10.0.0.0/24", "10.0.0.1", "10.0.0.2"},
+		{"10.10.10.10/24", "10.10.10.1", "10.10.10.2"},
+		{"10.10.10.10/16", "10.10.0.1", "10.10.0.2"},
+		{"10.10.10.10/8", "10.0.0.1", "10.0.0.2"},
+		{"10.10.10.10/0", "0.0.0.1", "0.0.0.2"},
+		{"192.168.100.1/16", "192.168.0.1", "192.168.0.2"},
+		{"153.15.250.5/23", "153.15.250.1", "153.15.250.2"},
+		{"2001:db8::/48", "2001:db8::1", "2001:db8::2"},
+		{"2001:db8:123:255::/48", "2001:db8:123::1", "2001:db8:123::2"},
+		{"12.12.0.0/30", "12.12.0.1", "12.12.0.2"},
 	}
-	for _, tc := range testCases {
-		r := ipSub(net.ParseIP(tc.lhs), net.ParseIP(tc.rhs))
-		if r != tc.expected {
-			t.Errorf("Expected %v, got %v", tc.expected, r)
+
+	// Act & Assert
+	for _, testCase := range testCases {
+		_, subnet, _ := net.ParseCIDR(testCase.subnet)
+		firstIP, err := GetIndexedIP(subnet, 1)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
 		}
+		secondIP, err := GetIndexedIP(subnet, 2)
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+		if firstIP.String() != testCase.expected1stIP {
+			t.Errorf("Unexpected first IP: Expected <%q> Actual <%q>", testCase.expected1stIP, firstIP.String())
+		}
+		if secondIP.String() != testCase.expected2ndIP {
+			t.Errorf("Unexpected second IP: Expected <%q> Actual <%q>", testCase.expected2ndIP, secondIP.String())
+		}
+	}
+}
+
+func TestGetIndexedIPSubnetTooSmall(t *testing.T) {
+	// Arrange
+	testCases := []struct {
+		subnet string
+	}{
+		{"12.12.0.0/32"},
+		{"12.12.0.0/31"},
+	}
+
+	// Act & Assert
+	for _, testCase := range testCases {
+		_, subnet, _ := net.ParseCIDR(testCase.subnet)
+		secondIP, err := GetIndexedIP(subnet, 2)
+		if err == nil {
+			t.Errorf("Expected error but no error occured for subnet: ", testCase.subnet)
+		}
+		thirdIP, err := GetIndexedIP(subnet, 3)
+		if err == nil {
+			t.Errorf("Expected error but no error occured for subnet: ", testCase.subnet)
+		}
+		if secondIP != nil {
+			t.Errorf("Unexpected second IP: Expected nil Actual <%q>", thirdIP.String())
+		}
+		if thirdIP != nil {
+			t.Errorf("Unexpected third IP: Expected nil Actual <%q>", secondIP.String())
+		}
+
 	}
 }
 
@@ -247,5 +289,25 @@ func TestCopyIP(t *testing.T) {
 	ip2[0]++
 	if ip1[0] == ip2[0] {
 		t.Errorf("copyIP did not copy")
+	}
+}
+
+func TestSimplifyIP(t *testing.T) {
+	ip4 := net.ParseIP("1.2.3.4")
+	if len(ip4) != 16 {
+		t.Errorf("expected 16 bytes")
+	}
+	if len(simplifyIP(ip4)) != 4 {
+		t.Errorf("expected 4 bytes")
+	}
+	ip6 := net.ParseIP("::1.2.3.4")
+	if len(ip6) != 16 {
+		t.Errorf("expected 16 bytes")
+	}
+	if len(simplifyIP(ip6)) != 16 {
+		t.Errorf("expected 16 bytes")
+	}
+	if simplifyIP([]byte{0, 0}) != nil {
+		t.Errorf("expected nil")
 	}
 }

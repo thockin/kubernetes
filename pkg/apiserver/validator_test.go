@@ -25,7 +25,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/health"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/probe"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 )
 
@@ -54,21 +54,21 @@ func TestValidate(t *testing.T) {
 	tests := []struct {
 		err            error
 		data           string
-		expectedStatus health.Status
+		expectedStatus probe.Result
 		code           int
 		expectErr      bool
 	}{
-		{fmt.Errorf("test error"), "", health.Unknown, 500 /*ignored*/, true},
-		{nil, "foo", health.Healthy, 200, false},
-		{nil, "foo", health.Unhealthy, 500, true},
+		{fmt.Errorf("test error"), "", probe.Unknown, 500 /*ignored*/, true},
+		{nil, "foo", probe.Success, 200, false},
+		{nil, "foo", probe.Failure, 500, true},
 	}
 
-	s := server{addr: "foo.com", port: 8080}
+	s := Server{Addr: "foo.com", Port: 8080, Path: "/healthz"}
 
 	for _, test := range tests {
 		fake := makeFake(test.data, test.code, test.err)
 		status, data, err := s.check(fake)
-		expect := fmt.Sprintf("http://%s:%d/healthz", s.addr, s.port)
+		expect := fmt.Sprintf("http://%s:%d/healthz", s.Addr, s.Port)
 		if fake.url != expect {
 			t.Errorf("expected %s, got %s", expect, fake.url)
 		}

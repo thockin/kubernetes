@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
@@ -36,65 +37,93 @@ func (t *testLW) Watch(resourceVersion string) (watch.Interface, error) {
 	return t.WatchFunc(resourceVersion)
 }
 
+func TestReflector_resyncChan(t *testing.T) {
+	s := NewStore(MetaNamespaceKeyFunc)
+	g := NewReflector(&testLW{}, &api.Pod{}, s, time.Millisecond)
+	a, b := g.resyncChan(), time.After(100*time.Millisecond)
+	select {
+	case <-a:
+		t.Logf("got timeout as expected")
+	case <-b:
+		t.Errorf("resyncChan() is at least 99 milliseconds late??")
+	}
+}
+
 func TestReflector_watchHandlerError(t *testing.T) {
-	s := NewStore()
-	g := NewReflector(&testLW{}, &api.Pod{}, s)
+	s := NewStore(MetaNamespaceKeyFunc)
+	g := NewReflector(&testLW{}, &api.Pod{}, s, 0)
 	fw := watch.NewFake()
 	go func() {
 		fw.Stop()
 	}()
 	var resumeRV string
-	err := g.watchHandler(fw, &resumeRV)
+	err := g.watchHandler(fw, &resumeRV, neverExitWatch)
 	if err == nil {
 		t.Errorf("unexpected non-error")
 	}
 }
 
 func TestReflector_watchHandler(t *testing.T) {
-	s := NewStore()
-	g := NewReflector(&testLW{}, &api.Pod{}, s)
+	s := NewStore(MetaNamespaceKeyFunc)
+	g := NewReflector(&testLW{}, &api.Pod{}, s, 0)
 	fw := watch.NewFake()
-	s.Add("foo", &api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}})
-	s.Add("bar", &api.Pod{TypeMeta: api.TypeMeta{ID: "bar"}})
+	s.Add(&api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}})
+	s.Add(&api.Pod{ObjectMeta: api.ObjectMeta{Name: "bar"}})
 	go func() {
-		fw.Add(&api.Service{TypeMeta: api.TypeMeta{ID: "rejected"}})
-		fw.Delete(&api.Pod{TypeMeta: api.TypeMeta{ID: "foo"}})
-		fw.Modify(&api.Pod{TypeMeta: api.TypeMeta{ID: "bar", ResourceVersion: "55"}})
-		fw.Add(&api.Pod{TypeMeta: api.TypeMeta{ID: "baz", ResourceVersion: "32"}})
+		fw.Add(&api.Service{ObjectMeta: api.ObjectMeta{Name: "rejected"}})
+		fw.Delete(&api.Pod{ObjectMeta: api.ObjectMeta{Name: "foo"}})
+		fw.Modify(&api.Pod{ObjectMeta: api.ObjectMeta{Name: "bar", ResourceVersion: "55"}})
+		fw.Add(&api.Pod{ObjectMeta: api.ObjectMeta{Name: "baz", ResourceVersion: "32"}})
 		fw.Stop()
 	}()
 	var resumeRV string
-	err := g.watchHandler(fw, &resumeRV)
+	err := g.watchHandler(fw, &resumeRV, neverExitWatch)
 	if err != nil {
 		t.Errorf("unexpected error %v", err)
 	}
 
+	mkPod := func(id string, rv string) *api.Pod {
+		return &api.Pod{ObjectMeta: api.ObjectMeta{Name: id, ResourceVersion: rv}}
+	}
+
 	table := []struct {
-		ID     string
-		RV     string
+		Pod    *api.Pod
 		exists bool
 	}{
-		{"foo", "", false},
-		{"rejected", "", false},
-		{"bar", "55", true},
-		{"baz", "32", true},
+		{mkPod("foo", ""), false},
+		{mkPod("rejected", ""), false},
+		{mkPod("bar", "55"), true},
+		{mkPod("baz", "32"), true},
 	}
 	for _, item := range table {
-		obj, exists := s.Get(item.ID)
+		obj, exists, _ := s.Get(item.Pod)
 		if e, a := item.exists, exists; e != a {
-			t.Errorf("%v: expected %v, got %v", item.ID, e, a)
+			t.Errorf("%v: expected %v, got %v", item.Pod, e, a)
 		}
 		if !exists {
 			continue
 		}
-		if e, a := item.RV, obj.(*api.Pod).ResourceVersion; e != a {
-			t.Errorf("%v: expected %v, got %v", item.ID, e, a)
+		if e, a := item.Pod.ResourceVersion, obj.(*api.Pod).ResourceVersion; e != a {
+			t.Errorf("%v: expected %v, got %v", item.Pod, e, a)
 		}
 	}
 
 	// RV should send the last version we see.
 	if e, a := "32", resumeRV; e != a {
 		t.Errorf("expected %v, got %v", e, a)
+	}
+}
+
+func TestReflector_watchHandlerTimeout(t *testing.T) {
+	s := NewStore(MetaNamespaceKeyFunc)
+	g := NewReflector(&testLW{}, &api.Pod{}, s, 0)
+	fw := watch.NewFake()
+	var resumeRV string
+	exit := make(chan time.Time, 1)
+	exit <- time.Now()
+	err := g.watchHandler(fw, &resumeRV, exit)
+	if err != errorResyncRequested {
+		t.Errorf("expected timeout error, but got %q", err)
 	}
 }
 
@@ -118,11 +147,11 @@ func TestReflector_listAndWatch(t *testing.T) {
 			return fw, nil
 		},
 		ListFunc: func() (runtime.Object, error) {
-			return &api.PodList{TypeMeta: api.TypeMeta{ResourceVersion: "1"}}, nil
+			return &api.PodList{ListMeta: api.ListMeta{ResourceVersion: "1"}}, nil
 		},
 	}
-	s := NewFIFO()
-	r := NewReflector(lw, &api.Pod{}, s)
+	s := NewFIFO(MetaNamespaceKeyFunc)
+	r := NewReflector(lw, &api.Pod{}, s, 0)
 	go r.listAndWatch()
 
 	ids := []string{"foo", "bar", "baz", "qux", "zoo"}
@@ -132,7 +161,7 @@ func TestReflector_listAndWatch(t *testing.T) {
 			fw = <-createdFakes
 		}
 		sendingRV := strconv.FormatUint(uint64(i+2), 10)
-		fw.Add(&api.Pod{TypeMeta: api.TypeMeta{ID: id, ResourceVersion: sendingRV}})
+		fw.Add(&api.Pod{ObjectMeta: api.ObjectMeta{Name: id, ResourceVersion: sendingRV}})
 		if sendingRV == "3" {
 			// Inject a failure.
 			fw.Stop()
@@ -143,7 +172,7 @@ func TestReflector_listAndWatch(t *testing.T) {
 	// Verify we received the right ids with the right resource versions.
 	for i, id := range ids {
 		pod := s.Pop().(*api.Pod)
-		if e, a := id, pod.ID; e != a {
+		if e, a := id, pod.Name; e != a {
 			t.Errorf("%v: Expected %v, got %v", i, e, a)
 		}
 		if e, a := strconv.FormatUint(uint64(i+2), 10), pod.ResourceVersion; e != a {
@@ -158,10 +187,10 @@ func TestReflector_listAndWatch(t *testing.T) {
 
 func TestReflector_listAndWatchWithErrors(t *testing.T) {
 	mkPod := func(id string, rv string) *api.Pod {
-		return &api.Pod{TypeMeta: api.TypeMeta{ID: id, ResourceVersion: rv}}
+		return &api.Pod{ObjectMeta: api.ObjectMeta{Name: id, ResourceVersion: rv}}
 	}
 	mkList := func(rv string, pods ...*api.Pod) *api.PodList {
-		list := &api.PodList{TypeMeta: api.TypeMeta{ResourceVersion: rv}}
+		list := &api.PodList{ListMeta: api.ListMeta{ResourceVersion: rv}}
 		for _, pod := range pods {
 			list.Items = append(list.Items, *pod)
 		}
@@ -200,7 +229,7 @@ func TestReflector_listAndWatchWithErrors(t *testing.T) {
 		},
 	}
 
-	s := NewFIFO()
+	s := NewFIFO(MetaNamespaceKeyFunc)
 	for line, item := range table {
 		if item.list != nil {
 			// Test that the list is what currently exists in the store.
@@ -208,11 +237,11 @@ func TestReflector_listAndWatchWithErrors(t *testing.T) {
 			checkMap := map[string]string{}
 			for _, item := range current {
 				pod := item.(*api.Pod)
-				checkMap[pod.ID] = pod.ResourceVersion
+				checkMap[pod.Name] = pod.ResourceVersion
 			}
 			for _, pod := range item.list.Items {
-				if e, a := pod.ResourceVersion, checkMap[pod.ID]; e != a {
-					t.Errorf("%v: expected %v, got %v for pod %v", line, e, a, pod.ID)
+				if e, a := pod.ResourceVersion, checkMap[pod.Name]; e != a {
+					t.Errorf("%v: expected %v, got %v for pod %v", line, e, a, pod.Name)
 				}
 			}
 			if e, a := len(item.list.Items), len(checkMap); e != a {
@@ -239,7 +268,7 @@ func TestReflector_listAndWatchWithErrors(t *testing.T) {
 				return item.list, item.listErr
 			},
 		}
-		r := NewReflector(lw, &api.Pod{}, s)
+		r := NewReflector(lw, &api.Pod{}, s, 0)
 		r.listAndWatch()
 	}
 }

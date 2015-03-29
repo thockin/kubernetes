@@ -19,7 +19,6 @@ package client
 import (
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"reflect"
 	"testing"
 
@@ -28,23 +27,25 @@ import (
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/testapi"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/v1beta1"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/v1beta2"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/v1beta3"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
 )
 
-func TestChecksCodec(t *testing.T) {
+func TestSetsCodec(t *testing.T) {
 	testCases := map[string]struct {
 		Err    bool
 		Prefix string
 		Codec  runtime.Codec
 	}{
-		"v1beta1": {false, "/v1beta1/", v1beta1.Codec},
-		"":        {false, "/v1beta1/", v1beta1.Codec},
-		"v1beta2": {false, "/v1beta2/", v1beta2.Codec},
-		"v1beta3": {true, "", nil},
+		"v1beta1": {false, "/api/v1beta1/", v1beta1.Codec},
+		"":        {false, "/api/v1beta1/", v1beta1.Codec},
+		"v1beta2": {false, "/api/v1beta2/", v1beta2.Codec},
+		"v1beta3": {false, "/api/v1beta3/", v1beta3.Codec},
+		"v1beta4": {true, "", nil},
 	}
 	for version, expected := range testCases {
-		client, err := RESTClientFor(&Config{Host: "127.0.0.1", Version: version})
+		client, err := New(&Config{Host: "127.0.0.1", Version: version})
 		switch {
 		case err == nil && expected.Err:
 			t.Errorf("expected error but was nil")
@@ -55,12 +56,24 @@ func TestChecksCodec(t *testing.T) {
 		case err != nil:
 			continue
 		}
-		if e, a := expected.Prefix, client.baseURL.Path; e != a {
+		if e, a := expected.Prefix, client.RESTClient.baseURL.Path; e != a {
 			t.Errorf("expected %#v, got %#v", e, a)
 		}
-		if e, a := expected.Codec, client.Codec; e != a {
+		if e, a := expected.Codec, client.RESTClient.Codec; e != a {
 			t.Errorf("expected %#v, got %#v", e, a)
 		}
+	}
+}
+
+func TestRESTClientRequires(t *testing.T) {
+	if _, err := RESTClientFor(&Config{Host: "127.0.0.1", Version: "", Codec: testapi.Codec()}); err == nil {
+		t.Errorf("unexpected non-error")
+	}
+	if _, err := RESTClientFor(&Config{Host: "127.0.0.1", Version: "v1beta1"}); err == nil {
+		t.Errorf("unexpected non-error")
+	}
+	if _, err := RESTClientFor(&Config{Host: "127.0.0.1", Version: testapi.Version(), Codec: testapi.Codec()}); err != nil {
+		t.Errorf("unexpected error: %v", err)
 	}
 }
 
@@ -82,7 +95,7 @@ func TestValidatesHostParameter(t *testing.T) {
 		{"host/server", "", "", true},
 	}
 	for i, testCase := range testCases {
-		c, err := RESTClientFor(&Config{Host: testCase.Host, Prefix: testCase.Prefix, Version: "v1beta1"})
+		c, err := RESTClientFor(&Config{Host: testCase.Host, Prefix: testCase.Prefix, Version: "v1beta1", Codec: testapi.Codec()})
 		switch {
 		case err == nil && testCase.Err:
 			t.Errorf("expected error but was nil")
@@ -100,108 +113,106 @@ func TestValidatesHostParameter(t *testing.T) {
 	}
 }
 
-func TestDoRequest(t *testing.T) {
-	invalid := "aaaaa"
-	uri, _ := url.Parse("http://localhost")
-	testClients := []testClient{
-		{Request: testRequest{Method: "GET", Path: "good"}, Response: Response{StatusCode: 200}},
-		{Request: testRequest{Method: "GET", Path: "bad%ZZ"}, Error: true},
-		{Request: testRequest{Method: "GET", Path: "error"}, Response: Response{StatusCode: 500}, Error: true},
-		{Request: testRequest{Method: "POST", Path: "faildecode"}, Response: Response{StatusCode: 200, RawBody: &invalid}},
-		{Request: testRequest{Method: "GET", Path: "failread"}, Response: Response{StatusCode: 200, RawBody: &invalid}},
-		{Client: &Client{&RESTClient{baseURL: uri, Codec: testapi.Codec()}}, Request: testRequest{Method: "GET", Path: "nocertificate"}, Error: true},
-	}
-	for _, c := range testClients {
-		client := c.Setup()
-		prefix := *client.baseURL
-		prefix.Path += c.Request.Path
-		request := &http.Request{
-			Method: c.Request.Method,
-			Header: make(http.Header),
-			URL:    &prefix,
-		}
-		response, err := client.doRequest(request)
-		//t.Logf("dorequest: %#v\n%#v\n%v", request.URL, response, err)
-		c.ValidateRaw(t, response, err)
-	}
-}
-
 func TestDoRequestBearer(t *testing.T) {
-	status := &api.Status{Status: api.StatusWorking}
+	status := &api.Status{Status: api.StatusFailure}
 	expectedBody, _ := latest.Codec.Encode(status)
 	fakeHandler := util.FakeHandler{
-		StatusCode:   202,
+		StatusCode:   400,
 		ResponseBody: string(expectedBody),
 		T:            t,
 	}
 	testServer := httptest.NewServer(&fakeHandler)
-	request, _ := http.NewRequest("GET", testServer.URL+"/foo/bar", nil)
-	c, err := RESTClientFor(&Config{Host: testServer.URL, BearerToken: "test"})
+	defer testServer.Close()
+	request, _ := http.NewRequest("GET", testServer.URL, nil)
+	c, err := RESTClientFor(&Config{
+		Host:           testServer.URL,
+		Version:        testapi.Version(),
+		Codec:          testapi.Codec(),
+		LegacyBehavior: true,
+
+		BearerToken: "test",
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	c.doRequest(request)
+	err = c.Get().Do().Error()
+	if err == nil {
+		t.Fatalf("unexpected non-error: %v", err)
+	}
 	if fakeHandler.RequestReceived.Header.Get("Authorization") != "Bearer test" {
 		t.Errorf("Request is missing authorization header: %#v", *request)
 	}
 }
 
-func TestDoRequestAccepted(t *testing.T) {
-	status := &api.Status{Status: api.StatusWorking}
+func TestDoRequestWithoutPassword(t *testing.T) {
+	status := &api.Status{Status: api.StatusFailure}
 	expectedBody, _ := latest.Codec.Encode(status)
 	fakeHandler := util.FakeHandler{
-		StatusCode:   202,
+		StatusCode:   400,
 		ResponseBody: string(expectedBody),
 		T:            t,
 	}
 	testServer := httptest.NewServer(&fakeHandler)
-	request, _ := http.NewRequest("GET", testServer.URL+"/foo/bar", nil)
-	c, err := RESTClientFor(&Config{Host: testServer.URL, Username: "test"})
+	defer testServer.Close()
+	c, err := RESTClientFor(&Config{
+		Host:           testServer.URL,
+		Version:        testapi.Version(),
+		Codec:          testapi.Codec(),
+		LegacyBehavior: true,
+
+		Username: "test",
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	body, err := c.doRequest(request)
-	if fakeHandler.RequestReceived.Header["Authorization"] == nil {
-		t.Errorf("Request is missing authorization header: %#v", *request)
-	}
+	body, err := c.Get().Prefix("test").Do().Raw()
 	if err == nil {
-		t.Error("Unexpected non-error")
-		return
+		t.Fatalf("Unexpected non-error")
+	}
+	if fakeHandler.RequestReceived.Header["Authorization"] == nil {
+		t.Errorf("Request is missing authorization header: %#v", fakeHandler.RequestReceived)
 	}
 	se, ok := err.(APIStatus)
 	if !ok {
-		t.Errorf("Unexpected kind of error: %#v", err)
-		return
+		t.Fatalf("Unexpected kind of error: %#v", err)
 	}
 	if !reflect.DeepEqual(se.Status(), *status) {
 		t.Errorf("Unexpected status: %#v %#v", se.Status(), status)
 	}
 	if body != nil {
-		t.Errorf("Expected nil body, but saw: '%s'", body)
+		t.Errorf("Expected nil body, but saw: '%s'", string(body))
 	}
-	fakeHandler.ValidateRequest(t, "/foo/bar", "GET", nil)
+	fakeHandler.ValidateRequest(t, "/"+testapi.Version()+"/test", "GET", nil)
 }
 
-func TestDoRequestAcceptedSuccess(t *testing.T) {
+func TestDoRequestSuccess(t *testing.T) {
 	status := &api.Status{Status: api.StatusSuccess}
 	expectedBody, _ := latest.Codec.Encode(status)
 	fakeHandler := util.FakeHandler{
-		StatusCode:   202,
+		StatusCode:   200,
 		ResponseBody: string(expectedBody),
 		T:            t,
 	}
 	testServer := httptest.NewServer(&fakeHandler)
-	request, _ := http.NewRequest("GET", testServer.URL+"/foo/bar", nil)
-	c, err := RESTClientFor(&Config{Host: testServer.URL, Username: "user", Password: "pass"})
+	defer testServer.Close()
+	c, err := RESTClientFor(&Config{
+		Host:           testServer.URL,
+		Version:        testapi.Version(),
+		Codec:          testapi.Codec(),
+		LegacyBehavior: true,
+
+		Username: "user",
+		Password: "pass",
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	body, err := c.doRequest(request)
-	if fakeHandler.RequestReceived.Header["Authorization"] == nil {
-		t.Errorf("Request is missing authorization header: %#v", *request)
-	}
+	body, err := c.Get().Prefix("test").Do().Raw()
 	if err != nil {
-		t.Errorf("Unexpected error %#v", err)
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if fakeHandler.RequestReceived.Header["Authorization"] == nil {
+		t.Errorf("Request is missing authorization header: %#v", fakeHandler.RequestReceived)
 	}
 	statusOut, err := latest.Codec.Decode(body)
 	if err != nil {
@@ -210,11 +221,17 @@ func TestDoRequestAcceptedSuccess(t *testing.T) {
 	if !reflect.DeepEqual(status, statusOut) {
 		t.Errorf("Unexpected mis-match. Expected %#v.  Saw %#v", status, statusOut)
 	}
-	fakeHandler.ValidateRequest(t, "/foo/bar", "GET", nil)
+	fakeHandler.ValidateRequest(t, "/"+testapi.Version()+"/test", "GET", nil)
 }
 
 func TestDoRequestFailed(t *testing.T) {
-	status := &api.Status{Status: api.StatusFailure, Reason: api.StatusReasonInvalid, Details: &api.StatusDetails{ID: "test", Kind: "test"}}
+	status := &api.Status{
+		Code:    http.StatusNotFound,
+		Status:  api.StatusFailure,
+		Reason:  api.StatusReasonNotFound,
+		Message: " \"\" not found",
+		Details: &api.StatusDetails{},
+	}
 	expectedBody, _ := latest.Codec.Encode(status)
 	fakeHandler := util.FakeHandler{
 		StatusCode:   404,
@@ -222,12 +239,17 @@ func TestDoRequestFailed(t *testing.T) {
 		T:            t,
 	}
 	testServer := httptest.NewServer(&fakeHandler)
-	request, _ := http.NewRequest("GET", testServer.URL+"/foo/bar", nil)
-	c, err := RESTClientFor(&Config{Host: testServer.URL})
+	defer testServer.Close()
+	c, err := RESTClientFor(&Config{
+		Host:           testServer.URL,
+		Version:        testapi.Version(),
+		Codec:          testapi.Codec(),
+		LegacyBehavior: true,
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	body, err := c.doRequest(request)
+	body, err := c.Get().Do().Raw()
 	if err == nil || body != nil {
 		t.Errorf("unexpected non-error: %#v", body)
 	}
@@ -237,6 +259,46 @@ func TestDoRequestFailed(t *testing.T) {
 	}
 	actual := ss.Status()
 	if !reflect.DeepEqual(status, &actual) {
-		t.Errorf("Unexpected mis-match. Expected %#v.  Saw %#v", status, actual)
+		t.Errorf("Unexpected mis-match: %s", util.ObjectDiff(status, &actual))
 	}
+}
+
+func TestDoRequestCreated(t *testing.T) {
+	status := &api.Status{Status: api.StatusSuccess}
+	expectedBody, _ := latest.Codec.Encode(status)
+	fakeHandler := util.FakeHandler{
+		StatusCode:   201,
+		ResponseBody: string(expectedBody),
+		T:            t,
+	}
+	testServer := httptest.NewServer(&fakeHandler)
+	defer testServer.Close()
+	c, err := RESTClientFor(&Config{
+		Host:           testServer.URL,
+		Version:        testapi.Version(),
+		Codec:          testapi.Codec(),
+		LegacyBehavior: true,
+
+		Username: "user",
+		Password: "pass",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	created := false
+	body, err := c.Get().Prefix("test").Do().WasCreated(&created).Raw()
+	if err != nil {
+		t.Errorf("Unexpected error %#v", err)
+	}
+	if !created {
+		t.Errorf("Expected object to be created")
+	}
+	statusOut, err := latest.Codec.Decode(body)
+	if err != nil {
+		t.Errorf("Unexpected error %#v", err)
+	}
+	if !reflect.DeepEqual(status, statusOut) {
+		t.Errorf("Unexpected mis-match. Expected %#v.  Saw %#v", status, statusOut)
+	}
+	fakeHandler.ValidateRequest(t, "/"+testapi.Version()+"/test", "GET", nil)
 }

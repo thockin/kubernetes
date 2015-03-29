@@ -14,39 +14,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# any command line arguments will be passed to hack/build_go.sh to build the
+# cmd/integration binary.  --use_go_build is a legitimate argument, as are
+# any other build time arguments.
+
 set -o errexit
 set -o nounset
 set -o pipefail
 
 KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
-source "${KUBE_ROOT}/hack/config-go.sh"
-source "${KUBE_ROOT}/hack/util.sh"
+source "${KUBE_ROOT}/hack/lib/init.sh"
+# Comma separated list of API Versions that should be tested.
+KUBE_TEST_API_VERSIONS=${KUBE_TEST_API_VERSIONS:-"v1beta1,v1beta3"}
+
 
 cleanup() {
-  kill "${ETCD_PID-}" >/dev/null 2>&1 || :
-  rm -rf "${ETCD_DIR-}"
-  echo ""
-  echo "Complete"
+  kube::etcd::cleanup
+  kube::log::status "Integration test cleanup complete"
 }
 
-if [[ "${KUBE_NO_BUILD_INTEGRATION+set}" != "set" ]]; then
-    "${KUBE_ROOT}/hack/build-go.sh" cmd/integration
-fi
+runTests() {
+  kube::etcd::start
+
+  kube::log::status "Running integration test cases"
+  KUBE_GOFLAGS="-tags 'integration no-docker' " \
+    KUBE_RACE="-race" \
+    KUBE_TEST_API_VERSIONS="$1" \
+    "${KUBE_ROOT}/hack/test-go.sh" test/integration
+
+  kube::log::status "Running integration test scenario"
+
+  "${KUBE_OUTPUT_HOSTBIN}/integration" --v=2 --apiVersion="$1"
+
+  cleanup
+}
+
+"${KUBE_ROOT}/hack/build-go.sh" "$@" cmd/integration
 
 # Run cleanup to stop etcd on interrupt or other kill signal.
-trap cleanup HUP INT QUIT TERM
+trap cleanup EXIT
 
-start_etcd
-
-echo ""
-echo "Integration test cases..."
-echo ""
-GOFLAGS="-tags 'integration no-docker'" \
-  "${KUBE_ROOT}/hack/test-go.sh" test/integration
-
-echo ""
-echo "Integration scenario ..."
-echo ""
-"${KUBE_TARGET}/bin/integration"
-
-cleanup
+# Convert the CSV to an array of API versions to test
+IFS=',' read -a apiVersions <<< "${KUBE_TEST_API_VERSIONS}"
+for apiVersion in "${apiVersions[@]}"; do
+  runTests "${apiVersion}"
+done

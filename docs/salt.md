@@ -51,15 +51,18 @@ The following enumerates the set of defined key/value pairs that are supported t
 
 Key | Value
 ------------- | -------------
+`apiservers` | (Optional) The IP address / host name where a kubelet can get read-only access to kube-apiserver
 `cbr-cidr` | (Optional) The minion IP address range used for the docker container bridge.
-`cloud` | (Optional) Which IaaS platform is used to host kubernetes, *gce*, *azure*
+`cloud` | (Optional) Which IaaS platform is used to host kubernetes, *gce*, *azure*, *aws*, *vagrant*
 `cloud_provider` | (Optional) The cloud_provider used by apiserver: *gce*, *azure*, *vagrant*
-`etcd_servers` | (Optional) Comma-delimited list of IP addresses the apiserver and kubelet use to reach etcd.  Uses the IP of the first machine in the kubernetes_master role.
+`etcd_servers` | (Optional) Comma-delimited list of IP addresses the kube-apiserver and kubelet use to reach etcd.  Uses the IP of the first machine in the kubernetes_master role.
 `hostnamef` | (Optional) The full host name of the machine, i.e. hostname -f
-`master_ip` | (Optional) The IP address that the apiserver will bind against
+`master_ip` | (Optional) The IP address that the kube-apiserver will bind against
 `node_ip` | (Optional) The IP address to use to address this node
 `minion_ip` | (Optional) Mapped to the kubelet hostname_override, K8S TODO - change this name
 `network_mode` | (Optional) Networking model to use among nodes: *openvswitch*
+`networkInterfaceName` | (Optional) Networking interface to use to bind addresses, default value *eth0*
+`publicAddressOverride` | (Optional) The IP address the kube-apiserver should use to bind against for external read-only access
 `roles` | (Required) 1. `kubernetes-master` means this machine is the master in the kubernetes cluster.  2. `kubernetes-pool` means this machine is a kubernetes-minion.  Depending on the role, the Salt scripts will provision different resources on the machine.
 
 These keys may be leveraged by the Salt sls files to branch behavior.

@@ -1,5 +1,5 @@
 /*
-Copyright 2014 Google Inc. All rights reserved.
+Copyright 2015 Google Inc. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,158 +17,51 @@ limitations under the License.
 package main
 
 import (
-	"flag"
-	"io/ioutil"
 	"os"
-	"runtime"
-	"strconv"
-	"time"
+	goruntime "runtime"
 
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/kubecfg"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/client/clientcmd"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
+	"github.com/GoogleCloudPlatform/kubernetes/test/e2e"
 	"github.com/golang/glog"
+	flag "github.com/spf13/pflag"
 )
 
 var (
-	authConfig = flag.String("auth_config", os.Getenv("HOME")+"/.kubernetes_auth", "Path to the auth info file.")
+	kubeConfig = flag.String(clientcmd.RecommendedConfigPathFlag, "", "Path to kubeconfig containing embeded authinfo. Will use cluster/user info from 'current-context'")
+	authConfig = flag.String("auth_config", "", "Path to the auth info file.")
+	certDir    = flag.String("cert_dir", "", "Path to the directory containing the certs. Default is empty, which doesn't use certs.")
+	gceProject = flag.String("gce_project", "", "The GCE project being used, if applicable")
+	gceZone    = flag.String("gce_zone", "", "GCE zone being used, if applicable")
 	host       = flag.String("host", "", "The host to connect to")
+	masterName = flag.String("kube_master", "", "Name of the kubernetes master. Only required if provider is gce or gke")
+	provider   = flag.String("provider", "", "The name of the Kubernetes provider")
+	orderseed  = flag.Int64("orderseed", 0, "If non-zero, seed of random test shuffle order. (Otherwise random.)")
+	repoRoot   = flag.String("repo_root", "./", "Root directory of kubernetes repository, for finding test files. Default assumes working directory is repository root")
+	reportDir  = flag.String("report_dir", "", "Path to the directory where the JUnit XML reports should be saved. Default is empty, which doesn't generate these reports.")
+	times      = flag.Int("times", 1, "Number of times each test is eligible to be run. Individual order is determined by shuffling --times instances of each test using --orderseed (like a multi-deck shoe of cards).")
+	testList   util.StringList
 )
 
-func waitForPodRunning(c *client.Client, id string) {
-	for {
-		ctx := api.NewContext()
-		time.Sleep(5 * time.Second)
-		pod, err := c.GetPod(ctx, id)
-		if err != nil {
-			glog.Warningf("Get pod failed: %v", err)
-			continue
-		}
-		if pod.CurrentState.Status == api.PodRunning {
-			break
-		}
-		glog.Infof("Waiting for pod status to be running (%s)", pod.CurrentState.Status)
-	}
-}
-
-func loadObjectOrDie(filePath string) interface{} {
-	data, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		glog.Fatalf("Failed to read pod: %v", err)
-	}
-	obj, err := latest.Codec.Decode(data)
-	if err != nil {
-		glog.Fatalf("Failed to decode pod: %v", err)
-	}
-	return obj
-}
-
-func loadPodOrDie(filePath string) *api.Pod {
-	obj := loadObjectOrDie(filePath)
-	pod, ok := obj.(*api.Pod)
-	if !ok {
-		glog.Fatalf("Failed to load pod: %v", obj)
-	}
-	return pod
-}
-
-func loadClientOrDie() *client.Client {
-	config := client.Config{
-		Host: *host,
-	}
-	auth, err := kubecfg.LoadAuthInfo(*authConfig, os.Stdin)
-	if err != nil {
-		glog.Fatalf("Error loading auth: %v", err)
-	}
-	config.Username = auth.User
-	config.Password = auth.Password
-	config.CAFile = auth.CAFile
-	config.CertFile = auth.CertFile
-	config.KeyFile = auth.KeyFile
-	if auth.Insecure != nil {
-		config.Insecure = *auth.Insecure
-	}
-	c, err := client.New(&config)
-	if err != nil {
-		glog.Fatalf("Error creating client")
-	}
-	return c
-}
-
-func TestPodUpdate(c *client.Client) bool {
-	ctx := api.NewContext()
-
-	pod := loadPodOrDie("./api/examples/pod.json")
-	value := strconv.Itoa(time.Now().Nanosecond())
-	pod.Labels["time"] = value
-
-	_, err := c.CreatePod(ctx, pod)
-	if err != nil {
-		glog.Errorf("Failed to create pod: %v", err)
-		return false
-	}
-	defer c.DeletePod(ctx, pod.ID)
-	waitForPodRunning(c, pod.ID)
-	pods, err := c.ListPods(ctx, labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
-	if len(pods.Items) != 1 {
-		glog.Errorf("Failed to find the correct pod")
-		return false
-	}
-
-	podOut, err := c.GetPod(ctx, pod.ID)
-	if err != nil {
-		glog.Errorf("Failed to get pod: %v", err)
-		return false
-	}
-	value = "time" + value
-	pod.Labels["time"] = value
-	pod.ResourceVersion = podOut.ResourceVersion
-	pod.DesiredState.Manifest.UUID = podOut.DesiredState.Manifest.UUID
-	pod, err = c.UpdatePod(ctx, pod)
-	if err != nil {
-		glog.Errorf("Failed to update pod: %v", err)
-		return false
-	}
-	waitForPodRunning(c, pod.ID)
-	pods, err = c.ListPods(ctx, labels.SelectorFromSet(labels.Set(map[string]string{"time": value})))
-	if len(pods.Items) != 1 {
-		glog.Errorf("Failed to find the correct pod after update.")
-		return false
-	}
-	glog.Infof("pod update OK")
-	return true
+func init() {
+	flag.VarP(&testList, "test", "t", "Test to execute (may be repeated or comma separated list of tests.) Defaults to running all tests.")
 }
 
 func main() {
-	flag.Parse()
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	util.ReallyCrash = true
-	util.InitLogs()
-	defer util.FlushLogs()
-
-	go func() {
-		defer util.FlushLogs()
-		time.Sleep(3 * time.Minute)
-		glog.Fatalf("This test has timed out.")
-	}()
-
-	c := loadClientOrDie()
-
-	tests := []func(c *client.Client) bool{
-		TestPodUpdate,
+	util.InitFlags()
+	goruntime.GOMAXPROCS(goruntime.NumCPU())
+	if *provider == "" {
+		glog.Info("The --provider flag is not set.  Treating as a conformance test.  Some tests may not be run.")
+		os.Exit(1)
 	}
-
-	passed := true
-	for _, test := range tests {
-		testPassed := test(c)
-		if !testPassed {
-			passed = false
-		}
+	if *times <= 0 {
+		glog.Error("Invalid --times (negative or no testing requested)!")
+		os.Exit(1)
 	}
-	if !passed {
-		glog.Fatalf("Tests failed")
+	gceConfig := &e2e.GCEConfig{
+		ProjectID:  *gceProject,
+		Zone:       *gceZone,
+		MasterName: *masterName,
 	}
+	e2e.RunE2ETests(*kubeConfig, *authConfig, *certDir, *host, *repoRoot, *provider, gceConfig, *orderseed, *times, *reportDir, testList)
 }

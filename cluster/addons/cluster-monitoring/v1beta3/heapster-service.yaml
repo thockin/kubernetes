@@ -1,0 +1,15 @@
+apiVersion: v1beta3
+kind: Service
+metadata: 
+  labels: 
+    name: heapster
+    kubernetes.io/cluster-service: "true"
+  name: monitoring-heapster
+spec: 
+  targetPort: 8082
+  port: 80
+  selector: 
+    name: heapster
+    kubernetes.io/cluster-service: "true"
+
+

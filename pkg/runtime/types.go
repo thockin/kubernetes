@@ -16,18 +16,14 @@ limitations under the License.
 
 package runtime
 
-import (
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
-)
-
 // Note that the types provided in this file are not versioned and are intended to be
 // safe to use from within all versions of every API object.
 
 // TypeMeta is shared by all top level objects. The proper way to use it is to inline it in your type,
 // like this:
 // type MyAwesomeAPIObject struct {
-// 	runtime.TypeMeta    `yaml:",inline" json:",inline"`
-// 	... // other fields
+//      runtime.TypeMeta    `json:",inline"`
+//      ... // other fields
 // }
 // func (*MyAwesomeAPIObject) IsAnAPIObject() {}
 //
@@ -35,18 +31,14 @@ import (
 // your own with the same fields.
 //
 type TypeMeta struct {
-	Kind              string    `json:"kind,omitempty" yaml:"kind,omitempty"`
-	ID                string    `json:"id,omitempty" yaml:"id,omitempty"`
-	CreationTimestamp util.Time `json:"creationTimestamp,omitempty" yaml:"creationTimestamp,omitempty"`
-	SelfLink          string    `json:"selfLink,omitempty" yaml:"selfLink,omitempty"`
-	ResourceVersion   string    `json:"resourceVersion,omitempty" yaml:"resourceVersion,omitempty"`
-	APIVersion        string    `json:"apiVersion,omitempty" yaml:"apiVersion,omitempty"`
+	APIVersion string `json:"apiVersion,omitempty" yaml:"apiVersion,omitempty"`
+	Kind       string `json:"kind,omitempty" yaml:"kind,omitempty"`
 }
 
 // PluginBase is like TypeMeta, but it's intended for plugin objects that won't ever be encoded
 // except while embedded in other objects.
 type PluginBase struct {
-	Kind string `json:"kind,omitempty" yaml:"kind,omitempty"`
+	Kind string `json:"kind,omitempty"`
 }
 
 // EmbeddedObject has appropriate encoder and decoder functions, such that on the wire, it's
@@ -71,22 +63,22 @@ type EmbeddedObject struct {
 //
 // // Internal package:
 // type MyAPIObject struct {
-// 	runtime.TypeMeta `yaml:",inline" json:",inline"`
-//	MyPlugin runtime.EmbeddedObject `json:"myPlugin" yaml:"myPlugin"`
+// 	runtime.TypeMeta `json:",inline"`
+//	MyPlugin runtime.EmbeddedObject `json:"myPlugin"`
 // }
 // type PluginA struct {
-// 	runtime.PluginBase `yaml:",inline" json:",inline"`
-//	AOption string `yaml:"aOption" json:"aOption"`
+// 	runtime.PluginBase `json:",inline"`
+//	AOption string `json:"aOption"`
 // }
 //
 // // External package:
 // type MyAPIObject struct {
-// 	runtime.TypeMeta `yaml:",inline" json:",inline"`
-//	MyPlugin runtime.RawExtension `json:"myPlugin" yaml:"myPlugin"`
+// 	runtime.TypeMeta `json:",inline"`
+//	MyPlugin runtime.RawExtension `json:"myPlugin"`
 // }
 // type PluginA struct {
-// 	runtime.PluginBase `yaml:",inline" json:",inline"`
-//	AOption string `yaml:"aOption" json:"aOption"`
+// 	runtime.PluginBase `json:",inline"`
+//	AOption string `json:"aOption"`
 // }
 //
 // // On the wire, the JSON will look something like this:
@@ -112,10 +104,11 @@ type RawExtension struct {
 
 // Unknown allows api objects with unknown types to be passed-through. This can be used
 // to deal with the API objects from a plug-in. Unknown objects still have functioning
-// TypeMeta features-- kind, version, resourceVersion, etc.
-// TODO: Not implemented yet!
+// TypeMeta features-- kind, version, etc.
+// TODO: Make this object have easy access to field based accessors and settors for
+// metadata and field mutatation.
 type Unknown struct {
-	TypeMeta `yaml:",inline" json:",inline"`
+	TypeMeta `json:",inline"`
 	// RawJSON will hold the complete JSON of the object which couldn't be matched
 	// with a registered type. Most likely, nothing should be done with this
 	// except for passing it through the system.

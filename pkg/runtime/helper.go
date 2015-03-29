@@ -19,73 +19,133 @@ package runtime
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/conversion"
 )
+
+// TODO: move me to pkg/api/meta
+func IsListType(obj Object) bool {
+	_, err := GetItemsPtr(obj)
+	return err == nil
+}
 
 // GetItemsPtr returns a pointer to the list object's Items member.
 // If 'list' doesn't have an Items member, it's not really a list type
 // and an error will be returned.
 // This function will either return a pointer to a slice, or an error, but not both.
+// TODO: move me to pkg/api/meta
 func GetItemsPtr(list Object) (interface{}, error) {
-	v := reflect.ValueOf(list)
-	if !v.IsValid() {
-		return nil, fmt.Errorf("nil list object")
+	v, err := conversion.EnforcePtr(list)
+	if err != nil {
+		return nil, err
 	}
-	items := v.Elem().FieldByName("Items")
+	items := v.FieldByName("Items")
 	if !items.IsValid() {
 		return nil, fmt.Errorf("no Items field in %#v", list)
 	}
-	if items.Kind() != reflect.Slice {
-		return nil, fmt.Errorf("Items field is not a slice")
+	switch items.Kind() {
+	case reflect.Interface, reflect.Ptr:
+		target := reflect.TypeOf(items.Interface()).Elem()
+		if target.Kind() != reflect.Slice {
+			return nil, fmt.Errorf("items: Expected slice, got %s", target.Kind())
+		}
+		return items.Interface(), nil
+	case reflect.Slice:
+		return items.Addr().Interface(), nil
+	default:
+		return nil, fmt.Errorf("items: Expected slice, got %s", items.Kind())
 	}
-	return items.Addr().Interface(), nil
 }
 
 // ExtractList returns obj's Items element as an array of runtime.Objects.
 // Returns an error if obj is not a List type (does not have an Items member).
+// TODO: move me to pkg/api/meta
 func ExtractList(obj Object) ([]Object, error) {
 	itemsPtr, err := GetItemsPtr(obj)
 	if err != nil {
 		return nil, err
 	}
-	items := reflect.ValueOf(itemsPtr).Elem()
+	items, err := conversion.EnforcePtr(itemsPtr)
+	if err != nil {
+		return nil, err
+	}
 	list := make([]Object, items.Len())
 	for i := range list {
 		raw := items.Index(i)
-		item, ok := raw.Addr().Interface().(Object)
-		if !ok {
-			return nil, fmt.Errorf("item in index %v isn't an object: %#v", i, raw.Interface())
+		var found bool
+		switch raw.Kind() {
+		case reflect.Interface, reflect.Ptr:
+			list[i], found = raw.Interface().(Object)
+		default:
+			list[i], found = raw.Addr().Interface().(Object)
 		}
-		list[i] = item
+		if !found {
+			return nil, fmt.Errorf("item[%v]: Expected object, got %#v(%s)", i, raw.Interface(), raw.Kind())
+		}
 	}
 	return list, nil
 }
+
+// objectSliceType is the type of a slice of Objects
+var objectSliceType = reflect.TypeOf([]Object{})
 
 // SetList sets the given list object's Items member have the elements given in
 // objects.
 // Returns an error if list is not a List type (does not have an Items member),
 // or if any of the objects are not of the right type.
+// TODO: move me to pkg/api/meta
 func SetList(list Object, objects []Object) error {
 	itemsPtr, err := GetItemsPtr(list)
 	if err != nil {
 		return err
 	}
-	items := reflect.ValueOf(itemsPtr).Elem()
+	items, err := conversion.EnforcePtr(itemsPtr)
+	if err != nil {
+		return err
+	}
+	if items.Type() == objectSliceType {
+		items.Set(reflect.ValueOf(objects))
+		return nil
+	}
 	slice := reflect.MakeSlice(items.Type(), len(objects), len(objects))
 	for i := range objects {
 		dest := slice.Index(i)
-		src := reflect.ValueOf(objects[i])
-		if !src.IsValid() || src.IsNil() {
-			return fmt.Errorf("an object was nil")
+		src, err := conversion.EnforcePtr(objects[i])
+		if err != nil {
+			return err
 		}
-		src = src.Elem() // Object is a pointer, but the items in slice are not.
 		if src.Type().AssignableTo(dest.Type()) {
 			dest.Set(src)
 		} else if src.Type().ConvertibleTo(dest.Type()) {
 			dest.Set(src.Convert(dest.Type()))
 		} else {
-			return fmt.Errorf("wrong type: need %v, got %v", dest.Type(), src.Type())
+			return fmt.Errorf("item[%d]: Type mismatch: Expected %v, got %v", i, dest.Type(), src.Type())
 		}
 	}
 	items.Set(slice)
 	return nil
+}
+
+// fieldPtr puts the address of fieldName, which must be a member of v,
+// into dest, which must be an address of a variable to which this field's
+// address can be assigned.
+func FieldPtr(v reflect.Value, fieldName string, dest interface{}) error {
+	field := v.FieldByName(fieldName)
+	if !field.IsValid() {
+		return fmt.Errorf("couldn't find %v field in %#v", fieldName, v.Interface())
+	}
+	v, err := conversion.EnforcePtr(dest)
+	if err != nil {
+		return err
+	}
+	field = field.Addr()
+	if field.Type().AssignableTo(v.Type()) {
+		v.Set(field)
+		return nil
+	}
+	if field.Type().ConvertibleTo(v.Type()) {
+		v.Set(field.Convert(v.Type()))
+		return nil
+	}
+	return fmt.Errorf("couldn't assign/convert %v to %v", field.Type(), v.Type())
 }

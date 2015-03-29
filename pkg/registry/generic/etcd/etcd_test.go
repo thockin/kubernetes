@@ -19,7 +19,6 @@ package etcd
 import (
 	"fmt"
 	"path"
-	"reflect"
 	"testing"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
@@ -29,23 +28,58 @@ import (
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/tools"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/util"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/util/fielderrors"
 
 	"github.com/coreos/go-etcd/etcd"
 )
 
+type testRESTStrategy struct {
+	runtime.ObjectTyper
+	api.NameGenerator
+	namespaceScoped     bool
+	allowCreateOnUpdate bool
+}
+
+func (t *testRESTStrategy) NamespaceScoped() bool     { return t.namespaceScoped }
+func (t *testRESTStrategy) AllowCreateOnUpdate() bool { return t.allowCreateOnUpdate }
+
+func (t *testRESTStrategy) PrepareForCreate(obj runtime.Object)      {}
+func (t *testRESTStrategy) PrepareForUpdate(obj, old runtime.Object) {}
+func (t *testRESTStrategy) Validate(obj runtime.Object) fielderrors.ValidationErrorList {
+	return nil
+}
+func (t *testRESTStrategy) ValidateUpdate(obj, old runtime.Object) fielderrors.ValidationErrorList {
+	return nil
+}
+
+func hasCreated(t *testing.T, pod *api.Pod) func(runtime.Object) bool {
+	return func(obj runtime.Object) bool {
+		actualPod := obj.(*api.Pod)
+		if !api.Semantic.DeepDerivative(pod.Status, actualPod.Status) {
+			t.Errorf("not a deep derivative %#v", actualPod)
+			return false
+		}
+		return api.HasObjectMetaSystemFieldValues(&actualPod.ObjectMeta)
+	}
+}
+
 func NewTestGenericEtcdRegistry(t *testing.T) (*tools.FakeEtcdClient, *Etcd) {
 	f := tools.NewFakeEtcdClient(t)
 	f.TestIndex = true
-	h := tools.EtcdHelper{f, testapi.Codec(), tools.RuntimeVersionAdapter{testapi.ResourceVersioner()}}
+	h := tools.NewEtcdHelper(f, testapi.Codec())
+	strategy := &testRESTStrategy{api.Scheme, api.SimpleNameGenerator, true, false}
 	return f, &Etcd{
-		NewFunc:      func() runtime.Object { return &api.Pod{} },
-		NewListFunc:  func() runtime.Object { return &api.PodList{} },
-		EndpointName: "pods",
-		KeyRoot:      "/registry/pods",
-		KeyFunc: func(id string) string {
-			return path.Join("/registry/pods", id)
+		NewFunc:        func() runtime.Object { return &api.Pod{} },
+		NewListFunc:    func() runtime.Object { return &api.PodList{} },
+		EndpointName:   "pods",
+		CreateStrategy: strategy,
+		UpdateStrategy: strategy,
+		KeyRootFunc:    func(ctx api.Context) string { return "/registry/pods" },
+		KeyFunc: func(ctx api.Context, id string) (string, error) {
+			return path.Join("/registry/pods", id), nil
 		},
-		Helper: h,
+		ObjectNameFunc: func(obj runtime.Object) (string, error) { return obj.(*api.Pod).Name, nil },
+		Helper:         h,
 	}
 }
 
@@ -60,7 +94,7 @@ func (sm SetMatcher) Matches(obj runtime.Object) (bool, error) {
 	if !ok {
 		return false, fmt.Errorf("wrong object")
 	}
-	return sm.Has(pod.ID), nil
+	return sm.Has(pod.Name), nil
 }
 
 // EverythingMatcher matches everything
@@ -72,12 +106,12 @@ func (EverythingMatcher) Matches(obj runtime.Object) (bool, error) {
 
 func TestEtcdList(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	podB := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "bar"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "bar"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 
 	normalListResp := &etcd.Response{
@@ -139,14 +173,14 @@ func TestEtcdList(t *testing.T) {
 
 	for name, item := range table {
 		fakeClient, registry := NewTestGenericEtcdRegistry(t)
-		fakeClient.Data[registry.KeyRoot] = item.in
-		list, err := registry.List(api.NewContext(), item.m)
+		fakeClient.Data[registry.KeyRootFunc(api.NewContext())] = item.in
+		list, err := registry.ListPredicate(api.NewContext(), item.m)
 		if e, a := item.succeed, err == nil; e != a {
 			t.Errorf("%v: expected %v, got %v", name, e, a)
 			continue
 		}
 
-		if e, a := item.out, list; !reflect.DeepEqual(e, a) {
+		if e, a := item.out, list; !api.Semantic.DeepDerivative(e, a) {
 			t.Errorf("%v: Expected %#v, got %#v", name, e, a)
 		}
 	}
@@ -154,12 +188,91 @@ func TestEtcdList(t *testing.T) {
 
 func TestEtcdCreate(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", Namespace: api.NamespaceDefault},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	podB := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine2"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", Namespace: api.NamespaceDefault},
+		Status:     api.PodStatus{Host: "machine2"},
+	}
+
+	nodeWithPodA := tools.EtcdResponseWithError{
+		R: &etcd.Response{
+			Node: &etcd.Node{
+				Value:         runtime.EncodeOrDie(testapi.Codec(), podA),
+				ModifiedIndex: 1,
+				CreatedIndex:  1,
+			},
+		},
+		E: nil,
+	}
+
+	emptyNode := tools.EtcdResponseWithError{
+		R: &etcd.Response{},
+		E: tools.EtcdErrorNotFound,
+	}
+
+	path := "/registry/pods/foo"
+
+	table := map[string]struct {
+		existing tools.EtcdResponseWithError
+		expect   tools.EtcdResponseWithError
+		toCreate runtime.Object
+		objOK    func(obj runtime.Object) bool
+		errOK    func(error) bool
+	}{
+		"normal": {
+			existing: emptyNode,
+			toCreate: podA,
+			objOK:    hasCreated(t, podA),
+			errOK:    func(err error) bool { return err == nil },
+		},
+		"preExisting": {
+			existing: nodeWithPodA,
+			expect:   nodeWithPodA,
+			toCreate: podB,
+			errOK:    errors.IsAlreadyExists,
+		},
+	}
+
+	for name, item := range table {
+		fakeClient, registry := NewTestGenericEtcdRegistry(t)
+		fakeClient.Data[path] = item.existing
+		obj, err := registry.Create(api.NewDefaultContext(), item.toCreate)
+		if !item.errOK(err) {
+			t.Errorf("%v: unexpected error: %v", name, err)
+		}
+
+		actual := fakeClient.Data[path]
+		if item.objOK != nil {
+			if !item.objOK(obj) {
+				t.Errorf("%v: unexpected returned: %v", name, obj)
+			}
+			actualObj, err := api.Scheme.Decode([]byte(actual.R.Node.Value))
+			if err != nil {
+				t.Errorf("unable to decode stored value for %#v", actual)
+				continue
+			}
+			if !item.objOK(actualObj) {
+				t.Errorf("%v: unexpected response: %v", name, actual)
+			}
+		} else {
+			if e, a := item.expect, actual; !api.Semantic.DeepDerivative(e, a) {
+				t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
+			}
+		}
+	}
+}
+
+// DEPRECATED
+func TestEtcdCreateWithName(t *testing.T) {
+	podA := &api.Pod{
+		ObjectMeta: api.ObjectMeta{Name: "foo", Namespace: api.NamespaceDefault},
+		Status:     api.PodStatus{Host: "machine"},
+	}
+	podB := &api.Pod{
+		ObjectMeta: api.ObjectMeta{Name: "foo", Namespace: api.NamespaceDefault},
+		Status:     api.PodStatus{Host: "machine2"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -185,12 +298,13 @@ func TestEtcdCreate(t *testing.T) {
 		existing tools.EtcdResponseWithError
 		expect   tools.EtcdResponseWithError
 		toCreate runtime.Object
+		objOK    func(obj runtime.Object) bool
 		errOK    func(error) bool
 	}{
 		"normal": {
 			existing: emptyNode,
-			expect:   nodeWithPodA,
 			toCreate: podA,
+			objOK:    hasCreated(t, podA),
 			errOK:    func(err error) bool { return err == nil },
 		},
 		"preExisting": {
@@ -204,25 +318,153 @@ func TestEtcdCreate(t *testing.T) {
 	for name, item := range table {
 		fakeClient, registry := NewTestGenericEtcdRegistry(t)
 		fakeClient.Data[path] = item.existing
-		err := registry.Create(api.NewContext(), key, item.toCreate)
+		err := registry.CreateWithName(api.NewDefaultContext(), key, item.toCreate)
 		if !item.errOK(err) {
 			t.Errorf("%v: unexpected error: %v", name, err)
 		}
 
-		if e, a := item.expect, fakeClient.Data[path]; !reflect.DeepEqual(e, a) {
-			t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
+		actual := fakeClient.Data[path]
+		if item.objOK != nil {
+			obj, err := api.Scheme.Decode([]byte(actual.R.Node.Value))
+			if err != nil {
+				t.Errorf("unable to decode stored value for %#v", actual)
+				continue
+			}
+			if !item.objOK(obj) {
+				t.Errorf("%v: unexpected response: %v", name, actual)
+			}
+		} else {
+			if e, a := item.expect, actual; !api.Semantic.DeepDerivative(e, a) {
+				t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
+			}
 		}
 	}
 }
 
 func TestEtcdUpdate(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", Namespace: api.NamespaceDefault},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	podB := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine2"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", Namespace: api.NamespaceDefault, ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine2"},
+	}
+
+	nodeWithPodA := tools.EtcdResponseWithError{
+		R: &etcd.Response{
+			Node: &etcd.Node{
+				Value:         runtime.EncodeOrDie(testapi.Codec(), podA),
+				ModifiedIndex: 1,
+				CreatedIndex:  1,
+			},
+		},
+		E: nil,
+	}
+
+	newerNodeWithPodA := tools.EtcdResponseWithError{
+		R: &etcd.Response{
+			Node: &etcd.Node{
+				Value:         runtime.EncodeOrDie(testapi.Codec(), podA),
+				ModifiedIndex: 2,
+				CreatedIndex:  1,
+			},
+		},
+		E: nil,
+	}
+
+	nodeWithPodB := tools.EtcdResponseWithError{
+		R: &etcd.Response{
+			Node: &etcd.Node{
+				Value:         runtime.EncodeOrDie(testapi.Codec(), podB),
+				ModifiedIndex: 1,
+				CreatedIndex:  1,
+			},
+		},
+		E: nil,
+	}
+
+	emptyNode := tools.EtcdResponseWithError{
+		R: &etcd.Response{},
+		E: tools.EtcdErrorNotFound,
+	}
+
+	path := "/registry/pods/foo"
+
+	table := map[string]struct {
+		existing    tools.EtcdResponseWithError
+		expect      tools.EtcdResponseWithError
+		toUpdate    runtime.Object
+		allowCreate bool
+		objOK       func(obj runtime.Object) bool
+		errOK       func(error) bool
+	}{
+		"normal": {
+			existing: nodeWithPodA,
+			expect:   nodeWithPodB,
+			toUpdate: podB,
+			errOK:    func(err error) bool { return err == nil },
+		},
+		"notExisting": {
+			existing: emptyNode,
+			expect:   emptyNode,
+			toUpdate: podA,
+			errOK:    func(err error) bool { return errors.IsNotFound(err) },
+		},
+		"createIfNotFound": {
+			existing:    emptyNode,
+			toUpdate:    podA,
+			allowCreate: true,
+			objOK:       hasCreated(t, podA),
+			errOK:       func(err error) bool { return err == nil },
+		},
+		"outOfDate": {
+			existing: newerNodeWithPodA,
+			expect:   newerNodeWithPodA,
+			toUpdate: podB,
+			errOK:    func(err error) bool { return errors.IsConflict(err) },
+		},
+	}
+
+	for name, item := range table {
+		fakeClient, registry := NewTestGenericEtcdRegistry(t)
+		registry.UpdateStrategy.(*testRESTStrategy).allowCreateOnUpdate = item.allowCreate
+		fakeClient.Data[path] = item.existing
+		obj, _, err := registry.Update(api.NewDefaultContext(), item.toUpdate)
+		if !item.errOK(err) {
+			t.Errorf("%v: unexpected error: %v", name, err)
+		}
+
+		actual := fakeClient.Data[path]
+		if item.objOK != nil {
+			if !item.objOK(obj) {
+				t.Errorf("%v: unexpected returned: %#v", name, obj)
+			}
+			actualObj, err := api.Scheme.Decode([]byte(actual.R.Node.Value))
+			if err != nil {
+				t.Errorf("unable to decode stored value for %#v", actual)
+				continue
+			}
+			if !item.objOK(actualObj) {
+				t.Errorf("%v: unexpected response: %#v", name, actual)
+			}
+		} else {
+			if e, a := item.expect, actual; !api.Semantic.DeepDerivative(e, a) {
+				t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
+			}
+		}
+	}
+}
+
+// DEPRECATED
+func TestEtcdUpdateWithName(t *testing.T) {
+	podA := &api.Pod{
+		ObjectMeta: api.ObjectMeta{Name: "foo"},
+		Status:     api.PodStatus{Host: "machine"},
+	}
+	podB := &api.Pod{
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine2"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -279,12 +521,12 @@ func TestEtcdUpdate(t *testing.T) {
 	for name, item := range table {
 		fakeClient, registry := NewTestGenericEtcdRegistry(t)
 		fakeClient.Data[path] = item.existing
-		err := registry.Update(api.NewContext(), key, item.toUpdate)
+		err := registry.UpdateWithName(api.NewContext(), key, item.toUpdate)
 		if !item.errOK(err) {
 			t.Errorf("%v: unexpected error: %v", name, err)
 		}
 
-		if e, a := item.expect, fakeClient.Data[path]; !reflect.DeepEqual(e, a) {
+		if e, a := item.expect, fakeClient.Data[path]; !api.Semantic.DeepDerivative(e, a) {
 			t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
 		}
 	}
@@ -292,8 +534,8 @@ func TestEtcdUpdate(t *testing.T) {
 
 func TestEtcdGet(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -340,7 +582,7 @@ func TestEtcdGet(t *testing.T) {
 			t.Errorf("%v: unexpected error: %v", name, err)
 		}
 
-		if e, a := item.expect, got; !reflect.DeepEqual(e, a) {
+		if e, a := item.expect, got; !api.Semantic.DeepDerivative(e, a) {
 			t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
 		}
 	}
@@ -348,8 +590,8 @@ func TestEtcdGet(t *testing.T) {
 
 func TestEtcdDelete(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 
 	nodeWithPodA := tools.EtcdResponseWithError{
@@ -384,19 +626,22 @@ func TestEtcdDelete(t *testing.T) {
 		"notExisting": {
 			existing: emptyNode,
 			expect:   emptyNode,
-			errOK:    func(err error) bool { return err == nil },
+			errOK:    func(err error) bool { return errors.IsNotFound(err) },
 		},
 	}
 
 	for name, item := range table {
 		fakeClient, registry := NewTestGenericEtcdRegistry(t)
 		fakeClient.Data[path] = item.existing
-		err := registry.Delete(api.NewContext(), key)
+		obj, err := registry.Delete(api.NewContext(), key, nil)
 		if !item.errOK(err) {
-			t.Errorf("%v: unexpected error: %v", name, err)
+			t.Errorf("%v: unexpected error: %v (%#v)", name, err, obj)
 		}
 
-		if e, a := item.expect, fakeClient.Data[path]; !reflect.DeepEqual(e, a) {
+		if item.expect.E != nil {
+			item.expect.E.(*etcd.EtcdError).Index = fakeClient.ChangeIndex
+		}
+		if e, a := item.expect, fakeClient.Data[path]; !api.Semantic.DeepDerivative(e, a) {
 			t.Errorf("%v:\n%s", name, util.ObjectDiff(e, a))
 		}
 	}
@@ -404,8 +649,8 @@ func TestEtcdDelete(t *testing.T) {
 
 func TestEtcdWatch(t *testing.T) {
 	podA := &api.Pod{
-		TypeMeta:     api.TypeMeta{ID: "foo", ResourceVersion: "1"},
-		DesiredState: api.PodState{Host: "machine"},
+		ObjectMeta: api.ObjectMeta{Name: "foo", ResourceVersion: "1"},
+		Status:     api.PodStatus{Host: "machine"},
 	}
 	respWithPodA := &etcd.Response{
 		Node: &etcd.Node{
@@ -417,7 +662,7 @@ func TestEtcdWatch(t *testing.T) {
 	}
 
 	fakeClient, registry := NewTestGenericEtcdRegistry(t)
-	wi, err := registry.Watch(api.NewContext(), EverythingMatcher{}, 1)
+	wi, err := registry.WatchPredicate(api.NewContext(), EverythingMatcher{}, "1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -432,7 +677,7 @@ func TestEtcdWatch(t *testing.T) {
 		t.Fatalf("unexpected channel close")
 	}
 
-	if e, a := podA, got.Object; !reflect.DeepEqual(e, a) {
+	if e, a := podA, got.Object; !api.Semantic.DeepDerivative(e, a) {
 		t.Errorf("difference: %s", util.ObjectDiff(e, a))
 	}
 }

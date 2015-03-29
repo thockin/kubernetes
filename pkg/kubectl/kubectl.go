@@ -18,94 +18,19 @@ limitations under the License.
 package kubectl
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
-	"reflect"
 	"strings"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/api"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/latest"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/client"
+	"github.com/GoogleCloudPlatform/kubernetes/pkg/api/meta"
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/labels"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/runtime"
-	"github.com/GoogleCloudPlatform/kubernetes/pkg/version"
-	"gopkg.in/v1/yaml"
 )
 
 var apiVersionToUse = "v1beta1"
 
-func GetKubeClient(config *client.Config, matchVersion bool) (*client.Client, error) {
-	// TODO: get the namespace context when kubectl ns is completed
-	c, err := client.New(config)
-	if err != nil {
-		return nil, err
-	}
+const kubectlAnnotationPrefix = "kubectl.kubernetes.io/"
 
-	if matchVersion {
-		clientVersion := version.Get()
-		serverVersion, err := c.ServerVersion()
-		if err != nil {
-			return nil, fmt.Errorf("Couldn't read version from server: %v\n", err)
-		}
-		if s := *serverVersion; !reflect.DeepEqual(clientVersion, s) {
-			return nil, fmt.Errorf("Server version (%#v) differs from client version (%#v)!\n", s, clientVersion)
-		}
-	}
-
-	return c, nil
-}
-
-type AuthInfo struct {
-	User     string
-	Password string
-	CAFile   string
-	CertFile string
-	KeyFile  string
-	Insecure *bool
-}
-
-// LoadAuthInfo parses an AuthInfo object from a file path. It prompts user and creates file if it doesn't exist.
-func LoadAuthInfo(path string, r io.Reader) (*AuthInfo, error) {
-	var auth AuthInfo
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		auth.User = promptForString("Username", r)
-		auth.Password = promptForString("Password", r)
-		data, err := json.Marshal(auth)
-		if err != nil {
-			return &auth, err
-		}
-		err = ioutil.WriteFile(path, data, 0600)
-		return &auth, err
-	}
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, &auth)
-	if err != nil {
-		return nil, err
-	}
-	return &auth, err
-}
-
-func promptForString(field string, r io.Reader) string {
-	fmt.Printf("Please enter %s: ", field)
-	var result string
-	fmt.Fscan(r, &result)
-	return result
-}
-
-func CreateResource(resource, id string) ([]byte, error) {
-	kind, err := resolveResource(resolveToKind, resource)
-	if err != nil {
-		return nil, err
-	}
-
-	s := fmt.Sprintf(`{"kind": "%s", "apiVersion": "%s", "id": "%s"}`, kind, apiVersionToUse, id)
-	return []byte(s), nil
+type NamespaceInfo struct {
+	Namespace string
 }
 
 // TODO Move to labels package.
@@ -117,112 +42,74 @@ func formatLabels(labelMap map[string]string) string {
 	return l
 }
 
-func makeImageList(manifest api.ContainerManifest) string {
+func listOfImages(spec *api.PodSpec) []string {
 	var images []string
-	for _, container := range manifest.Containers {
+	for _, container := range spec.Containers {
 		images = append(images, container.Image)
 	}
-	return strings.Join(images, ",")
+	return images
 }
 
-// Takes input 'data' as either json or yaml and attemps to decode it into the
-// supplied object.
-func dataToObject(data []byte) (runtime.Object, error) {
-	// This seems hacky but we can't get the codec from kubeClient.
-	versionInterfaces, err := latest.InterfacesFor(apiVersionToUse)
-	if err != nil {
-		return nil, err
-	}
-	obj, err := versionInterfaces.Codec.Decode(data)
-	if err != nil {
-		return nil, err
-	}
-	return obj, nil
+func makeImageList(spec *api.PodSpec) string {
+	return strings.Join(listOfImages(spec), ",")
 }
 
-const (
-	resolveToPath = "path"
-	resolveToKind = "kind"
-)
-
-// Takes a human-friendly reference to a resource and converts it to either a
-// resource path for an API call or to a Kind to construct a JSON definition.
-// See usages of the function for more context.
-//
-// target is one of the above constants ("path" or "kind") to determine what to
-// resolve the resource to.
-//
-// resource is the human-friendly reference to the resource you want to
-// convert.
-func resolveResource(target, resource string) (string, error) {
-	if target != resolveToPath && target != resolveToKind {
-		return "", fmt.Errorf("Unrecognized target to convert to: %s", target)
-	}
-
-	var resolved string
-	var err error
-	// Caseless comparison.
-	resource = strings.ToLower(resource)
-	switch resource {
-	case "pods", "pod", "po":
-		if target == resolveToPath {
-			resolved = "pods"
-		} else {
-			resolved = "Pod"
-		}
-	case "replicationcontrollers", "replicationcontroller", "rc":
-		if target == resolveToPath {
-			resolved = "replicationControllers"
-		} else {
-			resolved = "ReplicationController"
-		}
-	case "services", "service", "se":
-		if target == resolveToPath {
-			resolved = "services"
-		} else {
-			resolved = "Service"
-		}
-	case "minions", "minion", "mi":
-		if target == resolveToPath {
-			resolved = "minions"
-		} else {
-			resolved = "Minion"
-		}
-	default:
-		// It might be a GUID, but we don't know how to handle those for now.
-		err = fmt.Errorf("Resource %s not recognized; need pods, replicationContollers, services or minions.", resource)
-	}
-	return resolved, err
+// OutputVersionMapper is a RESTMapper that will prefer mappings that
+// correspond to a preferred output version (if feasible)
+type OutputVersionMapper struct {
+	meta.RESTMapper
+	OutputVersion string
 }
 
-func resolveKindToResource(kind string) (resource string, err error) {
-	// Determine the REST resource according to the type in data.
-	switch kind {
-	case "Pod":
-		resource = "pods"
-	case "ReplicationController":
-		resource = "replicationControllers"
-	case "Service":
-		resource = "services"
-	default:
-		err = fmt.Errorf("Object %s not recognized", kind)
+// RESTMapping implements meta.RESTMapper by prepending the output version to the preferred version list.
+func (m OutputVersionMapper) RESTMapping(kind string, versions ...string) (*meta.RESTMapping, error) {
+	preferred := []string{m.OutputVersion}
+	for _, version := range versions {
+		if len(version) > 0 {
+			preferred = append(preferred, version)
+		}
 	}
-	return
+	// if the caller wants to use the default version list, try with the preferred version, and on
+	// error, use the default behavior.
+	if len(preferred) == 1 {
+		if m, err := m.RESTMapper.RESTMapping(kind, preferred...); err == nil {
+			return m, nil
+		}
+		preferred = nil
+	}
+	return m.RESTMapper.RESTMapping(kind, preferred...)
 }
 
-// versionAndKind will return the APIVersion and Kind of the given wire-format
-// enconding of an APIObject, or an error. This is hacked in until the
-// migration to v1beta3.
-func versionAndKind(data []byte) (version, kind string, err error) {
-	findKind := struct {
-		Kind       string `json:"kind,omitempty" yaml:"kind,omitempty"`
-		APIVersion string `json:"apiVersion,omitempty" yaml:"apiVersion,omitempty"`
-	}{}
-	// yaml is a superset of json, so we use it to decode here. That way,
-	// we understand both.
-	err = yaml.Unmarshal(data, &findKind)
-	if err != nil {
-		return "", "", fmt.Errorf("couldn't get version/kind: %v", err)
+// ShortcutExpander is a RESTMapper that can be used for Kubernetes
+// resources.
+type ShortcutExpander struct {
+	meta.RESTMapper
+}
+
+// VersionAndKindForResource implements meta.RESTMapper. It expands the resource first, then invokes the wrapped
+// mapper.
+func (e ShortcutExpander) VersionAndKindForResource(resource string) (defaultVersion, kind string, err error) {
+	resource = expandResourceShortcut(resource)
+	return e.RESTMapper.VersionAndKindForResource(resource)
+}
+
+// expandResourceShortcut will return the expanded version of resource
+// (something that a pkg/api/meta.RESTMapper can understand), if it is
+// indeed a shortcut. Otherwise, will return resource unmodified.
+func expandResourceShortcut(resource string) string {
+	shortForms := map[string]string{
+		"po": "pods",
+		"rc": "replicationcontrollers",
+		// DEPRECATED: will be removed before 1.0
+		"se":     "services",
+		"svc":    "services",
+		"mi":     "minions",
+		"ev":     "events",
+		"limits": "limitRanges",
+		"quota":  "resourceQuotas",
 	}
-	return findKind.APIVersion, findKind.Kind, nil
+	if expanded, ok := shortForms[resource]; ok {
+		return expanded
+	}
+	return resource
 }
