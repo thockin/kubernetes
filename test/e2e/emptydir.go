@@ -124,7 +124,7 @@ var _ = Describe("emptyDir", func() {
 		if err != nil {
 			Fail(fmt.Sprintf("Failed to create client config: %v", err))
 		}
-		e := remotecommand.New(req, clientConfig, []string{"df -T"}, nil, out, nil, false)
+		e := remotecommand.New(req, clientConfig, []string{"df"}, nil, out, nil, false)
 		err = e.Execute()
 		if err != nil {
 			Fail(fmt.Sprintf("Failed to execute command on host %s pod %s in container %s: %v",
@@ -134,7 +134,7 @@ var _ = Describe("emptyDir", func() {
 		volmatch := regexp.MustCompile("tmpfs.*/testvol\n")
 		match := volmatch.FindAllString(out.String(), -1)
 		if len(match) != 1 {
-			Fail(fmt.Sprintf("Fail to mount tmpfs volume on /testvol in container"))
+			Fail(fmt.Sprintf("Fail to mount tmpfs volume in container"))
 		}
 		return
 	})
