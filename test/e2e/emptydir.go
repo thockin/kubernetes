@@ -48,6 +48,12 @@ var _ = Describe("emptyDir", func() {
 	})
 
 	It("should support tmpfs in emptyDir", func() {
+	// This test for tmpfs volueme can't run on GCE enviroment because
+	// the GCE environment does not support remote command execution.
+		if testContext.provider == "GCE" {
+			By("Skipping test which is broken for GCE")
+			return
+		}
 
 		By("creating the pod")
 		name := "pod-" + string(util.NewUUID())
@@ -91,9 +97,6 @@ var _ = Describe("emptyDir", func() {
 		}
 
 		By("submitting the pod to kubernetes")
-		// We call defer here in case there is a problem with
-		// the test so we can ensure that we clean up after
-		// ourselves
 		defer podClient.Delete(pod.Name)
 		_, err := podClient.Create(pod)
 		if err != nil {
