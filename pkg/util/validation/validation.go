@@ -21,7 +21,6 @@ import (
 	"math"
 	"net"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -30,7 +29,6 @@ const qnameExtCharFmt string = "[-A-Za-z0-9_.]"
 const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
 const qualifiedNameMaxLength int = 63
 
-var qualifiedNameMaxLengthString = strconv.Itoa(qualifiedNameMaxLength)
 var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
 
 func IsQualifiedName(value string) (bool, []string) {
@@ -44,21 +42,22 @@ func IsQualifiedName(value string) (bool, []string) {
 		var prefix string
 		prefix, name = parts[0], parts[1]
 		if len(prefix) == 0 {
-			errs = append(errs, "prefix part must be non-empty")
+			errs = append(errs, "prefix part "+EmptyError())
 		} else if !IsDNS1123Subdomain(prefix) {
 			errs = append(errs, fmt.Sprintf("prefix part must be a DNS subdomain (e.g. 'example.com')"))
 		}
 	default:
-		return false, append(errs, "must match the regex "+qualifiedNameFmt+" with an optional DNS subdomain prefix and '/' (e.g. 'MyName' or 'example.com/MyName'")
+		return false, append(errs, RegexError(qualifiedNameFmt, "MyName", "my.name", "123-abc")+
+			" with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName'")
 	}
 
 	if len(name) == 0 {
-		errs = append(errs, "name part must be non-empty")
+		errs = append(errs, "name part "+EmptyError())
 	} else if len(name) > qualifiedNameMaxLength {
-		errs = append(errs, "name part must be no more than "+qualifiedNameMaxLengthString+" characters")
+		errs = append(errs, "name part "+MaxLenError(qualifiedNameMaxLength))
 	}
 	if !qualifiedNameRegexp.MatchString(name) {
-		errs = append(errs, "name part must match the regex "+qualifiedNameFmt+" (e.g. 'MyName' or 'my.name' or '123-abc')")
+		errs = append(errs, "name part "+RegexError(qualifiedNameFmt, "MyName", "my.name", "123-abc"))
 	}
 	return len(errs) == 0, errs
 }
@@ -66,16 +65,15 @@ func IsQualifiedName(value string) (bool, []string) {
 const labelValueFmt string = "(" + qualifiedNameFmt + ")?"
 const LabelValueMaxLength int = 63
 
-var labelValueMaxLengthString = strconv.Itoa(LabelValueMaxLength)
 var labelValueRegexp = regexp.MustCompile("^" + labelValueFmt + "$")
 
 func IsValidLabelValue(value string) (bool, []string) {
 	var errs []string
 	if len(value) > LabelValueMaxLength {
-		errs = append(errs, "must be no more than "+labelValueMaxLengthString+" characters")
+		errs = append(errs, MaxLenError(LabelValueMaxLength))
 	}
 	if !labelValueRegexp.MatchString(value) {
-		errs = append(errs, "must match the regex "+labelValueFmt+" (e.g. 'MyValue' or 'my_value' or '12345')")
+		errs = append(errs, RegexError(labelValueFmt, "MyValue", "my_value", "12345"))
 	}
 	return len(errs) == 0, errs
 }
@@ -87,8 +85,15 @@ var dns1123LabelRegexp = regexp.MustCompile("^" + DNS1123LabelFmt + "$")
 
 // IsDNS1123Label tests for a string that conforms to the definition of a label in
 // DNS (RFC 1123).
-func IsDNS1123Label(value string) bool {
-	return len(value) <= DNS1123LabelMaxLength && dns1123LabelRegexp.MatchString(value)
+func IsDNS1123Label(value string) (bool, []string) {
+	var errs []string
+	if len(value) > DNS1123LabelMaxLength {
+		errs = append(errs, MaxLenError(DNS1123LabelMaxLength))
+	}
+	if !dns1123LabelRegexp.MatchString(value) {
+		errs = append(errs, RegexError(DNS1123LabelFmt, "my-name", "123-abc"))
+	}
+	return len(errs) == 0, errs
 }
 
 const DNS1123SubdomainFmt string = DNS1123LabelFmt + "(\\." + DNS1123LabelFmt + ")*"
@@ -198,4 +203,32 @@ var httpHeaderNameRegexp = regexp.MustCompile("^" + HTTPHeaderNameFmt + "$")
 // definition of a valid header field name (a stricter subset than RFC7230).
 func IsHTTPHeaderName(value string) bool {
 	return httpHeaderNameRegexp.MatchString(value)
+}
+
+// MaxLenError returns a string explanation of a "string too long" validation
+// failure.
+func MaxLenError(length int) string {
+	return fmt.Sprintf("must be no more than %d characters", length)
+}
+
+// RegexError returns a string explanation of a regex validation failure.
+func RegexError(fmt string, examples ...string) string {
+	s := "must match the regex " + fmt
+	if len(examples) == 0 {
+		return s
+	}
+	s += " (e.g. "
+	for i := range examples {
+		if i > 0 {
+			s += " or "
+		}
+		s += "'" + examples[i] + "'"
+	}
+	return s + ")"
+}
+
+// EmptyError returns a string explanation of a "must not be empty" validation
+// failure.
+func EmptyError() string {
+	return "must be non-empty"
 }

@@ -53,7 +53,6 @@ func InclusiveRangeErrorMsg(lo, hi int) string {
 }
 
 var DNSSubdomainErrorMsg string = fmt.Sprintf(`must be a DNS subdomain (at most %d characters, matching regex %s): e.g. "example.com"`, validation.DNS1123SubdomainMaxLength, validation.DNS1123SubdomainFmt)
-var DNS1123LabelErrorMsg string = fmt.Sprintf(`must be a DNS label (at most %d characters, matching regex %s): e.g. "my-name"`, validation.DNS1123LabelMaxLength, validation.DNS1123LabelFmt)
 var DNS952LabelErrorMsg string = fmt.Sprintf(`must be a DNS 952 label (at most %d characters, matching regex %s): e.g. "my-name"`, validation.DNS952LabelMaxLength, validation.DNS952LabelFmt)
 var pdPartitionErrorMsg string = InclusiveRangeErrorMsg(1, 255)
 var PortRangeErrorMsg string = InclusiveRangeErrorMsg(1, 65535)
@@ -212,10 +211,7 @@ func NameIsDNSLabel(name string, prefix bool) (bool, []string) {
 	if prefix {
 		name = maskTrailingDash(name)
 	}
-	if validation.IsDNS1123Label(name) {
-		return true, nil
-	}
-	return false, []string{DNS1123LabelErrorMsg}
+	return validation.IsDNS1123Label(name)
 }
 
 // NameIsDNS952Label is a ValidateNameFunc for names that must be a DNS 952 label.
@@ -284,8 +280,10 @@ func ValidateObjectMeta(meta *api.ObjectMeta, requiresNamespace bool, nameFn Val
 	if requiresNamespace {
 		if len(meta.Namespace) == 0 {
 			allErrs = append(allErrs, field.Required(fldPath.Child("namespace"), ""))
-		} else if ok, _ := ValidateNamespaceName(meta.Namespace, false); !ok {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("namespace"), meta.Namespace, DNS1123LabelErrorMsg))
+		} else if ok, errs := ValidateNamespaceName(meta.Namespace, false); !ok {
+			for i := range errs {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("namespace"), meta.Namespace, errs[i]))
+			}
 		}
 	} else {
 		if len(meta.Namespace) != 0 {
@@ -358,8 +356,10 @@ func validateVolumes(volumes []api.Volume, fldPath *field.Path) (sets.String, fi
 		el := validateVolumeSource(&vol.VolumeSource, idxPath)
 		if len(vol.Name) == 0 {
 			el = append(el, field.Required(idxPath.Child("name"), ""))
-		} else if !validation.IsDNS1123Label(vol.Name) {
-			el = append(el, field.Invalid(idxPath.Child("name"), vol.Name, DNS1123LabelErrorMsg))
+		} else if ok, errs := validation.IsDNS1123Label(vol.Name); !ok {
+			for i := range errs {
+				el = append(el, field.Invalid(idxPath.Child("name"), vol.Name, errs[i]))
+			}
 		} else if allNames.Has(vol.Name) {
 			el = append(el, field.Duplicate(idxPath.Child("name"), vol.Name))
 		}
@@ -1246,8 +1246,10 @@ func validateContainers(containers []api.Container, volumes sets.String, fldPath
 		idxPath := fldPath.Index(i)
 		if len(ctr.Name) == 0 {
 			allErrs = append(allErrs, field.Required(idxPath.Child("name"), ""))
-		} else if !validation.IsDNS1123Label(ctr.Name) {
-			allErrs = append(allErrs, field.Invalid(idxPath.Child("name"), ctr.Name, DNS1123LabelErrorMsg))
+		} else if ok, errs := validation.IsDNS1123Label(ctr.Name); !ok {
+			for i := range errs {
+				allErrs = append(allErrs, field.Invalid(idxPath.Child("name"), ctr.Name, errs[i]))
+			}
 		} else if allNames.Has(ctr.Name) {
 			allErrs = append(allErrs, field.Duplicate(idxPath.Child("name"), ctr.Name))
 		} else {
@@ -1738,8 +1740,10 @@ func validateServicePort(sp *api.ServicePort, requireName, isHeadlessService boo
 	if requireName && len(sp.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
 	} else if len(sp.Name) != 0 {
-		if !validation.IsDNS1123Label(sp.Name) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), sp.Name, DNS1123LabelErrorMsg))
+		if ok, errs := validation.IsDNS1123Label(sp.Name); !ok {
+			for i := range errs {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), sp.Name, errs[i]))
+			}
 		} else if allNames.Has(sp.Name) {
 			allErrs = append(allErrs, field.Duplicate(fldPath.Child("name"), sp.Name))
 		} else {
@@ -2484,8 +2488,10 @@ func validateEndpointPort(port *api.EndpointPort, requireName bool, fldPath *fie
 	if requireName && len(port.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
 	} else if len(port.Name) != 0 {
-		if !validation.IsDNS1123Label(port.Name) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), port.Name, DNS1123LabelErrorMsg))
+		if ok, errs := validation.IsDNS1123Label(port.Name); !ok {
+			for i := range errs {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), port.Name, errs[i]))
+			}
 		}
 	}
 	if !validation.IsValidPortNum(port.Port) {
