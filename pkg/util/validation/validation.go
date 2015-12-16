@@ -17,20 +17,24 @@ limitations under the License.
 package validation
 
 import (
+	"fmt"
 	"math"
 	"net"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 const qnameCharFmt string = "[A-Za-z0-9]"
 const qnameExtCharFmt string = "[-A-Za-z0-9_.]"
-const QualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
-const QualifiedNameMaxLength int = 63
+const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
+const qualifiedNameMaxLength int = 63
 
-var qualifiedNameRegexp = regexp.MustCompile("^" + QualifiedNameFmt + "$")
+var qualifiedNameMaxLengthString = strconv.Itoa(qualifiedNameMaxLength)
+var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
 
-func IsQualifiedName(value string) bool {
+func IsQualifiedName(value string) (bool, []string) {
+	var errs []string
 	parts := strings.Split(value, "/")
 	var name string
 	switch len(parts) {
@@ -39,17 +43,27 @@ func IsQualifiedName(value string) bool {
 	case 2:
 		var prefix string
 		prefix, name = parts[0], parts[1]
-		if prefix == "" || !IsDNS1123Subdomain(prefix) {
-			return false
+		if len(prefix) == 0 {
+			errs = append(errs, "prefix part must be non-empty")
+		} else if !IsDNS1123Subdomain(prefix) {
+			errs = append(errs, fmt.Sprintf("prefix part must be a DNS subdomain (e.g. 'example.com')"))
 		}
 	default:
-		return false
+		return false, append(errs, "must match the regex "+qualifiedNameFmt+" with an optional DNS subdomain prefix and '/' (e.g. 'MyName' or 'example.com/MyName'")
 	}
 
-	return name != "" && len(name) <= QualifiedNameMaxLength && qualifiedNameRegexp.MatchString(name)
+	if len(name) == 0 {
+		errs = append(errs, "name part must be non-empty")
+	} else if len(name) > qualifiedNameMaxLength {
+		errs = append(errs, "name part must be no more than "+qualifiedNameMaxLengthString+" characters")
+	}
+	if !qualifiedNameRegexp.MatchString(name) {
+		errs = append(errs, "name part must match the regex "+qualifiedNameFmt+" (e.g. 'MyName' or 'my.name' or '123-abc')")
+	}
+	return len(errs) == 0, errs
 }
 
-const LabelValueFmt string = "(" + QualifiedNameFmt + ")?"
+const LabelValueFmt string = "(" + qualifiedNameFmt + ")?"
 const LabelValueMaxLength int = 63
 
 var labelValueRegexp = regexp.MustCompile("^" + LabelValueFmt + "$")

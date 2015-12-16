@@ -266,7 +266,7 @@ func (pm *VolumePluginMgr) InitPlugins(plugins []VolumePlugin, host VolumeHost) 
 	allErrs := []error{}
 	for _, plugin := range plugins {
 		name := plugin.Name()
-		if !validation.IsQualifiedName(name) {
+		if ok, _ := validation.IsQualifiedName(name); !ok {
 			allErrs = append(allErrs, fmt.Errorf("volume plugin has invalid name: %#v", plugin))
 			continue
 		}
