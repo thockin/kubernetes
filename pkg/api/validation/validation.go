@@ -52,7 +52,6 @@ func InclusiveRangeErrorMsg(lo, hi int) string {
 	return fmt.Sprintf(`must be between %d and %d, inclusive`, lo, hi)
 }
 
-var labelValueErrorMsg string = fmt.Sprintf(`must have at most %d characters, matching regex %s: e.g. "MyValue" or ""`, validation.LabelValueMaxLength, validation.LabelValueFmt)
 var DNSSubdomainErrorMsg string = fmt.Sprintf(`must be a DNS subdomain (at most %d characters, matching regex %s): e.g. "example.com"`, validation.DNS1123SubdomainMaxLength, validation.DNS1123SubdomainFmt)
 var DNS1123LabelErrorMsg string = fmt.Sprintf(`must be a DNS label (at most %d characters, matching regex %s): e.g. "my-name"`, validation.DNS1123LabelMaxLength, validation.DNS1123LabelFmt)
 var DNS952LabelErrorMsg string = fmt.Sprintf(`must be a DNS 952 label (at most %d characters, matching regex %s): e.g. "my-name"`, validation.DNS952LabelMaxLength, validation.DNS952LabelFmt)
@@ -78,8 +77,10 @@ func ValidateLabels(labels map[string]string, fldPath *field.Path) field.ErrorLi
 	allErrs := field.ErrorList{}
 	for k, v := range labels {
 		allErrs = append(allErrs, ValidateLabelName(k, fldPath)...)
-		if !validation.IsValidLabelValue(v) {
-			allErrs = append(allErrs, field.Invalid(fldPath, v, labelValueErrorMsg))
+		if ok, errs := validation.IsValidLabelValue(v); !ok {
+			for i := range errs {
+				allErrs = append(allErrs, field.Invalid(fldPath, v, errs[i]))
+			}
 		}
 	}
 	return allErrs

@@ -257,8 +257,8 @@ func TestIsValidLabelValue(t *testing.T) {
 		"", // empty value
 	}
 	for i := range successCases {
-		if !IsValidLabelValue(successCases[i]) {
-			t.Errorf("case %s expected success", successCases[i])
+		if ok, msgs := IsValidLabelValue(successCases[i]); !ok {
+			t.Errorf("case %s expected success: %v", successCases[i], msgs)
 		}
 	}
 
@@ -273,7 +273,7 @@ func TestIsValidLabelValue(t *testing.T) {
 		strings.Repeat("a", 64), // over the limit
 	}
 	for i := range errorCases {
-		if IsValidLabelValue(errorCases[i]) {
+		if ok, _ := IsValidLabelValue(errorCases[i]); ok {
 			t.Errorf("case[%d] expected failure", i)
 		}
 	}
