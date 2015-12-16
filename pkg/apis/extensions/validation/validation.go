@@ -38,9 +38,8 @@ import (
 
 // ValidateHorizontalPodAutoscaler can be used to check whether the given autoscaler name is valid.
 // Prefix indicates this name will be used as part of generation, in which case trailing dashes are allowed.
-func ValidateHorizontalPodAutoscalerName(name string, prefix bool) (bool, string) {
-	// TODO: finally move it to pkg/api/validation and use nameIsDNSSubdomain function
-	return apivalidation.ValidateReplicationControllerName(name, prefix)
+func ValidateHorizontalPodAutoscalerName(name string, prefix bool) (bool, []string) {
+	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
 func validateHorizontalPodAutoscalerSpec(autoscaler extensions.HorizontalPodAutoscalerSpec, fldPath *field.Path) field.ErrorList {
@@ -69,20 +68,26 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 	allErrs := field.ErrorList{}
 	if len(ref.Kind) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("kind"), ""))
-	} else if ok, msg := apivalidation.IsValidPathSegmentName(ref.Kind); !ok {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msg))
+	} else if ok, msgs := apivalidation.IsValidPathSegmentName(ref.Kind); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msgs[i]))
+		}
 	}
 
 	if len(ref.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
-	} else if ok, msg := apivalidation.IsValidPathSegmentName(ref.Name); !ok {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msg))
+	} else if ok, msgs := apivalidation.IsValidPathSegmentName(ref.Name); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msgs[i]))
+		}
 	}
 
 	if len(ref.Subresource) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("subresource"), ""))
-	} else if ok, msg := apivalidation.IsValidPathSegmentName(ref.Subresource); !ok {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("subresource"), ref.Subresource, msg))
+	} else if ok, msgs := apivalidation.IsValidPathSegmentName(ref.Subresource); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("subresource"), ref.Subresource, msgs[i]))
+		}
 	}
 	return allErrs
 }
@@ -139,7 +144,7 @@ func ValidateThirdPartyResourceUpdate(update, old *extensions.ThirdPartyResource
 	return allErrs
 }
 
-func ValidateThirdPartyResourceName(name string, prefix bool) (bool, string) {
+func ValidateThirdPartyResourceName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
@@ -215,12 +220,12 @@ func ValidateDaemonSetSpec(spec *extensions.DaemonSetSpec, fldPath *field.Path) 
 // ValidateDaemonSetName can be used to check whether the given daemon set name is valid.
 // Prefix indicates this name will be used as part of generation, in which case
 // trailing dashes are allowed.
-func ValidateDaemonSetName(name string, prefix bool) (bool, string) {
+func ValidateDaemonSetName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
 // Validates that the given name can be used as a deployment name.
-func ValidateDeploymentName(name string, prefix bool) (bool, string) {
+func ValidateDeploymentName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
@@ -446,7 +451,7 @@ func ValidateIngress(ingress *extensions.Ingress) field.ErrorList {
 }
 
 // ValidateIngressName validates that the given name can be used as an Ingress name.
-func ValidateIngressName(name string, prefix bool) (bool, string) {
+func ValidateIngressName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
@@ -505,8 +510,10 @@ func validateIngressRules(IngressRules []extensions.IngressRule, fldPath *field.
 		if len(ih.Host) > 0 {
 			// TODO: Ports and ips are allowed in the host part of a url
 			// according to RFC 3986, consider allowing them.
-			if valid, errMsg := apivalidation.NameIsDNSSubdomain(ih.Host, false); !valid {
-				allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, errMsg))
+			if valid, errs := apivalidation.NameIsDNSSubdomain(ih.Host, false); !valid {
+				for i := range errs {
+					allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, errs[i]))
+				}
 			}
 			if isIP := (net.ParseIP(ih.Host) != nil); isIP {
 				allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, "must be a DNS name, not an IP address"))
@@ -561,8 +568,10 @@ func validateIngressBackend(backend *extensions.IngressBackend, fldPath *field.P
 	// All backends must reference a single local service by name, and a single service port by name or number.
 	if len(backend.ServiceName) == 0 {
 		return append(allErrs, field.Required(fldPath.Child("serviceName"), ""))
-	} else if ok, errMsg := apivalidation.ValidateServiceName(backend.ServiceName, false); !ok {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("serviceName"), backend.ServiceName, errMsg))
+	} else if ok, errs := apivalidation.ValidateServiceName(backend.ServiceName, false); !ok {
+		for i := range errs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("serviceName"), backend.ServiceName, errs[i]))
+		}
 	}
 	if backend.ServicePort.Type == intstr.String {
 		if !validation.IsDNS1123Label(backend.ServicePort.StrVal) {
@@ -629,7 +638,7 @@ func ValidateScale(scale *extensions.Scale) field.ErrorList {
 // name is valid.
 // Prefix indicates this name will be used as part of generation, in which case
 // trailing dashes are allowed.
-func ValidateReplicaSetName(name string, prefix bool) (bool, string) {
+func ValidateReplicaSetName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
@@ -710,7 +719,7 @@ func ValidatePodTemplateSpecForReplicaSet(template *api.PodTemplateSpec, selecto
 // pod security policy name is valid.
 // Prefix indicates this name will be used as part of generation, in which case
 // trailing dashes are allowed.
-func ValidatePodSecurityPolicyName(name string, prefix bool) (bool, string) {
+func ValidatePodSecurityPolicyName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 

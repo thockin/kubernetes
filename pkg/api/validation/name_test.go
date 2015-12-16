@@ -135,15 +135,18 @@ func TestValidatePathSegmentName(t *testing.T) {
 	}
 
 	for k, tc := range testcases {
-		ok, msg := ValidatePathSegmentName(tc.Name, tc.Prefix)
+		ok, msgs := ValidatePathSegmentName(tc.Name, tc.Prefix)
 		if ok != tc.ExpectedOK {
 			t.Errorf("%s: expected ok=%v, got %v", k, tc.ExpectedOK, ok)
 		}
-		if len(tc.ExpectedMsg) == 0 && len(msg) > 0 {
-			t.Errorf("%s: expected no message, got %v", k, msg)
+		if len(tc.ExpectedMsg) == 0 && len(msgs) > 0 {
+			t.Errorf("%s: expected no message, got %v", k, msgs)
 		}
-		if len(tc.ExpectedMsg) > 0 && !strings.Contains(msg, tc.ExpectedMsg) {
-			t.Errorf("%s: expected message containing %q, got %v", k, tc.ExpectedMsg, msg)
+		if len(tc.ExpectedMsg) > 0 && len(msgs) == 0 {
+			t.Errorf("%s: expected error message, got none", k)
+		}
+		if len(tc.ExpectedMsg) > 0 && !strings.Contains(msgs[0], tc.ExpectedMsg) {
+			t.Errorf("%s: expected message containing %q, got %v", k, tc.ExpectedMsg, msgs[0])
 		}
 	}
 }
