@@ -43,8 +43,8 @@ func IsQualifiedName(value string) (bool, []string) {
 		prefix, name = parts[0], parts[1]
 		if len(prefix) == 0 {
 			errs = append(errs, "prefix part "+EmptyError())
-		} else if !IsDNS1123Subdomain(prefix) {
-			errs = append(errs, fmt.Sprintf("prefix part must be a DNS subdomain (e.g. 'example.com')"))
+		} else if ok, msgs := IsDNS1123Subdomain(prefix); !ok {
+			errs = append(errs, prefixEach(msgs, "prefix part ")...)
 		}
 	default:
 		return false, append(errs, RegexError(qualifiedNameFmt, "MyName", "my.name", "123-abc")+
@@ -103,8 +103,15 @@ var dns1123SubdomainRegexp = regexp.MustCompile("^" + DNS1123SubdomainFmt + "$")
 
 // IsDNS1123Subdomain tests for a string that conforms to the definition of a
 // subdomain in DNS (RFC 1123).
-func IsDNS1123Subdomain(value string) bool {
-	return len(value) <= DNS1123SubdomainMaxLength && dns1123SubdomainRegexp.MatchString(value)
+func IsDNS1123Subdomain(value string) (bool, []string) {
+	var errs []string
+	if len(value) > DNS1123SubdomainMaxLength {
+		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+	}
+	if !dns1123SubdomainRegexp.MatchString(value) {
+		errs = append(errs, RegexError(DNS1123SubdomainFmt, "example.com"))
+	}
+	return len(errs) == 0, errs
 }
 
 const DNS952LabelFmt string = "[a-z]([-a-z0-9]*[a-z0-9])?"
@@ -231,4 +238,11 @@ func RegexError(fmt string, examples ...string) string {
 // failure.
 func EmptyError() string {
 	return "must be non-empty"
+}
+
+func prefixEach(msgs []string, prefix string) []string {
+	for i := range msgs {
+		msgs[i] = prefix + msgs[i]
+	}
+	return msgs
 }

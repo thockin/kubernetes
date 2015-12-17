@@ -52,7 +52,6 @@ func InclusiveRangeErrorMsg(lo, hi int) string {
 	return fmt.Sprintf(`must be between %d and %d, inclusive`, lo, hi)
 }
 
-var DNSSubdomainErrorMsg string = fmt.Sprintf(`must be a DNS subdomain (at most %d characters, matching regex %s): e.g. "example.com"`, validation.DNS1123SubdomainMaxLength, validation.DNS1123SubdomainFmt)
 var DNS952LabelErrorMsg string = fmt.Sprintf(`must be a DNS 952 label (at most %d characters, matching regex %s): e.g. "my-name"`, validation.DNS952LabelMaxLength, validation.DNS952LabelFmt)
 var pdPartitionErrorMsg string = InclusiveRangeErrorMsg(1, 255)
 var PortRangeErrorMsg string = InclusiveRangeErrorMsg(1, 65535)
@@ -200,10 +199,7 @@ func NameIsDNSSubdomain(name string, prefix bool) (bool, []string) {
 	if prefix {
 		name = maskTrailingDash(name)
 	}
-	if validation.IsDNS1123Subdomain(name) {
-		return true, nil
-	}
-	return false, []string{DNSSubdomainErrorMsg}
+	return validation.IsDNS1123Subdomain(name)
 }
 
 // NameIsDNSLabel is a ValidateNameFunc for names that must be a DNS 1123 label.

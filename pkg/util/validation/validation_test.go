@@ -60,7 +60,7 @@ func TestIsDNS1123Subdomain(t *testing.T) {
 		strings.Repeat("a", 253),
 	}
 	for _, val := range goodValues {
-		if !IsDNS1123Subdomain(val) {
+		if ok, _ := IsDNS1123Subdomain(val); !ok {
 			t.Errorf("expected true for '%s'", val)
 		}
 	}
@@ -80,7 +80,7 @@ func TestIsDNS1123Subdomain(t *testing.T) {
 		strings.Repeat("a", 254),
 	}
 	for _, val := range badValues {
-		if IsDNS1123Subdomain(val) {
+		if ok, _ := IsDNS1123Subdomain(val); ok {
 			t.Errorf("expected false for '%s'", val)
 		}
 	}
