@@ -119,7 +119,7 @@ func TestIsCIdentifier(t *testing.T) {
 		"A", "AB", "AbC", "A1", "_A", "A_", "A_B", "A_1", "A__1__2__B", "__123_ABC",
 	}
 	for _, val := range goodValues {
-		if !IsCIdentifier(val) {
+		if ok, _ := IsCIdentifier(val); !ok {
 			t.Errorf("expected true for '%s'", val)
 		}
 	}
@@ -132,7 +132,7 @@ func TestIsCIdentifier(t *testing.T) {
 		"#a#",
 	}
 	for _, val := range badValues {
-		if IsCIdentifier(val) {
+		if ok, _ := IsCIdentifier(val); ok {
 			t.Errorf("expected false for '%s'", val)
 		}
 	}
