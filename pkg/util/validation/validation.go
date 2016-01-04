@@ -67,7 +67,7 @@ const LabelValueMaxLength int = 63
 
 var labelValueRegexp = regexp.MustCompile("^" + labelValueFmt + "$")
 
-func IsValidLabelValue(value string) (bool, []string) {
+func IsLabelValue(value string) (bool, []string) {
 	var errs []string
 	if len(value) > LabelValueMaxLength {
 		errs = append(errs, MaxLenError(LabelValueMaxLength))
@@ -145,8 +145,8 @@ func IsCIdentifier(value string) (bool, []string) {
 	return true, nil
 }
 
-// IsValidPortNum tests that the argument is a valid, non-zero port number.
-func IsValidPortNum(port int) (bool, []string) {
+// IsPortNum tests that the argument is a valid, non-zero port number.
+func IsPortNum(port int) (bool, []string) {
 	return IsBetweenInclusive(1, 65535, int64(port))
 }
 
@@ -159,27 +159,27 @@ const (
 	maxGroupID = math.MaxInt32
 )
 
-// IsValidGroupId tests that the argument is a valid Unix GID.
-func IsValidGroupId(gid int64) (bool, []string) {
+// IsGroupID tests that the argument is a valid Unix GID.
+func IsGroupID(gid int64) (bool, []string) {
 	return IsBetweenInclusive(minGroupID, maxGroupID, int64(gid))
 }
 
-// IsValidUserId tests that the argument is a valid Unix UID.
-func IsValidUserId(uid int64) (bool, []string) {
+// IsUserID tests that the argument is a valid Unix UID.
+func IsUserID(uid int64) (bool, []string) {
 	return IsBetweenInclusive(minUserID, maxUserID, int64(uid))
 }
 
 var portNameCharsetRegex = regexp.MustCompile("^[-a-z0-9]+$")
 var portNameOneLetterRegexp = regexp.MustCompile("[a-z]")
 
-// IsValidPortName check that the argument is valid syntax. It must be
+// IsPortName check that the argument is valid syntax. It must be
 // non-empty and no more than 15 characters long. It may contain only [-a-z0-9]
 // and must contain at least one letter [a-z]. It must not start or end with a
 // hyphen, nor contain adjacent hyphens.
 //
 // Note: We only allow lower-case characters, even though RFC 6335 is case
 // insensitive.
-func IsValidPortName(port string) (bool, []string) {
+func IsPortName(port string) (bool, []string) {
 	var errs []string
 	if len(port) > 15 {
 		errs = append(errs, MaxLenError(15))
@@ -199,8 +199,8 @@ func IsValidPortName(port string) (bool, []string) {
 	return len(errs) == 0, errs
 }
 
-// IsValidIPv4 tests that the argument is a valid IPv4 address.
-func IsValidIPv4(value string) (bool, []string) {
+// IsIPv4 tests that the argument is a valid IPv4 address.
+func IsIPv4(value string) (bool, []string) {
 	ip := net.ParseIP(value)
 	if ip == nil || ip.To4() == nil {
 		return false, []string{"must be a valid IPv4 address, (e.g. 10.9.8.7)"}
@@ -212,7 +212,7 @@ const percentFmt string = "[0-9]+%"
 
 var percentRegexp = regexp.MustCompile("^" + percentFmt + "$")
 
-func IsValidPercent(percent string) (bool, []string) {
+func IsPercent(percent string) (bool, []string) {
 	if !percentRegexp.MatchString(percent) {
 		return false, []string{RegexError(percentFmt, "1%", "93%")}
 	}

@@ -138,65 +138,65 @@ func TestIsCIdentifier(t *testing.T) {
 	}
 }
 
-func TestIsValidPortNum(t *testing.T) {
+func TestIsPortNum(t *testing.T) {
 	goodValues := []int{1, 2, 1000, 16384, 32768, 65535}
 	for _, val := range goodValues {
-		if ok, msgs := IsValidPortNum(val); !ok {
+		if ok, msgs := IsPortNum(val); !ok {
 			t.Errorf("expected true for %d, got %v", val, msgs)
 		}
 	}
 
 	badValues := []int{0, -1, 65536, 100000}
 	for _, val := range badValues {
-		if ok, _ := IsValidPortNum(val); ok {
+		if ok, _ := IsPortNum(val); ok {
 			t.Errorf("expected false for %d", val)
 		}
 	}
 }
 
-func TestIsValidGroupId(t *testing.T) {
+func TestIsGroupID(t *testing.T) {
 	goodValues := []int64{0, 1, 1000, 65535, 2147483647}
 	for _, val := range goodValues {
-		if ok, _ := IsValidGroupId(val); !ok {
+		if ok, _ := IsGroupID(val); !ok {
 			t.Errorf("expected true for '%d'", val)
 		}
 	}
 
 	badValues := []int64{-1, -1003, 2147483648, 4147483647}
 	for _, val := range badValues {
-		if ok, _ := IsValidGroupId(val); ok {
+		if ok, _ := IsGroupID(val); ok {
 			t.Errorf("expected false for '%d'", val)
 		}
 	}
 }
 
-func TestIsValidUserId(t *testing.T) {
+func TestIsUserID(t *testing.T) {
 	goodValues := []int64{0, 1, 1000, 65535, 2147483647}
 	for _, val := range goodValues {
-		if ok, _ := IsValidUserId(val); !ok {
+		if ok, _ := IsUserID(val); !ok {
 			t.Errorf("expected true for '%d'", val)
 		}
 	}
 
 	badValues := []int64{-1, -1003, 2147483648, 4147483647}
 	for _, val := range badValues {
-		if ok, _ := IsValidUserId(val); ok {
+		if ok, _ := IsUserID(val); ok {
 			t.Errorf("expected false for '%d'", val)
 		}
 	}
 }
 
-func TestIsValidPortName(t *testing.T) {
+func TestIsPortName(t *testing.T) {
 	goodValues := []string{"telnet", "re-mail-ck", "pop3", "a", "a-1", "1-a", "a-1-b-2-c", "1-a-2-b-3"}
 	for _, val := range goodValues {
-		if ok, msgs := IsValidPortName(val); !ok {
+		if ok, msgs := IsPortName(val); !ok {
 			t.Errorf("expected true for %q, got %v", val, msgs)
 		}
 	}
 
 	badValues := []string{"longerthan15characters", "", strings.Repeat("a", 16), "12345", "1-2-3-4", "-begin", "end-", "two--hyphens", "whois++"}
 	for _, val := range badValues {
-		if ok, _ := IsValidPortName(val); ok {
+		if ok, _ := IsPortName(val); ok {
 			t.Errorf("expected false for %q", val)
 		}
 	}
@@ -246,7 +246,7 @@ func TestIsQualifiedName(t *testing.T) {
 	}
 }
 
-func TestIsValidLabelValue(t *testing.T) {
+func TestIsLabelValue(t *testing.T) {
 	successCases := []string{
 		"simple",
 		"now-with-dashes",
@@ -257,7 +257,7 @@ func TestIsValidLabelValue(t *testing.T) {
 		"", // empty value
 	}
 	for i := range successCases {
-		if ok, msgs := IsValidLabelValue(successCases[i]); !ok {
+		if ok, msgs := IsLabelValue(successCases[i]); !ok {
 			t.Errorf("case %s expected success: %v", successCases[i], msgs)
 		}
 	}
@@ -273,13 +273,13 @@ func TestIsValidLabelValue(t *testing.T) {
 		strings.Repeat("a", 64), // over the limit
 	}
 	for i := range errorCases {
-		if ok, _ := IsValidLabelValue(errorCases[i]); ok {
+		if ok, _ := IsLabelValue(errorCases[i]); ok {
 			t.Errorf("case[%d] expected failure", i)
 		}
 	}
 }
 
-func TestIsValidIP(t *testing.T) {
+func TestIsIP(t *testing.T) {
 	goodValues := []string{
 		"1.1.1.1",
 		"1.1.1.01",
@@ -288,7 +288,7 @@ func TestIsValidIP(t *testing.T) {
 		"0.0.0.0",
 	}
 	for _, val := range goodValues {
-		if ok, msgs := IsValidIPv4(val); !ok {
+		if ok, msgs := IsIPv4(val); !ok {
 			t.Errorf("expected true for %q, got %v", val, msgs)
 		}
 	}
@@ -303,7 +303,7 @@ func TestIsValidIP(t *testing.T) {
 		"1.0.0.1.",
 	}
 	for _, val := range badValues {
-		if ok, _ := IsValidIPv4(val); ok {
+		if ok, _ := IsIPv4(val); ok {
 			t.Errorf("expected false for %q", val)
 		}
 	}
@@ -336,7 +336,7 @@ func TestIsHTTPHeaderName(t *testing.T) {
 	}
 }
 
-func TestIsValidPercent(t *testing.T) {
+func TestIsPercent(t *testing.T) {
 	goodValues := []string{
 		"0%",
 		"00000%",
@@ -347,7 +347,7 @@ func TestIsValidPercent(t *testing.T) {
 		"101%",
 	}
 	for _, val := range goodValues {
-		if ok, msgs := IsValidPercent(val); !ok {
+		if ok, msgs := IsPercent(val); !ok {
 			t.Errorf("expected true for %q, got %v", val, msgs)
 		}
 	}
@@ -366,7 +366,7 @@ func TestIsValidPercent(t *testing.T) {
 		"+1%",
 	}
 	for _, val := range badValues {
-		if ok, _ := IsValidPercent(val); ok {
+		if ok, _ := IsPercent(val); ok {
 			t.Errorf("expected false for %q", val)
 		}
 	}

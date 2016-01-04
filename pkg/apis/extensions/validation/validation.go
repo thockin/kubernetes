@@ -232,7 +232,7 @@ func ValidateDeploymentName(name string, prefix bool) (bool, []string) {
 func validatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if intOrPercent.Type == intstr.String {
-		if ok, msgs := validation.IsValidPercent(intOrPercent.StrVal); !ok {
+		if ok, msgs := validation.IsPercent(intOrPercent.StrVal); !ok {
 			for i := range msgs {
 				allErrs = append(allErrs, field.Invalid(fldPath, intOrPercent, msgs[i]))
 			}
@@ -247,7 +247,7 @@ func getPercentValue(intOrStringValue intstr.IntOrString) (int, bool) {
 	if intOrStringValue.Type != intstr.String {
 		return 0, false
 	}
-	if ok, _ := validation.IsValidPercent(intOrStringValue.StrVal); !ok {
+	if ok, _ := validation.IsPercent(intOrStringValue.StrVal); !ok {
 		return 0, false
 	}
 	value, _ := strconv.Atoi(intOrStringValue.StrVal[:len(intOrStringValue.StrVal)-1])

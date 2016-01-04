@@ -760,7 +760,7 @@ func validateLabelKey(k string) error {
 }
 
 func validateLabelValue(v string) error {
-	if ok, errs := validation.IsValidLabelValue(v); !ok {
+	if ok, errs := validation.IsLabelValue(v); !ok {
 		return fmt.Errorf("invalid label value: %q: %s", v, strings.Join(errs, "; "))
 	}
 	return nil

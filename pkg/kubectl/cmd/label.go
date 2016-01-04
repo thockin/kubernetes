@@ -121,7 +121,7 @@ func parseLabels(spec []string) (map[string]string, []string, error) {
 			if len(parts) != 2 || len(parts[1]) == 0 {
 				return nil, nil, fmt.Errorf("invalid label spec: %v", labelSpec)
 			}
-			if ok, _ := validation.IsValidLabelValue(parts[1]); !ok {
+			if ok, _ := validation.IsLabelValue(parts[1]); !ok {
 				return nil, nil, fmt.Errorf("invalid label value: %v", labelSpec)
 			}
 			labels[parts[0]] = parts[1]

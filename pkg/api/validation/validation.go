@@ -62,7 +62,7 @@ func ValidateLabels(labels map[string]string, fldPath *field.Path) field.ErrorLi
 	allErrs := field.ErrorList{}
 	for k, v := range labels {
 		allErrs = append(allErrs, ValidateLabelName(k, fldPath)...)
-		if ok, errs := validation.IsValidLabelValue(v); !ok {
+		if ok, errs := validation.IsLabelValue(v); !ok {
 			for i := range errs {
 				allErrs = append(allErrs, field.Invalid(fldPath, v, errs[i]))
 			}
@@ -972,7 +972,7 @@ func validateContainerPorts(ports []api.ContainerPort, fldPath *field.Path) fiel
 	for i, port := range ports {
 		idxPath := fldPath.Index(i)
 		if len(port.Name) > 0 {
-			if ok, msgs := validation.IsValidPortName(port.Name); !ok {
+			if ok, msgs := validation.IsPortName(port.Name); !ok {
 				for i = range msgs {
 					allErrs = append(allErrs, field.Invalid(idxPath.Child("name"), port.Name, msgs[i]))
 				}
@@ -984,13 +984,13 @@ func validateContainerPorts(ports []api.ContainerPort, fldPath *field.Path) fiel
 		}
 		if port.ContainerPort == 0 {
 			allErrs = append(allErrs, field.Required(idxPath.Child("containerPort"), ""))
-		} else if ok, msgs := validation.IsValidPortNum(port.ContainerPort); !ok {
+		} else if ok, msgs := validation.IsPortNum(port.ContainerPort); !ok {
 			for i := range msgs {
 				allErrs = append(allErrs, field.Invalid(idxPath.Child("containerPort"), port.ContainerPort, msgs[i]))
 			}
 		}
 		if port.HostPort != 0 {
-			if ok, msgs := validation.IsValidPortNum(port.HostPort); !ok {
+			if ok, msgs := validation.IsPortNum(port.HostPort); !ok {
 				for i := range msgs {
 					allErrs = append(allErrs, field.Invalid(idxPath.Child("hostPort"), port.HostPort, msgs[i]))
 				}
@@ -1203,13 +1203,13 @@ func validateHTTPGetAction(http *api.HTTPGetAction, fldPath *field.Path) field.E
 func ValidatePortNumOrName(port intstr.IntOrString, fldPath *field.Path) field.ErrorList {
 	allErrors := field.ErrorList{}
 	if port.Type == intstr.Int {
-		if ok, msgs := validation.IsValidPortNum(port.IntValue()); !ok {
+		if ok, msgs := validation.IsPortNum(port.IntValue()); !ok {
 			for i := range msgs {
 				allErrors = append(allErrors, field.Invalid(fldPath, port.IntValue(), msgs[i]))
 			}
 		}
 	} else if port.Type == intstr.String {
-		if ok, msgs := validation.IsValidPortName(port.StrVal); !ok {
+		if ok, msgs := validation.IsPortName(port.StrVal); !ok {
 			for i := range msgs {
 				allErrors = append(allErrors, field.Invalid(fldPath, port.StrVal, msgs[i]))
 			}
@@ -1542,21 +1542,21 @@ func ValidatePodSecurityContext(securityContext *api.PodSecurityContext, spec *a
 	if securityContext != nil {
 		allErrs = append(allErrs, validateHostNetwork(securityContext.HostNetwork, spec.Containers, specPath.Child("containers"))...)
 		if securityContext.FSGroup != nil {
-			if ok, msgs := validation.IsValidGroupId(*securityContext.FSGroup); !ok {
+			if ok, msgs := validation.IsGroupID(*securityContext.FSGroup); !ok {
 				for i := range msgs {
 					allErrs = append(allErrs, field.Invalid(fldPath.Child("fsGroup"), *(securityContext.FSGroup), msgs[i]))
 				}
 			}
 		}
 		if securityContext.RunAsUser != nil {
-			if ok, msgs := validation.IsValidUserId(*securityContext.RunAsUser); !ok {
+			if ok, msgs := validation.IsUserID(*securityContext.RunAsUser); !ok {
 				for i := range msgs {
 					allErrs = append(allErrs, field.Invalid(fldPath.Child("runAsUser"), *(securityContext.RunAsUser), msgs[i]))
 				}
 			}
 		}
 		for g, gid := range securityContext.SupplementalGroups {
-			if ok, msgs := validation.IsValidGroupId(gid); !ok {
+			if ok, msgs := validation.IsGroupID(gid); !ok {
 				for i := range msgs {
 					allErrs = append(allErrs, field.Invalid(fldPath.Child("supplementalGroups").Index(g), gid, msgs[i]))
 				}
@@ -1729,7 +1729,7 @@ func ValidateService(service *api.Service) field.ErrorList {
 	ipPath := specPath.Child("externalIPs")
 	for i, ip := range service.Spec.ExternalIPs {
 		idxPath := ipPath.Index(i)
-		if ok, msgs := validation.IsValidIPv4(ip); !ok {
+		if ok, msgs := validation.IsIPv4(ip); !ok {
 			for i := range msgs {
 				allErrs = append(allErrs, field.Invalid(idxPath, ip, msgs[i]))
 			}
@@ -1809,7 +1809,7 @@ func validateServicePort(sp *api.ServicePort, requireName, isHeadlessService boo
 		}
 	}
 
-	if ok, msgs := validation.IsValidPortNum(sp.Port); !ok {
+	if ok, msgs := validation.IsPortNum(sp.Port); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("port"), sp.Port, msgs[i]))
 		}
@@ -2510,7 +2510,7 @@ func validateEndpointSubsets(subsets []api.EndpointSubset, fldPath *field.Path) 
 
 func validateEndpointAddress(address *api.EndpointAddress, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if ok, msgs := validation.IsValidIPv4(address.IP); !ok {
+	if ok, msgs := validation.IsIPv4(address.IP); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("ip"), address.IP, msgs[i]))
 		}
@@ -2557,7 +2557,7 @@ func validateEndpointPort(port *api.EndpointPort, requireName bool, fldPath *fie
 			}
 		}
 	}
-	if ok, msgs := validation.IsValidPortNum(port.Port); !ok {
+	if ok, msgs := validation.IsPortNum(port.Port); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("port"), port.Port, msgs[i]))
 		}
