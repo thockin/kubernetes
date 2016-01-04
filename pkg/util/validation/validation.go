@@ -203,8 +203,12 @@ func IsValidPortName(port string) (bool, []string) {
 }
 
 // IsValidIPv4 tests that the argument is a valid IPv4 address.
-func IsValidIPv4(value string) bool {
-	return net.ParseIP(value) != nil && net.ParseIP(value).To4() != nil
+func IsValidIPv4(value string) (bool, []string) {
+	ip := net.ParseIP(value)
+	if ip == nil || ip.To4() == nil {
+		return false, []string{"must be a valid IPv4 address, (e.g. 10.9.8.7)"}
+	}
+	return true, nil
 }
 
 const percentFmt string = "[0-9]+%"
