@@ -32,7 +32,7 @@ import (
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util/intstr"
 	"k8s.io/kubernetes/pkg/util/sets"
-	"k8s.io/kubernetes/pkg/util/validation"
+	utilvalidation "k8s.io/kubernetes/pkg/util/validation"
 	"k8s.io/kubernetes/pkg/util/validation/field"
 )
 
@@ -68,7 +68,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 	allErrs := field.ErrorList{}
 	if len(ref.Kind) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("kind"), ""))
-	} else if ok, msgs := apivalidation.IsValidPathSegmentName(ref.Kind); !ok {
+	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Kind); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msgs[i]))
 		}
@@ -76,7 +76,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 
 	if len(ref.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
-	} else if ok, msgs := apivalidation.IsValidPathSegmentName(ref.Name); !ok {
+	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Name); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msgs[i]))
 		}
@@ -84,7 +84,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 
 	if len(ref.Subresource) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("subresource"), ""))
-	} else if ok, msgs := apivalidation.IsValidPathSegmentName(ref.Subresource); !ok {
+	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Subresource); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("subresource"), ref.Subresource, msgs[i]))
 		}
@@ -232,7 +232,7 @@ func ValidateDeploymentName(name string, prefix bool) (bool, []string) {
 func validatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if intOrPercent.Type == intstr.String {
-		if ok, msgs := validation.IsPercent(intOrPercent.StrVal); !ok {
+		if ok, msgs := utilvalidation.IsPercent(intOrPercent.StrVal); !ok {
 			for i := range msgs {
 				allErrs = append(allErrs, field.Invalid(fldPath, intOrPercent, msgs[i]))
 			}
@@ -247,7 +247,7 @@ func getPercentValue(intOrStringValue intstr.IntOrString) (int, bool) {
 	if intOrStringValue.Type != intstr.String {
 		return 0, false
 	}
-	if ok, _ := validation.IsPercent(intOrStringValue.StrVal); !ok {
+	if ok, _ := utilvalidation.IsPercent(intOrStringValue.StrVal); !ok {
 		return 0, false
 	}
 	value, _ := strconv.Atoi(intOrStringValue.StrVal[:len(intOrStringValue.StrVal)-1])

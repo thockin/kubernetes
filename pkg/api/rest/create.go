@@ -22,6 +22,7 @@ import (
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	"k8s.io/kubernetes/pkg/api/validation"
 	"k8s.io/kubernetes/pkg/runtime"
+	utilvalidation "k8s.io/kubernetes/pkg/util/validation"
 	"k8s.io/kubernetes/pkg/util/validation/field"
 )
 
@@ -78,13 +79,23 @@ func BeforeCreate(strategy RESTCreateStrategy, ctx api.Context, obj runtime.Obje
 	// Custom validation (including name validation) passed
 	// Now run common validation on object meta
 	// Do this *after* custom validation so that specific error messages are shown whenever possible
-	if errs := validation.ValidateObjectMeta(objectMeta, strategy.NamespaceScoped(), validation.ValidatePathSegmentName, field.NewPath("metadata")); len(errs) > 0 {
+	if errs := validation.ValidateObjectMeta(objectMeta, strategy.NamespaceScoped(), validatePathSegment, field.NewPath("metadata")); len(errs) > 0 {
 		return errors.NewInvalid(kind.GroupKind(), objectMeta.Name, errs)
 	}
 
 	strategy.Canonicalize(obj)
 
 	return nil
+}
+
+// validatePathSegment validates the name can be safely encoded as a path
+// segment.
+func validatePathSegment(name string, prefix bool) (bool, []string) {
+	if prefix {
+		return utilvalidation.IsValidPathSegmentPrefix(name)
+	} else {
+		return utilvalidation.IsValidPathSegmentName(name)
+	}
 }
 
 // CheckGeneratedNameError checks whether an error that occurred creating a resource is due

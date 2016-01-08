@@ -459,3 +459,135 @@ func TestIsBetweenInclusive(t *testing.T) {
 		}
 	}
 }
+
+func TestIsValidatePathSegmentName(t *testing.T) {
+	testcases := map[string]struct {
+		name        string
+		expectedOK  bool
+		expectedMsg string
+	}{
+		"empty": {
+			name:        "",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		"valid": {
+			name:        "foo.bar.baz",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		// Make sure mixed case, non DNS subdomain characters are tolerated
+		"valid complex": {
+			name:        "sha256:ABCDEF012345@ABCDEF012345",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		// Make sure non-ascii characters are tolerated
+		"valid extended charset": {
+			name:        "Iñtërnâtiônàlizætiøn",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		"dot": {
+			name:        ".",
+			expectedOK:  false,
+			expectedMsg: ".",
+		},
+		"dot leading": {
+			name:        ".test",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		"dot dot": {
+			name:        "..",
+			expectedOK:  false,
+			expectedMsg: "..",
+		},
+		"dot dot leading": {
+			name:        "..test",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		"slash": {
+			name:        "foo/bar",
+			expectedOK:  false,
+			expectedMsg: "/",
+		},
+		"percent": {
+			name:        "foo%bar",
+			expectedOK:  false,
+			expectedMsg: "%",
+		},
+	}
+
+	for k, tc := range testcases {
+		ok, msgs := IsValidPathSegmentName(tc.name)
+		if ok != tc.expectedOK {
+			t.Errorf("%s: expected ok=%v, got %v", k, tc.expectedOK, ok)
+		}
+		if len(tc.expectedMsg) == 0 && len(msgs) > 0 {
+			t.Errorf("%s: expected no message, got %v", k, msgs)
+		}
+		if len(tc.expectedMsg) > 0 && len(msgs) == 0 {
+			t.Errorf("%s: expected error message, got none", k)
+		}
+		if len(tc.expectedMsg) > 0 && !strings.Contains(msgs[0], tc.expectedMsg) {
+			t.Errorf("%s: expected message containing %q, got %v", k, tc.expectedMsg, msgs[0])
+		}
+	}
+}
+
+func TestIsValidatePathSegmentPrefix(t *testing.T) {
+	testcases := map[string]struct {
+		name        string
+		expectedOK  bool
+		expectedMsg string
+	}{
+		"empty,prefix": {
+			name:        "",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		"valid,prefix": {
+			name:        "foo.bar.baz",
+			expectedOK:  true,
+			expectedMsg: "",
+		},
+		"dot,prefix": {
+			name:        ".",
+			expectedOK:  true, // allowed because a suffix could make it valid
+			expectedMsg: "",
+		},
+		"dot dot,prefix": {
+			name:        "..",
+			expectedOK:  true, // allowed because a suffix could make it valid
+			expectedMsg: "",
+		},
+		"slash,prefix": {
+			name:        "foo/bar",
+			expectedOK:  false,
+			expectedMsg: "/",
+		},
+		"percent,prefix": {
+			name:        "foo%bar",
+			expectedOK:  false,
+			expectedMsg: "%",
+		},
+	}
+
+	for k, tc := range testcases {
+		ok, msgs := IsValidPathSegmentPrefix(tc.name)
+		if ok != tc.expectedOK {
+			t.Errorf("%s: expected ok=%v, got %v", k, tc.expectedOK, ok)
+		}
+		if len(tc.expectedMsg) == 0 && len(msgs) > 0 {
+			t.Errorf("%s: expected no message, got %v", k, msgs)
+		}
+		if len(tc.expectedMsg) > 0 && len(msgs) == 0 {
+			t.Errorf("%s: expected error message, got none", k)
+		}
+		if len(tc.expectedMsg) > 0 && !strings.Contains(msgs[0], tc.expectedMsg) {
+			t.Errorf("%s: expected message containing %q, got %v", k, tc.expectedMsg, msgs[0])
+		}
+	}
+}

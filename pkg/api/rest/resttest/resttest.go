@@ -27,11 +27,11 @@ import (
 	"k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/api/rest"
 	"k8s.io/kubernetes/pkg/api/unversioned"
-	"k8s.io/kubernetes/pkg/api/validation"
 	"k8s.io/kubernetes/pkg/conversion"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/util/validation"
 	"k8s.io/kubernetes/pkg/util/wait"
 )
 
@@ -323,7 +323,7 @@ func (t *Tester) testCreateIgnoresMismatchedNamespace(valid runtime.Object) {
 }
 
 func (t *Tester) testCreateValidatesNames(valid runtime.Object) {
-	for _, invalidName := range validation.NameMayNotBe {
+	for _, invalidName := range validation.PathNameMayNotBe {
 		objCopy := copyOrDie(valid)
 		objCopyMeta := t.getObjectMetaOrFail(objCopy)
 		objCopyMeta.Name = invalidName
@@ -335,7 +335,7 @@ func (t *Tester) testCreateValidatesNames(valid runtime.Object) {
 		}
 	}
 
-	for _, invalidSuffix := range validation.NameMayNotContain {
+	for _, invalidSuffix := range validation.PathNameMayNotContain {
 		objCopy := copyOrDie(valid)
 		objCopyMeta := t.getObjectMetaOrFail(objCopy)
 		objCopyMeta.Name += invalidSuffix

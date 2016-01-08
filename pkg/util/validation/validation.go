@@ -300,6 +300,35 @@ func IsBetweenInclusive(lo, hi, value int64) (bool, []string) {
 	return false, []string{fmt.Sprintf("must be between %d and %d, inclusive", lo, hi)}
 }
 
+// PathNameMayNotBe specifies strings that cannot be used as names specified as path segments (like the REST API or etcd store)
+var PathNameMayNotBe = []string{".", ".."}
+
+// PathNameMayNotContain specifies substrings that cannot be used in names specified as path segments (like the REST API or etcd store)
+var PathNameMayNotContain = []string{"/", "%"}
+
+// IsValidPathSegmentName validates the name can be safely encoded as a path segment
+func IsValidPathSegmentName(name string) (bool, []string) {
+	for _, illegalName := range PathNameMayNotBe {
+		if name == illegalName {
+			return false, []string{fmt.Sprintf(`may not be '%s'`, illegalName)}
+		}
+	}
+
+	return IsValidPathSegmentPrefix(name)
+}
+
+// IsValidPathSegmentPrefix validates the name can be used as a prefix for a name which will be encoded as a path segment
+// It does not check for exact matches with disallowed names, since an arbitrary suffix might make the name valid
+func IsValidPathSegmentPrefix(name string) (bool, []string) {
+	for _, illegalContent := range PathNameMayNotContain {
+		if strings.Contains(name, illegalContent) {
+			return false, []string{fmt.Sprintf(`may not contain '%s'`, illegalContent)}
+		}
+	}
+
+	return true, nil
+}
+
 // MaxLenError returns a string explanation of a "string too long" validation
 // failure.
 func MaxLenError(length int) string {
