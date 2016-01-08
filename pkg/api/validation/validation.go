@@ -1728,14 +1728,7 @@ func ValidateService(service *api.Service) field.ErrorList {
 
 	ipPath := specPath.Child("externalIPs")
 	for i, ip := range service.Spec.ExternalIPs {
-		idxPath := ipPath.Index(i)
-		if ok, msgs := validation.IsIPv4(ip); !ok {
-			for i := range msgs {
-				allErrs = append(allErrs, field.Invalid(idxPath, ip, msgs[i]))
-			}
-		} else {
-			allErrs = append(allErrs, validateNonSpecialIP(ip, idxPath)...)
-		}
+		allErrs = append(allErrs, validateNonSpecialIP(ip, ipPath.Index(i))...)
 	}
 
 	if len(service.Spec.Type) == 0 {
@@ -2509,39 +2502,15 @@ func validateEndpointSubsets(subsets []api.EndpointSubset, fldPath *field.Path) 
 }
 
 func validateEndpointAddress(address *api.EndpointAddress, fldPath *field.Path) field.ErrorList {
-	allErrs := field.ErrorList{}
-	if ok, msgs := validation.IsIPv4(address.IP); !ok {
-		for i := range msgs {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("ip"), address.IP, msgs[i]))
-		}
-	} else {
-		allErrs = append(allErrs, validateNonSpecialIP(address.IP, fldPath.Child("ip"))...)
-	}
-	return allErrs
+	return validateNonSpecialIP(address.IP, fldPath.Child("ip"))
 }
 
 func validateNonSpecialIP(ipAddress string, fldPath *field.Path) field.ErrorList {
-	// We disallow some IPs as endpoints or external-ips.  Specifically,
-	// unspecified and loopback addresses are nonsensical and link-local
-	// addresses tend to be used for node-centric purposes (e.g. metadata
-	// service).
 	allErrs := field.ErrorList{}
-	ip := net.ParseIP(ipAddress)
-	if ip == nil {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipAddress, "must be a valid IP address"))
-		return allErrs
-	}
-	if ip.IsUnspecified() {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipAddress, "may not be unspecified (0.0.0.0)"))
-	}
-	if ip.IsLoopback() {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipAddress, "may not be in the loopback range (127.0.0.0/8)"))
-	}
-	if ip.IsLinkLocalUnicast() {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipAddress, "may not be in the link-local range (169.254.0.0/16)"))
-	}
-	if ip.IsLinkLocalMulticast() {
-		allErrs = append(allErrs, field.Invalid(fldPath, ipAddress, "may not be in the link-local multicast range (224.0.0.0/24)"))
+	if ok, msgs := validation.IsNonSpecialIPv4(ipAddress); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath, ipAddress, msgs[i]))
+		}
 	}
 	return allErrs
 }

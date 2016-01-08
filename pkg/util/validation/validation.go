@@ -199,11 +199,44 @@ func IsPortName(port string) (bool, []string) {
 	return len(errs) == 0, errs
 }
 
-// IsIPv4 tests that the argument is a valid IPv4 address.
-func IsIPv4(value string) (bool, []string) {
+func isIPv4(value string) (net.IP, []string) {
 	ip := net.ParseIP(value)
 	if ip == nil || ip.To4() == nil {
-		return false, []string{"must be a valid IPv4 address, (e.g. 10.9.8.7)"}
+		return nil, []string{"must be a valid IPv4 address, (e.g. 10.9.8.7)"}
+	}
+	return ip, nil
+}
+
+// IsIPv4 tests that the argument is a valid IPv4 address.
+func IsIPv4(value string) (bool, []string) {
+	ip, msgs := isIPv4(value)
+	if ip == nil {
+		return false, msgs
+	}
+	return true, nil
+}
+
+// Is NonSpecialIPv4 tests that the argument is a "normal" IP.  Specifically:
+//   * valid IPv4 address
+//   * not 0.0.0.0
+//   * not a loopback address
+//   * not a link-local address
+func IsNonSpecialIPv4(value string) (bool, []string) {
+	ip, msgs := isIPv4(value)
+	if ip == nil {
+		return false, msgs
+	}
+	if ip.IsUnspecified() {
+		return false, []string{"may not be unspecified (0.0.0.0)"}
+	}
+	if ip.IsLoopback() {
+		return false, []string{"may not be in the loopback range (127.0.0.0/8)"}
+	}
+	if ip.IsLinkLocalUnicast() {
+		return false, []string{"may not be in the link-local range (169.254.0.0/16)"}
+	}
+	if ip.IsLinkLocalMulticast() {
+		return false, []string{"may not be in the link-local multicast range (224.0.0.0/24)"}
 	}
 	return true, nil
 }
