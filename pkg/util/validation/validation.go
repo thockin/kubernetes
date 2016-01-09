@@ -22,14 +22,10 @@ import (
 	"net"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
-const qnameCharFmt string = "[A-Za-z0-9]"
-const qnameExtCharFmt string = "[-A-Za-z0-9_.]"
-const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
 const qualifiedNameMaxLength int = 63
-
-var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
 
 func IsQualifiedName(value string) (bool, []string) {
 	var errs []string
@@ -46,70 +42,123 @@ func IsQualifiedName(value string) (bool, []string) {
 		} else if ok, msgs := IsDNS1123Subdomain(prefix); !ok {
 			errs = append(errs, prefixEach(msgs, "prefix part ")...)
 		}
+	case 0:
+		return false, append(errs, EmptyError())
 	default:
-		return false, append(errs, RegexError(qualifiedNameFmt, "MyName", "my.name", "123-abc")+
-			" with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName'")
+		return false, append(errs, "must not contain more than 1 slash (/)")
 	}
 
-	if len(name) == 0 {
-		errs = append(errs, "name part "+EmptyError())
-	} else if len(name) > qualifiedNameMaxLength {
-		errs = append(errs, "name part "+MaxLenError(qualifiedNameMaxLength))
-	}
-	if !qualifiedNameRegexp.MatchString(name) {
-		errs = append(errs, "name part "+RegexError(qualifiedNameFmt, "MyName", "my.name", "123-abc"))
-	}
+	errs = append(errs, prefixEach(checkQualifiedNamePart(name), "name part ")...)
+
 	return len(errs) == 0, errs
 }
 
-const labelValueFmt string = "(" + qualifiedNameFmt + ")?"
-const LabelValueMaxLength int = 63
-
-var labelValueRegexp = regexp.MustCompile("^" + labelValueFmt + "$")
+func checkQualifiedNamePart(name string) []string {
+	var errs []string
+	runes := []rune(name)
+	if len(runes) == 0 {
+		return append(errs, EmptyError())
+	}
+	if len(runes) > qualifiedNameMaxLength {
+		errs = append(errs, MaxLenError(qualifiedNameMaxLength))
+	}
+	if !isAlphaNum(runes[0]) || !isAlphaNum(runes[len(runes)-1]) {
+		errs = append(errs, "must begin and end with an alpha-numeric character (A-Z, a-z, 0-9)")
+	}
+	if len(runes) > 2 { // don't repeat errors for first and last chars
+		for _, r := range runes[1 : len(runes)-1] {
+			if !isAlphaNum(r) && r != '.' && r != '-' && r != '_' {
+				errs = append(errs, "must contain only alpha-numeric characters (A-Z, a-z, 0-9), hyphens (-), underscores (_), and dots (.)")
+				break
+			}
+		}
+	}
+	return errs
+}
 
 func IsLabelValue(value string) (bool, []string) {
 	var errs []string
-	if len(value) > LabelValueMaxLength {
-		errs = append(errs, MaxLenError(LabelValueMaxLength))
+	if len(value) == 0 {
+		return true, nil
 	}
-	if !labelValueRegexp.MatchString(value) {
-		errs = append(errs, RegexError(labelValueFmt, "MyValue", "my_value", "12345"))
-	}
+	errs = append(errs, checkQualifiedNamePart(value)...)
 	return len(errs) == 0, errs
 }
 
 const DNS1123LabelFmt string = "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
 const DNS1123LabelMaxLength int = 63
 
-var dns1123LabelRegexp = regexp.MustCompile("^" + DNS1123LabelFmt + "$")
-
 // IsDNS1123Label tests for a string that conforms to the definition of a label in
 // DNS (RFC 1123).
 func IsDNS1123Label(value string) (bool, []string) {
 	var errs []string
-	if len(value) > DNS1123LabelMaxLength {
+	runes := []rune(value)
+	if len(runes) == 0 {
+		return false, append(errs, EmptyError())
+	}
+	if len(runes) > DNS1123LabelMaxLength {
 		errs = append(errs, MaxLenError(DNS1123LabelMaxLength))
 	}
-	if !dns1123LabelRegexp.MatchString(value) {
-		errs = append(errs, RegexError(DNS1123LabelFmt, "my-name", "123-abc"))
+	if !isLowerAlphaNum(runes[0]) || !isLowerAlphaNum(runes[len(runes)-1]) {
+		errs = append(errs, "must begin and end with an alpha-numeric character (a-z, 0-9)")
+	}
+	if len(runes) > 2 { // don't repeat errors for first and last chars
+		for _, r := range runes[1 : len(runes)-1] {
+			if !isDNSInnerChar(r) {
+				errs = append(errs, "must contain only alpha-numeric characters (a-z, 0-9) and hyphens (-)")
+				break
+			}
+		}
 	}
 	return len(errs) == 0, errs
+}
+
+func isDNSInnerChar(r rune) bool {
+	return isLowerAlphaNum(r) || r == '-'
 }
 
 const DNS1123SubdomainFmt string = DNS1123LabelFmt + "(\\." + DNS1123LabelFmt + ")*"
 const DNS1123SubdomainMaxLength int = 253
 
-var dns1123SubdomainRegexp = regexp.MustCompile("^" + DNS1123SubdomainFmt + "$")
-
 // IsDNS1123Subdomain tests for a string that conforms to the definition of a
 // subdomain in DNS (RFC 1123).
 func IsDNS1123Subdomain(value string) (bool, []string) {
 	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
+	runes := []rune(value)
+	if len(runes) == 0 {
+		return false, append(errs, EmptyError())
+	}
+	if len(runes) > DNS1123SubdomainMaxLength {
 		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
 	}
-	if !dns1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, RegexError(DNS1123SubdomainFmt, "example.com"))
+	parts := strings.Split(value, ".")
+	emptyErr, beginEndErr, contentErr := false, false, false
+	for _, part := range parts {
+		runes := []rune(part)
+		if len(runes) == 0 {
+			if !emptyErr {
+				errs = append(errs, "parts "+EmptyError())
+				emptyErr = true
+			}
+			continue
+		}
+		if !isLowerAlphaNum(runes[0]) || !isLowerAlphaNum(runes[len(runes)-1]) {
+			if !beginEndErr {
+				errs = append(errs, "each part must begin and end with an alpha-numeric character (a-z, 0-9)")
+				beginEndErr = true
+			}
+		}
+		if len(runes) > 2 { // don't repeat errors for first and last chars
+			for _, r := range runes[1 : len(runes)-1] {
+				if !isDNSInnerChar(r) {
+					if !contentErr {
+						errs = append(errs, "each part must contain only alpha-numeric characters (a-z, 0-9) and hyphens (-); parts must be joined by dots (.)")
+						contentErr = true
+					}
+					break
+				}
+			}
+		}
 	}
 	return len(errs) == 0, errs
 }
@@ -117,32 +166,54 @@ func IsDNS1123Subdomain(value string) (bool, []string) {
 const DNS952LabelFmt string = "[a-z]([-a-z0-9]*[a-z0-9])?"
 const DNS952LabelMaxLength int = 24
 
-var dns952LabelRegexp = regexp.MustCompile("^" + DNS952LabelFmt + "$")
-
 // IsDNS952Label tests for a string that conforms to the definition of a label in
 // DNS (RFC 952).
 func IsDNS952Label(value string) (bool, []string) {
 	var errs []string
-	if len(value) > DNS952LabelMaxLength {
+	runes := []rune(value)
+	if len(runes) == 0 {
+		return false, append(errs, EmptyError())
+	}
+	if len(runes) > DNS952LabelMaxLength {
 		errs = append(errs, MaxLenError(DNS952LabelMaxLength))
 	}
-	if !dns952LabelRegexp.MatchString(value) {
-		errs = append(errs, RegexError(DNS952LabelFmt, "my-name", "abc-123"))
+	if !isLowerAlpha(runes[0]) {
+		errs = append(errs, "must begin with an alphabetic character (a-z)")
+	}
+	if !isLowerAlphaNum(runes[len(runes)-1]) {
+		errs = append(errs, "must end with an alpha-numeric character (a-z, 0-9)")
+	}
+	if len(runes) > 2 { // don't repeat errors for first and last chars
+		for _, r := range runes[1 : len(runes)-1] {
+			if !isDNSInnerChar(r) {
+				errs = append(errs, "must contain only alpha-numeric characters (a-z, 0-9) and hyphens (-)")
+				break
+			}
+		}
 	}
 	return len(errs) == 0, errs
 }
 
-const CIdentifierFmt string = "[A-Za-z_][A-Za-z0-9_]*"
-
-var cIdentifierRegexp = regexp.MustCompile("^" + CIdentifierFmt + "$")
-
 // IsCIdentifier tests for a string that conforms the definition of an identifier
 // in C. This checks the format, but not the length.
 func IsCIdentifier(value string) (bool, []string) {
-	if !cIdentifierRegexp.MatchString(value) {
-		return false, []string{RegexError(CIdentifierFmt, "my_name", "MY_NAME", "MyName")}
+	var errs []string
+	runes := []rune(value)
+	if len(runes) == 0 {
+		return false, append(errs, EmptyError())
 	}
-	return true, nil
+	if !isASCIILetter(runes[0]) && runes[0] != '_' {
+		errs = append(errs, "must start with an alphabetic character (a-z, A-Z) or underscore (_)")
+	}
+	if len(runes) > 1 { // don't repeat errors for first char
+		for _, r := range runes[1:len(runes)] {
+			if !isAlphaNum(r) && r != '_' {
+				errs = append(errs, "must contain only alpha-numeric characters (a-z, A-Z, 0-9) and underscores (_)")
+				break
+			}
+		}
+	}
+	return len(errs) == 0, errs
 }
 
 // IsPortNum tests that the argument is a valid, non-zero port number.
@@ -169,9 +240,6 @@ func IsUserID(uid int64) (bool, []string) {
 	return IsBetweenInclusive(minUserID, maxUserID, int64(uid))
 }
 
-var portNameCharsetRegex = regexp.MustCompile("^[-a-z0-9]+$")
-var portNameOneLetterRegexp = regexp.MustCompile("[a-z]")
-
 // IsPortName check that the argument is valid syntax. It must be
 // non-empty and no more than 15 characters long. It may contain only [-a-z0-9]
 // and must contain at least one letter [a-z]. It must not start or end with a
@@ -181,20 +249,36 @@ var portNameOneLetterRegexp = regexp.MustCompile("[a-z]")
 // insensitive.
 func IsPortName(port string) (bool, []string) {
 	var errs []string
-	if len(port) > 15 {
+	runes := []rune(port)
+	if len(runes) == 0 {
+		return false, append(errs, EmptyError())
+	}
+	if len(runes) > 15 {
 		errs = append(errs, MaxLenError(15))
 	}
-	if !portNameCharsetRegex.MatchString(port) {
-		errs = append(errs, "must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)")
+	if runes[0] == '-' || runes[len(runes)-1] == '-' {
+		errs = append(errs, "must not begin or end with a hyphen")
 	}
-	if !portNameOneLetterRegexp.MatchString(port) {
+	foundLetter := false // must contain at least one letter
+	if isASCIILetter(runes[0]) || isASCIILetter(runes[len(runes)-1]) {
+		foundLetter = true
+	}
+	if len(runes) > 2 { // don't repeat errors for first and last chars
+		for _, r := range runes[1 : len(runes)-1] {
+			if !isLowerAlphaNum(r) && r != '-' {
+				errs = append(errs, "must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)")
+				break
+			}
+			if isASCIILetter(r) {
+				foundLetter = true
+			}
+		}
+	}
+	if !foundLetter {
 		errs = append(errs, "must contain at least one letter (a-z)")
 	}
 	if strings.Contains(port, "--") {
 		errs = append(errs, "must not contain consecutive hyphens")
-	}
-	if len(port) > 0 && (port[0] == '-' || port[len(port)-1] == '-') {
-		errs = append(errs, "must not begin or end with a hyphen")
 	}
 	return len(errs) == 0, errs
 }
@@ -241,13 +325,14 @@ func IsNonSpecialIPv4(value string) (bool, []string) {
 	return true, nil
 }
 
-const percentFmt string = "[0-9]+%"
-
-var percentRegexp = regexp.MustCompile("^" + percentFmt + "$")
+var percentRegexp = regexp.MustCompile("^[0-9]+%$")
 
 func IsPercent(percent string) (bool, []string) {
+	if len(percent) == 0 {
+		return false, []string{EmptyError()}
+	}
 	if !percentRegexp.MatchString(percent) {
-		return false, []string{RegexError(percentFmt, "1%", "93%")}
+		return false, []string{"must be one or more digits (0-9) followed by a percent (%)"}
 	}
 	return true, nil
 }
@@ -259,8 +344,11 @@ var httpHeaderNameRegexp = regexp.MustCompile("^" + httpHeaderNameFmt + "$")
 // IsHTTPHeaderName checks that a string conforms to the Go HTTP library's
 // definition of a valid header field name (a stricter subset than RFC7230).
 func IsHTTPHeaderName(value string) (bool, []string) {
+	if len(value) == 0 {
+		return false, []string{EmptyError()}
+	}
 	if !httpHeaderNameRegexp.MatchString(value) {
-		return false, []string{RegexError(httpHeaderNameFmt, "X-Header-Name")}
+		return false, []string{"must contain only alpha-numeric characters (a-z, A-Z, 0-9) and dashes (-) (e.g. X-Header-Name)"}
 	}
 	return true, nil
 }
@@ -310,7 +398,7 @@ var PathNameMayNotContain = []string{"/", "%"}
 func IsValidPathSegmentName(name string) (bool, []string) {
 	for _, illegalName := range PathNameMayNotBe {
 		if name == illegalName {
-			return false, []string{fmt.Sprintf(`may not be '%s'`, illegalName)}
+			return false, []string{fmt.Sprintf("may not be '%s'", illegalName)}
 		}
 	}
 
@@ -322,7 +410,7 @@ func IsValidPathSegmentName(name string) (bool, []string) {
 func IsValidPathSegmentPrefix(name string) (bool, []string) {
 	for _, illegalContent := range PathNameMayNotContain {
 		if strings.Contains(name, illegalContent) {
-			return false, []string{fmt.Sprintf(`may not contain '%s'`, illegalContent)}
+			return false, []string{fmt.Sprintf("may not contain '%s'", illegalContent)}
 		}
 	}
 
@@ -333,22 +421,6 @@ func IsValidPathSegmentPrefix(name string) (bool, []string) {
 // failure.
 func MaxLenError(length int) string {
 	return fmt.Sprintf("must be no more than %d characters", length)
-}
-
-// RegexError returns a string explanation of a regex validation failure.
-func RegexError(fmt string, examples ...string) string {
-	s := "must match the regex " + fmt
-	if len(examples) == 0 {
-		return s
-	}
-	s += " (e.g. "
-	for i := range examples {
-		if i > 0 {
-			s += " or "
-		}
-		s += "'" + examples[i] + "'"
-	}
-	return s + ")"
 }
 
 // EmptyError returns a string explanation of a "must not be empty" validation
@@ -362,4 +434,20 @@ func prefixEach(msgs []string, prefix string) []string {
 		msgs[i] = prefix + msgs[i]
 	}
 	return msgs
+}
+
+func isASCIILetter(r rune) bool {
+	return unicode.IsLetter(r) && r <= unicode.MaxASCII
+}
+
+func isAlphaNum(r rune) bool {
+	return isASCIILetter(r) || unicode.IsDigit(r)
+}
+
+func isLowerAlpha(r rune) bool {
+	return isASCIILetter(r) && unicode.IsLower(r)
+}
+
+func isLowerAlphaNum(r rune) bool {
+	return isLowerAlpha(r) || unicode.IsDigit(r)
 }

@@ -44,7 +44,7 @@ type LabelOptions struct {
 const (
 	label_long = `Update the labels on a resource.
 
-A label must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to %[1]d characters.
+A label must begin with a letter or number, and may contain letters, numbers, hyphens, dots, and underscores, up to 63 characters.
 If --overwrite is true, then existing labels can be overwritten, otherwise attempting to overwrite a label will result in an error.
 If --resource-version is specified, then updates will use this resource version, otherwise the existing resource-version will be used.`
 	label_example = `# Update pod 'foo' with the label 'unhealthy' and the value 'true'.
@@ -81,7 +81,7 @@ func NewCmdLabel(f *cmdutil.Factory, out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "label [--overwrite] (-f FILENAME | TYPE NAME) KEY_1=VAL_1 ... KEY_N=VAL_N [--resource-version=version]",
 		Short:   "Update the labels on a resource",
-		Long:    fmt.Sprintf(label_long, validation.LabelValueMaxLength),
+		Long:    label_long,
 		Example: label_example,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := RunLabel(f, out, cmd, args, options)

@@ -896,7 +896,7 @@ func TestValidateDeployment(t *testing.T) {
 			MaxSurge: intstr.FromString("20Percent"),
 		},
 	}
-	errorCases["must match the regex"] = invalidMaxSurgeDeployment
+	errorCases["must be one or more digits"] = invalidMaxSurgeDeployment
 
 	// MaxSurge and MaxUnavailable cannot both be zero.
 	invalidRollingUpdateDeployment := validDeployment()

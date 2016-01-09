@@ -89,7 +89,7 @@ func TestValidateObjectMetaNamespaces(t *testing.T) {
 			return true, nil
 		},
 		field.NewPath("field"))
-	if len(errs) != 2 {
+	if len(errs) != 3 {
 		t.Fatalf("unexpected errors: %v", errs)
 	}
 	if !strings.Contains(errs[0].Error(), "Invalid value") || !strings.Contains(errs[1].Error(), "Invalid value") {
@@ -159,40 +159,94 @@ func TestValidateLabels(t *testing.T) {
 
 	labelNameErrorCases := []struct {
 		labels map[string]string
-		expect string
+		errors []string
 	}{
-		{map[string]string{"nospecialchars^=@": "bar"}, "must match the regex"},
-		{map[string]string{"cantendwithadash-": "bar"}, "must match the regex"},
-		{map[string]string{"only/one/slash": "bar"}, "must match the regex"},
-		{map[string]string{strings.Repeat("a", 254): "bar"}, "must be no more than"},
+		{
+			labels: map[string]string{"^nospecialchars": "bar"},
+			errors: []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"nospecialchars$": "bar"},
+			errors: []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"no=special@chars": "bar"},
+			errors: []string{"must contain only alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"-cantstartwithadash": "bar"},
+			errors: []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"cantendwithadash-": "bar"},
+			errors: []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"only/one/slash": "bar"},
+			errors: []string{"must not contain more than 1 slash"},
+		},
+		{
+			labels: map[string]string{strings.Repeat("a", 254): "bar"},
+			errors: []string{"must be no more than"},
+		},
 	}
 	for i := range labelNameErrorCases {
 		errs := ValidateLabels(labelNameErrorCases[i].labels, field.NewPath("field"))
-		if len(errs) != 1 {
+		if len(errs) == 0 {
 			t.Errorf("case[%d]: expected failure", i)
 		} else {
-			if !strings.Contains(errs[0].Detail, labelNameErrorCases[i].expect) {
-				t.Errorf("case[%d]: error details do not include %q: %q", i, labelNameErrorCases[i].expect, errs[0].Detail)
+			for _, err := range errs {
+				found := false
+				for _, fragment := range labelNameErrorCases[i].errors {
+					if strings.Contains(err.Detail, fragment) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("case[%d]: unexpected error %q", i, err.Detail)
+				}
 			}
 		}
 	}
 
 	labelValueErrorCases := []struct {
 		labels map[string]string
-		expect string
+		errors []string
 	}{
-		{map[string]string{"toolongvalue": strings.Repeat("a", 64)}, "must be no more than"},
-		{map[string]string{"backslashesinvalue": "some\\bad\\value"}, "must match the regex"},
-		{map[string]string{"nocommasallowed": "bad,value"}, "must match the regex"},
-		{map[string]string{"strangecharsinvalue": "?#$notsogood"}, "must match the regex"},
+		{
+			labels: map[string]string{"toolongvalue": strings.Repeat("a", 64)},
+			errors: []string{"must be no more than"},
+		},
+		{
+			labels: map[string]string{"startswithinvalid": "@somebadvalue"},
+			errors: []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"endswithinvalid": "somebadvalue@"},
+			errors: []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			labels: map[string]string{"containsinvalid": "some,bad,value"},
+			errors: []string{"must contain only alpha-numeric"},
+		},
 	}
 	for i := range labelValueErrorCases {
 		errs := ValidateLabels(labelValueErrorCases[i].labels, field.NewPath("field"))
-		if len(errs) != 1 {
+		if len(errs) == 0 {
 			t.Errorf("case[%d]: expected failure", i)
 		} else {
-			if !strings.Contains(errs[0].Detail, labelValueErrorCases[i].expect) {
-				t.Errorf("case[%d]: error details do not include %q: %q", i, labelValueErrorCases[i].expect, errs[0].Detail)
+			for _, err := range errs {
+				found := false
+				for _, fragment := range labelValueErrorCases[i].errors {
+					if strings.Contains(err.Detail, fragment) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("case[%d]: unexpected error %q", i, err.Detail)
+				}
 			}
 		}
 	}
@@ -228,20 +282,53 @@ func TestValidateAnnotations(t *testing.T) {
 
 	nameErrorCases := []struct {
 		annotations map[string]string
-		expect      string
+		errors      []string
 	}{
-		{map[string]string{"nospecialchars^=@": "bar"}, "must match the regex"},
-		{map[string]string{"cantendwithadash-": "bar"}, "must match the regex"},
-		{map[string]string{"only/one/slash": "bar"}, "must match the regex"},
-		{map[string]string{strings.Repeat("a", 254): "bar"}, "must be no more than"},
+		{
+			annotations: map[string]string{"^nospecialchars": "bar"},
+			errors:      []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			annotations: map[string]string{"nospecialchars^": "bar"},
+			errors:      []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			annotations: map[string]string{"no,special,chars": "bar"},
+			errors:      []string{"must contain only alpha-numeric"},
+		},
+		{
+			annotations: map[string]string{"-cantstartwithadash": "bar"},
+			errors:      []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			annotations: map[string]string{"cantendwithadash-": "bar"},
+			errors:      []string{"must begin and end with an alpha-numeric"},
+		},
+		{
+			annotations: map[string]string{"only/one/slash": "bar"},
+			errors:      []string{"must not contain more than 1 slash"},
+		},
+		{
+			annotations: map[string]string{strings.Repeat("a", 254): "bar"},
+			errors:      []string{"must be no more than"},
+		},
 	}
 	for i := range nameErrorCases {
 		errs := ValidateAnnotations(nameErrorCases[i].annotations, field.NewPath("field"))
-		if len(errs) != 1 {
+		if len(errs) == 0 {
 			t.Errorf("case[%d]: expected failure", i)
 		} else {
-			if !strings.Contains(errs[0].Detail, nameErrorCases[i].expect) {
-				t.Errorf("case[%d]: error details do not include %q: %q", i, nameErrorCases[i].expect, errs[0].Detail)
+			for _, err := range errs {
+				found := false
+				for _, fragment := range nameErrorCases[i].errors {
+					if strings.Contains(err.Detail, fragment) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("case[%d]: unexpected error %q", i, err.Detail)
+				}
 			}
 		}
 	}
@@ -586,7 +673,7 @@ func TestValidateVolumes(t *testing.T) {
 		"name not a DNS label": {
 			[]api.Volume{{Name: "a.b.c", VolumeSource: emptyVS}},
 			field.ErrorTypeInvalid,
-			"name", "must match the regex",
+			"name", "must contain only alpha-numeric characters",
 		},
 		"name not unique": {
 			[]api.Volume{{Name: "abc", VolumeSource: emptyVS}, {Name: "abc", VolumeSource: emptyVS}},
@@ -872,7 +959,7 @@ func TestValidateEnv(t *testing.T) {
 		{
 			name:          "name not a C identifier",
 			envs:          []api.EnvVar{{Name: "a.b.c"}},
-			expectedError: `[0].name: Invalid value: "a.b.c": must match the regex`,
+			expectedError: `[0].name: Invalid value: "a.b.c": must contain only alpha-numeric characters`,
 		},
 		{
 			name: "value and valueFrom specified",
@@ -2490,7 +2577,7 @@ func TestValidateService(t *testing.T) {
 			tweakSvc: func(s *api.Service) {
 				s.Spec.Ports[0].Name = "INVALID"
 			},
-			numErrs: 1,
+			numErrs: 2,
 		},
 		{
 			name: "missing protocol",
@@ -2809,7 +2896,7 @@ func TestValidateService(t *testing.T) {
 		tc.tweakSvc(&svc)
 		errs := ValidateService(&svc)
 		if len(errs) != tc.numErrs {
-			t.Errorf("Unexpected error list for case %q: %v", tc.name, errs.ToAggregate())
+			t.Errorf("[%s] Unexpected error list, expected %d, got: %v", tc.name, tc.numErrs, errs.ToAggregate())
 		}
 	}
 }
@@ -3823,12 +3910,12 @@ func TestValidateLimitRange(t *testing.T) {
 			"",
 		},
 		"invalid-name": {
-			api.LimitRange{ObjectMeta: api.ObjectMeta{Name: "^Invalid", Namespace: "foo"}, Spec: api.LimitRangeSpec{}},
-			"must match the regex",
+			api.LimitRange{ObjectMeta: api.ObjectMeta{Name: "^invalid", Namespace: "foo"}, Spec: api.LimitRangeSpec{}},
+			"must begin and end with an alpha-numeric",
 		},
 		"invalid-namespace": {
-			api.LimitRange{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: api.LimitRangeSpec{}},
-			"must match the regex",
+			api.LimitRange{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "^invalid"}, Spec: api.LimitRangeSpec{}},
+			"must begin and end with an alpha-numeric",
 		},
 		"duplicate-limit-type": {
 			api.LimitRange{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: api.LimitRangeSpec{
@@ -4039,12 +4126,12 @@ func TestValidateResourceQuota(t *testing.T) {
 			"",
 		},
 		"invalid Name": {
-			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "^Invalid", Namespace: "foo"}, Spec: spec},
-			"must match the regex",
+			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "^invalid", Namespace: "foo"}, Spec: spec},
+			"must begin and end with an alpha-numeric",
 		},
 		"invalid Namespace": {
-			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: spec},
-			"must match the regex",
+			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "^invalid"}, Spec: spec},
+			"must begin and end with an alpha-numeric",
 		},
 		"negative-limits": {
 			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: negativeSpec},
@@ -4062,7 +4149,7 @@ func TestValidateResourceQuota(t *testing.T) {
 		}
 		for i := range errs {
 			if !strings.Contains(errs[i].Detail, v.D) {
-				t.Errorf("[%s]: expected error detail either empty or %s, got %s", k, v.D, errs[i].Detail)
+				t.Errorf("[%s]: expected error detail either empty or %s, got %q", k, v.D, errs[i].Detail)
 			}
 		}
 	}
@@ -4606,14 +4693,14 @@ func TestValidateEndpoints(t *testing.T) {
 			errorType: "FieldValueRequired",
 		},
 		"invalid namespace": {
-			endpoints:   api.Endpoints{ObjectMeta: api.ObjectMeta{Name: "mysvc", Namespace: "no@#invalid.;chars\"allowed"}},
+			endpoints:   api.Endpoints{ObjectMeta: api.ObjectMeta{Name: "mysvc", Namespace: "^invalid"}},
 			errorType:   "FieldValueInvalid",
-			errorDetail: "must match the regex",
+			errorDetail: "must begin and end with an alpha-numeric",
 		},
 		"invalid name": {
-			endpoints:   api.Endpoints{ObjectMeta: api.ObjectMeta{Name: "-_Invliad^&Characters", Namespace: "namespace"}},
+			endpoints:   api.Endpoints{ObjectMeta: api.ObjectMeta{Name: "^invalid", Namespace: "namespace"}},
 			errorType:   "FieldValueInvalid",
-			errorDetail: "must match the regex",
+			errorDetail: "must begin and end with an alpha-numeric",
 		},
 		"empty addresses": {
 			endpoints: api.Endpoints{
