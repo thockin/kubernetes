@@ -335,3 +335,39 @@ func TestIsHTTPHeaderName(t *testing.T) {
 		}
 	}
 }
+
+func TestIsValidPercent(t *testing.T) {
+	goodValues := []string{
+		"0%",
+		"00000%",
+		"1%",
+		"01%",
+		"99%",
+		"100%",
+		"101%",
+	}
+	for _, val := range goodValues {
+		if ok, msgs := IsValidPercent(val); !ok {
+			t.Errorf("expected true for %q, got %v", val, msgs)
+		}
+	}
+
+	badValues := []string{
+		"",
+		"0",
+		"100",
+		"0.0%",
+		"99.9%",
+		"hundred",
+		" 1%",
+		"1% ",
+		"-0%",
+		"-1%",
+		"+1%",
+	}
+	for _, val := range badValues {
+		if ok, _ := IsValidPercent(val); ok {
+			t.Errorf("expected false for %q", val)
+		}
+	}
+}

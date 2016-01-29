@@ -215,8 +215,11 @@ const percentFmt string = "[0-9]+%"
 
 var percentRegexp = regexp.MustCompile("^" + percentFmt + "$")
 
-func IsValidPercent(percent string) bool {
-	return percentRegexp.MatchString(percent)
+func IsValidPercent(percent string) (bool, []string) {
+	if !percentRegexp.MatchString(percent) {
+		return false, []string{RegexError(percentFmt, "1%", "93%")}
+	}
+	return true, nil
 }
 
 const HTTPHeaderNameFmt string = "[-A-Za-z0-9]+"
