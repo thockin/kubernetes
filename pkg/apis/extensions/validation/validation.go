@@ -44,17 +44,17 @@ func ValidateHorizontalPodAutoscalerName(name string, prefix bool) (bool, []stri
 
 func validateHorizontalPodAutoscalerSpec(autoscaler extensions.HorizontalPodAutoscalerSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if autoscaler.MinReplicas != nil && *autoscaler.MinReplicas < 1 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("minReplicas"), *autoscaler.MinReplicas, "must be greater than 0"))
+	if autoscaler.MinReplicas != nil {
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThan(0, int64(*autoscaler.MinReplicas), fldPath.Child("minReplicas"))...)
 	}
 	if autoscaler.MaxReplicas < 1 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than 0"))
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThan(0, int64(autoscaler.MaxReplicas), fldPath.Child("maxReplicas"))...)
 	}
 	if autoscaler.MinReplicas != nil && autoscaler.MaxReplicas < *autoscaler.MinReplicas {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than or equal to `minReplicas`"))
 	}
-	if autoscaler.CPUUtilization != nil && autoscaler.CPUUtilization.TargetPercentage < 1 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("cpuUtilization", "targetPercentage"), autoscaler.CPUUtilization.TargetPercentage, "must be greater than 0"))
+	if autoscaler.CPUUtilization != nil {
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThan(0, int64(autoscaler.CPUUtilization.TargetPercentage), fldPath.Child("cpuUtilization", "targetPercentage"))...)
 	}
 	if refErrs := ValidateSubresourceReference(autoscaler.ScaleRef, fldPath.Child("scaleRef")); len(refErrs) > 0 {
 		allErrs = append(allErrs, refErrs...)
@@ -132,8 +132,8 @@ func ValidateHorizontalPodAutoscalerUpdate(newAutoscaler, oldAutoscaler *extensi
 func ValidateHorizontalPodAutoscalerStatusUpdate(controller, oldController *extensions.HorizontalPodAutoscaler) field.ErrorList {
 	allErrs := apivalidation.ValidateObjectMetaUpdate(&controller.ObjectMeta, &oldController.ObjectMeta, field.NewPath("metadata"))
 	status := controller.Status
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.CurrentReplicas), field.NewPath("status", "currentReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.DesiredReplicas), field.NewPath("status", "desiredReplicasa"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.CurrentReplicas), field.NewPath("status", "currentReplicas"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.DesiredReplicas), field.NewPath("status", "desiredReplicasa"))...)
 	return allErrs
 }
 
@@ -183,9 +183,9 @@ func ValidateDaemonSetUpdate(controller, oldController *extensions.DaemonSet) fi
 // validateDaemonSetStatus validates a DaemonSetStatus
 func validateDaemonSetStatus(status *extensions.DaemonSetStatus, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.CurrentNumberScheduled), fldPath.Child("currentNumberScheduled"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.NumberMisscheduled), fldPath.Child("numberMisscheduled"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.DesiredNumberScheduled), fldPath.Child("desiredNumberScheduled"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.CurrentNumberScheduled), fldPath.Child("currentNumberScheduled"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.NumberMisscheduled), fldPath.Child("numberMisscheduled"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.DesiredNumberScheduled), fldPath.Child("desiredNumberScheduled"))...)
 	return allErrs
 }
 
@@ -229,7 +229,7 @@ func ValidateDeploymentName(name string, prefix bool) (bool, []string) {
 	return apivalidation.NameIsDNSSubdomain(name, prefix)
 }
 
-func ValidatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *field.Path) field.ErrorList {
+func validatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if intOrPercent.Type == intstr.String {
 		if ok, msgs := validation.IsValidPercent(intOrPercent.StrVal); !ok {
@@ -238,7 +238,7 @@ func ValidatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *fiel
 			}
 		}
 	} else if intOrPercent.Type == intstr.Int {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(intOrPercent.IntValue()), fldPath)...)
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(intOrPercent.IntValue()), fldPath)...)
 	}
 	return allErrs
 }
@@ -274,8 +274,8 @@ func IsNotMoreThan100Percent(intOrStringValue intstr.IntOrString, fldPath *field
 
 func ValidateRollingUpdateDeployment(rollingUpdate *extensions.RollingUpdateDeployment, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, ValidatePositiveIntOrPercent(rollingUpdate.MaxUnavailable, fldPath.Child("maxUnavailable"))...)
-	allErrs = append(allErrs, ValidatePositiveIntOrPercent(rollingUpdate.MaxSurge, fldPath.Child("maxSurge"))...)
+	allErrs = append(allErrs, validatePositiveIntOrPercent(rollingUpdate.MaxUnavailable, fldPath.Child("maxUnavailable"))...)
+	allErrs = append(allErrs, validatePositiveIntOrPercent(rollingUpdate.MaxSurge, fldPath.Child("maxSurge"))...)
 	if getIntOrPercentValue(rollingUpdate.MaxUnavailable) == 0 && getIntOrPercentValue(rollingUpdate.MaxSurge) == 0 {
 		// Both MaxSurge and MaxUnavailable cannot be zero.
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxUnavailable"), rollingUpdate.MaxUnavailable, "may not be 0 when `maxSurge` is 0"))
@@ -302,22 +302,20 @@ func ValidateDeploymentStrategy(strategy *extensions.DeploymentStrategy, fldPath
 func ValidateRollback(rollback *extensions.RollbackConfig, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	v := rollback.Revision
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(v), fldPath.Child("version"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(v), fldPath.Child("version"))...)
 	return allErrs
 }
 
 // Validates given deployment spec.
 func ValidateDeploymentSpec(spec *extensions.DeploymentSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.Replicas), fldPath.Child("replicas"))...)
 
-	if spec.Selector == nil {
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.Replicas), fldPath.Child("replicas"))...)
+
+	if spec.Selector == nil || len(spec.Selector.MatchLabels)+len(spec.Selector.MatchExpressions) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))
 	} else {
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
-		if len(spec.Selector.MatchLabels)+len(spec.Selector.MatchExpressions) == 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, "empty selector is not valid for deployment."))
-		}
 	}
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
@@ -328,10 +326,10 @@ func ValidateDeploymentSpec(spec *extensions.DeploymentSpec, fldPath *field.Path
 	}
 
 	allErrs = append(allErrs, ValidateDeploymentStrategy(&spec.Strategy, fldPath.Child("strategy"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
 	if spec.RevisionHistoryLimit != nil {
 		// zero is a valid RevisionHistoryLimit
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.RevisionHistoryLimit), fldPath.Child("revisionHistoryLimit"))...)
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(*spec.RevisionHistoryLimit), fldPath.Child("revisionHistoryLimit"))...)
 	}
 	if spec.RollbackTo != nil {
 		allErrs = append(allErrs, ValidateRollback(spec.RollbackTo, fldPath.Child("rollback"))...)
@@ -383,13 +381,13 @@ func ValidateJobSpec(spec *extensions.JobSpec, fldPath *field.Path) field.ErrorL
 	allErrs := field.ErrorList{}
 
 	if spec.Parallelism != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.Parallelism), fldPath.Child("parallelism"))...)
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(*spec.Parallelism), fldPath.Child("parallelism"))...)
 	}
 	if spec.Completions != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.Completions), fldPath.Child("completions"))...)
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(*spec.Completions), fldPath.Child("completions"))...)
 	}
 	if spec.ActiveDeadlineSeconds != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.ActiveDeadlineSeconds), fldPath.Child("activeDeadlineSeconds"))...)
+		allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(*spec.ActiveDeadlineSeconds), fldPath.Child("activeDeadlineSeconds"))...)
 	}
 	if spec.Selector == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))
@@ -415,9 +413,9 @@ func ValidateJobSpec(spec *extensions.JobSpec, fldPath *field.Path) field.ErrorL
 
 func ValidateJobStatus(status *extensions.JobStatus, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Active), fldPath.Child("active"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Succeeded), fldPath.Child("succeeded"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Failed), fldPath.Child("failed"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.Active), fldPath.Child("active"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.Succeeded), fldPath.Child("succeeded"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(status.Failed), fldPath.Child("failed"))...)
 	return allErrs
 }
 
@@ -584,9 +582,7 @@ func validateIngressBackend(backend *extensions.IngressBackend, fldPath *field.P
 
 func validateClusterAutoscalerSpec(spec extensions.ClusterAutoscalerSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if spec.MinNodes < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("minNodes"), spec.MinNodes, "must be greater than or equal to 0"))
-	}
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.MinNodes), fldPath.Child("minNodes"))...)
 	if spec.MaxNodes < spec.MinNodes {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxNodes"), spec.MaxNodes, "must be greater than or equal to `minNodes`"))
 	}
@@ -597,14 +593,19 @@ func validateClusterAutoscalerSpec(spec extensions.ClusterAutoscalerSpec, fldPat
 		if len(target.Resource) == 0 {
 			allErrs = append(allErrs, field.Required(fldPath.Child("targetUtilization", "resource"), ""))
 		}
-		if target.Value <= 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetUtilization", "value"), target.Value, "must be greater than 0"))
-		}
-		if target.Value > 1 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetUtilization", "value"), target.Value, "must be less than or equal to 1"))
-		}
+		allErrs = append(allErrs, validateTargetUtilization(target.Value, fldPath.Child("targetUtilization", "value"))...)
 	}
 	return allErrs
+}
+
+func validateTargetUtilization(value float64, fldPath *field.Path) field.ErrorList {
+	if value <= 0 {
+		return field.ErrorList{field.Invalid(fldPath, value, "must be greater than 0.0")}
+	}
+	if value > 1 {
+		return field.ErrorList{field.Invalid(fldPath, value, "must be less than or equal to 1.0")}
+	}
+	return nil
 }
 
 func ValidateClusterAutoscaler(autoscaler *extensions.ClusterAutoscaler) field.ErrorList {
@@ -623,9 +624,7 @@ func ValidateScale(scale *extensions.Scale) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&scale.ObjectMeta, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 
-	if scale.Spec.Replicas < 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "replicas"), scale.Spec.Replicas, "must be greater than or equal to 0"))
-	}
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(scale.Spec.Replicas), field.NewPath("spec", "replicas"))...)
 
 	return allErrs
 }
@@ -657,8 +656,8 @@ func ValidateReplicaSetUpdate(rs, oldRs *extensions.ReplicaSet) field.ErrorList 
 func ValidateReplicaSetStatusUpdate(rs, oldRs *extensions.ReplicaSet) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaUpdate(&rs.ObjectMeta, &oldRs.ObjectMeta, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(rs.Status.Replicas), field.NewPath("status", "replicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(rs.Status.ObservedGeneration), field.NewPath("status", "observedGeneration"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(rs.Status.Replicas), field.NewPath("status", "replicas"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(rs.Status.ObservedGeneration), field.NewPath("status", "observedGeneration"))...)
 	return allErrs
 }
 
@@ -666,7 +665,7 @@ func ValidateReplicaSetStatusUpdate(rs, oldRs *extensions.ReplicaSet) field.Erro
 func ValidateReplicaSetSpec(spec *extensions.ReplicaSetSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.Replicas), fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.Replicas), fldPath.Child("replicas"))...)
 
 	if spec.Selector == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))

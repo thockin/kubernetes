@@ -4048,11 +4048,11 @@ func TestValidateResourceQuota(t *testing.T) {
 		},
 		"negative-limits": {
 			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: negativeSpec},
-			isNegativeErrorMsg,
+			"greater than",
 		},
 		"fractional-api-resource": {
 			api.ResourceQuota{ObjectMeta: api.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: fractionalPodSpec},
-			isNotIntegerErrorMsg,
+			"whole number",
 		},
 	}
 	for k, v := range errorCases {
@@ -4889,7 +4889,7 @@ func TestValidateSecurityContext(t *testing.T) {
 		"negative RunAsUser": {
 			sc:          negativeRunAsUser,
 			errorType:   "FieldValueInvalid",
-			errorDetail: isNegativeErrorMsg,
+			errorDetail: "greater than",
 		},
 	}
 	for k, v := range errorCases {

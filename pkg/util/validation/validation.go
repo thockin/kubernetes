@@ -147,10 +147,7 @@ func IsCIdentifier(value string) (bool, []string) {
 
 // IsValidPortNum tests that the argument is a valid, non-zero port number.
 func IsValidPortNum(port int) (bool, []string) {
-	if 1 <= port && port <= 65535 {
-		return true, nil
-	}
-	return false, []string{InclusiveRangeError(1, 65535)}
+	return IsBetweenInclusive(1, 65535, int64(port))
 }
 
 // Now in libcontainer UID/GID limits is 0 ~ 1<<31 - 1
@@ -164,18 +161,12 @@ const (
 
 // IsValidGroupId tests that the argument is a valid Unix GID.
 func IsValidGroupId(gid int64) (bool, []string) {
-	if minGroupID <= gid && gid <= maxGroupID {
-		return true, nil
-	}
-	return false, []string{InclusiveRangeError(minGroupID, maxGroupID)}
+	return IsBetweenInclusive(minGroupID, maxGroupID, int64(gid))
 }
 
 // IsValidUserId tests that the argument is a valid Unix UID.
 func IsValidUserId(uid int64) (bool, []string) {
-	if minUserID <= uid && uid <= maxUserID {
-		return true, nil
-	}
-	return false, []string{InclusiveRangeError(minUserID, maxUserID)}
+	return IsBetweenInclusive(minUserID, maxUserID, int64(uid))
 }
 
 var portNameCharsetRegex = regexp.MustCompile("^[-a-z0-9]+$")
@@ -241,6 +232,41 @@ func IsHTTPHeaderName(value string) (bool, []string) {
 	return true, nil
 }
 
+func IsLessThan(max, value int64) (bool, []string) {
+	if value < max {
+		return true, nil
+	}
+	return false, []string{fmt.Sprintf("must be less than %d", max)}
+}
+
+func IsLessThanOrEqual(max, value int64) (bool, []string) {
+	if value <= max {
+		return true, nil
+	}
+	return false, []string{fmt.Sprintf("must be less than or equal to %d", max)}
+}
+
+func IsGreaterThan(min, value int64) (bool, []string) {
+	if value > min {
+		return true, nil
+	}
+	return false, []string{fmt.Sprintf("must be greater than %d", min)}
+}
+
+func IsGreaterThanOrEqual(min, value int64) (bool, []string) {
+	if value >= min {
+		return true, nil
+	}
+	return false, []string{fmt.Sprintf("must be greater than or equal to %d", min)}
+}
+
+func IsBetweenInclusive(lo, hi, value int64) (bool, []string) {
+	if lo <= value && value <= hi {
+		return true, nil
+	}
+	return false, []string{fmt.Sprintf("must be between %d and %d, inclusive", lo, hi)}
+}
+
 // MaxLenError returns a string explanation of a "string too long" validation
 // failure.
 func MaxLenError(length int) string {
@@ -274,10 +300,4 @@ func prefixEach(msgs []string, prefix string) []string {
 		msgs[i] = prefix + msgs[i]
 	}
 	return msgs
-}
-
-// InclusiveRangeError returns a string explanation of a numeric "must be
-// between" validation failure.
-func InclusiveRangeError(lo, hi int) string {
-	return fmt.Sprintf(`must be between %d and %d, inclusive`, lo, hi)
 }

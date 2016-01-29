@@ -371,3 +371,91 @@ func TestIsValidPercent(t *testing.T) {
 		}
 	}
 }
+
+func TestIsLessThan(t *testing.T) {
+	cases := []struct {
+		val int64
+		max int64
+		ok  bool
+	}{
+		{0, 1, true},
+		{1, 0, false},
+		{0, 0, false},
+	}
+	for _, val := range cases {
+		if ok, _ := IsLessThan(val.max, val.val); ok != val.ok {
+			t.Errorf("expected %t for %d < %d", val.ok, val.val, val.max)
+		}
+	}
+}
+
+func TestIsLessThanOrEqual(t *testing.T) {
+	cases := []struct {
+		val int64
+		max int64
+		ok  bool
+	}{
+		{0, 1, true},
+		{1, 0, false},
+		{0, 0, true},
+	}
+	for _, val := range cases {
+		if ok, _ := IsLessThanOrEqual(val.max, val.val); ok != val.ok {
+			t.Errorf("expected %t for %d <= %d", val.ok, val.val, val.max)
+		}
+	}
+}
+
+func TestIsGreaterThan(t *testing.T) {
+	cases := []struct {
+		val int64
+		min int64
+		ok  bool
+	}{
+		{0, 1, false},
+		{1, 0, true},
+		{0, 0, false},
+	}
+	for _, val := range cases {
+		if ok, _ := IsGreaterThan(val.min, val.val); ok != val.ok {
+			t.Errorf("expected %t for %d > %d", val.ok, val.val, val.min)
+		}
+	}
+}
+
+func TestIsGreaterThanOrEqual(t *testing.T) {
+	cases := []struct {
+		val int64
+		min int64
+		ok  bool
+	}{
+		{0, 1, false},
+		{1, 0, true},
+		{0, 0, true},
+	}
+	for _, val := range cases {
+		if ok, _ := IsGreaterThanOrEqual(val.min, val.val); ok != val.ok {
+			t.Errorf("expected %t for %d >= %d", val.ok, val.val, val.min)
+		}
+	}
+}
+
+func TestIsBetweenInclusive(t *testing.T) {
+	cases := []struct {
+		val int64
+		min int64
+		max int64
+		ok  bool
+	}{
+		{0, 0, 0, true},
+		{0, 0, 1, true},
+		{1, 0, 1, true},
+		{1, 0, 2, true},
+		{0, 1, 1, false},
+	}
+	for _, val := range cases {
+		if ok, _ := IsBetweenInclusive(val.min, val.max, val.val); ok != val.ok {
+			t.Errorf("expected %t for %d <= %d <= %d))", val.ok, val.min, val.val, val.max)
+		}
+	}
+}

@@ -39,14 +39,11 @@ import (
 )
 
 // TODO: delete this global variable when we enable the validation of common
-// fields by default.
+// fields by default.  Must be 'var' not 'const' because we take the address of
+// it elsewhere.
 var RepairMalformedUpdates bool = true
 
-const isNegativeErrorMsg string = `must be greater than or equal to 0`
 const fieldImmutableErrorMsg string = `field is immutable`
-const isNotIntegerErrorMsg string = `must be an integer`
-
-var pdPartitionErrorMsg string = validation.InclusiveRangeError(1, 255)
 
 const totalAnnotationSizeLimitB int = 256 * (1 << 10) // 256 kB
 
@@ -208,20 +205,58 @@ func NameIsDNS952Label(name string, prefix bool) (bool, []string) {
 	return validation.IsDNS952Label(name)
 }
 
-// Validates that given value is not negative.
-func ValidateNonnegativeField(value int64, fldPath *field.Path) field.ErrorList {
+// Validates that given value is less than a max value.
+func ValidateLessThan(max, value int64, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if value < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, value, isNegativeErrorMsg))
+	if ok, msgs := validation.IsLessThan(max, value); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath, value, msgs[i]))
+		}
 	}
 	return allErrs
 }
 
-// Validates that a Quantity is not negative
+// Validates that given value is less than or equal to a max value.
+func ValidateLessThanOrEqual(max, value int64, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+	if ok, msgs := validation.IsLessThanOrEqual(max, value); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath, value, msgs[i]))
+		}
+	}
+	return allErrs
+}
+
+// Validates that given value is greater than a min value.
+func ValidateGreaterThan(min, value int64, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+	if ok, msgs := validation.IsGreaterThan(min, value); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath, value, msgs[i]))
+		}
+	}
+	return allErrs
+}
+
+// Validates that given value is greater than or equal to a min value.
+func ValidateGreaterThanOrEqual(min, value int64, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+	if ok, msgs := validation.IsGreaterThanOrEqual(min, value); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath, value, msgs[i]))
+		}
+	}
+	return allErrs
+}
+
+// Validates that a Quantity is not negative.
 func ValidateNonnegativeQuantity(value resource.Quantity, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if value.Cmp(resource.Quantity{}) < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, value.String(), isNegativeErrorMsg))
+	cmp := value.Cmp(resource.Quantity{})
+	if ok, msgs := validation.IsGreaterThanOrEqual(0, int64(cmp)); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath, value.String(), msgs[i]))
+		}
 	}
 	return allErrs
 }
@@ -273,7 +308,7 @@ func ValidateObjectMeta(meta *api.ObjectMeta, requiresNamespace bool, nameFn Val
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("namespace"), "not allowed on this type"))
 		}
 	}
-	allErrs = append(allErrs, ValidateNonnegativeField(meta.Generation, fldPath.Child("generation"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, meta.Generation, fldPath.Child("generation"))...)
 	allErrs = append(allErrs, ValidateLabels(meta.Labels, fldPath.Child("labels"))...)
 	allErrs = append(allErrs, ValidateAnnotations(meta.Annotations, fldPath.Child("annotations"))...)
 
@@ -537,8 +572,10 @@ func validateISCSIVolumeSource(iscsi *api.ISCSIVolumeSource, fldPath *field.Path
 	if len(iscsi.IQN) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("iqn"), ""))
 	}
-	if iscsi.Lun < 0 || iscsi.Lun > 255 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), iscsi.Lun, validation.InclusiveRangeError(0, 255)))
+	if ok, msgs := validation.IsBetweenInclusive(0, 255, int64(iscsi.Lun)); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), iscsi.Lun, msgs[i]))
+		}
 	}
 	return allErrs
 }
@@ -551,9 +588,9 @@ func validateFCVolumeSource(fc *api.FCVolumeSource, fldPath *field.Path) field.E
 
 	if fc.Lun == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("lun"), ""))
-	} else {
-		if *fc.Lun < 0 || *fc.Lun > 255 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), fc.Lun, validation.InclusiveRangeError(0, 255)))
+	} else if ok, msgs := validation.IsBetweenInclusive(0, 255, int64(*fc.Lun)); !ok {
+		for i := range msgs {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), *fc.Lun, msgs[i]))
 		}
 	}
 	return allErrs
@@ -564,19 +601,27 @@ func validateGCEPersistentDiskVolumeSource(pd *api.GCEPersistentDiskVolumeSource
 	if len(pd.PDName) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("pdName"), ""))
 	}
-	if pd.Partition < 0 || pd.Partition > 255 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("partition"), pd.Partition, pdPartitionErrorMsg))
+	if pd.Partition > 0 {
+		if ok, msgs := validation.IsBetweenInclusive(1, 255, int64(pd.Partition)); !ok {
+			for i := range msgs {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("partition"), pd.Partition, msgs[i]))
+			}
+		}
 	}
 	return allErrs
 }
 
-func validateAWSElasticBlockStoreVolumeSource(PD *api.AWSElasticBlockStoreVolumeSource, fldPath *field.Path) field.ErrorList {
+func validateAWSElasticBlockStoreVolumeSource(ebs *api.AWSElasticBlockStoreVolumeSource, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if len(PD.VolumeID) == 0 {
+	if len(ebs.VolumeID) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("volumeID"), ""))
 	}
-	if PD.Partition < 0 || PD.Partition > 255 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("partition"), PD.Partition, pdPartitionErrorMsg))
+	if ebs.Partition > 0 {
+		if ok, msgs := validation.IsBetweenInclusive(1, 255, int64(ebs.Partition)); !ok {
+			for i := range msgs {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("partition"), ebs.Partition, msgs[i]))
+			}
+		}
 	}
 	return allErrs
 }
@@ -1086,11 +1131,11 @@ func validateProbe(probe *api.Probe, fldPath *field.Path) field.ErrorList {
 	}
 	allErrs = append(allErrs, validateHandler(&probe.Handler, fldPath)...)
 
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(probe.InitialDelaySeconds), fldPath.Child("initialDelaySeconds"))...)
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(probe.TimeoutSeconds), fldPath.Child("timeoutSeconds"))...)
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(probe.PeriodSeconds), fldPath.Child("periodSeconds"))...)
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(probe.SuccessThreshold), fldPath.Child("successThreshold"))...)
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(probe.FailureThreshold), fldPath.Child("failureThreshold"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(probe.InitialDelaySeconds), fldPath.Child("initialDelaySeconds"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(probe.TimeoutSeconds), fldPath.Child("timeoutSeconds"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(probe.PeriodSeconds), fldPath.Child("periodSeconds"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(probe.SuccessThreshold), fldPath.Child("successThreshold"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(probe.FailureThreshold), fldPath.Child("failureThreshold"))...)
 	return allErrs
 }
 
@@ -1387,9 +1432,7 @@ func ValidatePodSpec(spec *api.PodSpec, fldPath *field.Path) field.ErrorList {
 	}
 
 	if spec.ActiveDeadlineSeconds != nil {
-		if *spec.ActiveDeadlineSeconds <= 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("activeDeadlineSeconds"), spec.ActiveDeadlineSeconds, "must be greater than 0"))
-		}
+		allErrs = append(allErrs, ValidateGreaterThan(0, *spec.ActiveDeadlineSeconds, fldPath.Child("activeDeadlineSeconds"))...)
 	}
 	return allErrs
 }
@@ -1552,10 +1595,7 @@ func ValidatePodUpdate(newPod, oldPod *api.Pod) field.ErrorList {
 	// 2.  from a positive value to a lesser, non-negative value
 	if newPod.Spec.ActiveDeadlineSeconds != nil {
 		newActiveDeadlineSeconds := *newPod.Spec.ActiveDeadlineSeconds
-		if newActiveDeadlineSeconds < 0 {
-			allErrs = append(allErrs, field.Invalid(specPath.Child("activeDeadlineSeconds"), newActiveDeadlineSeconds, isNegativeErrorMsg))
-			return allErrs
-		}
+		allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(newActiveDeadlineSeconds), specPath.Child("activeDeadlineSeconds"))...)
 		if oldPod.Spec.ActiveDeadlineSeconds != nil {
 			oldActiveDeadlineSeconds := *oldPod.Spec.ActiveDeadlineSeconds
 			if oldActiveDeadlineSeconds < newActiveDeadlineSeconds {
@@ -1829,8 +1869,8 @@ func ValidateReplicationControllerUpdate(controller, oldController *api.Replicat
 func ValidateReplicationControllerStatusUpdate(controller, oldController *api.ReplicationController) field.ErrorList {
 	allErrs := ValidateObjectMetaUpdate(&controller.ObjectMeta, &oldController.ObjectMeta, field.NewPath("metadata"))
 	statusPath := field.NewPath("status")
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(controller.Status.Replicas), statusPath.Child("replicas"))...)
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(controller.Status.ObservedGeneration), statusPath.Child("observedGeneration"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(controller.Status.Replicas), statusPath.Child("replicas"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(controller.Status.ObservedGeneration), statusPath.Child("observedGeneration"))...)
 	return allErrs
 }
 
@@ -1874,7 +1914,7 @@ func ValidatePodTemplateSpecForRC(template *api.PodTemplateSpec, selectorMap map
 func ValidateReplicationControllerSpec(spec *api.ReplicationControllerSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, ValidateNonEmptySelector(spec.Selector, fldPath.Child("selector"))...)
-	allErrs = append(allErrs, ValidateNonnegativeField(int64(spec.Replicas), fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, int64(spec.Replicas), fldPath.Child("replicas"))...)
 	allErrs = append(allErrs, ValidatePodTemplateSpecForRC(spec.Template, spec.Selector, spec.Replicas, fldPath.Child("template"))...)
 	return allErrs
 }
@@ -2325,7 +2365,7 @@ func validateResourceQuantityValue(resource string, value resource.Quantity, fld
 	allErrs = append(allErrs, ValidateNonnegativeQuantity(value, fldPath)...)
 	if api.IsIntegerResourceName(resource) {
 		if value.MilliValue()%int64(1000) != int64(0) {
-			allErrs = append(allErrs, field.Invalid(fldPath, value, isNotIntegerErrorMsg))
+			allErrs = append(allErrs, field.Invalid(fldPath, value, "must be a whole number"))
 		}
 	}
 	return allErrs
@@ -2552,28 +2592,24 @@ func ValidateSecurityContext(sc *api.SecurityContext, fldPath *field.Path) field
 	}
 
 	if sc.RunAsUser != nil {
-		if *sc.RunAsUser < 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("runAsUser"), *sc.RunAsUser, isNegativeErrorMsg))
-		}
+		allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, *sc.RunAsUser, fldPath.Child("runAsUser"))...)
 	}
 	return allErrs
 }
 
 func ValidatePodLogOptions(opts *api.PodLogOptions) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if opts.TailLines != nil && *opts.TailLines < 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("tailLines"), *opts.TailLines, isNegativeErrorMsg))
+	if opts.TailLines != nil {
+		allErrs = append(allErrs, ValidateGreaterThanOrEqual(0, *opts.TailLines, field.NewPath("tailLines"))...)
 	}
-	if opts.LimitBytes != nil && *opts.LimitBytes < 1 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("limitBytes"), *opts.LimitBytes, "must be greater than 0"))
+	if opts.LimitBytes != nil {
+		allErrs = append(allErrs, ValidateGreaterThan(0, *opts.LimitBytes, field.NewPath("limitBytes"))...)
 	}
 	switch {
 	case opts.SinceSeconds != nil && opts.SinceTime != nil:
 		allErrs = append(allErrs, field.Forbidden(field.NewPath(""), "at most one of `sinceTime` or `sinceSeconds` may be specified"))
 	case opts.SinceSeconds != nil:
-		if *opts.SinceSeconds < 1 {
-			allErrs = append(allErrs, field.Invalid(field.NewPath("sinceSeconds"), *opts.SinceSeconds, "must be greater than 0"))
-		}
+		allErrs = append(allErrs, ValidateGreaterThan(0, *opts.SinceSeconds, field.NewPath("sinceSeconds"))...)
 	}
 	return allErrs
 }
