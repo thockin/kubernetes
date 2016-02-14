@@ -1146,8 +1146,10 @@ func validateHTTPGetAction(http *api.HTTPGetAction, fldPath *field.Path) field.E
 		allErrors = append(allErrors, field.NotSupported(fldPath.Child("scheme"), http.Scheme, supportedHTTPSchemes.List()))
 	}
 	for _, header := range http.HTTPHeaders {
-		if !validation.IsHTTPHeaderName(header.Name) {
-			allErrors = append(allErrors, field.Invalid(fldPath.Child("httpHeaders"), header.Name, fmt.Sprintf("name must match %s", validation.HTTPHeaderNameFmt)))
+		if ok, msgs := validation.IsHTTPHeaderName(header.Name); !ok {
+			for i := range msgs {
+				allErrors = append(allErrors, field.Invalid(fldPath.Child("httpHeaders"), header.Name, msgs[i]))
+			}
 		}
 	}
 	return allErrors
