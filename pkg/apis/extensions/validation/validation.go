@@ -203,7 +203,9 @@ func ValidateDaemonSetSpec(spec *extensions.DaemonSetSpec, fldPath *field.Path) 
 	allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
-	if err == nil && !selector.Matches(labels.Set(spec.Template.Labels)) {
+	if err != nil {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
+	} else if !selector.Matches(labels.Set(spec.Template.Labels)) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("template", "metadata", "labels"), spec.Template.Labels, "`selector` does not match template `labels`"))
 	}
 
@@ -320,7 +322,7 @@ func ValidateDeploymentSpec(spec *extensions.DeploymentSpec, fldPath *field.Path
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
 	if err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, "invalid label selector."))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
 	} else {
 		allErrs = append(allErrs, ValidatePodTemplateSpecForReplicaSet(&spec.Template, selector, spec.Replicas, fldPath.Child("template"))...)
 	}
@@ -395,7 +397,9 @@ func ValidateJobSpec(spec *extensions.JobSpec, fldPath *field.Path) field.ErrorL
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
 	}
 
-	if selector, err := unversioned.LabelSelectorAsSelector(spec.Selector); err == nil {
+	if selector, err := unversioned.LabelSelectorAsSelector(spec.Selector); err != nil {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
+	} else {
 		labels := labels.Set(spec.Template.Labels)
 		if !selector.Matches(labels) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("template", "metadata", "labels"), spec.Template.Labels, "`selector` does not match template `labels`"))
@@ -678,7 +682,7 @@ func ValidateReplicaSetSpec(spec *extensions.ReplicaSetSpec, fldPath *field.Path
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
 	if err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, "invalid label selector."))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
 	} else {
 		allErrs = append(allErrs, ValidatePodTemplateSpecForReplicaSet(spec.Template, selector, spec.Replicas, fldPath.Child("template"))...)
 	}
