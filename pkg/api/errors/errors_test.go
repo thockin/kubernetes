@@ -93,7 +93,7 @@ func TestNewInvalid(t *testing.T) {
 		Details *unversioned.StatusDetails
 	}{
 		{
-			field.Duplicate(field.NewPath("field[0].name"), "bar"),
+			field.NewPath("field[0].name").DuplicateError("bar"),
 			&unversioned.StatusDetails{
 				Kind: "Kind",
 				Name: "name",
@@ -104,7 +104,7 @@ func TestNewInvalid(t *testing.T) {
 			},
 		},
 		{
-			field.Invalid(field.NewPath("field[0].name"), "bar", "detail"),
+			field.NewPath("field[0].name").InvalidError("bar", "detail"),
 			&unversioned.StatusDetails{
 				Kind: "Kind",
 				Name: "name",
@@ -115,7 +115,7 @@ func TestNewInvalid(t *testing.T) {
 			},
 		},
 		{
-			field.NotFound(field.NewPath("field[0].name"), "bar"),
+			field.NewPath("field[0].name").NotFoundError("bar"),
 			&unversioned.StatusDetails{
 				Kind: "Kind",
 				Name: "name",
@@ -126,7 +126,7 @@ func TestNewInvalid(t *testing.T) {
 			},
 		},
 		{
-			field.NotSupported(field.NewPath("field[0].name"), "bar", nil),
+			field.NewPath("field[0].name").NotSupportedError("bar", nil),
 			&unversioned.StatusDetails{
 				Kind: "Kind",
 				Name: "name",
@@ -137,7 +137,7 @@ func TestNewInvalid(t *testing.T) {
 			},
 		},
 		{
-			field.Required(field.NewPath("field[0].name"), ""),
+			field.NewPath("field[0].name").RequiredError(""),
 			&unversioned.StatusDetails{
 				Kind: "Kind",
 				Name: "name",

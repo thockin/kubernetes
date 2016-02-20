@@ -51,7 +51,7 @@ func ParseWatchResourceVersion(resourceVersion string) (uint64, error) {
 		return 0, errors.NewInvalid(unversioned.GroupKind{}, "", field.ErrorList{
 			// Validation errors are supposed to return version-specific field
 			// paths, but this is probably close enough.
-			field.Invalid(field.NewPath("resourceVersion"), resourceVersion, err.Error()),
+			field.NewPath("resourceVersion").InvalidError(resourceVersion, err.Error()),
 		})
 	}
 	return version, nil

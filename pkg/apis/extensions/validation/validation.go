@@ -51,7 +51,7 @@ func validateHorizontalPodAutoscalerSpec(autoscaler extensions.HorizontalPodAuto
 		allErrs = append(allErrs, apivalidation.ValidateGreaterThan(0, int64(autoscaler.MaxReplicas), fldPath.Child("maxReplicas"))...)
 	}
 	if autoscaler.MinReplicas != nil && autoscaler.MaxReplicas < *autoscaler.MinReplicas {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than or equal to `minReplicas`"))
+		allErrs = append(allErrs, fldPath.Child("maxReplicas").InvalidError(autoscaler.MaxReplicas, "must be greater than or equal to `minReplicas`"))
 	}
 	if autoscaler.CPUUtilization != nil {
 		allErrs = append(allErrs, apivalidation.ValidateGreaterThan(0, int64(autoscaler.CPUUtilization.TargetPercentage), fldPath.Child("cpuUtilization", "targetPercentage"))...)
@@ -70,7 +70,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 		allErrs = append(allErrs, fldPath.Child("kind").RequiredError(""))
 	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Kind); !ok {
 		for i := range msgs {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msgs[i]))
+			allErrs = append(allErrs, fldPath.Child("kind").InvalidError(ref.Kind, msgs[i]))
 		}
 	}
 
@@ -78,7 +78,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 		allErrs = append(allErrs, fldPath.Child("name").RequiredError(""))
 	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Name); !ok {
 		for i := range msgs {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msgs[i]))
+			allErrs = append(allErrs, fldPath.Child("name").InvalidError(ref.Name, msgs[i]))
 		}
 	}
 
@@ -86,7 +86,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 		allErrs = append(allErrs, fldPath.Child("subresource").RequiredError(""))
 	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Subresource); !ok {
 		for i := range msgs {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("subresource"), ref.Subresource, msgs[i]))
+			allErrs = append(allErrs, fldPath.Child("subresource").InvalidError(ref.Subresource, msgs[i]))
 		}
 	}
 	return allErrs
@@ -99,7 +99,7 @@ func validateHorizontalPodAutoscalerAnnotations(annotations map[string]string, f
 		// Try to parse the annotation
 		var targetList extensions.CustomMetricTargetList
 		if err := json.Unmarshal([]byte(annotationValue), &targetList); err != nil {
-			allErrs = append(allErrs, field.Invalid(annPath, annotations, "failed to parse custom metrics target annotation"))
+			allErrs = append(allErrs, annPath.InvalidError(annotations, "failed to parse custom metrics target annotation"))
 		} else {
 			if len(targetList.Items) == 0 {
 				allErrs = append(allErrs, annPath.Child("items").RequiredError(""))
@@ -109,7 +109,7 @@ func validateHorizontalPodAutoscalerAnnotations(annotations map[string]string, f
 					allErrs = append(allErrs, annPath.Child("items").Index(i).Child("name").RequiredError(""))
 				}
 				if target.TargetValue.MilliValue() <= 0 {
-					allErrs = append(allErrs, field.Invalid(annPath.Child("items").Index(i).Child("value"), target.TargetValue, "custom metric target value must be greater than 0"))
+					allErrs = append(allErrs, annPath.Child("items").Index(i).Child("value").InvalidError(target.TargetValue, "custom metric target value must be greater than 0"))
 				}
 			}
 		}
@@ -157,7 +157,7 @@ func ValidateThirdPartyResource(obj *extensions.ThirdPartyResource) field.ErrorL
 	for ix := range obj.Versions {
 		version := &obj.Versions[ix]
 		if len(version.Name) == 0 {
-			allErrs = append(allErrs, field.Invalid(field.NewPath("versions").Index(ix).Child("name"), version, "must not be empty"))
+			allErrs = append(allErrs, field.NewPath("versions").Index(ix).Child("name").InvalidError(version, "must not be empty"))
 		}
 		if versions.Has(version.Name) {
 			allErrs = append(allErrs, field.NewPath("versions").Index(ix).Child("name").DuplicateError(version))
@@ -205,9 +205,9 @@ func ValidateDaemonSetSpec(spec *extensions.DaemonSetSpec, fldPath *field.Path) 
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
 	if err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
+		allErrs = append(allErrs, fldPath.Child("selector").InvalidError(spec.Selector, err.Error()))
 	} else if !selector.Matches(labels.Set(spec.Template.Labels)) {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("template", "metadata", "labels"), spec.Template.Labels, "`selector` does not match template `labels`"))
+		allErrs = append(allErrs, fldPath.Child("template", "metadata", "labels").InvalidError(spec.Template.Labels, "`selector` does not match template `labels`"))
 	}
 
 	allErrs = append(allErrs, apivalidation.ValidatePodTemplateSpec(&spec.Template, fldPath.Child("template"))...)
@@ -237,7 +237,7 @@ func validatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *fiel
 	if intOrPercent.Type == intstr.String {
 		if ok, msgs := utilvalidation.IsPercent(intOrPercent.StrVal); !ok {
 			for i := range msgs {
-				allErrs = append(allErrs, field.Invalid(fldPath, intOrPercent, msgs[i]))
+				allErrs = append(allErrs, fldPath.InvalidError(intOrPercent, msgs[i]))
 			}
 		}
 	} else if intOrPercent.Type == intstr.Int {
@@ -271,7 +271,7 @@ func IsNotMoreThan100Percent(intOrStringValue intstr.IntOrString, fldPath *field
 	if !isPercent || value <= 100 {
 		return nil
 	}
-	allErrs = append(allErrs, field.Invalid(fldPath, intOrStringValue, "must not be greater than 100%"))
+	allErrs = append(allErrs, fldPath.InvalidError(intOrStringValue, "must not be greater than 100%"))
 	return allErrs
 }
 
@@ -281,7 +281,7 @@ func ValidateRollingUpdateDeployment(rollingUpdate *extensions.RollingUpdateDepl
 	allErrs = append(allErrs, validatePositiveIntOrPercent(rollingUpdate.MaxSurge, fldPath.Child("maxSurge"))...)
 	if getIntOrPercentValue(rollingUpdate.MaxUnavailable) == 0 && getIntOrPercentValue(rollingUpdate.MaxSurge) == 0 {
 		// Both MaxSurge and MaxUnavailable cannot be zero.
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxUnavailable"), rollingUpdate.MaxUnavailable, "may not be 0 when `maxSurge` is 0"))
+		allErrs = append(allErrs, fldPath.Child("maxUnavailable").InvalidError(rollingUpdate.MaxUnavailable, "may not be 0 when `maxSurge` is 0"))
 	}
 	// Validate that MaxUnavailable is not more than 100%.
 	allErrs = append(allErrs, IsNotMoreThan100Percent(rollingUpdate.MaxUnavailable, fldPath.Child("maxUnavailable"))...)
@@ -323,7 +323,7 @@ func ValidateDeploymentSpec(spec *extensions.DeploymentSpec, fldPath *field.Path
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
 	if err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
+		allErrs = append(allErrs, fldPath.Child("selector").InvalidError(spec.Selector, err.Error()))
 	} else {
 		allErrs = append(allErrs, ValidatePodTemplateSpecForReplicaSet(&spec.Template, selector, spec.Replicas, fldPath.Child("template"))...)
 	}
@@ -399,11 +399,11 @@ func ValidateJobSpec(spec *extensions.JobSpec, fldPath *field.Path) field.ErrorL
 	}
 
 	if selector, err := unversioned.LabelSelectorAsSelector(spec.Selector); err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
+		allErrs = append(allErrs, fldPath.Child("selector").InvalidError(spec.Selector, err.Error()))
 	} else {
 		labels := labels.Set(spec.Template.Labels)
 		if !selector.Matches(labels) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("template", "metadata", "labels"), spec.Template.Labels, "`selector` does not match template `labels`"))
+			allErrs = append(allErrs, fldPath.Child("template", "metadata", "labels").InvalidError(spec.Template.Labels, "`selector` does not match template `labels`"))
 		}
 	}
 
@@ -483,7 +483,7 @@ func ValidateIngressSpec(spec *extensions.IngressSpec, fldPath *field.Path) fiel
 	if spec.Backend != nil {
 		allErrs = append(allErrs, validateIngressBackend(spec.Backend, fldPath.Child("backend"))...)
 	} else if len(spec.Rules) == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, spec.Rules, "either `backend` or `rules` must be specified"))
+		allErrs = append(allErrs, fldPath.InvalidError(spec.Rules, "either `backend` or `rules` must be specified"))
 	}
 	if len(spec.Rules) > 0 {
 		allErrs = append(allErrs, validateIngressRules(spec.Rules, fldPath.Child("rules"))...)
@@ -519,11 +519,11 @@ func validateIngressRules(IngressRules []extensions.IngressRule, fldPath *field.
 			// according to RFC 3986, consider allowing them.
 			if valid, errs := apivalidation.NameIsDNSSubdomain(ih.Host, false); !valid {
 				for i := range errs {
-					allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, errs[i]))
+					allErrs = append(allErrs, fldPath.Index(i).Child("host").InvalidError(ih.Host, errs[i]))
 				}
 			}
 			if isIP := (net.ParseIP(ih.Host) != nil); isIP {
-				allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, "must be a DNS name, not an IP address"))
+				allErrs = append(allErrs, fldPath.Index(i).Child("host").InvalidError(ih.Host, "must be a DNS name, not an IP address"))
 			}
 		}
 		allErrs = append(allErrs, validateIngressRuleValue(&ih.IngressRuleValue, fldPath.Index(0))...)
@@ -547,7 +547,7 @@ func validateHTTPIngressRuleValue(httpIngressRuleValue *extensions.HTTPIngressRu
 	for i, rule := range httpIngressRuleValue.Paths {
 		if len(rule.Path) > 0 {
 			if !strings.HasPrefix(rule.Path, "/") {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("paths").Index(i).Child("path"), rule.Path, "must be an absolute path"))
+				allErrs = append(allErrs, fldPath.Child("paths").Index(i).Child("path").InvalidError(rule.Path, "must be an absolute path"))
 			}
 			// TODO: More draconian path regex validation.
 			// Path must be a valid regex. This is the basic requirement.
@@ -560,7 +560,7 @@ func validateHTTPIngressRuleValue(httpIngressRuleValue *extensions.HTTPIngressRu
 			// the user is confusing url regexes with path regexes.
 			_, err := regexp.CompilePOSIX(rule.Path)
 			if err != nil {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("paths").Index(i).Child("path"), rule.Path, "must be a valid regex"))
+				allErrs = append(allErrs, fldPath.Child("paths").Index(i).Child("path").InvalidError(rule.Path, "must be a valid regex"))
 			}
 		}
 		allErrs = append(allErrs, validateIngressBackend(&rule.Backend, fldPath.Child("backend"))...)
@@ -577,7 +577,7 @@ func validateIngressBackend(backend *extensions.IngressBackend, fldPath *field.P
 		return append(allErrs, fldPath.Child("serviceName").RequiredError(""))
 	} else if ok, errs := apivalidation.ValidateServiceName(backend.ServiceName, false); !ok {
 		for i := range errs {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("serviceName"), backend.ServiceName, errs[i]))
+			allErrs = append(allErrs, fldPath.Child("serviceName").InvalidError(backend.ServiceName, errs[i]))
 		}
 	}
 	allErrs = append(allErrs, apivalidation.ValidatePortNumOrName(backend.ServicePort, fldPath.Child("servicePort"))...)
@@ -588,7 +588,7 @@ func validateClusterAutoscalerSpec(spec extensions.ClusterAutoscalerSpec, fldPat
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.MinNodes), fldPath.Child("minNodes"))...)
 	if spec.MaxNodes < spec.MinNodes {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxNodes"), spec.MaxNodes, "must be greater than or equal to `minNodes`"))
+		allErrs = append(allErrs, fldPath.Child("maxNodes").InvalidError(spec.MaxNodes, "must be greater than or equal to `minNodes`"))
 	}
 	if len(spec.TargetUtilization) == 0 {
 		allErrs = append(allErrs, fldPath.Child("targetUtilization").RequiredError(""))
@@ -604,10 +604,10 @@ func validateClusterAutoscalerSpec(spec extensions.ClusterAutoscalerSpec, fldPat
 
 func validateTargetUtilization(value float64, fldPath *field.Path) field.ErrorList {
 	if value <= 0 {
-		return field.ErrorList{field.Invalid(fldPath, value, "must be greater than 0.0")}
+		return field.ErrorList{fldPath.InvalidError(value, "must be greater than 0.0")}
 	}
 	if value > 1 {
-		return field.ErrorList{field.Invalid(fldPath, value, "must be less than or equal to 1.0")}
+		return field.ErrorList{fldPath.InvalidError(value, "must be less than or equal to 1.0")}
 	}
 	return nil
 }
@@ -615,10 +615,10 @@ func validateTargetUtilization(value float64, fldPath *field.Path) field.ErrorLi
 func ValidateClusterAutoscaler(autoscaler *extensions.ClusterAutoscaler) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if autoscaler.Name != "ClusterAutoscaler" {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata", "name"), autoscaler.Name, "must be 'ClusterAutoscaler'"))
+		allErrs = append(allErrs, field.NewPath("metadata", "name").InvalidError(autoscaler.Name, "must be 'ClusterAutoscaler'"))
 	}
 	if autoscaler.Namespace != api.NamespaceDefault {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("metadata", "namespace"), autoscaler.Namespace, "must be 'default'"))
+		allErrs = append(allErrs, field.NewPath("metadata", "namespace").InvalidError(autoscaler.Namespace, "must be 'default'"))
 	}
 	allErrs = append(allErrs, validateClusterAutoscalerSpec(autoscaler.Spec, field.NewPath("spec"))...)
 	return allErrs
@@ -676,13 +676,13 @@ func ValidateReplicaSetSpec(spec *extensions.ReplicaSetSpec, fldPath *field.Path
 	} else {
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
 		if len(spec.Selector.MatchLabels)+len(spec.Selector.MatchExpressions) == 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, "empty selector is not valid for deployment."))
+			allErrs = append(allErrs, fldPath.Child("selector").InvalidError(spec.Selector, "empty selector is not valid for deployment."))
 		}
 	}
 
 	selector, err := unversioned.LabelSelectorAsSelector(spec.Selector)
 	if err != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("selector"), spec.Selector, err.Error()))
+		allErrs = append(allErrs, fldPath.Child("selector").InvalidError(spec.Selector, err.Error()))
 	} else {
 		allErrs = append(allErrs, ValidatePodTemplateSpecForReplicaSet(spec.Template, selector, spec.Replicas, fldPath.Child("template"))...)
 	}
@@ -699,7 +699,7 @@ func ValidatePodTemplateSpecForReplicaSet(template *api.PodTemplateSpec, selecto
 			// Verify that the ReplicaSet selector matches the labels in template.
 			labels := labels.Set(template.Labels)
 			if !selector.Matches(labels) {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("metadata", "labels"), template.Labels, "`selector` does not match template `labels`"))
+				allErrs = append(allErrs, fldPath.Child("metadata", "labels").InvalidError(template.Labels, "`selector` does not match template `labels`"))
 			}
 		}
 		allErrs = append(allErrs, apivalidation.ValidatePodTemplateSpec(template, fldPath)...)
@@ -807,13 +807,13 @@ func validateIDRanges(fldPath *field.Path, rng extensions.IDRange) field.ErrorLi
 	// if 0 <= Min <= Max then we do not need to validate max.  It is always greater than or
 	// equal to 0 and Min.
 	if rng.Min < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("min"), rng.Min, "min cannot be negative"))
+		allErrs = append(allErrs, fldPath.Child("min").InvalidError(rng.Min, "min cannot be negative"))
 	}
 	if rng.Max < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("max"), rng.Max, "max cannot be negative"))
+		allErrs = append(allErrs, fldPath.Child("max").InvalidError(rng.Max, "max cannot be negative"))
 	}
 	if rng.Min > rng.Max {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("min"), rng.Min, "min cannot be greater than max"))
+		allErrs = append(allErrs, fldPath.Child("min").InvalidError(rng.Min, "min cannot be greater than max"))
 	}
 
 	return allErrs

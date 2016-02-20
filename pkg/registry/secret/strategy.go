@@ -86,7 +86,7 @@ func (s strategy) Export(obj runtime.Object, exact bool) error {
 	// secrets that are tied to the UID of a service account cannot be exported anyway
 	if t.Type == api.SecretTypeServiceAccountToken || len(t.Annotations[api.ServiceAccountUIDKey]) > 0 {
 		errs := []*field.Error{
-			field.Invalid(field.NewPath("type"), t, "can not export service account secrets"),
+			field.NewPath("type").InvalidError(t, "can not export service account secrets"),
 		}
 		return errors.NewInvalid(api.Kind("Secret"), t.Name, errs)
 	}

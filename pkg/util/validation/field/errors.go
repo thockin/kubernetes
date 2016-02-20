@@ -123,12 +123,6 @@ func (t ErrorType) String() string {
 	}
 }
 
-// Invalid returns a *Error indicating "invalid value".  This is used
-// to report malformed values (e.g. failed regex match, too long, out of bounds).
-func Invalid(field *Path, value interface{}, detail string) *Error {
-	return &Error{ErrorTypeInvalid, field.String(), value, detail}
-}
-
 // ErrorList holds a set of Errors.  It is plausible that we might one day have
 // non-field errors in this same umbrella package, but for now we don't, so
 // we can keep it simple and leave ErrorList here.

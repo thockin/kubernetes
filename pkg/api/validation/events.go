@@ -31,15 +31,15 @@ func ValidateEvent(event *api.Event) field.ErrorList {
 	if event.InvolvedObject.Kind == "Node" &&
 		event.Namespace != api.NamespaceDefault &&
 		event.Namespace != "" {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("involvedObject", "namespace"), event.InvolvedObject.Namespace, "not allowed for node"))
+		allErrs = append(allErrs, field.NewPath("involvedObject", "namespace").InvalidError(event.InvolvedObject.Namespace, "not allowed for node"))
 	}
 	if event.InvolvedObject.Kind != "Node" &&
 		event.Namespace != event.InvolvedObject.Namespace {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("involvedObject", "namespace"), event.InvolvedObject.Namespace, "does not match involvedObject"))
+		allErrs = append(allErrs, field.NewPath("involvedObject", "namespace").InvalidError(event.InvolvedObject.Namespace, "does not match involvedObject"))
 	}
 	if ok, errs := validation.IsDNS1123Subdomain(event.Namespace); !ok {
 		for i := range errs {
-			allErrs = append(allErrs, field.Invalid(field.NewPath("namespace"), event.Namespace, errs[i]))
+			allErrs = append(allErrs, field.NewPath("namespace").InvalidError(event.Namespace, errs[i]))
 		}
 	}
 	return allErrs

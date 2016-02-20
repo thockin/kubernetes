@@ -46,7 +46,7 @@ func ValidateLabelSelectorRequirement(sr unversioned.LabelSelectorRequirement, f
 			allErrs = append(allErrs, fldPath.Child("values").ForbiddenError("may not be specified when `operator` is 'Exists' or 'DoesNotExist'"))
 		}
 	default:
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("operator"), sr.Operator, "not a valid selector operator"))
+		allErrs = append(allErrs, fldPath.Child("operator").InvalidError(sr.Operator, "not a valid selector operator"))
 	}
 	allErrs = append(allErrs, apivalidation.ValidateLabelName(sr.Key, fldPath.Child("key"))...)
 	return allErrs

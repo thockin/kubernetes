@@ -24,13 +24,13 @@ import (
 func ValidateSubjectAccessReviewSpec(spec authorizationapi.SubjectAccessReviewSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if spec.ResourceAttributes != nil && spec.NonResourceAttributes != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("nonResourceAttributes"), spec.NonResourceAttributes, `cannot be specified in combination with resourceAttributes`))
+		allErrs = append(allErrs, fldPath.Child("nonResourceAttributes").InvalidError(spec.NonResourceAttributes, `cannot be specified in combination with resourceAttributes`))
 	}
 	if spec.ResourceAttributes == nil && spec.NonResourceAttributes == nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("resourceAttributes"), spec.NonResourceAttributes, `exactly one of nonResourceAttributes or resourceAttributes must be specified`))
+		allErrs = append(allErrs, fldPath.Child("resourceAttributes").InvalidError(spec.NonResourceAttributes, `exactly one of nonResourceAttributes or resourceAttributes must be specified`))
 	}
 	if len(spec.User) == 0 && len(spec.Groups) == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("user"), spec.User, `at least one of user or group must be specified`))
+		allErrs = append(allErrs, fldPath.Child("user").InvalidError(spec.User, `at least one of user or group must be specified`))
 	}
 
 	return allErrs
@@ -39,10 +39,10 @@ func ValidateSubjectAccessReviewSpec(spec authorizationapi.SubjectAccessReviewSp
 func ValidateSelfSubjectAccessReviewSpec(spec authorizationapi.SelfSubjectAccessReviewSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if spec.ResourceAttributes != nil && spec.NonResourceAttributes != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("nonResourceAttributes"), spec.NonResourceAttributes, `cannot be specified in combination with resourceAttributes`))
+		allErrs = append(allErrs, fldPath.Child("nonResourceAttributes").InvalidError(spec.NonResourceAttributes, `cannot be specified in combination with resourceAttributes`))
 	}
 	if spec.ResourceAttributes == nil && spec.NonResourceAttributes == nil {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("resourceAttributes"), spec.NonResourceAttributes, `exactly one of nonResourceAttributes or resourceAttributes must be specified`))
+		allErrs = append(allErrs, fldPath.Child("resourceAttributes").InvalidError(spec.NonResourceAttributes, `exactly one of nonResourceAttributes or resourceAttributes must be specified`))
 	}
 
 	return allErrs
