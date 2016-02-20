@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // Path represents the path from some root to a particular field.
@@ -88,4 +89,63 @@ func (p *Path) String() string {
 		}
 	}
 	return buf.String()
+}
+
+// NotFoundError returns a *Error indicating "value not found".  This is
+// used to report failure to find a requested value (e.g. looking up an ID).
+func (p *Path) NotFoundError(value interface{}) *Error {
+	return &Error{ErrorTypeNotFound, p.String(), value, ""}
+}
+
+// RequiredError returns a *Error indicating "value required".  This is used
+// to report required values that are not provided (e.g. empty strings, null
+// values, or empty arrays).
+func (p *Path) RequiredError(detail string) *Error {
+	return &Error{ErrorTypeRequired, p.String(), "", detail}
+}
+
+// DuplicateError returns a *Error indicating "duplicate value".  This is
+// used to report collisions of values that must be unique (e.g. names or IDs).
+func (p *Path) DuplicateError(value interface{}) *Error {
+	return &Error{ErrorTypeDuplicate, p.String(), value, ""}
+}
+
+// InvalidError returns a *Error indicating "invalid value".  This is used
+// to report malformed values (e.g. failed regex match, too long, out of bounds).
+func (p *Path) InvalidError(value interface{}, detail string) *Error {
+	return &Error{ErrorTypeInvalid, p.String(), value, detail}
+}
+
+// NotSupportedError returns a *Error indicating "unsupported value".
+// This is used to report unknown values for enumerated fields (e.g. a list of
+// valid values).
+func (p *Path) NotSupportedError(value interface{}, validValues []string) *Error {
+	detail := ""
+	if validValues != nil && len(validValues) > 0 {
+		detail = "supported values: " + strings.Join(validValues, ", ")
+	}
+	return &Error{ErrorTypeNotSupported, p.String(), value, detail}
+}
+
+// ForbiddenError returns a *Error indicating "forbidden".  This is used to
+// report valid (as per formatting rules) values which would be accepted under
+// some conditions, but which are not permitted by current conditions (e.g.
+// security policy).
+func (p *Path) ForbiddenError(detail string) *Error {
+	return &Error{ErrorTypeForbidden, p.String(), "", detail}
+}
+
+// TooLongError returns a *Error indicating "too long".  This is used to
+// report that the given value is too long.  This is similar to
+// Invalid, but the returned error will not include the too-long
+// value.
+func (p *Path) TooLongError(value interface{}, maxLength int) *Error {
+	return &Error{ErrorTypeTooLong, p.String(), value, fmt.Sprintf("must have at most %d characters", maxLength)}
+}
+
+// InternalError returns a *Error indicating "internal error".  This is used
+// to signal that an error was found that was not directly related to user
+// input.  The err argument must be non-nil.
+func (p *Path) InternalError(err error) *Error {
+	return &Error{ErrorTypeInternal, p.String(), nil, err.Error()}
 }

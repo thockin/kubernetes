@@ -19,7 +19,6 @@ package field
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	utilerrors "k8s.io/kubernetes/pkg/util/errors"
 )
@@ -124,63 +123,10 @@ func (t ErrorType) String() string {
 	}
 }
 
-// NotFound returns a *Error indicating "value not found".  This is
-// used to report failure to find a requested value (e.g. looking up an ID).
-func NotFound(field *Path, value interface{}) *Error {
-	return &Error{ErrorTypeNotFound, field.String(), value, ""}
-}
-
-// Required returns a *Error indicating "value required".  This is used
-// to report required values that are not provided (e.g. empty strings, null
-// values, or empty arrays).
-func Required(field *Path, detail string) *Error {
-	return &Error{ErrorTypeRequired, field.String(), "", detail}
-}
-
-// Duplicate returns a *Error indicating "duplicate value".  This is
-// used to report collisions of values that must be unique (e.g. names or IDs).
-func Duplicate(field *Path, value interface{}) *Error {
-	return &Error{ErrorTypeDuplicate, field.String(), value, ""}
-}
-
 // Invalid returns a *Error indicating "invalid value".  This is used
 // to report malformed values (e.g. failed regex match, too long, out of bounds).
 func Invalid(field *Path, value interface{}, detail string) *Error {
 	return &Error{ErrorTypeInvalid, field.String(), value, detail}
-}
-
-// NotSupported returns a *Error indicating "unsupported value".
-// This is used to report unknown values for enumerated fields (e.g. a list of
-// valid values).
-func NotSupported(field *Path, value interface{}, validValues []string) *Error {
-	detail := ""
-	if validValues != nil && len(validValues) > 0 {
-		detail = "supported values: " + strings.Join(validValues, ", ")
-	}
-	return &Error{ErrorTypeNotSupported, field.String(), value, detail}
-}
-
-// Forbidden returns a *Error indicating "forbidden".  This is used to
-// report valid (as per formatting rules) values which would be accepted under
-// some conditions, but which are not permitted by current conditions (e.g.
-// security policy).
-func Forbidden(field *Path, detail string) *Error {
-	return &Error{ErrorTypeForbidden, field.String(), "", detail}
-}
-
-// TooLong returns a *Error indicating "too long".  This is used to
-// report that the given value is too long.  This is similar to
-// Invalid, but the returned error will not include the too-long
-// value.
-func TooLong(field *Path, value interface{}, maxLength int) *Error {
-	return &Error{ErrorTypeTooLong, field.String(), value, fmt.Sprintf("must have at most %d characters", maxLength)}
-}
-
-// InternalError returns a *Error indicating "internal error".  This is used
-// to signal that an error was found that was not directly related to user
-// input.  The err argument must be non-nil.
-func InternalError(field *Path, err error) *Error {
-	return &Error{ErrorTypeInternal, field.String(), nil, err.Error()}
 }
 
 // ErrorList holds a set of Errors.  It is plausible that we might one day have

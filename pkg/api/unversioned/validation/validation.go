@@ -39,11 +39,11 @@ func ValidateLabelSelectorRequirement(sr unversioned.LabelSelectorRequirement, f
 	switch sr.Operator {
 	case unversioned.LabelSelectorOpIn, unversioned.LabelSelectorOpNotIn:
 		if len(sr.Values) == 0 {
-			allErrs = append(allErrs, field.Required(fldPath.Child("values"), "must be specified when `operator` is 'In' or 'NotIn'"))
+			allErrs = append(allErrs, fldPath.Child("values").RequiredError("must be specified when `operator` is 'In' or 'NotIn'"))
 		}
 	case unversioned.LabelSelectorOpExists, unversioned.LabelSelectorOpDoesNotExist:
 		if len(sr.Values) > 0 {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("values"), "may not be specified when `operator` is 'Exists' or 'DoesNotExist'"))
+			allErrs = append(allErrs, fldPath.Child("values").ForbiddenError("may not be specified when `operator` is 'Exists' or 'DoesNotExist'"))
 		}
 	default:
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("operator"), sr.Operator, "not a valid selector operator"))

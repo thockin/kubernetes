@@ -22,47 +22,8 @@ import (
 	"testing"
 )
 
-func TestMakeFuncs(t *testing.T) {
-	testCases := []struct {
-		fn       func() *Error
-		expected ErrorType
-	}{
-		{
-			func() *Error { return Invalid(NewPath("f"), "v", "d") },
-			ErrorTypeInvalid,
-		},
-		{
-			func() *Error { return NotSupported(NewPath("f"), "v", nil) },
-			ErrorTypeNotSupported,
-		},
-		{
-			func() *Error { return Duplicate(NewPath("f"), "v") },
-			ErrorTypeDuplicate,
-		},
-		{
-			func() *Error { return NotFound(NewPath("f"), "v") },
-			ErrorTypeNotFound,
-		},
-		{
-			func() *Error { return Required(NewPath("f"), "d") },
-			ErrorTypeRequired,
-		},
-		{
-			func() *Error { return InternalError(NewPath("f"), fmt.Errorf("e")) },
-			ErrorTypeInternal,
-		},
-	}
-
-	for _, testCase := range testCases {
-		err := testCase.fn()
-		if err.Type != testCase.expected {
-			t.Errorf("expected Type %q, got %q", testCase.expected, err.Type)
-		}
-	}
-}
-
 func TestErrorUsefulMessage(t *testing.T) {
-	s := Invalid(NewPath("foo"), "bar", "deet").Error()
+	s := NewPath("foo").InvalidError("bar", "deet").Error()
 	t.Logf("message: %v", s)
 	for _, part := range []string{"foo", "bar", "deet", ErrorTypeInvalid.String()} {
 		if !strings.Contains(s, part) {
@@ -76,8 +37,7 @@ func TestErrorUsefulMessage(t *testing.T) {
 		Inner interface{}
 		KV    map[string]int
 	}
-	s = Invalid(
-		NewPath("foo"),
+	s = NewPath("foo").InvalidError(
 		&complicated{
 			Baz:   1,
 			Qux:   "aoeu",
@@ -102,8 +62,8 @@ func TestToAggregate(t *testing.T) {
 	testCases := []ErrorList{
 		nil,
 		{},
-		{Invalid(NewPath("f"), "v", "d")},
-		{Invalid(NewPath("f"), "v", "d"), InternalError(NewPath(""), fmt.Errorf("e"))},
+		{NewPath("f").InvalidError("v", "d")},
+		{NewPath("f").InvalidError("v", "d"), NewPath("").InternalError(fmt.Errorf("e"))},
 	}
 	for i, tc := range testCases {
 		agg := tc.ToAggregate()
@@ -121,9 +81,9 @@ func TestToAggregate(t *testing.T) {
 
 func TestErrListFilter(t *testing.T) {
 	list := ErrorList{
-		Invalid(NewPath("test.field"), "", ""),
-		Invalid(NewPath("field.test"), "", ""),
-		Duplicate(NewPath("test"), "value"),
+		NewPath("test.field").InvalidError("", ""),
+		NewPath("field.test").InvalidError("", ""),
+		NewPath("test").DuplicateError("value"),
 	}
 	if len(list.Filter(NewErrorTypeMatcher(ErrorTypeDuplicate))) != 2 {
 		t.Errorf("should not filter")

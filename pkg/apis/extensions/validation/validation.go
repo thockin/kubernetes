@@ -59,7 +59,7 @@ func validateHorizontalPodAutoscalerSpec(autoscaler extensions.HorizontalPodAuto
 	if refErrs := ValidateSubresourceReference(autoscaler.ScaleRef, fldPath.Child("scaleRef")); len(refErrs) > 0 {
 		allErrs = append(allErrs, refErrs...)
 	} else if autoscaler.ScaleRef.Subresource != "scale" {
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("scaleRef", "subresource"), autoscaler.ScaleRef.Subresource, []string{"scale"}))
+		allErrs = append(allErrs, fldPath.Child("scaleRef", "subresource").NotSupportedError(autoscaler.ScaleRef.Subresource, []string{"scale"}))
 	}
 	return allErrs
 }
@@ -67,7 +67,7 @@ func validateHorizontalPodAutoscalerSpec(autoscaler extensions.HorizontalPodAuto
 func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if len(ref.Kind) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("kind"), ""))
+		allErrs = append(allErrs, fldPath.Child("kind").RequiredError(""))
 	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Kind); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msgs[i]))
@@ -75,7 +75,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 	}
 
 	if len(ref.Name) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
+		allErrs = append(allErrs, fldPath.Child("name").RequiredError(""))
 	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Name); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msgs[i]))
@@ -83,7 +83,7 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 	}
 
 	if len(ref.Subresource) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("subresource"), ""))
+		allErrs = append(allErrs, fldPath.Child("subresource").RequiredError(""))
 	} else if ok, msgs := utilvalidation.IsValidPathSegmentName(ref.Subresource); !ok {
 		for i := range msgs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("subresource"), ref.Subresource, msgs[i]))
@@ -95,20 +95,21 @@ func ValidateSubresourceReference(ref extensions.SubresourceReference, fldPath *
 func validateHorizontalPodAutoscalerAnnotations(annotations map[string]string, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if annotationValue, found := annotations[podautoscaler.HpaCustomMetricsTargetAnnotationName]; found {
+		annPath := fldPath.Key(podautoscaler.HpaCustomMetricsTargetAnnotationName)
 		// Try to parse the annotation
 		var targetList extensions.CustomMetricTargetList
 		if err := json.Unmarshal([]byte(annotationValue), &targetList); err != nil {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("annotations"), annotations, "failed to parse custom metrics target annotation"))
+			allErrs = append(allErrs, field.Invalid(annPath, annotations, "failed to parse custom metrics target annotation"))
 		} else {
 			if len(targetList.Items) == 0 {
-				allErrs = append(allErrs, field.Required(fldPath.Child("annotations", "items"), "custom metrics target must not be empty"))
+				allErrs = append(allErrs, annPath.Child("items").RequiredError(""))
 			}
-			for _, target := range targetList.Items {
+			for i, target := range targetList.Items {
 				if target.Name == "" {
-					allErrs = append(allErrs, field.Required(fldPath.Child("annotations", "items", "name"), "missing custom metric target name"))
+					allErrs = append(allErrs, annPath.Child("items").Index(i).Child("name").RequiredError(""))
 				}
 				if target.TargetValue.MilliValue() <= 0 {
-					allErrs = append(allErrs, field.Invalid(fldPath.Child("annotations", "items", "value"), target.TargetValue, "custom metric target value must be greater than 0"))
+					allErrs = append(allErrs, field.Invalid(annPath.Child("items").Index(i).Child("value"), target.TargetValue, "custom metric target value must be greater than 0"))
 				}
 			}
 		}
@@ -119,7 +120,7 @@ func validateHorizontalPodAutoscalerAnnotations(annotations map[string]string, f
 func ValidateHorizontalPodAutoscaler(autoscaler *extensions.HorizontalPodAutoscaler) field.ErrorList {
 	allErrs := apivalidation.ValidateObjectMeta(&autoscaler.ObjectMeta, true, ValidateHorizontalPodAutoscalerName, field.NewPath("metadata"))
 	allErrs = append(allErrs, validateHorizontalPodAutoscalerSpec(autoscaler.Spec, field.NewPath("spec"))...)
-	allErrs = append(allErrs, validateHorizontalPodAutoscalerAnnotations(autoscaler.Annotations, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, validateHorizontalPodAutoscalerAnnotations(autoscaler.Annotations, field.NewPath("metadata", "annotations"))...)
 	return allErrs
 }
 
@@ -159,7 +160,7 @@ func ValidateThirdPartyResource(obj *extensions.ThirdPartyResource) field.ErrorL
 			allErrs = append(allErrs, field.Invalid(field.NewPath("versions").Index(ix).Child("name"), version, "must not be empty"))
 		}
 		if versions.Has(version.Name) {
-			allErrs = append(allErrs, field.Duplicate(field.NewPath("versions").Index(ix).Child("name"), version))
+			allErrs = append(allErrs, field.NewPath("versions").Index(ix).Child("name").DuplicateError(version))
 		}
 		versions.Insert(version.Name)
 	}
@@ -214,7 +215,7 @@ func ValidateDaemonSetSpec(spec *extensions.DaemonSetSpec, fldPath *field.Path) 
 	allErrs = append(allErrs, apivalidation.ValidateReadOnlyPersistentDisks(spec.Template.Spec.Volumes, fldPath.Child("template", "spec", "volumes"))...)
 	// RestartPolicy has already been first-order validated as per ValidatePodTemplateSpec().
 	if spec.Template.Spec.RestartPolicy != api.RestartPolicyAlways {
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("template", "spec", "restartPolicy"), spec.Template.Spec.RestartPolicy, []string{string(api.RestartPolicyAlways)}))
+		allErrs = append(allErrs, fldPath.Child("template", "spec", "restartPolicy").NotSupportedError(spec.Template.Spec.RestartPolicy, []string{string(api.RestartPolicyAlways)}))
 	}
 	return allErrs
 }
@@ -294,7 +295,7 @@ func ValidateDeploymentStrategy(strategy *extensions.DeploymentStrategy, fldPath
 	}
 	switch strategy.Type {
 	case extensions.RecreateDeploymentStrategyType:
-		allErrs = append(allErrs, field.Forbidden(fldPath.Child("rollingUpdate"), "may not be specified when strategy `type` is '"+string(extensions.RecreateDeploymentStrategyType+"'")))
+		allErrs = append(allErrs, fldPath.Child("rollingUpdate").ForbiddenError("may not be specified when strategy `type` is '"+string(extensions.RecreateDeploymentStrategyType+"'")))
 	case extensions.RollingUpdateDeploymentStrategyType:
 		allErrs = append(allErrs, ValidateRollingUpdateDeployment(strategy.RollingUpdate, fldPath.Child("rollingUpdate"))...)
 	}
@@ -315,7 +316,7 @@ func ValidateDeploymentSpec(spec *extensions.DeploymentSpec, fldPath *field.Path
 	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.Replicas), fldPath.Child("replicas"))...)
 
 	if spec.Selector == nil || len(spec.Selector.MatchLabels)+len(spec.Selector.MatchExpressions) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))
+		allErrs = append(allErrs, fldPath.Child("selector").RequiredError(""))
 	} else {
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
 	}
@@ -354,7 +355,7 @@ func ValidateDeployment(obj *extensions.Deployment) field.ErrorList {
 func ValidateDeploymentRollback(obj *extensions.DeploymentRollback) field.ErrorList {
 	allErrs := apivalidation.ValidateAnnotations(obj.UpdatedAnnotations, field.NewPath("updatedAnnotations"))
 	if len(obj.Name) == 0 {
-		allErrs = append(allErrs, field.Required(field.NewPath("name"), "name is required"))
+		allErrs = append(allErrs, field.NewPath("name").RequiredError(""))
 	}
 	allErrs = append(allErrs, ValidateRollback(&obj.RollbackTo, field.NewPath("rollback"))...)
 	return allErrs
@@ -367,7 +368,7 @@ func ValidateThirdPartyResourceDataUpdate(update, old *extensions.ThirdPartyReso
 func ValidateThirdPartyResourceData(obj *extensions.ThirdPartyResourceData) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if len(obj.Name) == 0 {
-		allErrs = append(allErrs, field.Required(field.NewPath("name"), ""))
+		allErrs = append(allErrs, field.NewPath("name").RequiredError(""))
 	}
 	return allErrs
 }
@@ -392,7 +393,7 @@ func ValidateJobSpec(spec *extensions.JobSpec, fldPath *field.Path) field.ErrorL
 		allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(*spec.ActiveDeadlineSeconds), fldPath.Child("activeDeadlineSeconds"))...)
 	}
 	if spec.Selector == nil {
-		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))
+		allErrs = append(allErrs, fldPath.Child("selector").RequiredError(""))
 	} else {
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
 	}
@@ -409,8 +410,7 @@ func ValidateJobSpec(spec *extensions.JobSpec, fldPath *field.Path) field.ErrorL
 	allErrs = append(allErrs, apivalidation.ValidatePodTemplateSpec(&spec.Template, fldPath.Child("template"))...)
 	if spec.Template.Spec.RestartPolicy != api.RestartPolicyOnFailure &&
 		spec.Template.Spec.RestartPolicy != api.RestartPolicyNever {
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("template", "spec", "restartPolicy"),
-			spec.Template.Spec.RestartPolicy, []string{string(api.RestartPolicyOnFailure), string(api.RestartPolicyNever)}))
+		allErrs = append(allErrs, fldPath.Child("template", "spec", "restartPolicy").NotSupportedError(spec.Template.Spec.RestartPolicy, []string{string(api.RestartPolicyOnFailure), string(api.RestartPolicyNever)}))
 	}
 	return allErrs
 }
@@ -468,7 +468,7 @@ func validateIngressTLS(spec *extensions.IngressSpec, fldPath *field.Path) field
 	// This will not be the case if we support SSL routing at L4 via SNI.
 	for i, t := range spec.TLS {
 		if t.SecretName == "" {
-			allErrs = append(allErrs, field.Required(fldPath.Index(i).Child("secretName"), spec.TLS[i].SecretName))
+			allErrs = append(allErrs, fldPath.Index(i).Child("secretName").RequiredError(""))
 		}
 	}
 	// TODO: Perform a more thorough validation of spec.TLS.Hosts that takes
@@ -511,7 +511,7 @@ func ValidateIngressStatusUpdate(ingress, oldIngress *extensions.Ingress) field.
 func validateIngressRules(IngressRules []extensions.IngressRule, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if len(IngressRules) == 0 {
-		return append(allErrs, field.Required(fldPath, ""))
+		return append(allErrs, fldPath.RequiredError(""))
 	}
 	for i, ih := range IngressRules {
 		if len(ih.Host) > 0 {
@@ -542,7 +542,7 @@ func validateIngressRuleValue(ingressRule *extensions.IngressRuleValue, fldPath 
 func validateHTTPIngressRuleValue(httpIngressRuleValue *extensions.HTTPIngressRuleValue, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if len(httpIngressRuleValue.Paths) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("paths"), ""))
+		allErrs = append(allErrs, fldPath.Child("paths").RequiredError(""))
 	}
 	for i, rule := range httpIngressRuleValue.Paths {
 		if len(rule.Path) > 0 {
@@ -574,7 +574,7 @@ func validateIngressBackend(backend *extensions.IngressBackend, fldPath *field.P
 
 	// All backends must reference a single local service by name, and a single service port by name or number.
 	if len(backend.ServiceName) == 0 {
-		return append(allErrs, field.Required(fldPath.Child("serviceName"), ""))
+		return append(allErrs, fldPath.Child("serviceName").RequiredError(""))
 	} else if ok, errs := apivalidation.ValidateServiceName(backend.ServiceName, false); !ok {
 		for i := range errs {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("serviceName"), backend.ServiceName, errs[i]))
@@ -591,11 +591,11 @@ func validateClusterAutoscalerSpec(spec extensions.ClusterAutoscalerSpec, fldPat
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxNodes"), spec.MaxNodes, "must be greater than or equal to `minNodes`"))
 	}
 	if len(spec.TargetUtilization) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("targetUtilization"), ""))
+		allErrs = append(allErrs, fldPath.Child("targetUtilization").RequiredError(""))
 	}
 	for _, target := range spec.TargetUtilization {
 		if len(target.Resource) == 0 {
-			allErrs = append(allErrs, field.Required(fldPath.Child("targetUtilization", "resource"), ""))
+			allErrs = append(allErrs, fldPath.Child("targetUtilization", "resource").RequiredError(""))
 		}
 		allErrs = append(allErrs, validateTargetUtilization(target.Value, fldPath.Child("targetUtilization", "value"))...)
 	}
@@ -672,7 +672,7 @@ func ValidateReplicaSetSpec(spec *extensions.ReplicaSetSpec, fldPath *field.Path
 	allErrs = append(allErrs, apivalidation.ValidateGreaterThanOrEqual(0, int64(spec.Replicas), fldPath.Child("replicas"))...)
 
 	if spec.Selector == nil {
-		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))
+		allErrs = append(allErrs, fldPath.Child("selector").RequiredError(""))
 	} else {
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabelSelector(spec.Selector, fldPath.Child("selector"))...)
 		if len(spec.Selector.MatchLabels)+len(spec.Selector.MatchExpressions) == 0 {
@@ -693,7 +693,7 @@ func ValidateReplicaSetSpec(spec *extensions.ReplicaSetSpec, fldPath *field.Path
 func ValidatePodTemplateSpecForReplicaSet(template *api.PodTemplateSpec, selector labels.Selector, replicas int, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if template == nil {
-		allErrs = append(allErrs, field.Required(fldPath, ""))
+		allErrs = append(allErrs, fldPath.RequiredError(""))
 	} else {
 		if !selector.Empty() {
 			// Verify that the ReplicaSet selector matches the labels in template.
@@ -708,7 +708,7 @@ func ValidatePodTemplateSpecForReplicaSet(template *api.PodTemplateSpec, selecto
 		}
 		// RestartPolicy has already been first-order validated as per ValidatePodTemplateSpec().
 		if template.Spec.RestartPolicy != api.RestartPolicyAlways {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("spec", "restartPolicy"), template.Spec.RestartPolicy, []string{string(api.RestartPolicyAlways)}))
+			allErrs = append(allErrs, fldPath.Child("spec", "restartPolicy").NotSupportedError(template.Spec.RestartPolicy, []string{string(api.RestartPolicyAlways)}))
 		}
 	}
 	return allErrs
@@ -747,7 +747,7 @@ func validatePSPSELinuxContext(fldPath *field.Path, seLinuxContext *extensions.S
 	supportedSELinuxContextTypes := sets.NewString(string(extensions.SELinuxStrategyMustRunAs),
 		string(extensions.SELinuxStrategyRunAsAny))
 	if !supportedSELinuxContextTypes.Has(string(seLinuxContext.Type)) {
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("type"), seLinuxContext.Type, supportedSELinuxContextTypes.List()))
+		allErrs = append(allErrs, fldPath.Child("type").NotSupportedError(seLinuxContext.Type, supportedSELinuxContextTypes.List()))
 	}
 
 	return allErrs
@@ -762,7 +762,7 @@ func validatePSPRunAsUser(fldPath *field.Path, runAsUser *extensions.RunAsUserSt
 		string(extensions.RunAsUserStrategyMustRunAsNonRoot),
 		string(extensions.RunAsUserStrategyRunAsAny))
 	if !supportedRunAsUserTypes.Has(string(runAsUser.Type)) {
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("type"), runAsUser.Type, supportedRunAsUserTypes.List()))
+		allErrs = append(allErrs, fldPath.Child("type").NotSupportedError(runAsUser.Type, supportedRunAsUserTypes.List()))
 	}
 
 	// validate range settings
@@ -793,7 +793,7 @@ func validatePodSecurityPolicyVolumes(fldPath *field.Path, volumes []extensions.
 		string(extensions.FC))
 	for _, v := range volumes {
 		if !allowed.Has(string(v)) {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("volumes"), v, allowed.List()))
+			allErrs = append(allErrs, fldPath.Child("volumes").NotSupportedError(v, allowed.List()))
 		}
 	}
 

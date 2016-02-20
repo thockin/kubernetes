@@ -263,7 +263,7 @@ func TestValidateHorizontalPodAutoscaler(t *testing.T) {
 					MaxReplicas: 5,
 				},
 			},
-			msg: "custom metrics target must not be empty",
+			msg: "Required value",
 		},
 		{
 			horizontalPodAutoscaler: extensions.HorizontalPodAutoscaler{
@@ -284,7 +284,7 @@ func TestValidateHorizontalPodAutoscaler(t *testing.T) {
 					MaxReplicas: 5,
 				},
 			},
-			msg: "missing custom metric target name",
+			msg: "Required value",
 		},
 		{
 			horizontalPodAutoscaler: extensions.HorizontalPodAutoscaler{
@@ -309,12 +309,12 @@ func TestValidateHorizontalPodAutoscaler(t *testing.T) {
 		},
 	}
 
-	for _, c := range errorCases {
+	for i, c := range errorCases {
 		errs := ValidateHorizontalPodAutoscaler(&c.horizontalPodAutoscaler)
 		if len(errs) == 0 {
-			t.Errorf("expected failure for %q", c.msg)
+			t.Errorf("[%d] expected failure for %q", i, c.msg)
 		} else if !strings.Contains(errs[0].Error(), c.msg) {
-			t.Errorf("unexpected error: %q, expected: %q", errs[0], c.msg)
+			t.Errorf("[%d] unexpected error: %q, expected: %q", i, errs[0], c.msg)
 		}
 	}
 }

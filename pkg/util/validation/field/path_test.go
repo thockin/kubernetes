@@ -16,7 +16,10 @@ limitations under the License.
 
 package field
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestPath(t *testing.T) {
 	testCases := []struct {
@@ -118,6 +121,45 @@ func TestPathMultiArg(t *testing.T) {
 		}
 		if p.Root() != root.Root() {
 			t.Errorf("[%d] Wrong root: %#v", i, p.Root())
+		}
+	}
+}
+
+func TestErrorFuncs(t *testing.T) {
+	testCases := []struct {
+		fn       func() *Error
+		expected ErrorType
+	}{
+		{
+			func() *Error { return NewPath("f").InvalidError("v", "d") },
+			ErrorTypeInvalid,
+		},
+		{
+			func() *Error { return NewPath("f").NotSupportedError("v", nil) },
+			ErrorTypeNotSupported,
+		},
+		{
+			func() *Error { return NewPath("f").DuplicateError("v") },
+			ErrorTypeDuplicate,
+		},
+		{
+			func() *Error { return NewPath("f").NotFoundError("v") },
+			ErrorTypeNotFound,
+		},
+		{
+			func() *Error { return NewPath("f").RequiredError("d") },
+			ErrorTypeRequired,
+		},
+		{
+			func() *Error { return NewPath("f").InternalError(fmt.Errorf("e")) },
+			ErrorTypeInternal,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := testCase.fn()
+		if err.Type != testCase.expected {
+			t.Errorf("expected Type %q, got %q", testCase.expected, err.Type)
 		}
 	}
 }
