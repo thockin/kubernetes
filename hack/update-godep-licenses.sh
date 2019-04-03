@@ -76,7 +76,7 @@ process_content () {
     github.com/*|golang.org/*|bitbucket.org/*|gonum.org/*)
      package_root=$(echo "${package}" |awk -F/ '{ print $1"/"$2"/"$3 }')
      ;;
-    go4.org/*)
+    go4.org/*|go.opencensus.io/*)
      package_root=$(echo "${package}" |awk -F/ '{ print $1 }')
      ;;
     gopkg.in/*)
