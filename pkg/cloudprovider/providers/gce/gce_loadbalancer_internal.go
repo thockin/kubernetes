@@ -38,6 +38,10 @@ const (
 func (g *Cloud) ensureInternalLoadBalancer(clusterName, clusterID string, svc *v1.Service, existingFwdRule *compute.ForwardingRule, nodes []*v1.Node) (*v1.LoadBalancerStatus, error) {
 	nm := types.NamespacedName{Name: svc.Name, Namespace: svc.Namespace}
 	ports, protocol := getPortsAndProtocol(svc.Spec.Ports)
+	allPorts := GetServiceAllPortsFlag(svc)
+	if allPorts {
+		ports = nil // one or the other
+	}
 	if protocol != v1.ProtocolTCP && protocol != v1.ProtocolUDP {
 		return nil, fmt.Errorf("Invalid protocol %s, only TCP and UDP are supported", string(protocol))
 	}
@@ -116,6 +120,7 @@ func (g *Cloud) ensureInternalLoadBalancer(clusterName, clusterID string, svc *v
 		IPAddress:           ipToUse,
 		BackendService:      backendServiceLink,
 		Ports:               ports,
+		AllPorts:            allPorts,
 		IPProtocol:          string(protocol),
 		LoadBalancingScheme: string(scheme),
 	}
@@ -367,6 +372,9 @@ func (g *Cloud) ensureInternalFirewalls(loadBalancerName, ipAddress, clusterID s
 	// First firewall is for ingress traffic
 	fwDesc := makeFirewallDescription(nm.String(), ipAddress)
 	ports, protocol := getPortsAndProtocol(svc.Spec.Ports)
+	if GetServiceAllPortsFlag(svc) {
+		ports = nil
+	}
 	sourceRanges, err := servicehelpers.GetLoadBalancerSourceRanges(svc)
 	if err != nil {
 		return err

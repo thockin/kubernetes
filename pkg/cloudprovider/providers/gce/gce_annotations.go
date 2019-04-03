@@ -58,6 +58,11 @@ const (
 
 	// NetworkTierAnnotationPremium is an annotation to indicate the Service is on the Premium network tier
 	NetworkTierAnnotationPremium = cloud.NetworkTierPremium
+
+	// ServiceAnnotationAllPorts is annotated on a service to indicate that all
+	// ports of the service should be exposed. Boolean.  Only "true" activates
+	// this feature - every other value is considerd "false".
+	ServiceAnnotationAllPorts = "networking.gke.io/all-ports"
 )
 
 // GetLoadBalancerAnnotationType returns the type of GCP load balancer which should be assembled.
@@ -115,4 +120,10 @@ func GetServiceNetworkTier(service *v1.Service) (cloud.NetworkTier, error) {
 	default:
 		return cloud.NetworkTierDefault, fmt.Errorf("unsupported network tier: %q", v)
 	}
+}
+
+// GetServiceAllPortsFlag tests whether the annotation to enable all service ports is enabled.
+func GetServiceAllPortsFlag(svc *v1.Service) bool {
+	val, found := svc.Annotations[ServiceAnnotationAllPorts]
+	return found && val == "true"
 }
