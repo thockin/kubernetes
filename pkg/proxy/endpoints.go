@@ -60,7 +60,7 @@ func (info *BaseEndpointInfo) IP() string {
 	return utilproxy.IPPart(info.Endpoint)
 }
 
-// Port returns just the Port part of the endpoint.
+// Port returns just the Port part of the endpoint.  If this returns 0 the proxier is expected to handle all ports.
 func (info *BaseEndpointInfo) Port() (int, error) {
 	return utilproxy.PortPart(info.Endpoint)
 }
@@ -70,9 +70,13 @@ func (info *BaseEndpointInfo) Equal(other Endpoint) bool {
 	return info.String() == other.String() && info.GetIsLocal() == other.GetIsLocal()
 }
 
-func newBaseEndpointInfo(IP string, port int, isLocal bool) *BaseEndpointInfo {
+func newBaseEndpointInfo(ip string, port int, isLocal bool) *BaseEndpointInfo {
+	ept := ip
+	if port != 0 {
+		ept = net.JoinHostPort(ip, strconv.Itoa(port))
+	}
 	return &BaseEndpointInfo{
-		Endpoint: net.JoinHostPort(IP, strconv.Itoa(port)),
+		Endpoint: ept,
 		IsLocal:  isLocal,
 	}
 }
@@ -229,6 +233,7 @@ func (ect *EndpointChangeTracker) endpointsToEndpointsMap(endpoints *v1.Endpoint
 	}
 
 	endpointsMap := make(EndpointsMap)
+	allIPs := map[string]bool{}
 	// We need to build a map of portname -> all ip:ports for that
 	// portname.  Explode Endpoints.Subsets[*] into this structure.
 	for i := range endpoints.Subsets {
@@ -258,6 +263,7 @@ func (ect *EndpointChangeTracker) endpointsToEndpointsMap(endpoints *v1.Endpoint
 					continue
 				}
 				isLocal := addr.NodeName != nil && *addr.NodeName == ect.hostname
+				allIPs[addr.IP] = isLocal
 				baseEndpointInfo := newBaseEndpointInfo(addr.IP, int(port.Port), isLocal)
 				if ect.makeEndpointInfo != nil {
 					endpointsMap[svcPortName] = append(endpointsMap[svcPortName], ect.makeEndpointInfo(baseEndpointInfo))
@@ -271,6 +277,23 @@ func (ect *EndpointChangeTracker) endpointsToEndpointsMap(endpoints *v1.Endpoint
 					newEPList = append(newEPList, ep.String())
 				}
 				klog.Infof("Setting endpoints for %q to %+v", svcPortName, newEPList)
+			}
+		}
+	}
+	// Add endpoints for "all-ports" services.  We use the same structure, but
+	// set the port to 0 (which is not allowed via the API)).  The active
+	// proxier can detect port 0 to mean "all ports".
+	if getServiceAllPortsFlag(&endpoints.ObjectMeta) {
+		for ip, isLocal := range allIPs {
+			svcPortName := ServicePortName{
+				NamespacedName: types.NamespacedName{Namespace: endpoints.Namespace, Name: endpoints.Name},
+				Port:           "*",
+			}
+			baseEndpointInfo := newBaseEndpointInfo(ip, 0, isLocal)
+			if ect.makeEndpointInfo != nil {
+				endpointsMap[svcPortName] = append(endpointsMap[svcPortName], ect.makeEndpointInfo(baseEndpointInfo))
+			} else {
+				endpointsMap[svcPortName] = append(endpointsMap[svcPortName], baseEndpointInfo)
 			}
 		}
 	}

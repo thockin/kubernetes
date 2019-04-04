@@ -26,6 +26,7 @@ import (
 	"k8s.io/klog"
 
 	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
@@ -40,7 +41,7 @@ import (
 // defined by the proxier if needed.
 type BaseServiceInfo struct {
 	ClusterIP                net.IP
-	Port                     int
+	Port                     int // If this is 0, the proxy is expected to receive all ports.
 	Protocol                 v1.Protocol
 	NodePort                 int
 	LoadBalancerStatus       v1.LoadBalancerStatus
@@ -56,6 +57,9 @@ var _ ServicePort = &BaseServiceInfo{}
 
 // String is part of ServicePort interface.
 func (info *BaseServiceInfo) String() string {
+	if info.Port == 0 {
+		return fmt.Sprintf("%s:*/%s", info.ClusterIP, info.Protocol)
+	}
 	return fmt.Sprintf("%s:%d/%s", info.ClusterIP, info.Port, info.Protocol)
 }
 
@@ -269,6 +273,7 @@ func (sct *ServiceChangeTracker) serviceToServiceMap(service *v1.Service) Servic
 	}
 
 	serviceMap := make(ServiceMap)
+	protocols := map[v1.Protocol]bool{}
 	for i := range service.Spec.Ports {
 		servicePort := &service.Spec.Ports[i]
 		svcPortName := ServicePortName{NamespacedName: svcName, Port: servicePort.Name}
@@ -278,8 +283,36 @@ func (sct *ServiceChangeTracker) serviceToServiceMap(service *v1.Service) Servic
 		} else {
 			serviceMap[svcPortName] = baseSvcInfo
 		}
+		protocols[servicePort.Protocol] = true
+	}
+	// Create a svcInfo for "all-ports" services.  We set the port to 0 (which
+	// is not allowed via the API), which the active proxier can interpret as
+	// "all ports".
+	if getServiceAllPortsFlag(&service.ObjectMeta) {
+		for proto, _ := range protocols {
+			svcPortName := ServicePortName{NamespacedName: svcName, Port: "*"}
+			svcPort := &v1.ServicePort{
+				Port:     0,
+				Protocol: proto,
+			}
+			baseSvcInfo := sct.newBaseServiceInfo(svcPort, service)
+			if sct.makeServiceInfo != nil {
+				serviceMap[svcPortName] = sct.makeServiceInfo(svcPort, service, baseSvcInfo)
+			} else {
+				serviceMap[svcPortName] = baseSvcInfo
+			}
+		}
 	}
 	return serviceMap
+}
+
+//FIXME: This is google-specific for now, and duplicated with the GCE cloud provider.
+const serviceAnnotationAllPorts = "networking.gke.io/all-ports"
+
+// getServiceAllPortsFlag tests whether the annotation to enable all service ports is enabled.
+func getServiceAllPortsFlag(meta *metav1.ObjectMeta) bool {
+	val, found := meta.Annotations[serviceAnnotationAllPorts]
+	return found && val == "true"
 }
 
 // apply the changes to ServiceMap and update the stale udp cluster IP set. The UDPStaleClusterIP argument is passed in to store the

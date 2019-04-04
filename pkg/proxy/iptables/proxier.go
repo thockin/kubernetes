@@ -837,8 +837,10 @@ func (proxier *Proxier) syncProxyRules() {
 				"-m", "comment", "--comment", fmt.Sprintf(`"%s cluster IP"`, svcNameString),
 				"-m", protocol, "-p", protocol,
 				"-d", utilproxy.ToCIDR(svcInfo.ClusterIP),
-				"--dport", strconv.Itoa(svcInfo.Port),
 			)
+			if svcInfo.Port != 0 {
+				args = append(args, "--dport", strconv.Itoa(svcInfo.Port))
+			}
 			if proxier.masqueradeAll {
 				writeLine(proxier.natRules, append(args, "-j", string(KubeMarkMasqChain))...)
 			} else if len(proxier.clusterCIDR) > 0 {
@@ -864,37 +866,39 @@ func (proxier *Proxier) syncProxyRules() {
 
 		// Capture externalIPs.
 		for _, externalIP := range svcInfo.ExternalIPs {
-			// If the "external" IP happens to be an IP that is local to this
-			// machine, hold the local port open so no other process can open it
-			// (because the socket might open but it would never work).
-			if local, err := utilproxy.IsLocalIP(externalIP); err != nil {
-				klog.Errorf("can't determine if IP is local, assuming not: %v", err)
-			} else if local && (svcInfo.GetProtocol() != v1.ProtocolSCTP) {
-				lp := utilproxy.LocalPort{
-					Description: "externalIP for " + svcNameString,
-					IP:          externalIP,
-					Port:        svcInfo.Port,
-					Protocol:    protocol,
-				}
-				if proxier.portsMap[lp] != nil {
-					klog.V(4).Infof("Port %s was open before and is still needed", lp.String())
-					replacementPortsMap[lp] = proxier.portsMap[lp]
-				} else {
-					socket, err := proxier.portMapper.OpenLocalPort(&lp)
-					if err != nil {
-						msg := fmt.Sprintf("can't open %s, skipping this externalIP: %v", lp.String(), err)
-
-						proxier.recorder.Eventf(
-							&v1.ObjectReference{
-								Kind:      "Node",
-								Name:      proxier.hostname,
-								UID:       types.UID(proxier.hostname),
-								Namespace: "",
-							}, v1.EventTypeWarning, err.Error(), msg)
-						klog.Error(msg)
-						continue
+			if svcInfo.Port != 0 {
+				// If the "external" IP happens to be an IP that is local to this
+				// machine, hold the local port open so no other process can open it
+				// (because the socket might open but it would never work).
+				if local, err := utilproxy.IsLocalIP(externalIP); err != nil {
+					klog.Errorf("can't determine if IP is local, assuming not: %v", err)
+				} else if local && (svcInfo.GetProtocol() != v1.ProtocolSCTP) {
+					lp := utilproxy.LocalPort{
+						Description: "externalIP for " + svcNameString,
+						IP:          externalIP,
+						Port:        svcInfo.Port,
+						Protocol:    protocol,
 					}
-					replacementPortsMap[lp] = socket
+					if proxier.portsMap[lp] != nil {
+						klog.V(4).Infof("Port %s was open before and is still needed", lp.String())
+						replacementPortsMap[lp] = proxier.portsMap[lp]
+					} else {
+						socket, err := proxier.portMapper.OpenLocalPort(&lp)
+						if err != nil {
+							msg := fmt.Sprintf("can't open %s, skipping this externalIP: %v", lp.String(), err)
+
+							proxier.recorder.Eventf(
+								&v1.ObjectReference{
+									Kind:      "Node",
+									Name:      proxier.hostname,
+									UID:       types.UID(proxier.hostname),
+									Namespace: "",
+								}, v1.EventTypeWarning, err.Error(), msg)
+							klog.Error(msg)
+							continue
+						}
+						replacementPortsMap[lp] = socket
+					}
 				}
 			}
 
@@ -904,8 +908,11 @@ func (proxier *Proxier) syncProxyRules() {
 					"-m", "comment", "--comment", fmt.Sprintf(`"%s external IP"`, svcNameString),
 					"-m", protocol, "-p", protocol,
 					"-d", utilproxy.ToCIDR(net.ParseIP(externalIP)),
-					"--dport", strconv.Itoa(svcInfo.Port),
 				)
+				if svcInfo.Port != 0 {
+					args = append(args, "--dport", strconv.Itoa(svcInfo.Port))
+				}
+
 				// We have to SNAT packets to external IPs.
 				writeLine(proxier.natRules, append(args, "-j", string(KubeMarkMasqChain))...)
 
@@ -955,8 +962,10 @@ func (proxier *Proxier) syncProxyRules() {
 						"-m", "comment", "--comment", fmt.Sprintf(`"%s loadbalancer IP"`, svcNameString),
 						"-m", protocol, "-p", protocol,
 						"-d", utilproxy.ToCIDR(net.ParseIP(ingress.IP)),
-						"--dport", strconv.Itoa(svcInfo.Port),
 					)
+					if svcInfo.Port != 0 {
+						args = append(args, "--dport", strconv.Itoa(svcInfo.Port))
+					}
 					// jump to service firewall chain
 					writeLine(proxier.natRules, append(args, "-j", string(fwChain))...)
 
@@ -1360,10 +1369,10 @@ func (proxier *Proxier) syncProxyRules() {
 	proxier.iptablesData.Write(proxier.natChains.Bytes())
 	proxier.iptablesData.Write(proxier.natRules.Bytes())
 
-	klog.V(5).Infof("Restoring iptables rules: %s", proxier.iptablesData.Bytes())
+	klog.V(5).Infof("Restoring iptables rules: %s", proxier.iptablesData.String())
 	err = proxier.iptables.RestoreAll(proxier.iptablesData.Bytes(), utiliptables.NoFlushTables, utiliptables.RestoreCounters)
 	if err != nil {
-		klog.Errorf("Failed to execute iptables-restore: %v", err)
+		klog.Errorf("Failed to execute iptables-restore: %v\nfailed payload:\n%s", err, proxier.iptablesData.String())
 		// Revert new local ports.
 		klog.V(2).Infof("Closing local ports after iptables-restore failure")
 		utilproxy.RevertPorts(replacementPortsMap, proxier.portsMap)
