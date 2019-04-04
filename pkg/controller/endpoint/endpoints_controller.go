@@ -537,6 +537,9 @@ func (e *EndpointController) syncService(key string) error {
 		delete(newEndpoints.Annotations, v1.EndpointsLastChangeTriggerTime)
 	}
 
+	if getServiceAllPortsFlag(&service.ObjectMeta) {
+		newEndpoints.Annotations[serviceAnnotationAllPorts] = "true"
+	}
 	klog.V(4).Infof("Update endpoints for %v/%v, ready: %d not ready: %d", service.Namespace, service.Name, totalReadyEps, totalNotReadyEps)
 	if createEndpoints {
 		// No previous endpoints, create them
@@ -563,6 +566,15 @@ func (e *EndpointController) syncService(key string) error {
 		return err
 	}
 	return nil
+}
+
+//FIXME: This is google-specific for now, and duplicated with the GCE cloud provider.
+const serviceAnnotationAllPorts = "networking.gke.io/all-ports"
+
+// getServiceAllPortsFlag tests whether the annotation to enable all service ports is enabled.
+func getServiceAllPortsFlag(meta *metav1.ObjectMeta) bool {
+	val, found := meta.Annotations[serviceAnnotationAllPorts]
+	return found && val == "true"
 }
 
 // checkLeftoverEndpoints lists all currently existing endpoints and adds their
