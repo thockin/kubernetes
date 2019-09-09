@@ -15,9 +15,18 @@
 FROM BASEIMAGE
 
 RUN clean-install \
+    bash \
     conntrack \
     ebtables \
     ipset \
     iptables \
     kmod \
-    netbase
+    netbase \
+    nftables
+
+# Remove unnecessary packages.
+RUN echo "Yes, do as I say!" | apt-get purge bash
+
+# Cleanup cached and unnecessary files.
+RUN apt-get autoremove -y && \
+    apt-get clean -y
