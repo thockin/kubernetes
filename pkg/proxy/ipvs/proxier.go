@@ -896,6 +896,27 @@ func (proxier *Proxier) OnEndpointSlicesSynced() {
 	proxier.syncProxyRules()
 }
 
+func (proxier *Proxier) OnNodeAdd(node *v1.Node) {
+	if node.Name != proxier.hostname {
+		klog.Errorf("BAD NEWS: Got a watch event for a node that isn't me: %s", node.Name)
+	}
+}
+
+func (proxier *Proxier) OnNodeUpdate(oldNode, node *v1.Node) {
+	if node.Name != proxier.hostname {
+		klog.Errorf("BAD NEWS: Got a watch event for a node that isn't me: %s", node.Name)
+	}
+}
+
+func (proxier *Proxier) OnNodeDelete(node *v1.Node) {
+	if node.Name != proxier.hostname {
+		klog.Errorf("BAD NEWS: Got a watch event for a node that isn't me: %s", node.Name)
+	}
+}
+
+func (proxier *Proxier) OnNodeSynced() {
+}
+
 // EntryInvalidErr indicates if an ipset entry is invalid or not
 const EntryInvalidErr = "error adding entry %s to ipset %s"
 

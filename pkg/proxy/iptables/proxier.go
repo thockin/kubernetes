@@ -591,6 +591,27 @@ func (proxier *Proxier) OnEndpointSlicesSynced() {
 	proxier.syncProxyRules()
 }
 
+func (proxier *Proxier) OnNodeAdd(node *v1.Node) {
+	if node.Name != proxier.hostname {
+		klog.Errorf("BAD NEWS: Got a watch event for a node that isn't me: %s", node.Name)
+	}
+}
+
+func (proxier *Proxier) OnNodeUpdate(oldNode, node *v1.Node) {
+	if node.Name != proxier.hostname {
+		klog.Errorf("BAD NEWS: Got a watch event for a node that isn't me: %s", node.Name)
+	}
+}
+
+func (proxier *Proxier) OnNodeDelete(node *v1.Node) {
+	if node.Name != proxier.hostname {
+		klog.Errorf("BAD NEWS: Got a watch event for a node that isn't me: %s", node.Name)
+	}
+}
+
+func (proxier *Proxier) OnNodeSynced() {
+}
+
 // portProtoHash takes the ServicePortName and protocol for a service
 // returns the associated 16 character hash. This is computed by hashing (sha256)
 // then encoding to base32 and truncating to 16 chars. We do this because IPTables

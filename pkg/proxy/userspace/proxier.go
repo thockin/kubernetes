@@ -663,6 +663,18 @@ func (proxier *Proxier) OnEndpointsSynced() {
 	go proxier.syncProxyRules()
 }
 
+func (proxier *Proxier) OnNodeAdd(node *v1.Node) {
+}
+
+func (proxier *Proxier) OnNodeUpdate(oldNode, node *v1.Node) {
+}
+
+func (proxier *Proxier) OnNodeDelete(node *v1.Node) {
+}
+
+func (proxier *Proxier) OnNodeSynced() {
+}
+
 func sameConfig(info *ServiceInfo, service *v1.Service, port *v1.ServicePort) bool {
 	if info.protocol != port.Protocol || info.portal.port != int(port.Port) || info.nodePort != int(port.NodePort) {
 		return false

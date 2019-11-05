@@ -30,6 +30,7 @@ type Provider interface {
 	config.EndpointsHandler
 	config.EndpointSliceHandler
 	config.ServiceHandler
+	config.NodeHandler
 
 	// Sync immediately synchronizes the Provider's current state to proxy rules.
 	Sync()
