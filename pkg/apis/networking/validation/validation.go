@@ -173,7 +173,9 @@ func ValidateIPBlock(ipb *networking.IPBlock, fldPath *field.Path) field.ErrorLi
 }
 
 // ValidateIngress tests if required fields in the Ingress are set.
-func ValidateIngress(ingress *networking.Ingress) field.ErrorList {
+// NOTE: taking the API version here is kind of a hack to allow for proper
+// errors on fields that were renamed from v1beta1->v1.
+func ValidateIngress(ingress *networking.Ingress, apiVersion string) field.ErrorList {
 	allErrs := apivalidation.ValidateObjectMeta(&ingress.ObjectMeta, true, ValidateIngressName, field.NewPath("metadata"))
 	allErrs = append(allErrs, ValidateIngressSpec(&ingress.Spec, field.NewPath("spec"))...)
 	return allErrs
@@ -222,7 +224,9 @@ func ValidateIngressSpec(spec *networking.IngressSpec, fldPath *field.Path) fiel
 }
 
 // ValidateIngressUpdate tests if required fields in the Ingress are set.
-func ValidateIngressUpdate(ingress, oldIngress *networking.Ingress) field.ErrorList {
+// NOTE: taking the API version here is kind of a hack to allow for proper
+// errors on fields that were renamed from v1beta1->v1.
+func ValidateIngressUpdate(ingress, oldIngress *networking.Ingress, apiVersion string) field.ErrorList {
 	allErrs := apivalidation.ValidateObjectMetaUpdate(&ingress.ObjectMeta, &oldIngress.ObjectMeta, field.NewPath("metadata"))
 	allErrs = append(allErrs, ValidateIngressSpec(&ingress.Spec, field.NewPath("spec"))...)
 	return allErrs

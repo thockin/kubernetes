@@ -22,6 +22,7 @@ import (
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/networking"
@@ -69,8 +70,12 @@ func (ingressStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Ob
 
 // Validate validates a new Ingress.
 func (ingressStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
+	requestInfo, ok := request.RequestInfoFrom(ctx)
+	if !ok {
+		//FIXME: do something?
+	}
 	ingress := obj.(*networking.Ingress)
-	err := validation.ValidateIngress(ingress)
+	err := validation.ValidateIngress(ingress, requestInfo.APIVersion)
 	return err
 }
 
@@ -85,8 +90,12 @@ func (ingressStrategy) AllowCreateOnUpdate() bool {
 
 // ValidateUpdate is the default update validation for an end user.
 func (ingressStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
+	requestInfo, ok := request.RequestInfoFrom(ctx)
+	if !ok {
+		//FIXME: do something?
+	}
 	validationErrorList := validation.ValidateIngress(obj.(*networking.Ingress))
-	updateErrorList := validation.ValidateIngressUpdate(obj.(*networking.Ingress), old.(*networking.Ingress))
+	updateErrorList := validation.ValidateIngressUpdate(obj.(*networking.Ingress), old.(*networking.Ingress), requestInfo.APIVersion)
 	return append(validationErrorList, updateErrorList...)
 }
 
