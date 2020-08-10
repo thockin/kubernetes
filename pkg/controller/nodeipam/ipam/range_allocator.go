@@ -23,7 +23,7 @@ import (
 
 	"k8s.io/klog"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -118,7 +118,7 @@ func NewCIDRRangeAllocator(client clientset.Interface, nodeInformer informers.No
 
 	if nodeList != nil {
 		for _, node := range nodeList.Items {
-			if len(node.Spec.PodCIDRs) == 0 {
+			if len(getPodCIDRs(&node)) == 0 {
 				klog.V(4).Infof("Node %v has no CIDR, ignoring", node.Name)
 				continue
 			}
@@ -155,7 +155,7 @@ func NewCIDRRangeAllocator(client clientset.Interface, nodeInformer informers.No
 			// which prevents it from being assigned to any new node. The cluster
 			// state is correct.
 			// Restart of NC fixes the issue.
-			if len(newNode.Spec.PodCIDRs) == 0 {
+			if len(getPodCIDRs(newNode)) == 0 {
 				return ra.AllocateOrOccupyCIDR(newNode)
 			}
 			return nil
@@ -220,10 +220,13 @@ func (r *rangeAllocator) removeNodeFromProcessing(nodeName string) {
 // marks node.PodCIDRs[...] as used in allocator's tracked cidrSet
 func (r *rangeAllocator) occupyCIDRs(node *v1.Node) error {
 	defer r.removeNodeFromProcessing(node.Name)
-	if len(node.Spec.PodCIDRs) == 0 {
+
+	cidrs := getPodCIDRs(node)
+
+	if len(cidrs) == 0 {
 		return nil
 	}
-	for idx, cidr := range node.Spec.PodCIDRs {
+	for idx, cidr := range cidrs {
 		_, podCIDR, err := net.ParseCIDR(cidr)
 		if err != nil {
 			return fmt.Errorf("failed to parse node %s, CIDR %s", node.Name, node.Spec.PodCIDR)
@@ -247,7 +250,9 @@ func (r *rangeAllocator) AllocateOrOccupyCIDR(node *v1.Node) error {
 		return nil
 	}
 
-	if len(node.Spec.PodCIDRs) > 0 {
+	// Check both plural and singular, since the apiserver we are talking to
+	// could be older than this controller, and might not popdulate the new field.
+	if len(getPodCIDRs(node)) > 0 {
 		return r.occupyCIDRs(node)
 	}
 	// allocate and queue the assignment
@@ -274,11 +279,12 @@ func (r *rangeAllocator) AllocateOrOccupyCIDR(node *v1.Node) error {
 
 // ReleaseCIDR marks node.podCIDRs[...] as unused in our tracked cidrSets
 func (r *rangeAllocator) ReleaseCIDR(node *v1.Node) error {
-	if node == nil || len(node.Spec.PodCIDRs) == 0 {
+	cidrs := getPodCIDRs(node)
+	if node == nil || len(cidrs) == 0 {
 		return nil
 	}
 
-	for idx, cidr := range node.Spec.PodCIDRs {
+	for idx, cidr := range cidrs {
 		_, podCIDR, err := net.ParseCIDR(cidr)
 		if err != nil {
 			return fmt.Errorf("failed to parse CIDR %s on Node %v: %v", cidr, node.Name, err)
@@ -325,13 +331,15 @@ func (r *rangeAllocator) updateCIDRsAllocation(data nodeReservedCIDRs) error {
 		return err
 	}
 
+	cidrs := getPodCIDRs(node)
+
 	// if cidr list matches the proposed.
 	// then we possibly updated this node
 	// and just failed to ack the success.
-	if len(node.Spec.PodCIDRs) == len(data.allocatedCIDRs) {
+	if len(cidrs) == len(data.allocatedCIDRs) {
 		match := true
 		for idx, cidr := range cidrsString {
-			if node.Spec.PodCIDRs[idx] != cidr {
+			if cidrs[idx] != cidr {
 				match = false
 				break
 			}
@@ -343,8 +351,8 @@ func (r *rangeAllocator) updateCIDRsAllocation(data nodeReservedCIDRs) error {
 	}
 
 	// node has cidrs, release the reserved
-	if len(node.Spec.PodCIDRs) != 0 {
-		klog.Errorf("Node %v already has a CIDR allocated %v. Releasing the new one.", node.Name, node.Spec.PodCIDRs)
+	if len(cidrs) != 0 {
+		klog.Errorf("Node %v already has a CIDR allocated %v. Releasing the new one.", node.Name, getPodCIDRs(node))
 		for idx, cidr := range data.allocatedCIDRs {
 			if releaseErr := r.cidrSets[idx].Release(cidr); err != nil {
 				klog.Errorf("Error when releasing CIDR idx:%v value: %v err:%v", idx, cidr, releaseErr)
@@ -375,6 +383,17 @@ func (r *rangeAllocator) updateCIDRsAllocation(data nodeReservedCIDRs) error {
 		}
 	}
 	return err
+}
+
+// Returns the list of pod CIDRs considering the newer plural field and the
+// older singular field.
+func getPodCIDRs(node *v1.Node) []string {
+	cidrs := node.Spec.PodCIDRs
+	if len(cidrs) == 0 {
+		// Handle older API servers.
+		cidrs = append(cidrs, node.Spec.PodCIDR)
+	}
+	return cidrs
 }
 
 // converts a slice of cidrs into <c-1>,<c-2>,<c-n>
