@@ -3578,6 +3578,12 @@ type ServiceSpec struct {
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/
 	Selector map[string]string
 
+	// ClusterIP is effectively obsoleted by ClusterIPs, but we need to be able
+	// to recognize updates that clear ClusterIP but not ClusterIPs (i.e. old
+	// clients) AFTER objects have been converted to internal.  If we simply
+	// merge into ClusterIPs we lose information too early.
+	ClusterIP string
+
 	// ClusterIPs identifies all the ClusterIPs assigned to this
 	// service. ClusterIPs are assigned or reserved based on the values of
 	// service.spec.ipFamilies. A maximum of two entries (dual-stack IPs) are
