@@ -95,12 +95,8 @@ func (strategy svcStrategy) PrepareForCreate(ctx context.Context, obj runtime.Ob
 	service := obj.(*api.Service)
 	service.Status = api.ServiceStatus{}
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.IPv6DualStack) && service.Spec.IPFamily == nil {
-		family := strategy.ipFamilies[0]
-		service.Spec.IPFamily = &family
-	}
-
 	dropServiceDisabledFields(service, nil)
+	normalizeLinkedFields(service, nil)
 }
 
 // PrepareForUpdate sets contextual defaults and clears fields that are not allowed to be set by end users on update.
@@ -109,16 +105,8 @@ func (strategy svcStrategy) PrepareForUpdate(ctx context.Context, obj, old runti
 	oldService := old.(*api.Service)
 	newService.Status = oldService.Status
 
-	if utilfeature.DefaultFeatureGate.Enabled(features.IPv6DualStack) && newService.Spec.IPFamily == nil {
-		if oldService.Spec.IPFamily != nil {
-			newService.Spec.IPFamily = oldService.Spec.IPFamily
-		} else {
-			family := strategy.ipFamilies[0]
-			newService.Spec.IPFamily = &family
-		}
-	}
-
 	dropServiceDisabledFields(newService, oldService)
+	normalizeLinkedFields(newService, oldService)
 }
 
 // Validate validates a new service.
@@ -203,6 +191,108 @@ func topologyKeysInUse(svc *api.Service) bool {
 		return false
 	}
 	return len(svc.Spec.TopologyKeys) > 0
+}
+
+// This is an unusual call.  Service has a number of inter-linked fields and in
+// order to avoid breaking clients we try really hard to infer what users
+// meant.
+func normalizeLinkedFields(newSvc *api.Service, oldSvc *api.Service) {
+	//FIXME: Clear ClusterIP if it is not needed and not owned
+
+	//FIXME: Clear ClusterIPs if thy are not needed and not owned
+
+	if utilfeature.DefaultFeatureGate.Enabled(features.IPv6DualStack) {
+		normalizeClusterIPs(newSvc, oldSvc)
+	}
+}
+
+func normalizeClusterIPs(newSvc *api.Service, oldSvc *api.Service) {
+	// In all cases here, we don't need to over-think the inputs.  Validation
+	// will be called on the new object soon enough.  All this needs to do is
+	// try to divine what user meant with these linked fields.
+
+	if oldSvc == nil {
+		// This was a create operation.
+
+		// User specified singular and not plural (e.g. an old client), so init
+		// plural for them.
+		if len(newSvc.Spec.ClusterIP) > 0 && len(newSvc.Spec.ClusterIPs) == 0 {
+			newSvc.Spec.ClusterIPs = []string{newSvc.Spec.ClusterIP}
+			return
+		}
+
+		// User specified plural and not singular, so init singular for them.
+		if len(newSvc.Spec.ClusterIPs) > 0 && len(newSvc.Spec.ClusterIP) == 0 {
+			newSvc.Spec.ClusterIP = newSvc.Spec.ClusterIPs[0]
+			return
+		}
+
+		// Either both were not specified (will be allocated) or both were
+		// specified (will be validated).
+		return
+	}
+
+	// This was an update operation.
+
+	// User cleared singular...
+	if len(oldSvc.Spec.ClusterIP) > 0 && len(newSvc.Spec.ClusterIP) == 0 {
+		// ...if they did not change plural (e.g. an old client), we can clear
+		// it for them.
+		if sameStringSlice(oldSvc.Spec.ClusterIPs, newSvc.Spec.ClusterIPs) {
+			newSvc.Spec.ClusterIPs = nil
+		} else {
+			// They cleared one and changed the other.  Let validation catch it.
+		}
+		return
+	}
+
+	// User cleared plural...
+	if len(oldSvc.Spec.ClusterIPs) > 0 && len(newSvc.Spec.ClusterIPs) == 0 {
+		// ...if they did not change singular, we can clear it for them.
+		if oldSvc.Spec.ClusterIP == newSvc.Spec.ClusterIP {
+			newSvc.Spec.ClusterIP = ""
+		} else {
+			// They cleared one and changed the other.  Let validation catch it.
+		}
+		return
+	}
+
+	// User changed singular from unset to set (e.g. type=ExternalName ->
+	// ClusterIP)...
+	if len(oldSvc.Spec.ClusterIP) == 0 && len(newSvc.Spec.ClusterIP) > 0 {
+		// ...if they did not set plural, we can set it for them.
+		if len(newSvc.Spec.ClusterIPs) == 0 {
+			newSvc.Spec.ClusterIPs = []string{newSvc.Spec.ClusterIP}
+		} else {
+			// They set both.  Let validation catch any errors.
+		}
+		return
+	}
+
+	// User changed plural from unset to set...
+	if len(oldSvc.Spec.ClusterIPs) == 0 && len(newSvc.Spec.ClusterIPs) > 0 {
+		// ...if they did not set plural, we can set it for them.
+		if len(newSvc.Spec.ClusterIP) == 0 {
+			newSvc.Spec.ClusterIP = newSvc.Spec.ClusterIPs[0]
+		} else {
+			// They set both.  Let validation catch any errors.
+		}
+		return
+	}
+
+	// We don't currently allow value->value mutations of singular
+}
+
+func sameStringSlice(a []string, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 type serviceStatusStrategy struct {

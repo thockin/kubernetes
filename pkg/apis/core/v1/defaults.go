@@ -19,7 +19,7 @@ package v1
 import (
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/kubernetes/pkg/util/parsers"
@@ -135,6 +135,9 @@ func SetDefaults_Service(obj *v1.Service) {
 	if utilfeature.DefaultFeatureGate.Enabled(features.IPv6DualStack) {
 		// Default obj.Spec.IPFamilyPolicy if we *know* we can, otherwise it will
 		// be handled later in allocation.
+		//FIXME: This is trouble.  It means that a client who changes from
+		//FIXME: ClusterIP to ExternalName has to clear this field, which makes
+		//FIXME: it a breaking change for older clients.
 		if obj.Spec.Type != v1.ServiceTypeExternalName && obj.Spec.IPFamilyPolicy == nil {
 			if len(obj.Spec.ClusterIPs) == 2 || len(obj.Spec.IPFamilies) == 2 {
 				requireDualStack := v1.RequireDualStack
@@ -142,6 +145,8 @@ func SetDefaults_Service(obj *v1.Service) {
 			}
 		}
 
+		//FIXME: if we nix the above, then this mightr make more sense with the
+		//FIXME: other code, rather than here.
 		// If the user demanded dual-stack, but only specified one family, we add
 		// the other.
 		if obj.Spec.IPFamilyPolicy != nil && *(obj.Spec.IPFamilyPolicy) == v1.RequireDualStack && len(obj.Spec.IPFamilies) == 1 {
@@ -161,6 +166,7 @@ func SetDefaults_Service(obj *v1.Service) {
 		// note: conversion logic handles cases where ClusterIPs is used (but not ClusterIP).
 	}
 }
+
 func SetDefaults_Pod(obj *v1.Pod) {
 	// If limits are specified, but requests are not, default requests to limits
 	// This is done here rather than a more specific defaulting pass on v1.ResourceRequirements

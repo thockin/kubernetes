@@ -4164,19 +4164,22 @@ func ValidateService(service *core.Service, allowAppProtocol bool) field.ErrorLi
 			}
 		}
 		if isHeadlessService(service) {
-			allErrs = append(allErrs, field.Invalid(specPath.Child("clusterIPs").Index(0), service.Spec.ClusterIPs[0], "may not be set to 'None' for LoadBalancer services"))
+			allErrs = append(allErrs, field.Invalid(specPath.Child("clusterIP"), service.Spec.ClusterIPs[0], "may not be set to 'None' for LoadBalancer services"))
 		}
 	case core.ServiceTypeNodePort:
 		if isHeadlessService(service) {
-			allErrs = append(allErrs, field.Invalid(specPath.Child("clusterIPs").Index(0), service.Spec.ClusterIPs[0], "may not be set to 'None' for NodePort services"))
+			allErrs = append(allErrs, field.Invalid(specPath.Child("clusterIP"), service.Spec.ClusterIPs[0], "may not be set to 'None' for NodePort services"))
 		}
 	case core.ServiceTypeExternalName:
 		// must have ClusterIP == "" && len(.spec.ClusterIPs == 0)
-		if len(service.Spec.ClusterIPs) > 0 {
+		if len(service.Spec.ClusterIP) > 0 {
+			allErrs = append(allErrs, field.Forbidden(specPath.Child("clusterIP"), "may not be set for ExternalName services"))
+		} else if len(service.Spec.ClusterIPs) > 0 {
 			allErrs = append(allErrs, field.Forbidden(specPath.Child("clusterIPs"), "may not be set for ExternalName services"))
 		}
 
 		// must have nil families and nil policy
+		//FIXME: breaking change - old clients won't know to unset it.
 		if len(service.Spec.IPFamilies) > 0 {
 			allErrs = append(allErrs, field.Forbidden(specPath.Child("IPFamilies"), "ExternalName services may not set `ipFamilies`"))
 		}
@@ -6117,12 +6120,32 @@ func validateServiceClusterIPsRelatedFields(service *core.Service) field.ErrorLi
 	}
 
 	allErrs := field.ErrorList{}
-	hasInvalidIPs := false
 
 	specPath := field.NewPath("spec")
+	clusterIPField := specPath.Child("clusterIP")
 	clusterIPsField := specPath.Child("clusterIPs")
 	ipFamiliesField := specPath.Child("ipFamilies")
 	ipFamilyPolicyField := specPath.Child("ipFamilyPolicy")
+
+	// Make sure ClusterIP and ClusterIPs are synced.  For most cases users can
+	// just manage one or the other and we'll handle the rest (see PrepareFor*
+	// in strategy).
+	if len(service.Spec.ClusterIP) != 0 {
+		// If ClusterIP is set, ClusterIPs[0] must match.
+		if len(service.Spec.ClusterIPs) == 0 {
+			//FIXME: Required error
+		} else if service.Spec.ClusterIPs[0] != service.Spec.ClusterIP {
+			//FIXME: Invalid error
+		}
+	} else { // ClusterIP == ""
+		// If ClusterIP is not set, ClusterIPs must also be unset.
+		if len(service.Spec.ClusterIPs) != 0 {
+			//FIXME: Invalid error
+		}
+	}
+
+	// This will signal a short-circuit later.
+	hasInvalidIPs := false
 
 	// First do various stand-alone validation, then do cross-field checks
 	// after.
