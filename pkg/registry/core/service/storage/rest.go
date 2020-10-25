@@ -205,6 +205,12 @@ func (rs *REST) Export(ctx context.Context, name string, opts metav1.ExportOptio
 	return rs.services.Export(ctx, name, opts)
 }
 
+// This serves as a wrapper for the more generic Create(), which can fail.  If
+// the inner Create() call fails, we need to clean up allocations.  If we had a
+// transactional store, this would just be part of the larger transaction.  We
+// don't have that, so we have to do it manually.
+//
+// This should stay as thin as possible.
 func (rs *REST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
 	service := obj.(*api.Service)
 
@@ -212,54 +218,15 @@ func (rs *REST) Create(ctx context.Context, obj runtime.Object, createValidation
 	// early, before anyone looks at them.
 	normalizeClusterIPs(service, nil)
 
-	// bag of clusterIPs allocated in the process of creation
-	// failed allocation will automatically trigger release
-	var toReleaseClusterIPs map[api.IPFamily]string
-
-	if err := rest.BeforeCreate(rs.strategy, ctx, obj); err != nil {
+	// Allocate and initialize fields.  This has to happen here and not in any
+	// earlier hooks because it needs to be aware of flags and be able to
+	// access API storage.
+	txn, err := rs.allocateCreate(service, dryrun.IsDryRun(options.DryRun))
+	if err != nil {
 		return nil, err
 	}
 
-	// TODO: this should probably move to inner strategy.PrepareForCreate()
-	defer func() {
-		released, err := rs.releaseClusterIPs(toReleaseClusterIPs)
-		if err != nil {
-			klog.Warningf("failed to release clusterIPs for failed new service:%v allocated:%v released:%v error:%v",
-				service.Name, toReleaseClusterIPs, released, err)
-		}
-	}()
-
-	// try set ip families (for missing ip families)
-	// we do it here, since we want this to be visible
-	// even when dryRun == true
-	if err := rs.tryDefaultValidateServiceClusterIPFields(service); err != nil {
-		return nil, err
-	}
-
-	var err error
-	if !dryrun.IsDryRun(options.DryRun) {
-		toReleaseClusterIPs, err = rs.allocServiceClusterIPs(service)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	nodePortOp := portallocator.StartOperation(rs.serviceNodePorts, dryrun.IsDryRun(options.DryRun))
-	defer nodePortOp.Finish()
-
-	if service.Spec.Type == api.ServiceTypeNodePort || service.Spec.Type == api.ServiceTypeLoadBalancer {
-		if err := initNodePorts(service, nodePortOp); err != nil {
-			return nil, err
-		}
-	}
-
-	// Handle ExternalTraffic related fields during service creation.
-	if apiservice.NeedsHealthCheck(service) {
-		if err := allocateHealthCheckNodePort(service, nodePortOp); err != nil {
-			return nil, errors.NewInternalError(err)
-		}
-	}
-
+	// FIXME: move this some place that makes more sense
 	if errs := validation.ValidateServiceExternalTrafficFieldsCombination(service); len(errs) > 0 {
 		return nil, errors.NewInvalid(api.Kind("Service"), service.Name, errs)
 	}
@@ -267,21 +234,89 @@ func (rs *REST) Create(ctx context.Context, obj runtime.Object, createValidation
 	// Call the wrapped "simple" REST to do the real work.
 	out, err := rs.services.Create(ctx, service, createValidation, options)
 	if err != nil {
-		err = rest.CheckGeneratedNameError(rs.strategy, err, service)
+		txn.Revert()
+		return out, err
+	}
+	txn.Commit()
+
+	return out, nil
+}
+
+// transaction represents something that may need to be finalized on success or
+// failure of the larger transaction.
+type transaction interface {
+	// Commit tells the transaction to finalize any changes it may have
+	// pending.
+	Commit()
+
+	// Revert tells the transaction to abandon or undo any changes it may have
+	// pending.
+	Revert()
+}
+
+// metaTransaction is a collection of transactions.
+type metaTransaction []transaction
+
+func (mt metaTransaction) Commit() {
+	for _, t := range mt {
+		t.Commit()
+	}
+}
+
+func (mt metaTransaction) Revert() {
+	for _, t := range mt {
+		t.Revert()
+	}
+}
+
+// callbackTransaction is a transaction which calls arbitrary functions.
+type callbackTransaction struct {
+	commit func()
+	revert func()
+}
+
+func (cb callbackTransaction) Commit() {
+	if cb.commit != nil {
+		cb.commit()
+	}
+}
+
+func (cb callbackTransaction) Revert() {
+	if cb.revert != nil {
+		cb.revert()
+	}
+}
+
+func (rs *REST) allocateCreate(service *api.Service, dryRun bool) (transaction, error) {
+	result := metaTransaction{}
+
+	// Ensure IP family fields are correctly initialized.  We do it here, since
+	// we want this to be visible even when dryRun == true.
+	if err := rs.tryDefaultValidateServiceClusterIPFields(service); err != nil {
+		return nil, err
 	}
 
-	if err == nil {
-		el := nodePortOp.Commit()
-		if el != nil {
-			// these should be caught by an eventual reconciliation / restart
-			utilruntime.HandleError(fmt.Errorf("error(s) committing service node-ports changes: %v", el))
+	// Allocate ClusterIPs
+	//FIXME: we need to put values in, even if dry run - else validation should
+	//not pass.  It does but that should be fixed.
+	if !dryRun {
+		if txn, err := rs.allocServiceClusterIPsNew(service); err != nil {
+			result.Revert()
+			return nil, err
+		} else {
+			result = append(result, txn)
 		}
-
-		// no clusterips to release
-		toReleaseClusterIPs = nil
 	}
 
-	return out, err
+	// Allocate ports
+	if txn, err := rs.allocServiceNodePortsNew(service, dryRun); err != nil {
+		result.Revert()
+		return nil, err
+	} else {
+		result = append(result, txn)
+	}
+
+	return result, nil
 }
 
 func (rs *REST) Delete(ctx context.Context, id string, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
@@ -676,6 +711,27 @@ func (rs *REST) allocServiceClusterIP(service *api.Service) (map[api.IPFamily]st
 	return allocated, err
 }
 
+//FIXME: replace allocServiceClusterIPs rather than call it
+func (rs *REST) allocServiceClusterIPsNew(service *api.Service) (transaction, error) {
+	// clusterIPs that were allocated may need to be released in case of
+	// failure at a higher level.
+	toReleaseClusterIPs, err := rs.allocServiceClusterIPs(service)
+	if err != nil {
+		return nil, err
+	}
+
+	txn := callbackTransaction{
+		revert: func() {
+			released, err := rs.releaseClusterIPs(toReleaseClusterIPs)
+			if err != nil {
+				klog.Warningf("failed to release clusterIPs for failed new service:%v allocated:%v released:%v error:%v",
+					service.Name, toReleaseClusterIPs, released, err)
+			}
+		},
+	}
+	return txn, nil
+}
+
 // allocates ClusterIPs for a service
 func (rs *REST) allocServiceClusterIPs(service *api.Service) (map[api.IPFamily]string, error) {
 	// external name don't get ClusterIPs
@@ -744,6 +800,42 @@ func (rs *REST) allocServiceClusterIPs(service *api.Service) (map[api.IPFamily]s
 	}
 
 	return allocated, err
+}
+
+//FIXME: rename and merge with initNodePorts
+func (rs *REST) allocServiceNodePortsNew(service *api.Service, dryRun bool) (transaction, error) {
+	// The allocator tracks dry-run-ness internally.
+	nodePortOp := portallocator.StartOperation(rs.serviceNodePorts, dryRun)
+
+	txn := callbackTransaction{
+		commit: func() {
+			nodePortOp.Commit()
+			// We don't NEED to call Finish() here, but for that package says
+			// to, so for future-safety, we will.
+			nodePortOp.Finish()
+		},
+		revert: func() {
+			// Weirdly named but this will revert if commit wasn't called
+			nodePortOp.Finish()
+		},
+	}
+
+	if service.Spec.Type == api.ServiceTypeNodePort || service.Spec.Type == api.ServiceTypeLoadBalancer {
+		if err := initNodePorts(service, nodePortOp); err != nil {
+			txn.Revert()
+			return nil, err
+		}
+	}
+
+	// Handle ExternalTraffic related fields during service creation.
+	if apiservice.NeedsHealthCheck(service) {
+		if err := allocateHealthCheckNodePort(service, nodePortOp); err != nil {
+			txn.Revert()
+			return nil, errors.NewInternalError(err)
+		}
+	}
+
+	return txn, nil
 }
 
 // handles type change/upgrade/downgrade change type for an update service
@@ -869,6 +961,7 @@ func (rs *REST) releaseServiceClusterIPs(service *api.Service) (released map[api
 
 // attempts to default service ip families according to cluster configuration
 // while ensuring that provided families are configured on cluster.
+//FIXME: rename to initIPFamilyFields ?
 func (rs *REST) tryDefaultValidateServiceClusterIPFields(service *api.Service) error {
 	// can not do anything here
 	if service.Spec.Type == api.ServiceTypeExternalName {
@@ -881,6 +974,7 @@ func (rs *REST) tryDefaultValidateServiceClusterIPFields(service *api.Service) e
 		return nil
 	}
 
+	//FIXME: can this be left for validation to catch?
 	// two families or two IPs with Single or PreferDualStack is not allowed
 	if service.Spec.IPFamilyPolicy != nil && *(service.Spec.IPFamilyPolicy) != api.IPFamilyPolicyRequireDualStack {
 		el := make(field.ErrorList, 0)
