@@ -319,29 +319,25 @@ func (rs *REST) allocateCreate(service *api.Service, dryRun bool) (transaction, 
 	return result, nil
 }
 
+// This serves as a wrapper for the more generic Delete(), so we can release
+// allocated fields.
+//
+// This should stay as thin as possible.
 func (rs *REST) Delete(ctx context.Context, id string, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
-	// TODO: handle graceful
+	// Call the wrapped "simple" REST to do the real work.
 	obj, _, err := rs.services.Delete(ctx, id, deleteValidation, options)
 	if err != nil {
 		return nil, false, err
 	}
 
-	svc := obj.(*api.Service)
-	// (khenidak) double check that this is in fact the best place for this
-
-	// delete strategy handles graceful delete only. It expects strategy
-	// to implement Graceful-Delete related interface. Hence we are not doing
-	// the below there. instead we are doing it locally. Until strategy.BeforeDelete works without
-	// having to implement graceful delete management
-	// set ClusterIPs based on ClusterIP
-	// because we depend on ClusterIPs and data might be saved without ClusterIPs ..
-
-	if svc.Spec.ClusterIPs == nil && len(svc.Spec.ClusterIP) > 0 {
-		svc.Spec.ClusterIPs = []string{svc.Spec.ClusterIP}
-	}
+	// Clean up any allocated fields.
 
 	// Only perform the cleanup if this is a non-dryrun deletion
 	if !dryrun.IsDryRun(options.DryRun) {
+		// This assertion is safe because we set ReturnDeletedObject when we
+		// constructed this object.
+		svc := obj.(*api.Service)
+
 		// TODO: can leave dangling endpoints, and potentially return incorrect
 		// endpoints if a new service is created with the same name
 		_, _, err = rs.endpoints.Delete(ctx, id, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{})
@@ -352,17 +348,7 @@ func (rs *REST) Delete(ctx context.Context, id string, deleteValidation rest.Val
 		rs.releaseAllocatedResources(svc)
 	}
 
-	// TODO: this is duplicated from the generic storage, when this wrapper is fully removed we can drop this
-	details := &metav1.StatusDetails{
-		Name: svc.Name,
-		UID:  svc.UID,
-	}
-	if info, ok := genericapirequest.RequestInfoFrom(ctx); ok {
-		details.Group = info.APIGroup
-		details.Kind = info.Resource // legacy behavior
-	}
-	status := &metav1.Status{Status: metav1.StatusSuccess, Details: details}
-	return status, true, nil
+	return obj, true, nil
 }
 
 func (rs *REST) releaseAllocatedResources(svc *api.Service) {
@@ -1364,7 +1350,7 @@ func (nearlyNullStrategy) Export(ctx context.Context, obj runtime.Object, exact 
 	return nil
 }
 
-// normalizeClusterIPs adjust clusterIPs based on ClusterIP
+// normalizeClusterIPs adjusts clusterIPs based on ClusterIP.
 func normalizeClusterIPs(newSvc, oldSvc *api.Service) {
 	// In all cases here, we don't need to over-think the inputs.  Validation
 	// will be called on the new object soon enough.  All this needs to do is
