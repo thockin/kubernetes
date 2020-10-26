@@ -142,6 +142,7 @@ func NewREST(
 
 	klog.V(0).Infof("the default service ipfamily for this cluster is: %s", string(serviceIPFamily))
 
+	// FIXME: something like embed generic REST and init with `services`?
 	rest := &REST{
 		strategy:                    strategy,
 		services:                    services,
