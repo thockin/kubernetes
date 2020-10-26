@@ -41,6 +41,7 @@ import (
 	api "k8s.io/kubernetes/pkg/apis/core"
 	endpointstore "k8s.io/kubernetes/pkg/registry/core/endpoint/storage"
 	podstore "k8s.io/kubernetes/pkg/registry/core/pod/storage"
+	svcreg "k8s.io/kubernetes/pkg/registry/core/service"
 	"k8s.io/kubernetes/pkg/registry/core/service/ipallocator"
 	"k8s.io/kubernetes/pkg/registry/core/service/portallocator"
 	"k8s.io/kubernetes/pkg/registry/registrytest"
@@ -61,6 +62,7 @@ var (
 // in a completely different way. We should unify it.
 
 type serviceStorage struct {
+	strategy           rest.RESTCreateUpdateStrategy
 	GottenID           string
 	UpdatedID          string
 	CreatedID          string
@@ -116,6 +118,10 @@ func (s *serviceStorage) New() runtime.Object {
 }
 
 func (s *serviceStorage) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	if err := rest.BeforeCreate(s.strategy, ctx, obj); err != nil {
+		return nil, err
+	}
+
 	if dryrun.IsDryRun(options.DryRun) {
 		return obj, s.Err
 	}
@@ -134,6 +140,9 @@ func (s *serviceStorage) Create(ctx context.Context, obj runtime.Object, createV
 func (s *serviceStorage) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
 	obj, err := objInfo.UpdatedObject(ctx, s.OldService)
 	if err != nil {
+		return nil, false, err
+	}
+	if err := rest.BeforeUpdate(s.strategy, ctx, obj, s.OldService); err != nil {
 		return nil, false, err
 	}
 	if !dryrun.IsDryRun(options.DryRun) {
@@ -185,7 +194,17 @@ func NewTestREST(t *testing.T, endpoints *api.EndpointsList, ipFamilies []api.IP
 func NewTestRESTWithPods(t *testing.T, endpoints *api.EndpointsList, pods *api.PodList, ipFamilies []api.IPFamily) (*REST, *serviceStorage, *etcd3testing.EtcdTestServer) {
 	etcdStorage, server := registrytest.NewEtcdStorage(t, "")
 
-	serviceStorage := &serviceStorage{}
+	v4CIDR := makeIPNet(t)
+	v6CIDR := makeIPNet6(t)
+	primaryCIDR := v4CIDR
+	if ipFamilies[0] == api.IPv6Protocol {
+		primaryCIDR = v6CIDR
+	}
+
+	strategy, _ := svcreg.StrategyForServiceCIDRs(*primaryCIDR, len(ipFamilies) > 1)
+	serviceStorage := &serviceStorage{
+		strategy: strategy,
+	}
 
 	podStorage, err := podstore.NewStorage(generic.RESTOptions{
 		StorageConfig:           etcdStorage,
@@ -233,12 +252,12 @@ func NewTestRESTWithPods(t *testing.T, endpoints *api.EndpointsList, pods *api.P
 		var r ipallocator.Interface
 		switch family {
 		case api.IPv4Protocol:
-			r, err = ipallocator.NewCIDRRange(makeIPNet(t))
+			r, err = ipallocator.NewCIDRRange(v4CIDR)
 			if err != nil {
 				t.Fatalf("cannot create CIDR Range %v", err)
 			}
 		case api.IPv6Protocol:
-			r, err = ipallocator.NewCIDRRange(makeIPNet6(t))
+			r, err = ipallocator.NewCIDRRange(v6CIDR)
 			if err != nil {
 				t.Fatalf("cannot create CIDR Range %v", err)
 			}
@@ -485,9 +504,7 @@ func TestServiceRegistryCreate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.IPv6DualStack, tc.enableDualStack)()
 
-			// NOTE: This does not include the strategy, which limits the
-			// utility of these tests. We should rethink how we want to test
-			// this "nested" REST.
+			// TODO(thockin): This test does not validate ipFamilyPolicy and other fields.
 			storage, registry, server := NewTestREST(t, nil, tc.clusterFamilies)
 			defer server.Terminate(t)
 
