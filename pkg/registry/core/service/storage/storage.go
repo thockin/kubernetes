@@ -129,10 +129,6 @@ func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.Updat
 // defaults fields that were not previously set on read. becomes an
 // essential part of upgrading a service
 func (r *GenericREST) defaultServiceOnRead(obj runtime.Object) error {
-	if !utilfeature.DefaultFeatureGate.Enabled(features.IPv6DualStack) {
-		return nil
-	}
-
 	service, ok := obj.(*api.Service)
 	if ok {
 		return r.defaultAServiceOnRead(service)
@@ -166,6 +162,15 @@ func (r *GenericREST) defaultServiceList(serviceList *api.ServiceList) error {
 // defaults a single service
 func (r *GenericREST) defaultAServiceOnRead(service *api.Service) error {
 	if service == nil {
+		return nil
+	}
+
+	// We might find Services that were written before ClusterIP became plural.
+	// We still want to present a consistent view of them.
+	normalizeClusterIPs(service, nil)
+
+	// The rest of this does not apply unless dual-stack is enabled.
+	if !utilfeature.DefaultFeatureGate.Enabled(features.IPv6DualStack) {
 		return nil
 	}
 
