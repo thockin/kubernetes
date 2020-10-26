@@ -435,7 +435,14 @@ func (rs *REST) healthCheckNodePortUpdate(oldService, service *api.Service, node
 	return true, nil
 }
 
+// This serves as a wrapper for the more generic Update(), which can fail.  If
+// the inner Update() call fails, we need to clean up allocations.  If we had a
+// transactional store, this would just be part of the larger transaction.  We
+// don't have that, so we have to do it manually.
+//
+// This should stay as thin as possible.
 func (rs *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
+	// Get the old and new objects.
 	oldObj, err := rs.services.Get(ctx, name, &metav1.GetOptions{})
 	if err != nil {
 		// Support create on update, if forced to.
@@ -464,91 +471,108 @@ func (rs *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObj
 	// early, before anyone looks at them.
 	normalizeClusterIPs(service, oldService)
 
-	if !rest.ValidNamespace(ctx, &service.ObjectMeta) {
-		return nil, false, errors.NewConflict(api.Resource("services"), service.Namespace, fmt.Errorf("Service.Namespace does not match the provided context"))
-	}
-
-	// Copy over non-user fields
-	if err := rest.BeforeUpdate(rs.strategy, ctx, service, oldService); err != nil {
+	// Allocate and initialize fields.
+	txn, err := rs.allocateUpdate(service, oldService, dryrun.IsDryRun(options.DryRun))
+	if err != nil {
 		return nil, false, err
 	}
 
-	var allocated map[api.IPFamily]string
-	var toReleaseIPs map[api.IPFamily]string
-
-	performRelease := false // when set, any clusterIP that should be released will be released
-	// cleanup
-	// on failure: Any allocated ip must be released back
-	// on failure: any ip that should be released, will *not* be released
-	// on success: any ip that should be released, will  be released
-	defer func() {
-		// release the allocated, this is expected to be cleared if the entire function ran to success
-		if allocated_released, err := rs.releaseClusterIPs(allocated); err != nil {
-			klog.V(4).Infof("service %v/%v failed to clean up after failed service update error:%v. Allocated/Released:%v/%v", service.Namespace, service.Name, err, allocated, allocated_released)
-
-		}
-		// performRelease is set when the enture function ran to success
-		if performRelease {
-			if toReleaseIPs_released, err := rs.releaseClusterIPs(toReleaseIPs); err != nil {
-				klog.V(4).Infof("service %v/%v failed to clean up after failed service update error:%v. ShouldRelease/Released:%v/%v", service.Namespace, service.Name, err, toReleaseIPs, toReleaseIPs_released)
-			}
-		}
-	}()
-
-	nodePortOp := portallocator.StartOperation(rs.serviceNodePorts, dryrun.IsDryRun(options.DryRun))
-	defer nodePortOp.Finish()
-
-	// try set ip families (for missing ip families)
-	if err := rs.tryDefaultValidateServiceClusterIPFields(service); err != nil {
-		return nil, false, err
-	}
-
-	if !dryrun.IsDryRun(options.DryRun) {
-		allocated, toReleaseIPs, err = rs.handleClusterIPsForUpdatedService(oldService, service)
-		if err != nil {
-			return nil, false, err
-		}
-	}
-	// Update service from NodePort or LoadBalancer to ExternalName or ClusterIP, should release NodePort if exists.
-	if (oldService.Spec.Type == api.ServiceTypeNodePort || oldService.Spec.Type == api.ServiceTypeLoadBalancer) &&
-		(service.Spec.Type == api.ServiceTypeExternalName || service.Spec.Type == api.ServiceTypeClusterIP) {
-		releaseNodePorts(oldService, nodePortOp)
-	}
-	// Update service from any type to NodePort or LoadBalancer, should update NodePort.
-	if service.Spec.Type == api.ServiceTypeNodePort || service.Spec.Type == api.ServiceTypeLoadBalancer {
-		if err := updateNodePorts(oldService, service, nodePortOp); err != nil {
-			return nil, false, err
-		}
-	}
 	// Update service from LoadBalancer to non-LoadBalancer, should remove any LoadBalancerStatus.
+	// FIXME: move to PrepareFor?
 	if service.Spec.Type != api.ServiceTypeLoadBalancer {
 		// Although loadbalancer delete is actually asynchronous, we don't need to expose the user to that complexity.
 		service.Status.LoadBalancer = api.LoadBalancerStatus{}
 	}
 
-	// Handle ExternalTraffic related updates.
-	success, err := rs.healthCheckNodePortUpdate(oldService, service, nodePortOp)
-	if !success || err != nil {
-		return nil, false, err
-	}
+	// FIXME: move this some place that makes more sense
 	externalTrafficPolicyUpdate(oldService, service)
 	if errs := validation.ValidateServiceExternalTrafficFieldsCombination(service); len(errs) > 0 {
 		return nil, false, errors.NewInvalid(api.Kind("Service"), service.Name, errs)
 	}
 
+	// Call the wrapped "simple" REST to do the real work.
 	out, created, err := rs.services.Update(ctx, service.Name, rest.DefaultUpdatedObjectInfo(service), createValidation, updateValidation, forceAllowCreate, options)
 	if err == nil {
-		el := nodePortOp.Commit()
-		if el != nil {
-			// problems should be fixed by an eventual reconciliation / restart
-			utilruntime.HandleError(fmt.Errorf("error(s) committing NodePorts changes: %v", el))
-		}
+		txn.Revert()
+		return out, created, err
 	}
-	// all good
-	allocated = nil       // if something was allocated, keep it allocated
-	performRelease = true // if something that should be released then go ahead and release it
+	txn.Commit()
 
 	return out, created, err
+}
+
+func (rs *REST) allocateUpdate(service, oldService *api.Service, dryRun bool) (transaction, error) {
+	result := metaTransaction{}
+
+	// Ensure IP family fields are correctly initialized.  We do it here, since
+	// we want this to be visible even when dryRun == true.
+	if err := rs.tryDefaultValidateServiceClusterIPFields(service); err != nil {
+		return nil, err
+	}
+
+	// Allocate ClusterIPs
+	//FIXME: we need to put values in, even if dry run - else validation should
+	//not pass.  It does but that should be fixed.
+	if !dryRun {
+		if txn, err := rs.allocUpdateServiceClusterIPsNew(service, oldService); err != nil {
+			result.Revert()
+			return nil, err
+		} else {
+			result = append(result, txn)
+		}
+	}
+
+	// Allocate ports
+	if txn, err := rs.allocUpdateServiceNodePortsNew(service, oldService, dryRun); err != nil {
+		result.Revert()
+		return nil, err
+	} else {
+		result = append(result, txn)
+	}
+
+	return result, nil
+}
+
+//FIXME: rename and merge with updateNodePorts?
+func (rs *REST) allocUpdateServiceNodePortsNew(service, oldService *api.Service, dryRun bool) (transaction, error) {
+	// The allocator tracks dry-run-ness internally.
+	nodePortOp := portallocator.StartOperation(rs.serviceNodePorts, dryRun)
+
+	txn := callbackTransaction{
+		commit: func() {
+			nodePortOp.Commit()
+			// We don't NEED to call Finish() here, but for that package says
+			// to, so for future-safety, we will.
+			nodePortOp.Finish()
+		},
+		revert: func() {
+			// Weirdly named but this will revert if commit wasn't called
+			nodePortOp.Finish()
+		},
+	}
+
+	// Update service from NodePort or LoadBalancer to ExternalName or ClusterIP, should release NodePort if exists.
+	if (oldService.Spec.Type == api.ServiceTypeNodePort || oldService.Spec.Type == api.ServiceTypeLoadBalancer) &&
+		(service.Spec.Type == api.ServiceTypeExternalName || service.Spec.Type == api.ServiceTypeClusterIP) {
+		releaseNodePorts(oldService, nodePortOp)
+	}
+
+	// Update service from any type to NodePort or LoadBalancer, should update NodePort.
+	if service.Spec.Type == api.ServiceTypeNodePort || service.Spec.Type == api.ServiceTypeLoadBalancer {
+		if err := updateNodePorts(oldService, service, nodePortOp); err != nil {
+			txn.Revert()
+			return nil, err
+		}
+	}
+
+	// Handle ExternalTraffic related updates.
+	success, err := rs.healthCheckNodePortUpdate(oldService, service, nodePortOp)
+	if !success || err != nil {
+		txn.Revert()
+		return nil, err
+	}
+
+	return txn, nil
 }
 
 // Implement Redirector.
@@ -821,6 +845,35 @@ func (rs *REST) allocServiceNodePortsNew(service *api.Service, dryRun bool) (tra
 		}
 	}
 
+	return txn, nil
+}
+
+//FIXME: rename and merge with handleClusterIPsForUpdatedService
+func (rs *REST) allocUpdateServiceClusterIPsNew(service *api.Service, oldService *api.Service) (transaction, error) {
+	allocated, released, err := rs.handleClusterIPsForUpdatedService(oldService, service)
+	if err != nil {
+		return nil, err
+	}
+
+	// on failure: Any newly allocated IP must be released back
+	// on failure: Any previously allocated IP that would have been released,
+	//             must *not* be released
+	// on success: Any previously allocated IP that should be released, will be
+	//             released
+	txn := callbackTransaction{
+		commit: func() {
+			if actuallyReleased, err := rs.releaseClusterIPs(released); err != nil {
+				klog.V(4).Infof("service %v/%v failed to clean up after failed service update error:%v. ShouldRelease/Released:%v/%v",
+					service.Namespace, service.Name, err, released, actuallyReleased)
+			}
+		},
+		revert: func() {
+			if actuallyReleased, err := rs.releaseClusterIPs(allocated); err != nil {
+				klog.V(4).Infof("service %v/%v failed to clean up after failed service update error:%v. Allocated/Released:%v/%v",
+					service.Namespace, service.Name, err, allocated, actuallyReleased)
+			}
+		},
+	}
 	return txn, nil
 }
 
@@ -1350,7 +1403,8 @@ func (nearlyNullStrategy) Export(ctx context.Context, obj runtime.Object, exact 
 	return nil
 }
 
-// normalizeClusterIPs adjusts clusterIPs based on ClusterIP.
+// normalizeClusterIPs adjusts clusterIPs based on ClusterIP.  This must not
+// consider any other fields.
 func normalizeClusterIPs(newSvc, oldSvc *api.Service) {
 	// In all cases here, we don't need to over-think the inputs.  Validation
 	// will be called on the new object soon enough.  All this needs to do is
