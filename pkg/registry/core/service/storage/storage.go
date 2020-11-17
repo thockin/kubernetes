@@ -26,6 +26,7 @@ import (
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/klog/v2"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/printers"
@@ -248,11 +249,16 @@ func (r *GenericREST) beginCreate(ctx context.Context, obj runtime.Object, optio
 
 	// FIXME: remove this when implementing
 	_ = svc
+	klog.Errorf("TIM: beginCreate: svc %v/%v - prepare to allocate", svc.Namespace, svc.Name)
 
 	// Our cleanup callback
 	finish := func(_ context.Context, success bool) {
 		if success {
+			// FIXME: remove this
+			klog.Errorf("TIM: beginCreate: svc %v/%v - commit allocations", svc.Namespace, svc.Name)
 		} else {
+			// FIXME: remove this
+			klog.Errorf("TIM: beginCreate: svc %v/%v - revert allocations", svc.Namespace, svc.Name)
 		}
 	}
 
@@ -266,11 +272,16 @@ func (r *GenericREST) beginUpdate(ctx context.Context, obj, oldObj runtime.Objec
 	// FIXME: remove these when implementing
 	_ = oldSvc
 	_ = newSvc
+	klog.Errorf("TIM: beginUpdate: svc %v/%v - prepare to allocate", newSvc.Namespace, newSvc.Name)
 
 	// Our cleanup callback
 	finish := func(_ context.Context, success bool) {
 		if success {
+			// FIXME: remove this
+			klog.Errorf("TIM: beginUpdate: svc %v/%v - commit allocations", newSvc.Namespace, newSvc.Name)
 		} else {
+			// FIXME: remove this
+			klog.Errorf("TIM: beginUpdate: svc %v/%v - revert allocations", newSvc.Namespace, newSvc.Name)
 		}
 	}
 
