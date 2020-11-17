@@ -18,12 +18,12 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"reflect"
 	"strings"
 	"testing"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,6 +36,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	etcd3testing "k8s.io/apiserver/pkg/storage/etcd3/testing"
 	"k8s.io/apiserver/pkg/util/dryrun"
+	"k8s.io/klog/v2"
 
 	"k8s.io/kubernetes/pkg/api/service"
 	api "k8s.io/kubernetes/pkg/apis/core"
@@ -70,7 +71,6 @@ type serviceStorage struct {
 	Created            bool
 	DeletedImmediately bool
 	Service            *api.Service
-	OldService         *api.Service
 	ServiceList        *api.ServiceList
 	Err                error
 }
@@ -80,6 +80,10 @@ func (s *serviceStorage) NamespaceScoped() bool {
 }
 
 func (s *serviceStorage) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+	klog.Errorf("TIM: s: %+v", *s)
+	if s.Service == nil {
+		return nil, fmt.Errorf("GET %s: does not exist", name)
+	}
 	s.GottenID = name
 	return s.Service, s.Err
 }
@@ -118,6 +122,7 @@ func (s *serviceStorage) New() runtime.Object {
 }
 
 func (s *serviceStorage) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	klog.Errorf("TIM: in Delete: %v", s.Service)
 	if err := rest.BeforeCreate(s.strategy, ctx, obj); err != nil {
 		return nil, err
 	}
@@ -138,11 +143,11 @@ func (s *serviceStorage) Create(ctx context.Context, obj runtime.Object, createV
 }
 
 func (s *serviceStorage) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
-	obj, err := objInfo.UpdatedObject(ctx, s.OldService)
+	obj, err := objInfo.UpdatedObject(ctx, s.Service)
 	if err != nil {
 		return nil, false, err
 	}
-	if err := rest.BeforeUpdate(s.strategy, ctx, obj, s.OldService); err != nil {
+	if err := rest.BeforeUpdate(s.strategy, ctx, obj, s.Service); err != nil {
 		return nil, false, err
 	}
 	if !dryrun.IsDryRun(options.DryRun) {
@@ -153,6 +158,7 @@ func (s *serviceStorage) Update(ctx context.Context, name string, objInfo rest.U
 }
 
 func (s *serviceStorage) Delete(ctx context.Context, name string, deleteValidation rest.ValidateObjectFunc, options *metav1.DeleteOptions) (runtime.Object, bool, error) {
+	klog.Errorf("TIM: in Delete: %v", s.Service)
 	if !dryrun.IsDryRun(options.DryRun) {
 		s.DeletedID = name
 	}
@@ -990,6 +996,7 @@ func TestServiceRegistryUpdateDryRun(t *testing.T) {
 			Selector:        map[string]string{"bar": "baz"},
 			SessionAffinity: api.ServiceAffinityNone,
 			Type:            api.ServiceTypeExternalName,
+			ExternalName:    "example.com",
 			Ports: []api.ServicePort{{
 				Port:       6502,
 				Protocol:   api.ProtocolTCP,
@@ -1149,59 +1156,6 @@ func TestServiceRegistryUpdateDryRun(t *testing.T) {
 	}
 }
 
-func TestServiceStorageValidatesUpdate(t *testing.T) {
-	ctx := genericapirequest.NewDefaultContext()
-	storage, registry, server := NewTestREST(t, nil, singleStackIPv4)
-	defer server.Terminate(t)
-	registry.Create(ctx, &api.Service{
-		ObjectMeta: metav1.ObjectMeta{Name: "foo"},
-		Spec: api.ServiceSpec{
-			Selector: map[string]string{"bar": "baz"},
-			Ports: []api.ServicePort{{
-				Port:     6502,
-				Protocol: api.ProtocolTCP,
-			}},
-		},
-	}, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
-	failureCases := map[string]api.Service{
-		"empty ID": {
-			ObjectMeta: metav1.ObjectMeta{Name: ""},
-			Spec: api.ServiceSpec{
-				Selector:        map[string]string{"bar": "baz"},
-				SessionAffinity: api.ServiceAffinityNone,
-				Type:            api.ServiceTypeClusterIP,
-				Ports: []api.ServicePort{{
-					Port:       6502,
-					Protocol:   api.ProtocolTCP,
-					TargetPort: intstr.FromInt(6502),
-				}},
-			},
-		},
-		"invalid selector": {
-			ObjectMeta: metav1.ObjectMeta{Name: "foo"},
-			Spec: api.ServiceSpec{
-				Selector:        map[string]string{"ThisSelectorFailsValidation": "ok"},
-				SessionAffinity: api.ServiceAffinityNone,
-				Type:            api.ServiceTypeClusterIP,
-				Ports: []api.ServicePort{{
-					Port:       6502,
-					Protocol:   api.ProtocolTCP,
-					TargetPort: intstr.FromInt(6502),
-				}},
-			},
-		},
-	}
-	for _, failureCase := range failureCases {
-		c, created, err := storage.Update(ctx, failureCase.Name, rest.DefaultUpdatedObjectInfo(&failureCase), rest.ValidateAllObjectFunc, rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})
-		if c != nil || created {
-			t.Errorf("Expected nil object or created false")
-		}
-		if !errors.IsInvalid(err) {
-			t.Errorf("Expected to get an invalid resource error, got %v", err)
-		}
-	}
-}
-
 func TestServiceRegistryExternalService(t *testing.T) {
 	ctx := genericapirequest.NewDefaultContext()
 	storage, registry, server := NewTestREST(t, nil, singleStackIPv4)
@@ -1252,12 +1206,16 @@ func TestServiceRegistryDelete(t *testing.T) {
 			SessionAffinity: api.ServiceAffinityNone,
 			Type:            api.ServiceTypeClusterIP,
 			Ports: []api.ServicePort{{
-				Port:     6502,
-				Protocol: api.ProtocolTCP,
+				Port:       6502,
+				TargetPort: intstr.FromInt(6502),
+				Protocol:   api.ProtocolTCP,
 			}},
 		},
 	}
-	registry.Create(ctx, svc, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+	_, err := registry.Create(ctx, svc, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+	if err != nil {
+		klog.Errorf("TIM: err %v", err)
+	}
 	storage.Delete(ctx, svc.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{})
 	if e, a := "foo", registry.DeletedID; e != a {
 		t.Errorf("Expected %v, but got %v", e, a)
@@ -1387,8 +1345,9 @@ func TestServiceRegistryDeleteExternal(t *testing.T) {
 			SessionAffinity: api.ServiceAffinityNone,
 			Type:            api.ServiceTypeLoadBalancer,
 			Ports: []api.ServicePort{{
-				Port:     6502,
-				Protocol: api.ProtocolTCP,
+				Port:       6502,
+				TargetPort: intstr.FromInt(6502),
+				Protocol:   api.ProtocolTCP,
 			}},
 		},
 	}
@@ -1480,12 +1439,20 @@ func TestServiceRegistryGet(t *testing.T) {
 	ctx := genericapirequest.NewDefaultContext()
 	storage, registry, server := NewTestREST(t, nil, singleStackIPv4)
 	defer server.Terminate(t)
-	registry.Create(ctx, &api.Service{
+	_, err := registry.Create(ctx, &api.Service{
 		ObjectMeta: metav1.ObjectMeta{Name: "foo"},
 		Spec: api.ServiceSpec{
-			Selector: map[string]string{"bar": "baz"},
+			Selector:        map[string]string{"bar": "baz"},
+			SessionAffinity: api.ServiceAffinityNone,
+			Type:            api.ServiceTypeClusterIP,
+			Ports: []api.ServicePort{
+				{Port: 9393, Protocol: "TCP", TargetPort: intstr.FromString("p")},
+			},
 		},
 	}, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("create failed: %s", err)
+	}
 	storage.Get(ctx, "foo", &metav1.GetOptions{})
 	if e, a := "foo", registry.GottenID; e != a {
 		t.Errorf("Expected %v, but got %v", e, a)
@@ -1493,44 +1460,37 @@ func TestServiceRegistryGet(t *testing.T) {
 }
 
 func TestServiceRegistryResourceLocation(t *testing.T) {
-	ctx := genericapirequest.NewDefaultContext()
 	endpoints := &api.EndpointsList{
-		Items: []api.Endpoints{
-			{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "bad",
-					Namespace: metav1.NamespaceDefault,
-				},
-				Subsets: []api.EndpointSubset{{
-					Addresses: []api.EndpointAddress{
-						{IP: "1.2.3.4", TargetRef: &api.ObjectReference{Name: "foo", Namespace: "doesn't exist"}},
-						{IP: "1.2.3.4", TargetRef: &api.ObjectReference{Name: "doesn't exist", Namespace: metav1.NamespaceDefault}},
-						{IP: "23.2.3.4", TargetRef: &api.ObjectReference{Name: "foo", Namespace: metav1.NamespaceDefault}},
+		Items: []api.Endpoints{{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "single-port",
+				Namespace: metav1.NamespaceDefault,
+			},
+			Subsets: []api.EndpointSubset{{
+				Addresses: []api.EndpointAddress{{IP: "1.2.3.4"}},
+				Ports:     []api.EndpointPort{{Name: "", Port: 93}},
+			}},
+			/*
+				}, {
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo",
+						Namespace: metav1.NamespaceDefault,
 					},
-					Ports: []api.EndpointPort{{Name: "", Port: 80}, {Name: "p", Port: 93}},
-				}},
-			},
-			{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
-					Namespace: metav1.NamespaceDefault,
-				},
-				Subsets: []api.EndpointSubset{{
-					Addresses: []api.EndpointAddress{{IP: "1.2.3.4", TargetRef: &api.ObjectReference{Name: "foo", Namespace: metav1.NamespaceDefault}}},
-					Ports:     []api.EndpointPort{{Name: "", Port: 80}, {Name: "p", Port: 93}},
-				}},
-			},
-			{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo-second-ip",
-					Namespace: metav1.NamespaceDefault,
-				},
-				Subsets: []api.EndpointSubset{{
-					Addresses: []api.EndpointAddress{{IP: "2001:db7::", TargetRef: &api.ObjectReference{Name: "foo", Namespace: metav1.NamespaceDefault}}},
-					Ports:     []api.EndpointPort{{Name: "", Port: 80}, {Name: "p", Port: 93}},
-				}},
-			},
-		},
+					Subsets: []api.EndpointSubset{{
+						Addresses: []api.EndpointAddress{{IP: "1.2.3.4", TargetRef: &api.ObjectReference{Name: "foo", Namespace: metav1.NamespaceDefault}}},
+						Ports:     []api.EndpointPort{{Name: "q", Port: 80}, {Name: "p", Port: 93}},
+					}},
+				}, {
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-second-ip",
+						Namespace: metav1.NamespaceDefault,
+					},
+					Subsets: []api.EndpointSubset{{
+						Addresses: []api.EndpointAddress{{IP: "2001:db7::", TargetRef: &api.ObjectReference{Name: "foo", Namespace: metav1.NamespaceDefault}}},
+						Ports:     []api.EndpointPort{{Name: "q", Port: 80}, {Name: "p", Port: 93}},
+					}},
+			*/
+		}},
 	}
 	pods := &api.PodList{
 		Items: []api.Pod{
@@ -1566,24 +1526,32 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 	}
 	storage, registry, server := NewTestRESTWithPods(t, endpoints, pods, singleStackIPv4)
 	defer server.Terminate(t)
-	for _, name := range []string{"foo", "bad"} {
-		registry.Create(ctx, &api.Service{
+	//FIXME: what a mess - need a single-port service
+	for _, name := range []string{"single-port", "foo", "bad"} {
+		_, err := registry.Create(ctx, &api.Service{
 			ObjectMeta: metav1.ObjectMeta{Name: name},
 			Spec: api.ServiceSpec{
-				Selector: map[string]string{"bar": "baz"},
+				Selector:        map[string]string{"bar": "baz"},
+				SessionAffinity: api.ServiceAffinityNone,
+				Type:            api.ServiceTypeClusterIP,
 				Ports: []api.ServicePort{
 					// Service port 9393 should route to endpoint port "p", which is port 93
-					{Name: "p", Port: 9393, TargetPort: intstr.FromString("p")},
+					{Name: "p", Port: 9393, Protocol: "TCP", TargetPort: intstr.FromString("p")},
 
-					// Service port 93 should route to unnamed endpoint port, which is port 80
+					// Service port 93 should route to the endpoint port, which is port 80
 					// This is to test that the service port definition is used when determining resource location
-					{Name: "", Port: 93, TargetPort: intstr.FromInt(80)},
+					{Name: "q", Port: 93, Protocol: "TCP", TargetPort: intstr.FromInt(80)},
 				},
 			},
 		}, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+		if err != nil {
+			t.Fatalf("failed to create: %v", err)
+		}
 	}
 	redirector := rest.Redirector(storage)
 
+	ctx := genericapirequest.NewDefaultContext()
+	klog.Errorf("TIM: 1: %+v", *registry)
 	// Test a simple id.
 	location, _, err := redirector.ResourceLocation(ctx, "foo")
 	if err != nil {
@@ -1596,6 +1564,7 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", e, a)
 	}
 
+	klog.Errorf("TIM: 2: %+v", *registry)
 	// Test a simple id (using second ip).
 	location, _, err = redirector.ResourceLocation(ctx, "foo-second-ip")
 	if err != nil {
@@ -1608,6 +1577,7 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", e, a)
 	}
 
+	klog.Errorf("TIM: 3: %+v", *registry)
 	// Test a name + port.
 	location, _, err = redirector.ResourceLocation(ctx, "foo:p")
 	if err != nil {
@@ -1620,6 +1590,7 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", e, a)
 	}
 
+	klog.Errorf("TIM: 4: %+v", *registry)
 	// Test a name + port (using second ip).
 	location, _, err = redirector.ResourceLocation(ctx, "foo-second-ip:p")
 	if err != nil {
@@ -1632,6 +1603,7 @@ func TestServiceRegistryResourceLocation(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", e, a)
 	}
 
+	klog.Errorf("TIM: 5: %+v", *registry)
 	// Test a name + port number (service port 93 -> target port 80)
 	location, _, err = redirector.ResourceLocation(ctx, "foo:93")
 	if err != nil {
@@ -1732,18 +1704,29 @@ func TestServiceRegistryList(t *testing.T) {
 	ctx := genericapirequest.NewDefaultContext()
 	storage, registry, server := NewTestREST(t, nil, singleStackIPv4)
 	defer server.Terminate(t)
-	registry.Create(ctx, &api.Service{
+	_, err := registry.Create(ctx, &api.Service{
 		ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: metav1.NamespaceDefault},
 		Spec: api.ServiceSpec{
-			Selector: map[string]string{"bar": "baz"},
+			Selector:        map[string]string{"bar": "baz"},
+			SessionAffinity: api.ServiceAffinityNone,
+			Type:            api.ServiceTypeClusterIP,
+			Ports: []api.ServicePort{
+				{Port: 9393, Protocol: "TCP", TargetPort: intstr.FromString("p")},
+			},
 		},
 	}, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
-	registry.Create(ctx, &api.Service{
+	if err != nil {
+		t.Fatalf("failed to create service: %v", err)
+	}
+	_, err = registry.Create(ctx, &api.Service{
 		ObjectMeta: metav1.ObjectMeta{Name: "foo2", Namespace: metav1.NamespaceDefault},
 		Spec: api.ServiceSpec{
 			Selector: map[string]string{"bar2": "baz2"},
 		},
 	}, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+	if err != nil {
+		t.Fatalf("failed to create service: %v", err)
+	}
 	registry.ServiceList.ResourceVersion = "1"
 	s, _ := storage.List(ctx, nil)
 	sl := s.(*api.ServiceList)

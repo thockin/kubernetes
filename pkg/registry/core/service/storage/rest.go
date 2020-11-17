@@ -338,6 +338,9 @@ func (rs *REST) Delete(ctx context.Context, id string, deleteValidation rest.Val
 		// This assertion is safe because we set ReturnDeletedObject when we
 		// constructed this object.
 		svc := obj.(*api.Service)
+		if svc == nil { //FIXME:
+			klog.Errorf("TIM: Delete returned nil")
+		}
 
 		// TODO: can leave dangling endpoints, and potentially return incorrect
 		// endpoints if a new service is created with the same name
@@ -446,8 +449,10 @@ func (rs *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObj
 	// Get the old and new objects.
 	oldObj, err := rs.services.Get(ctx, name, &metav1.GetOptions{})
 	if err != nil {
+		klog.Errorf("TIM: Update's first get failed: %v", err)
 		// Support create on update, if forced to.
 		if forceAllowCreate {
+			klog.Errorf("TIM: force allow create")
 			obj, err := objInfo.UpdatedObject(ctx, nil)
 			if err != nil {
 				return nil, false, err
@@ -460,7 +465,11 @@ func (rs *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObj
 		}
 		return nil, false, err
 	}
+	klog.Errorf("TIM: Update's first get succeeded: %v", err)
 	oldService := oldObj.(*api.Service)
+	if oldService == nil { //FIXME:
+		klog.Errorf("TIM: oldService is nil: %+v", ctx)
+	}
 	obj, err := objInfo.UpdatedObject(ctx, oldService)
 	if err != nil {
 		return nil, false, err
@@ -505,6 +514,9 @@ func (rs *REST) Update(ctx context.Context, name string, objInfo rest.UpdatedObj
 func (rs *REST) allocateUpdate(service, oldService *api.Service, dryRun bool) (transaction, error) {
 	result := metaTransaction{}
 
+	if oldService == nil { //FIXME:
+		klog.Errorf("TIM: 2: oldService is nil")
+	}
 	// Ensure IP family fields are correctly initialized.  We do it here, since
 	// we want this to be visible even when dryRun == true.
 	if err := rs.tryDefaultValidateServiceClusterIPFields(service); err != nil {
@@ -589,11 +601,15 @@ func (rs *REST) ResourceLocation(ctx context.Context, id string) (*url.URL, http
 
 	// If a port *number* was specified, find the corresponding service port name
 	if portNum, err := strconv.ParseInt(portStr, 10, 64); err == nil {
+		klog.Errorf("TIM: port number: %s", portStr)
 		obj, err := rs.services.Get(ctx, svcName, &metav1.GetOptions{})
 		if err != nil {
 			return nil, nil, err
 		}
 		svc := obj.(*api.Service)
+		if svc == nil { //FIXME:
+			klog.Errorf("TIM: svc %s is nil", svcName)
+		}
 		found := false
 		for _, svcPort := range svc.Spec.Ports {
 			if int64(svcPort.Port) == portNum {
@@ -891,6 +907,8 @@ func (rs *REST) handleClusterIPsForUpdatedService(oldService *api.Service, servi
 
 	// CASE A:
 	// Update service from ExternalName to non-ExternalName, should initialize ClusterIP.
+	klog.Errorf("TIM: oldService: %p", oldService)
+	klog.Errorf("TIM: oldService.spec: %v", oldService.Spec)
 	if oldService.Spec.Type == api.ServiceTypeExternalName && service.Spec.Type != api.ServiceTypeExternalName {
 		allocated, err := rs.allocServiceClusterIPs(service)
 		return allocated, nil, err
