@@ -337,19 +337,31 @@ func (r *GenericREST) beginUpdate(ctx context.Context, obj, oldObj runtime.Objec
 	// FIXME: remove this
 	klog.Errorf("TIM: beginUpdate: svc %v/%v - prepare to allocate", newSvc.Namespace, newSvc.Name)
 
+	// Fix up allocated values that the client may have not specified (for
+	// idempotence).
+	svcreg.PatchAllocatedValues(newSvc, oldSvc)
+
 	// Make sure ClusterIP and ClusterIPs are in sync.  This has to happen
 	// early, before anyone looks at them.
 	// NOTE: the args are (old, new)
 	svcreg.NormalizeClusterIPs(oldSvc, newSvc)
+
+	// Allocate and initialize fields.
+	txn, err := r.alloc.allocateUpdate(newSvc, oldSvc, dryrun.IsDryRun(options.DryRun))
+	if err != nil {
+		return nil, err
+	}
 
 	// Our cleanup callback
 	finish := func(_ context.Context, success bool) {
 		if success {
 			// FIXME: remove this
 			klog.Errorf("TIM: beginUpdate: svc %v/%v - commit allocations", newSvc.Namespace, newSvc.Name)
+			txn.Commit()
 		} else {
 			// FIXME: remove this
 			klog.Errorf("TIM: beginUpdate: svc %v/%v - revert allocations", newSvc.Namespace, newSvc.Name)
+			txn.Revert()
 		}
 	}
 
