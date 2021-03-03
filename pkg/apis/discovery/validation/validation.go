@@ -18,7 +18,6 @@ package validation
 
 import (
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
-	metavalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -38,10 +37,9 @@ var (
 		string(api.ProtocolUDP),
 		string(api.ProtocolSCTP),
 	)
-	maxTopologyLabels = 16
-	maxAddresses      = 100
-	maxPorts          = 100
-	maxEndpoints      = 1000
+	maxAddresses = 100
+	maxPorts     = 100
+	maxEndpoints = 1000
 )
 
 // ValidateEndpointSliceName can be used to check whether the given endpoint
@@ -109,12 +107,6 @@ func validateEndpoints(endpoints []discovery.Endpoint, addrType discovery.Addres
 				allErrs = append(allErrs, field.Invalid(nnPath, *endpoint.NodeName, msg))
 			}
 		}
-
-		topologyPath := idxPath.Child("topology")
-		if len(endpoint.Topology) > maxTopologyLabels {
-			allErrs = append(allErrs, field.TooMany(topologyPath, len(endpoint.Topology), maxTopologyLabels))
-		}
-		allErrs = append(allErrs, metavalidation.ValidateLabels(endpoint.Topology, topologyPath)...)
 
 		if endpoint.Hostname != nil {
 			allErrs = append(allErrs, apivalidation.ValidateDNS1123Label(*endpoint.Hostname, idxPath.Child("hostname"))...)

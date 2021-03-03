@@ -28,7 +28,7 @@ import (
 	"time"
 
 	apiserverinternalv1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
-	discoveryv1alpha1 "k8s.io/api/discovery/v1alpha1"
+	discoveryv1 "k8s.io/api/discovery/v1"
 	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	flowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
@@ -164,7 +164,7 @@ func TestServerSidePrint(t *testing.T) {
 	s, _, closeFn := setupWithResources(t,
 		// additional groupversions needed for the test to run
 		[]schema.GroupVersion{
-			discoveryv1alpha1.SchemeGroupVersion,
+			discoveryv1.SchemeGroupVersion,
 			discoveryv1beta1.SchemeGroupVersion,
 			rbacv1alpha1.SchemeGroupVersion,
 			schedulerapi.SchemeGroupVersion,

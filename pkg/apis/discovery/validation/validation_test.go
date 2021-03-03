@@ -187,22 +187,6 @@ func TestValidateEndpointSlice(t *testing.T) {
 				}},
 			},
 		},
-		"max-topology-keys": {
-			expectedErrors: 0,
-			endpointSlice: &discovery.EndpointSlice{
-				ObjectMeta:  standardMeta,
-				AddressType: discovery.AddressTypeIPv4,
-				Ports: []discovery.EndpointPort{{
-					Name:     utilpointer.StringPtr("http"),
-					Protocol: protocolPtr(api.ProtocolTCP),
-				}},
-				Endpoints: []discovery.Endpoint{{
-					Addresses: generateIPAddresses(1),
-					Topology:  generateTopology(maxTopologyLabels),
-				}},
-			},
-		},
-
 		// expected failures
 		"duplicate-port-name": {
 			expectedErrors: 1,
@@ -308,36 +292,6 @@ func TestValidateEndpointSlice(t *testing.T) {
 				}},
 				Endpoints: []discovery.Endpoint{{
 					Addresses: generateIPAddresses(maxAddresses + 1),
-				}},
-			},
-		},
-		"bad-topology-key": {
-			expectedErrors: 1,
-			endpointSlice: &discovery.EndpointSlice{
-				ObjectMeta:  standardMeta,
-				AddressType: discovery.AddressTypeIPv4,
-				Ports: []discovery.EndpointPort{{
-					Name:     utilpointer.StringPtr("http"),
-					Protocol: protocolPtr(api.ProtocolTCP),
-				}},
-				Endpoints: []discovery.Endpoint{{
-					Addresses: generateIPAddresses(1),
-					Topology:  map[string]string{"--INVALID": "example"},
-				}},
-			},
-		},
-		"too-many-topology-keys": {
-			expectedErrors: 1,
-			endpointSlice: &discovery.EndpointSlice{
-				ObjectMeta:  standardMeta,
-				AddressType: discovery.AddressTypeIPv4,
-				Ports: []discovery.EndpointPort{{
-					Name:     utilpointer.StringPtr("http"),
-					Protocol: protocolPtr(api.ProtocolTCP),
-				}},
-				Endpoints: []discovery.Endpoint{{
-					Addresses: generateIPAddresses(1),
-					Topology:  generateTopology(maxTopologyLabels + 1),
 				}},
 			},
 		},
@@ -689,12 +643,4 @@ func generateIPAddresses(n int) []string {
 		addresses = append(addresses, fmt.Sprintf("10.1.2.%d", i%255))
 	}
 	return addresses
-}
-
-func generateTopology(n int) map[string]string {
-	topology := map[string]string{}
-	for i := 0; i < n; i++ {
-		topology[fmt.Sprintf("topology-%d", i)] = "example"
-	}
-	return topology
 }
