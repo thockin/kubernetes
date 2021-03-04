@@ -19,10 +19,14 @@ package endpointslice
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
+	discoveryv1 "k8s.io/api/discovery/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -51,6 +55,24 @@ func (endpointSliceStrategy) PrepareForCreate(ctx context.Context, obj runtime.O
 	endpointSlice.Generation = 1
 
 	dropDisabledFieldsOnCreate(endpointSlice)
+
+	// Handle some v1 <-> v1beta1 compat issues.
+	//FIXME: move to a nice helper function instead of copying this block in create and update
+	if requestInfo, ok := request.RequestInfoFrom(ctx); ok {
+		requestGV := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		if requestGV == discoveryv1.SchemeGroupVersion {
+			for i := range endpointSlice.Endpoints {
+				// Silently wipe deprecatedTopology.
+				ep := &endpointSlice.Endpoints[i]
+				ep.DeprecatedTopology = map[string]string{}
+
+				// Set the topology[hostname] for compat with old clients.
+				if ep.NodeName != nil {
+					ep.DeprecatedTopology[corev1.LabelHostname] = *ep.NodeName
+				}
+			}
+		}
+	}
 }
 
 // PrepareForUpdate clears fields that are not allowed to be set by end users on update.
@@ -62,8 +84,8 @@ func (endpointSliceStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 	// This needs to be changed if a status attribute is added to EndpointSlice
 	ogNewMeta := newEPS.ObjectMeta
 	ogOldMeta := oldEPS.ObjectMeta
-	newEPS.ObjectMeta = v1.ObjectMeta{}
-	oldEPS.ObjectMeta = v1.ObjectMeta{}
+	newEPS.ObjectMeta = metav1.ObjectMeta{}
+	oldEPS.ObjectMeta = metav1.ObjectMeta{}
 
 	if !apiequality.Semantic.DeepEqual(newEPS, oldEPS) {
 		ogNewMeta.Generation = ogOldMeta.Generation + 1
@@ -73,6 +95,23 @@ func (endpointSliceStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 	oldEPS.ObjectMeta = ogOldMeta
 
 	dropDisabledFieldsOnUpdate(oldEPS, newEPS)
+
+	// Handle some v1 <-> v1beta1 compat issues.
+	if requestInfo, ok := request.RequestInfoFrom(ctx); ok {
+		requestGV := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		if requestGV == discoveryv1.SchemeGroupVersion {
+			for i := range newEPS.Endpoints {
+				// Silently wipe deprecatedTopology.
+				ep := &newEPS.Endpoints[i]
+				ep.DeprecatedTopology = map[string]string{}
+
+				// Set the topology[hostname] for compat with old clients.
+				if ep.NodeName != nil {
+					ep.DeprecatedTopology[corev1.LabelHostname] = *ep.NodeName
+				}
+			}
+		}
+	}
 }
 
 // Validate validates a new EndpointSlice.

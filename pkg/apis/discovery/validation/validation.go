@@ -17,7 +17,11 @@ limitations under the License.
 package validation
 
 import (
+	"fmt"
+
+	v1 "k8s.io/api/core/v1"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
+	metavalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -37,9 +41,10 @@ var (
 		string(api.ProtocolUDP),
 		string(api.ProtocolSCTP),
 	)
-	maxAddresses = 100
-	maxPorts     = 100
-	maxEndpoints = 1000
+	maxTopologyLabels = 16
+	maxAddresses      = 100
+	maxPorts          = 100
+	maxEndpoints      = 1000
 )
 
 // ValidateEndpointSliceName can be used to check whether the given endpoint
@@ -106,6 +111,15 @@ func validateEndpoints(endpoints []discovery.Endpoint, addrType discovery.Addres
 			for _, msg := range apivalidation.ValidateNodeName(*endpoint.NodeName, false) {
 				allErrs = append(allErrs, field.Invalid(nnPath, *endpoint.NodeName, msg))
 			}
+		}
+
+		topologyPath := idxPath.Child("deprecatedTopology")
+		if len(endpoint.DeprecatedTopology) > maxTopologyLabels {
+			allErrs = append(allErrs, field.TooMany(topologyPath, len(endpoint.DeprecatedTopology), maxTopologyLabels))
+		}
+		allErrs = append(allErrs, metavalidation.ValidateLabels(endpoint.DeprecatedTopology, topologyPath)...)
+		if _, found := endpoint.DeprecatedTopology[v1.LabelTopologyZone]; found {
+			allErrs = append(allErrs, field.InternalError(topologyPath.Key(v1.LabelTopologyZone), fmt.Errorf("reserved key was not removed in conversion")))
 		}
 
 		if endpoint.Hostname != nil {

@@ -98,6 +98,7 @@ func autoConvert_v1_Endpoint_To_discovery_Endpoint(in *v1.Endpoint, out *discove
 	}
 	out.Hostname = (*string)(unsafe.Pointer(in.Hostname))
 	out.TargetRef = (*core.ObjectReference)(unsafe.Pointer(in.TargetRef))
+	out.DeprecatedTopology = *(*map[string]string)(unsafe.Pointer(&in.DeprecatedTopology))
 	out.NodeName = (*string)(unsafe.Pointer(in.NodeName))
 	out.Zone = (*string)(unsafe.Pointer(in.Zone))
 	return nil
@@ -115,6 +116,7 @@ func autoConvert_discovery_Endpoint_To_v1_Endpoint(in *discovery.Endpoint, out *
 	}
 	out.Hostname = (*string)(unsafe.Pointer(in.Hostname))
 	out.TargetRef = (*corev1.ObjectReference)(unsafe.Pointer(in.TargetRef))
+	out.DeprecatedTopology = *(*map[string]string)(unsafe.Pointer(&in.DeprecatedTopology))
 	out.NodeName = (*string)(unsafe.Pointer(in.NodeName))
 	out.Zone = (*string)(unsafe.Pointer(in.Zone))
 	return nil

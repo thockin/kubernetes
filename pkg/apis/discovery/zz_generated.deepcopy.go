@@ -44,6 +44,13 @@ func (in *Endpoint) DeepCopyInto(out *Endpoint) {
 		*out = new(core.ObjectReference)
 		**out = **in
 	}
+	if in.DeprecatedTopology != nil {
+		in, out := &in.DeprecatedTopology, &out.DeprecatedTopology
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
 	if in.NodeName != nil {
 		in, out := &in.NodeName, &out.NodeName
 		*out = new(string)

@@ -90,12 +90,14 @@ type Endpoint struct {
 	// endpoint.
 	// +optional
 	TargetRef *v1.ObjectReference `json:"targetRef,omitempty" protobuf:"bytes,4,opt,name=targetRef"`
-
-	// topology was a beta feature for Endpoint to store arbitrary topology
-	// information. The values of this field are persisted as an anotation on
-	// on the EndpointSlice starting in v1.
-	// +k8s:deprecated=topology,protobuf=5
-
+	// deprecatedTopology contains topology information part of the v1beta1
+	// API.  This field is deprecated, and will be removed when the v1beta1
+	// API is removed (no sooner than kubernetes v1.24).  While this field can
+	// hold values, it is not writable through the v1 API, and any attempts to
+	// write to it will be silently ignored.  Topology information can be found
+	// in the zone and nodeName fields instead.
+	// +optional
+	DeprecatedTopology map[string]string `json:"deprecatedTopology,omitempty" protobuf:"bytes,5,opt,name=deprecatedTopology"`
 	// nodeName represents the name of the Node hosting this endpoint. This can
 	// be used to determine endpoints local to a Node. This field can be enabled
 	// with the EndpointSliceNodeName feature gate.
