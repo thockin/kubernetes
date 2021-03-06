@@ -86,6 +86,7 @@ message RuntimeClassSpec {
   // given RuntimeClass. For more details, see
   // https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
   // +optional
+  // +featureGate=PodOverhead
   optional Overhead overhead = 2;
 
   // scheduling holds the scheduling constraints to ensure that pods running

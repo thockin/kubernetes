@@ -158,6 +158,7 @@ message CSIDriverSpec {
   // if a fstype is defined and the volume's access mode contains ReadWriteOnce.
   //
   // +optional
+  // +featureGate=CSIVolumeFSGroupPolicy
   optional string fsGroupPolicy = 5;
 
   // tokenRequests indicates the CSI driver needs pods' service account
@@ -178,6 +179,7 @@ message CSIDriverSpec {
   //
   // +optional
   // +listType=atomic
+  // +featureGate=CSIServiceAccountToken
   repeated TokenRequest tokenRequests = 6;
 
   // requiresRepublish indicates the CSI driver wants `NodePublishVolume`
@@ -189,6 +191,7 @@ message CSIDriverSpec {
   // mount points will not be seen by a running container.
   //
   // +optional
+  // +featureGate=CSIServiceAccountToken
   optional bool requiresRepublish = 7;
 
   // seLinuxMount specifies if the CSI driver supports "-o context"
@@ -504,6 +507,7 @@ message VolumeAttachmentSource {
   // PersistentVolumeSpec. This field is beta-level and is only
   // honored by servers that enabled the CSIMigration feature.
   // +optional
+  // +featureGate=CSIMigration
   optional k8s.io.api.core.v1.PersistentVolumeSpec inlineVolumeSpec = 2;
 }
 

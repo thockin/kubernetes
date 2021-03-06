@@ -456,6 +456,7 @@ type PersistentVolumeClaimSpec struct {
 	// and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
 	// If the namespace is specified, then dataSourceRef will not be copied to dataSource.
 	// +optional
+	// +featureGate=AnyVolumeDataSource
 	DataSource *TypedLocalObjectReference
 	// Specifies the object from which to populate the volume with data, if a non-empty
 	// volume is desired. This may be any object from a non-empty API group (non
@@ -1744,6 +1745,7 @@ type CSIPersistentVolumeSource struct {
 	// This field is optional, and may be empty if no secret is required. If the
 	// secret object contains more than one secret, all secrets are passed.
 	// +optional
+	// +featureGate=ExpandCSIVolumes
 	ControllerExpandSecretRef *SecretReference
 
 	// NodeExpandSecretRef is a reference to the secret object containing
@@ -2824,6 +2826,7 @@ type PodAffinityTerm struct {
 	// null selector and null or empty namespaces list means "this pod's namespace".
 	// An empty selector ({}) matches all namespaces.
 	// +optional
+	// +featureGate=PodAffinityNamespaceSelector
 	NamespaceSelector *metav1.LabelSelector
 }
 
@@ -2968,6 +2971,7 @@ type PodSpec struct {
 	// creating a pod, and it cannot be modified by updating the pod spec. In order to add an
 	// ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
 	// +optional
+	// +featureGate=EphemeralContainers
 	EphemeralContainers []EphemeralContainer
 	// +optional
 	RestartPolicy RestartPolicy
@@ -3029,6 +3033,7 @@ type PodSpec struct {
 	// In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN.
 	// If a pod does not have FQDN, this has no effect.
 	// +optional
+	// +featureGate=SetHostnameAsFQDN
 	SetHostnameAsFQDN *bool
 	// If specified, the pod's scheduling constraints
 	// +optional
@@ -3063,6 +3068,7 @@ type PodSpec struct {
 	// One of Never, PreemptLowerPriority.
 	// Defaults to PreemptLowerPriority if unset.
 	// +optional
+	// +featureGate=NonPreemptingPriority
 	PreemptionPolicy *PreemptionPolicy
 	// Specifies the DNS parameters of a pod.
 	// Parameters specified here will be merged to the generated DNS
@@ -3090,6 +3096,7 @@ type PodSpec struct {
 	// defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
 	// More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead
 	// +optional
+	// +featureGate=PodOverhead
 	Overhead ResourceList
 	// EnableServiceLinks indicates whether information about services should be injected into pod's
 	// environment variables, matching the syntax of Docker links.
@@ -3620,6 +3627,7 @@ type PodStatus struct {
 
 	// Status for any ephemeral containers that have run in this pod.
 	// +optional
+	// +featureGate=EphemeralContainers
 	EphemeralContainerStatuses []ContainerStatus
 
 	// Status of resources resize desired for pod's containers.
@@ -4146,6 +4154,7 @@ type ServiceSpec struct {
 	// This field may only be set for services with type LoadBalancer and will
 	// be cleared if the type is changed to any other type.
 	// +optional
+	// +featureGate=ServiceLBNodePortControl
 	AllocateLoadBalancerNodePorts *bool
 
 	// loadBalancerClass is the class of the load balancer implementation this Service belongs to.
@@ -4389,6 +4398,7 @@ type NodeSpec struct {
 
 	// Deprecated: Previously used to specify the source of the node's configuration for the DynamicKubeletConfig feature. This feature is removed.
 	// +optional
+	// +featureGate=DynamicKubeletConfig
 	ConfigSource *NodeConfigSource
 
 	// Deprecated. Not all kubelets will set this field. Remove field after 1.13.

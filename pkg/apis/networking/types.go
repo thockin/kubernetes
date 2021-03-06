@@ -157,6 +157,7 @@ type NetworkPolicyPort struct {
 	// is not defined or if the port field is defined as a named (string) port.
 	// The endPort must be equal or greater than port.
 	// +optional
+	// +featureGate=NetworkPolicyEndPort
 	EndPort *int32
 }
 

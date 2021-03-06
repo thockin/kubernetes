@@ -141,12 +141,14 @@ type EndpointConditions struct {
 	// a ready endpoint that is terminating. If nil, consumers should defer to
 	// the ready condition.
 	// +optional
+	// +featureGate=EndpointSliceTerminatingCondition
 	Serving *bool `json:"serving,omitempty" protobuf:"bytes,2,name=serving"`
 
 	// terminating indicates that this endpoint is terminating. A nil value
 	// indicates an unknown state. Consumers should interpret this unknown state
 	// to mean that the endpoint is not terminating.
 	// +optional
+	// +featureGate=EndpointSliceTerminatingCondition
 	Terminating *bool `json:"terminating,omitempty" protobuf:"bytes,3,name=terminating"`
 }
 

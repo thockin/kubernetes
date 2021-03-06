@@ -59,6 +59,7 @@ message PriorityClass {
   // One of Never, PreemptLowerPriority.
   // Defaults to PreemptLowerPriority if unset.
   // +optional
+  // +featureGate=NonPreemptingPriority
   optional string preemptionPolicy = 5;
 }
 

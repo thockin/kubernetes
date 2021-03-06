@@ -55,6 +55,7 @@ type RuntimeClass struct {
 	// given RuntimeClass. For more details, see
 	//  https://kubernetes.io/docs/concepts/scheduling-eviction/pod-overhead/
 	// +optional
+	// +featureGate=PodOverhead
 	Overhead *Overhead `json:"overhead,omitempty" protobuf:"bytes,3,opt,name=overhead"`
 
 	// scheduling holds the scheduling constraints to ensure that pods running

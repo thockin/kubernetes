@@ -280,6 +280,7 @@ message JobSpec {
   // is possible during upgrades due to version skew, the controller
   // skips updates for the Job.
   // +optional
+  // +featureGate=IndexedJob
   optional string completionMode = 9;
 
   // suspend specifies whether the Job controller should create Pods or not. If

@@ -396,6 +396,7 @@ type RollingUpdateDaemonSet struct {
 	// cause evictions during disruption.
 	// This is an alpha field and requires enabling DaemonSetUpdateSurge feature gate.
 	// +optional
+	// +featureGate=DaemonSetUpdateSurge
 	MaxSurge *intstr.IntOrString `json:"maxSurge,omitempty" protobuf:"bytes,2,opt,name=maxSurge"`
 }
 
@@ -1163,6 +1164,7 @@ type NetworkPolicyPort struct {
 	// is not defined or if the port field is defined as a named (string) port.
 	// The endPort must be equal or greater than port.
 	// +optional
+	// +featureGate=NetworkPolicyEndPort
 	EndPort *int32 `json:"endPort,omitempty" protobuf:"bytes,3,opt,name=endPort"`
 }
 

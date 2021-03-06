@@ -179,6 +179,7 @@ type VolumeAttachmentSource struct {
 	// PersistentVolumeSpec. This field is beta-level and is only
 	// honored by servers that enabled the CSIMigration feature.
 	// +optional
+	// +featureGate=CSIMigration
 	InlineVolumeSpec *v1.PersistentVolumeSpec `json:"inlineVolumeSpec,omitempty" protobuf:"bytes,2,opt,name=inlineVolumeSpec"`
 }
 
@@ -361,6 +362,7 @@ type CSIDriverSpec struct {
 	// if a fstype is defined and the volume's access mode contains ReadWriteOnce.
 	//
 	// +optional
+	// +featureGate=CSIVolumeFSGroupPolicy
 	FSGroupPolicy *FSGroupPolicy `json:"fsGroupPolicy,omitempty" protobuf:"bytes,5,opt,name=fsGroupPolicy"`
 
 	// tokenRequests indicates the CSI driver needs pods' service account
@@ -381,6 +383,7 @@ type CSIDriverSpec struct {
 	//
 	// +optional
 	// +listType=atomic
+	// +featureGate=CSIServiceAccountToken
 	TokenRequests []TokenRequest `json:"tokenRequests,omitempty" protobuf:"bytes,6,opt,name=tokenRequests"`
 
 	// requiresRepublish indicates the CSI driver wants `NodePublishVolume`
@@ -392,6 +395,7 @@ type CSIDriverSpec struct {
 	// mount points will not be seen by a running container.
 	//
 	// +optional
+	// +featureGate=CSIServiceAccountToken
 	RequiresRepublish *bool `json:"requiresRepublish,omitempty" protobuf:"varint,7,opt,name=requiresRepublish"`
 
 	// seLinuxMount specifies if the CSI driver supports "-o context"

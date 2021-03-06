@@ -501,6 +501,7 @@ type PersistentVolumeClaimSpec struct {
 	// and dataSourceRef contents will be copied to dataSource when dataSourceRef.namespace is not specified.
 	// If the namespace is specified, then dataSourceRef will not be copied to dataSource.
 	// +optional
+	// +featureGate=AnyVolumeDataSource
 	DataSource *TypedLocalObjectReference `json:"dataSource,omitempty" protobuf:"bytes,7,opt,name=dataSource"`
 	// dataSourceRef specifies the object from which to populate the volume with data, if a non-empty
 	// volume is desired. This may be any object from a non-empty API group (non
@@ -1829,6 +1830,7 @@ type CSIPersistentVolumeSource struct {
 	// This field is optional, and may be empty if no secret is required. If the
 	// secret object contains more than one secret, all secrets are passed.
 	// +optional
+	// +featureGate=ExpandCSIVolumes
 	ControllerExpandSecretRef *SecretReference `json:"controllerExpandSecretRef,omitempty" protobuf:"bytes,9,opt,name=controllerExpandSecretRef"`
 
 	// nodeExpandSecretRef is a reference to the secret object containing
@@ -3070,6 +3072,7 @@ type PodAffinityTerm struct {
 	// null selector and null or empty namespaces list means "this pod's namespace".
 	// An empty selector ({}) matches all namespaces.
 	// +optional
+	// +featureGate=PodAffinityNamespaceSelector
 	NamespaceSelector *metav1.LabelSelector `json:"namespaceSelector,omitempty" protobuf:"bytes,4,opt,name=namespaceSelector"`
 }
 
@@ -3237,6 +3240,7 @@ type PodSpec struct {
 	// +optional
 	// +patchMergeKey=name
 	// +patchStrategy=merge
+	// +featureGate=EphemeralContainers
 	EphemeralContainers []EphemeralContainer `json:"ephemeralContainers,omitempty" patchStrategy:"merge" patchMergeKey:"name" protobuf:"bytes,34,rep,name=ephemeralContainers"`
 	// Restart policy for all containers within the pod.
 	// One of Always, OnFailure, Never. In some contexts, only a subset of those values may be permitted.
@@ -3393,6 +3397,7 @@ type PodSpec struct {
 	// One of Never, PreemptLowerPriority.
 	// Defaults to PreemptLowerPriority if unset.
 	// +optional
+	// +featureGate=NonPreemptingPriority
 	PreemptionPolicy *PreemptionPolicy `json:"preemptionPolicy,omitempty" protobuf:"bytes,31,opt,name=preemptionPolicy"`
 	// Overhead represents the resource overhead associated with running a pod for a given RuntimeClass.
 	// This field will be autopopulated at admission time by the RuntimeClass admission controller. If
@@ -3402,6 +3407,7 @@ type PodSpec struct {
 	// defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
 	// More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
 	// +optional
+	// +featureGate=PodOverhead
 	Overhead ResourceList `json:"overhead,omitempty" protobuf:"bytes,32,opt,name=overhead"`
 	// TopologySpreadConstraints describes how a group of pods ought to spread across topology
 	// domains. Scheduler will schedule pods in a way which abides by the constraints.
@@ -3419,6 +3425,7 @@ type PodSpec struct {
 	// If a pod does not have FQDN, this has no effect.
 	// Default to false.
 	// +optional
+	// +featureGate=SetHostnameAsFQDN
 	SetHostnameAsFQDN *bool `json:"setHostnameAsFQDN,omitempty" protobuf:"varint,35,opt,name=setHostnameAsFQDN"`
 	// Specifies the OS of the containers in the pod.
 	// Some pod and container fields are restricted if this is set.
@@ -4166,6 +4173,7 @@ type PodStatus struct {
 	QOSClass PodQOSClass `json:"qosClass,omitempty" protobuf:"bytes,9,rep,name=qosClass"`
 	// Status for any ephemeral containers that have run in this pod.
 	// +optional
+	// +featureGate=EphemeralContainers
 	EphemeralContainerStatuses []ContainerStatus `json:"ephemeralContainerStatuses,omitempty" protobuf:"bytes,13,rep,name=ephemeralContainerStatuses"`
 
 	// Status of resources resize desired for pod's containers.
@@ -4802,6 +4810,7 @@ type ServiceSpec struct {
 	// governed by the ipFamilyPolicy field.
 	// +listType=atomic
 	// +optional
+	// +featureGate=IPv6DualStack
 	IPFamilies []IPFamily `json:"ipFamilies,omitempty" protobuf:"bytes,19,opt,name=ipFamilies,casttype=IPFamily"`
 
 	// IPFamilyPolicy represents the dual-stack-ness requested or required by
@@ -4823,6 +4832,7 @@ type ServiceSpec struct {
 	// This field may only be set for services with type LoadBalancer and will
 	// be cleared if the type is changed to any other type.
 	// +optional
+	// +featureGate=ServiceLBNodePortControl
 	AllocateLoadBalancerNodePorts *bool `json:"allocateLoadBalancerNodePorts,omitempty" protobuf:"bytes,20,opt,name=allocateLoadBalancerNodePorts"`
 
 	// loadBalancerClass is the class of the load balancer implementation this Service belongs to.
@@ -5156,6 +5166,7 @@ type NodeSpec struct {
 
 	// Deprecated: Previously used to specify the source of the node's configuration for the DynamicKubeletConfig feature. This feature is removed.
 	// +optional
+	// +featureGate=DynamicKubeletConfig
 	ConfigSource *NodeConfigSource `json:"configSource,omitempty" protobuf:"bytes,6,opt,name=configSource"`
 
 	// Deprecated. Not all kubelets will set this field. Remove field after 1.13.
@@ -6741,6 +6752,7 @@ type SecurityContext struct {
 	// This requires the ProcMountType feature flag to be enabled.
 	// Note that this field cannot be set when spec.os.name is windows.
 	// +optional
+	// +featureGate=ProcMountType
 	ProcMount *ProcMountType `json:"procMount,omitempty" protobuf:"bytes,9,opt,name=procMount"`
 	// The seccomp options to use by this container. If seccomp options are
 	// provided at both the pod & container level, the container options

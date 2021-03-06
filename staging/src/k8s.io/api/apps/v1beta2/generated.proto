@@ -522,6 +522,7 @@ message RollingUpdateDaemonSet {
   // so resource intensive daemonsets should take into account that they may
   // cause evictions during disruption.
   // +optional
+  // +featureGate=DaemonSetUpdateSurge
   optional k8s.io.apimachinery.pkg.util.intstr.IntOrString maxSurge = 2;
 }
 

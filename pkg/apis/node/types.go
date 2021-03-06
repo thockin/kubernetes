@@ -52,6 +52,7 @@ type RuntimeClass struct {
 	// given RuntimeClass. For more details, see
 	// https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
 	// +optional
+	// +featureGate=PodOverhead
 	Overhead *Overhead
 
 	// scheduling holds the scheduling constraints to ensure that pods running

@@ -65,6 +65,7 @@ type RuntimeClassSpec struct {
 	// given RuntimeClass. For more details, see
 	// https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
 	// +optional
+	// +featureGate=PodOverhead
 	Overhead *Overhead `json:"overhead,omitempty" protobuf:"bytes,2,opt,name=overhead"`
 
 	// scheduling holds the scheduling constraints to ensure that pods running

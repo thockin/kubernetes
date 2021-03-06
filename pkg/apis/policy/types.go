@@ -263,6 +263,7 @@ type PodSecurityPolicySpec struct {
 	// AllowedCSIDrivers is an allowlist of inline CSI drivers that must be explicitly set to be embedded within a pod spec.
 	// An empty value indicates that any CSI driver can be used for inline ephemeral volumes.
 	// +optional
+	// +featureGate=CSIInlineVolume
 	AllowedCSIDrivers []AllowedCSIDriver
 	// AllowedUnsafeSysctls is a list of explicitly allowed unsafe sysctls, defaults to none.
 	// Each entry is either a plain sysctl name or ends in "*" in which case it is considered

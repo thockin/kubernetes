@@ -161,6 +161,7 @@ type VolumeAttachmentSource struct {
 	// PersistentVolumeSpec. This field is beta-level and is only
 	// honored by servers that enabled the CSIMigration feature.
 	// +optional
+	// +featureGate=CSIMigration
 	InlineVolumeSpec *api.PersistentVolumeSpec
 }
 
@@ -291,6 +292,7 @@ type CSIDriverSpec struct {
 	// With the default policy the defined fsGroup will only be applied
 	// if a fstype is defined and the volume's access mode contains ReadWriteOnce.
 	// +optional
+	// +featureGate=CSIVolumeFSGroupPolicy
 	FSGroupPolicy *FSGroupPolicy
 
 	// If set to true, podInfoOnMount indicates this CSI volume driver
@@ -378,6 +380,7 @@ type CSIDriverSpec struct {
 	//
 	// +optional
 	// +listType=atomic
+	// +featureGate=CSIServiceAccountToken
 	TokenRequests []TokenRequest
 
 	// RequiresRepublish indicates the CSI driver wants `NodePublishVolume`
@@ -389,6 +392,7 @@ type CSIDriverSpec struct {
 	// mount points will not be seen by a running container.
 	//
 	// +optional
+	// +featureGate=CSIServiceAccountToken
 	RequiresRepublish *bool
 
 	// SELinuxMount specifies if the CSI driver supports "-o context"
