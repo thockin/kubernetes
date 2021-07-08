@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"k8s.io/client-go/util/flowcontrol"
-
 	"k8s.io/klog/v2"
 )
 
@@ -110,7 +109,11 @@ func (rt *realTimer) Now() time.Time {
 }
 
 func (rt *realTimer) Remaining() time.Duration {
-	return rt.next.Sub(time.Now())
+	r := rt.next.Sub(time.Now())
+	if r < 0 {
+		r = 0
+	}
+	return r
 }
 
 func (rt *realTimer) Since(t time.Time) time.Duration {
@@ -300,8 +303,12 @@ func (bfr *BoundedFrequencyRunner) tryRun() {
 	// It can't run right now, figure out when it can run next.
 	elapsed := bfr.timer.Since(bfr.lastRun)   // how long since last run
 	nextPossible := bfr.minInterval - elapsed // time to next possible run
-	nextScheduled := bfr.timer.Remaining()    // time to next scheduled run
-	klog.V(4).Infof("%s: %v since last run, possible in %v, scheduled in %v", bfr.name, elapsed, nextPossible, nextScheduled)
+	if nextPossible < 0 {
+		nextPossible = 0
+	}
+	nextScheduled := bfr.timer.Remaining() // time to next scheduled run
+	fmt.Printf("TIM: last:%v \n", bfr.lastRun)
+	fmt.Printf("%s: %v since last run, possible in %v, scheduled in %v\n", bfr.name, elapsed, nextPossible, nextScheduled)
 
 	// It's hard to avoid race conditions in the unit tests unless we always reset
 	// the timer here, even when it's unchanged
@@ -309,5 +316,6 @@ func (bfr *BoundedFrequencyRunner) tryRun() {
 		nextScheduled = nextPossible
 	}
 	bfr.timer.Stop()
+	fmt.Printf("TIM: reset(next):%v \n", nextScheduled)
 	bfr.timer.Reset(nextScheduled)
 }
