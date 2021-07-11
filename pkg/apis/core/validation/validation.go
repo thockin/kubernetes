@@ -4454,9 +4454,9 @@ func ValidateService(service *core.Service) field.ErrorList {
 	// validate LoadBalancerClass field
 	allErrs = append(allErrs, validateLoadBalancerClassField(nil, service)...)
 
-	// external traffic fields
-	allErrs = append(allErrs, validateServiceExternalTrafficFieldsValue(service)...)
-	allErrs = append(allErrs, validateServiceExternalTrafficFieldsCombination(service)...)
+	// external traffic policy fields
+	allErrs = append(allErrs, validateServiceExternalTrafficPolicy(service)...)
+	allErrs = append(allErrs, validateServiceHealthCheckNodePort(service)...)
 
 	// internal traffic policy field
 	allErrs = append(allErrs, validateServiceInternalTrafficFieldsValue(service)...)
@@ -4508,22 +4508,59 @@ func validateServicePort(sp *core.ServicePort, requireName, isHeadlessService bo
 	return allErrs
 }
 
-// validateServiceExternalTrafficFieldsValue validates ExternalTraffic related annotations
-// have legal value.
-func validateServiceExternalTrafficFieldsValue(service *core.Service) field.ErrorList {
+func needsExternalTrafficPolicy(svc *api.Service) bool {
+	t := svc.Spec.Type
+	return t == core.ServiceTypeLoadBalancer || t == core.ServiceTypeNodePort
+}
+
+var supportedExternalTrafficPolicies = sets.NewString(
+	string(api.ServiceExternalTrafficPolicyTypeCluster),
+	string(api.ServiceExternalTrafficPolicyTypeLocal))
+
+func validateServiceExternalTrafficPolicy(service *core.Service) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	// Check first class fields.
-	if service.Spec.ExternalTrafficPolicy != "" &&
-		service.Spec.ExternalTrafficPolicy != core.ServiceExternalTrafficPolicyTypeCluster &&
-		service.Spec.ExternalTrafficPolicy != core.ServiceExternalTrafficPolicyTypeLocal {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("spec").Child("externalTrafficPolicy"), service.Spec.ExternalTrafficPolicy,
-			fmt.Sprintf("ExternalTrafficPolicy must be empty, %v or %v", core.ServiceExternalTrafficPolicyTypeCluster, core.ServiceExternalTrafficPolicyTypeLocal)))
+	etp := service.Spec.ExternalTrafficPolicy
+	fldPath := field.NewPath("spec", "externalTrafficPolicy")
+
+	if needsExternalTrafficPolicy(service) && etp == "" {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+		return allErrs
+	}
+	if !needsExternalTrafficPolicy(service) {
+		if etp != "" {
+			allErrs = append(allErrs, field.Invalid(fldPath, etp, "may only be set when `type` is 'NodePort' or 'LoadBalancer'"))
+		}
+		return allErrs
 	}
 
-	if service.Spec.HealthCheckNodePort < 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("spec").Child("healthCheckNodePort"), service.Spec.HealthCheckNodePort,
-			"HealthCheckNodePort must be not less than 0"))
+	if !supportedExternalTrafficPolicies.Has(string(etp)) {
+		allErrs = append(allErrs, field.NotSupported(fldPath, etp, supportedExternalTrafficPolicies.List()))
+	}
+
+	return allErrs
+}
+
+func validateServiceHealthCheckNodePort(service *core.Service) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	hcnp := service.Spec.HealthCheckNodePort
+	fldPath := field.NewPath("spec", "healthCheckNodePort")
+
+	if apiservice.NeedsHealthCheck(service) && hcnp == 0 {
+		allErrs = append(allErrs, field.Required(fldPath, ""))
+		return allErrs
+	}
+	if !apiservice.NeedsHealthCheck(service) {
+		if hcnp != 0 {
+			allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "healthCheckNodePort"), service.Spec.HealthCheckNodePort,
+				"may only be set when `type` is 'LoadBalancer' and `externalTrafficPolicy` is 'Local'"))
+		}
+		return allErrs
+	}
+
+	for _, msg := range validation.IsValidPortNum(int(hcnp)) {
+		allErrs = append(allErrs, field.Invalid(fldPath, hcnp, msg))
 	}
 
 	return allErrs
@@ -4554,29 +4591,6 @@ func validateServiceInternalTrafficFieldsValue(service *core.Service) field.Erro
 
 	if service.Spec.InternalTrafficPolicy != nil && !supportedServiceInternalTrafficPolicy.Has(string(*service.Spec.InternalTrafficPolicy)) {
 		allErrs = append(allErrs, field.NotSupported(field.NewPath("spec").Child("internalTrafficPolicy"), *service.Spec.InternalTrafficPolicy, supportedServiceInternalTrafficPolicy.List()))
-	}
-
-	return allErrs
-}
-
-// validateServiceExternalTrafficFieldsCombination validates if ExternalTrafficPolicy,
-// HealthCheckNodePort and Type combination are legal. For update, it should be called
-// after clearing externalTraffic related fields for the ease of transitioning between
-// different service types.
-func validateServiceExternalTrafficFieldsCombination(service *core.Service) field.ErrorList {
-	allErrs := field.ErrorList{}
-
-	if service.Spec.Type != core.ServiceTypeLoadBalancer &&
-		service.Spec.Type != core.ServiceTypeNodePort &&
-		service.Spec.ExternalTrafficPolicy != "" {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "externalTrafficPolicy"), service.Spec.ExternalTrafficPolicy,
-			"ExternalTrafficPolicy can only be set on NodePort and LoadBalancer service"))
-	}
-
-	if !apiservice.NeedsHealthCheck(service) &&
-		service.Spec.HealthCheckNodePort != 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "healthCheckNodePort"), service.Spec.HealthCheckNodePort,
-			"HealthCheckNodePort can only be set on LoadBalancer service with ExternalTrafficPolicy=Local"))
 	}
 
 	return allErrs

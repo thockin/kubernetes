@@ -11955,7 +11955,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}
 }
 
-func TestValidateServiceExternalTrafficFieldsCombination(t *testing.T) {
+func TestValidateServiceExternalTrafficPolicy(t *testing.T) {
 	testCases := []struct {
 		name     string
 		tweakSvc func(svc *core.Service) // Given a basic valid service, each test case can customize it.
@@ -12020,7 +12020,8 @@ func TestValidateServiceExternalTrafficFieldsCombination(t *testing.T) {
 		svc := makeValidService()
 		tc.tweakSvc(&svc)
 		// TODO: This test is probably insufficient for such a big function under test.
-		errs := validateServiceExternalTrafficFieldsCombination(&svc)
+		errs := validateServiceExternalTrafficPolicy(&svc)
+		errs = append(errs, validateServiceHealthCheckNodePort(&svc)...)
 		if len(errs) != tc.numErrs {
 			t.Errorf("Unexpected error list for case %q: %v", tc.name, errs.ToAggregate())
 		}
