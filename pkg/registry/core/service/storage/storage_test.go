@@ -23,6 +23,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -5832,4 +5833,244 @@ func TestDeleteDryRun(t *testing.T) {
 	}
 }
 
-//FIXME: Tests for update()
+func TestUpdateSimpleMutations(t *testing.T) {
+	testCases := []struct {
+		name        string
+		svc         *api.Service
+		mutate      svctest.Tweak
+		verify      func(t *testing.T, before, after *api.Service)
+		expectError bool
+	}{{
+		name: "ExternalName_externalName:other",
+		svc:  svctest.MakeService("foo", svctest.SetTypeExternalName),
+		mutate: func(s *api.Service) {
+			s.Spec.ExternalName = "updated.example.com"
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			en := after.Spec.ExternalName
+			if en != "updated.example.com" {
+				t.Errorf("wrong externalName: %v", en)
+			}
+			before.Spec.ExternalName = en
+		},
+	}, {
+		name: "ExternalName_externalName:blank",
+		svc:  svctest.MakeService("foo", svctest.SetTypeExternalName),
+		mutate: func(s *api.Service) {
+			s.Spec.ExternalName = ""
+		},
+		expectError: true,
+	}, {
+		name: "ClusterIP_selector",
+		svc:  svctest.MakeService("foo"),
+		mutate: func(s *api.Service) {
+			s.Spec.Selector = map[string]string{"updated": "value"}
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			sel := after.Spec.Selector
+			if len(sel) != 1 || sel["updated"] != "value" {
+				t.Errorf("wrong selector: %v", sel)
+			}
+			before.Spec.Selector = sel
+		},
+	}, {
+		name:        "ClusterIP_clusterIP:headless",
+		svc:         svctest.MakeService("foo"),
+		mutate:      svctest.SetHeadless,
+		expectError: true,
+	}, {
+		name: "ClusterIP_clusterIP:other",
+		svc:  svctest.MakeService("foo"),
+		mutate: func(s *api.Service) {
+			if s.Spec.ClusterIP == "10.0.0.93" {
+				s.Spec.ClusterIP = "10.0.0.76"
+			} else {
+				s.Spec.ClusterIP = "10.0.0.93"
+			}
+		},
+		expectError: true,
+	}, {
+		name: "ClusterIP_clusterIPs:other",
+		svc:  svctest.MakeService("foo", svctest.SetIPFamilyPolicy(api.IPFamilyPolicyRequireDualStack)),
+		mutate: func(s *api.Service) {
+			if s.Spec.ClusterIP == "10.0.0.93" {
+				s.Spec.ClusterIP = "10.0.0.76"
+				s.Spec.ClusterIPs[0] = s.Spec.ClusterIP
+			} else {
+				s.Spec.ClusterIP = "10.0.0.93"
+				s.Spec.ClusterIPs[0] = s.Spec.ClusterIP
+			}
+			if s.Spec.ClusterIPs[1] == "2000::93" {
+				s.Spec.ClusterIPs[1] = "2000::76"
+			} else {
+				s.Spec.ClusterIPs[1] = "2000::93"
+			}
+		},
+		expectError: true,
+	}, {
+		name: "ClusterIP_ports:add",
+		svc: svctest.MakeService("foo",
+			svctest.SetPorts(
+				svctest.MakeServicePort("p", 80, intstr.FromInt(80), api.ProtocolTCP))),
+		mutate: func(s *api.Service) {
+			s.Spec.Ports = append(s.Spec.Ports, svctest.MakeServicePort("q", 443, intstr.FromInt(443), api.ProtocolTCP))
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			ports := after.Spec.Ports
+			if len(ports) != 2 || ports[1].Name != "q" {
+				t.Errorf("wrong ports: %v", ports)
+			}
+			before.Spec.Ports = ports
+		},
+	}, {
+		name: "ClusterIP_ports:remove",
+		svc: svctest.MakeService("foo",
+			svctest.SetPorts(
+				svctest.MakeServicePort("p", 80, intstr.FromInt(80), api.ProtocolTCP),
+				svctest.MakeServicePort("q", 443, intstr.FromInt(443), api.ProtocolTCP))),
+		mutate: func(s *api.Service) {
+			s.Spec.Ports = s.Spec.Ports[:1]
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			ports := after.Spec.Ports
+			if len(ports) != 1 || ports[0].Name != "p" {
+				t.Errorf("wrong ports: %v", ports)
+			}
+			before.Spec.Ports = ports
+		},
+	}, {
+		name: "ClusterIP_ports:modify",
+		svc: svctest.MakeService("foo",
+			svctest.SetPorts(
+				svctest.MakeServicePort("p", 80, intstr.FromInt(80), api.ProtocolTCP),
+				svctest.MakeServicePort("q", 443, intstr.FromInt(443), api.ProtocolTCP))),
+		mutate: func(s *api.Service) {
+			s.Spec.Ports[0].Port = 8080
+			s.Spec.Ports[1].Port = 8443
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			ports := after.Spec.Ports
+			if len(ports) != 2 || ports[0].Port != 8080 || ports[1].Port != 8443 {
+				t.Errorf("wrong ports: %v", ports)
+			}
+			before.Spec.Ports = ports
+		},
+	}, {
+		name: "ClusterIP_affinity:none:clientip",
+		svc: svctest.MakeService("foo",
+			svctest.SetSessionAffinity(api.ServiceAffinityNone)),
+		mutate: func(s *api.Service) {
+			timeout := int32(1)
+			s.Spec.SessionAffinity = api.ServiceAffinityClientIP
+			s.Spec.SessionAffinityConfig = &api.SessionAffinityConfig{
+				ClientIP: &api.ClientIPConfig{
+					TimeoutSeconds: &timeout,
+				},
+			}
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			aff := after.Spec.SessionAffinity
+			if aff != api.ServiceAffinityClientIP {
+				t.Errorf("wrong sessionAffinity: %v", aff)
+			}
+			before.Spec.SessionAffinity = aff
+
+			cfg := after.Spec.SessionAffinityConfig
+			if tmout := *cfg.ClientIP.TimeoutSeconds; tmout != 1 {
+				t.Errorf("wrong sessionAffinityConfig: %v", cfg)
+			}
+			before.Spec.SessionAffinityConfig = cfg
+		},
+	}, {
+		name: "ClusterIP_affinity:clientip:none",
+		svc: svctest.MakeService("foo",
+			svctest.SetSessionAffinity(api.ServiceAffinityClientIP)),
+		mutate: func(s *api.Service) {
+			s.Spec.SessionAffinity = api.ServiceAffinityNone
+			s.Spec.SessionAffinityConfig = nil
+		},
+		verify: func(t *testing.T, before, after *api.Service) {
+			aff := after.Spec.SessionAffinity
+			if aff != api.ServiceAffinityNone {
+				t.Errorf("wrong sessionAffinity: %v", aff)
+			}
+			before.Spec.SessionAffinity = aff
+
+			cfg := after.Spec.SessionAffinityConfig
+			if cfg != nil {
+				t.Errorf("wrong sessionAffinityConfig: %v", cfg)
+			}
+			before.Spec.SessionAffinityConfig = cfg
+		},
+	}, {
+		name: "ClusterIP_affinity:none:invalid",
+		svc: svctest.MakeService("foo",
+			svctest.SetSessionAffinity(api.ServiceAffinityNone)),
+		mutate: func(s *api.Service) {
+			s.Spec.SessionAffinity = api.ServiceAffinityClientIP
+			// did not set SessionAffinityConfig
+		},
+		expectError: true,
+	}, {
+		name: "ClusterIP_affinity:clientip:invalid",
+		svc: svctest.MakeService("foo",
+			svctest.SetSessionAffinity(api.ServiceAffinityClientIP)),
+		mutate: func(s *api.Service) {
+			s.Spec.SessionAffinity = api.ServiceAffinityNone
+			// did not clear SessionAffinityConfig
+		},
+		expectError: true,
+	}}
+	// FIXME: ports, type, externalIPs, lbip,
+	// lbsourceranges, externalname, etp, hcnp, itp, PublishNotReadyAddresses,
+	// ipfamilypolicy and list,
+	// AllocateLoadBalancerNodePorts, LoadBalancerClass, status
+
+	// This test is ONLY with the gate enabled.
+	defer featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.IPv6DualStack, true)()
+
+	storage, _, server := newStorage(t, []api.IPFamily{api.IPv4Protocol, api.IPv6Protocol})
+	defer server.Terminate(t)
+	defer storage.Store.DestroyFunc()
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := genericapirequest.NewDefaultContext()
+			obj, err := storage.Create(ctx, tc.svc, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
+			if err != nil {
+				t.Fatalf("unexpected error creating service: %v", err)
+			}
+			defer storage.Delete(ctx, tc.svc.Name, rest.ValidateAllObjectFunc, &metav1.DeleteOptions{})
+			createdSvc := obj.(*api.Service)
+
+			// Make a copy and modify it.
+			modified := createdSvc.DeepCopy()
+			tc.mutate(modified)
+
+			obj, created, err := storage.Update(ctx, tc.svc.Name,
+				rest.DefaultUpdatedObjectInfo(modified), rest.ValidateAllObjectFunc,
+				rest.ValidateAllObjectUpdateFunc, false, &metav1.UpdateOptions{})
+			if tc.expectError && err != nil {
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error updating service: %v", err)
+			}
+			if tc.expectError && err == nil {
+				t.Fatalf("unexpected success updating service")
+			}
+			if created {
+				t.Fatalf("unexpected create-on-update")
+			}
+			updatedSvc := obj.(*api.Service)
+
+			// Check the results.  The verify func must copy expected mutations
+			// into the "before" object, so we can compare the whole thing.
+			tc.verify(t, createdSvc, updatedSvc)
+			createdSvc.ResourceVersion = updatedSvc.ResourceVersion
+			if !reflect.DeepEqual(createdSvc, updatedSvc) {
+				t.Errorf("unexpected diff:\n%s", cmp.Diff(createdSvc, updatedSvc))
+			}
+		})
+	}
+}
