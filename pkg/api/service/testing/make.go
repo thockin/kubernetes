@@ -220,3 +220,10 @@ func SetSessionAffinity(affinity api.ServiceAffinity) Tweak {
 		}
 	}
 }
+
+// SetExternalName sets the ExternalName field.
+func SetExternalName(val string) Tweak {
+	return func(svc *api.Service) {
+		svc.Spec.ExternalName = val
+	}
+}
