@@ -1,0 +1,26 @@
+run:
+  timeout: 30m
+  skip-files:
+    - "^zz_generated.*"
+
+issues:
+  max-same-issues: 0
+
+linters:
+  disable-all: true
+  enable: # please keep this alphabetized
+    - deadcode
+    - gocritic
+    - ineffassign
+    - unused
+    - staticcheck
+    - varcheck
+linters-settings: # please keep this alphabetized
+  gocritic:
+    enabled-checks:
+      - ruleguard
+    settings:
+      ruleguard:
+        rules: ".ruleguard_rules.go"
+  unused:
+    go: "1.16"
