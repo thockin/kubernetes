@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/api/common"
 	"k8s.io/klog/v2"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -254,7 +255,7 @@ func (c LegacyRESTStorageProvider) NewLegacyRESTStorage(restOptionsGetter generi
 		return LegacyRESTStorage{}, genericapiserver.APIGroupInfo{}, err
 	}
 
-	serviceIPAllocators := map[api.IPFamily]ipallocator.Interface{
+	serviceIPAllocators := map[common.IPFamily]ipallocator.Interface{
 		serviceClusterIPAllocator.IPFamily(): serviceClusterIPAllocator,
 	}
 	if secondaryServiceClusterIPAllocator != nil {

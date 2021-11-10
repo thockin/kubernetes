@@ -60,9 +60,9 @@ type AddressType string
 
 const (
 	// AddressTypeIPv4 represents an IPv4 Address.
-	AddressTypeIPv4 = AddressType(v1.IPv4Protocol)
+	AddressTypeIPv4 = AddressType(common.IPFamilyIPv4)
 	// AddressTypeIPv6 represents an IPv6 Address.
-	AddressTypeIPv6 = AddressType(v1.IPv6Protocol)
+	AddressTypeIPv6 = AddressType(common.IPFamilyIPv6)
 	// AddressTypeFQDN represents a FQDN.
 	AddressTypeFQDN = AddressType("FQDN")
 )

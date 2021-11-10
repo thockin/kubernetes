@@ -172,7 +172,7 @@ type EndpointChangeTracker struct {
 	// endpointSliceCache holds a simplified version of endpoint slices.
 	endpointSliceCache *EndpointSliceCache
 	// ipfamily identify the ip family on which the tracker is operating on
-	ipFamily v1.IPFamily
+	ipFamily common.IPFamily
 	recorder events.EventRecorder
 	// Map from the Endpoints namespaced-name to the times of the triggers that caused the endpoints
 	// object to change. Used to calculate the network-programming-latency.
@@ -185,7 +185,7 @@ type EndpointChangeTracker struct {
 }
 
 // NewEndpointChangeTracker initializes an EndpointsChangeMap
-func NewEndpointChangeTracker(hostname string, makeEndpointInfo makeEndpointFunc, ipFamily v1.IPFamily, recorder events.EventRecorder, processEndpointsMapChange processEndpointsMapChangeFunc) *EndpointChangeTracker {
+func NewEndpointChangeTracker(hostname string, makeEndpointInfo makeEndpointFunc, ipFamily common.IPFamily, recorder events.EventRecorder, processEndpointsMapChange processEndpointsMapChangeFunc) *EndpointChangeTracker {
 	return &EndpointChangeTracker{
 		hostname:                  hostname,
 		items:                     make(map[types.NamespacedName]*endpointsChange),
@@ -439,7 +439,7 @@ func (ect *EndpointChangeTracker) endpointsToEndpointsMap(endpoints *v1.Endpoint
 
 				// Filter out the incorrect IP version case.
 				// Any endpoint port that contains incorrect IP version will be ignored.
-				if (ect.ipFamily == v1.IPv6Protocol) != utilnet.IsIPv6String(addr.IP) {
+				if (ect.ipFamily == common.IPFamilyIPv6) != utilnet.IsIPv6String(addr.IP) {
 					// Emit event on the corresponding service which had a different
 					// IP version than the endpoint.
 					utilproxy.LogAndEmitIncorrectIPVersionEvent(ect.recorder, "endpoints", addr.IP, endpoints.Namespace, endpoints.Name, "")

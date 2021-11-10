@@ -1090,9 +1090,9 @@ func GetPodsScheduled(workerNodes sets.String, pods *v1.PodList) (scheduledPods,
 // getNodeHostIP returns the first internal IP on the node matching the main Cluster IP family
 func getNodeHostIP(f *framework.Framework, nodeName string) string {
 	// Get the internal HostIP of the node
-	family := v1.IPv4Protocol
+	family := common.IPFamilyIPv4
 	if framework.TestContext.ClusterIsIPv6() {
-		family = v1.IPv6Protocol
+		family = common.IPFamilyIPv6
 	}
 	node, err := f.ClientSet.CoreV1().Nodes().Get(context.TODO(), nodeName, metav1.GetOptions{})
 	framework.ExpectNoError(err)

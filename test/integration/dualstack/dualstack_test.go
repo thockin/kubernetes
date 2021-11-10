@@ -28,6 +28,7 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -74,9 +75,9 @@ func TestCreateServiceSingleStackIPv4(t *testing.T) {
 		name               string
 		serviceType        v1.ServiceType
 		clusterIPs         []string
-		ipFamilies         []v1.IPFamily
+		ipFamilies         []common.IPFamily
 		ipFamilyPolicy     v1.IPFamilyPolicy
-		expectedIPFamilies []v1.IPFamily
+		expectedIPFamilies []common.IPFamily
 		expectError        bool
 	}{
 		{
@@ -85,7 +86,7 @@ func TestCreateServiceSingleStackIPv4(t *testing.T) {
 			clusterIPs:         nil,
 			ipFamilies:         nil,
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        false,
 		},
 		{
@@ -94,7 +95,7 @@ func TestCreateServiceSingleStackIPv4(t *testing.T) {
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        false,
 		},
 		{
@@ -103,115 +104,115 @@ func TestCreateServiceSingleStackIPv4(t *testing.T) {
 			clusterIPs:         nil,
 			ipFamilies:         nil,
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        false,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        false,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 		{
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         nil,
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			expectError:        true,
 		},
 	}
@@ -290,8 +291,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 		name               string
 		serviceType        v1.ServiceType
 		clusterIPs         []string
-		ipFamilies         []v1.IPFamily
-		expectedIPFamilies []v1.IPFamily
+		ipFamilies         []common.IPFamily
+		expectedIPFamilies []common.IPFamily
 		ipFamilyPolicy     v1.IPFamilyPolicy
 		expectError        bool
 	}{
@@ -300,7 +301,7 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        false,
 		},
@@ -309,7 +310,7 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -318,7 +319,7 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        true,
 		},
@@ -326,8 +327,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -335,8 +336,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        true,
 		},
@@ -344,8 +345,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        true,
 		},
@@ -353,8 +354,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        false,
 		},
@@ -362,8 +363,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -371,8 +372,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        true,
 		},
@@ -380,8 +381,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -389,8 +390,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        true,
 		},
@@ -398,8 +399,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        true,
 		},
@@ -407,8 +408,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -416,8 +417,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        true,
 		},
@@ -425,8 +426,8 @@ func TestCreateServiceDualStackIPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        true,
 		},
@@ -516,8 +517,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 		name               string
 		serviceType        v1.ServiceType
 		clusterIPs         []string
-		ipFamilies         []v1.IPFamily
-		expectedIPFamilies []v1.IPFamily
+		ipFamilies         []common.IPFamily
+		expectedIPFamilies []common.IPFamily
 		ipFamilyPolicy     v1.IPFamilyPolicy
 		expectError        bool
 	}{
@@ -526,7 +527,7 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        false,
 		},
@@ -535,7 +536,7 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -544,7 +545,7 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -552,8 +553,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        false,
 		},
@@ -561,8 +562,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -570,8 +571,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -579,8 +580,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        false,
 		},
@@ -588,8 +589,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -597,8 +598,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -607,8 +608,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -616,8 +617,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -625,8 +626,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -634,8 +635,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -643,8 +644,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -652,8 +653,8 @@ func TestCreateServiceDualStackIPv4IPv6(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -754,8 +755,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 		name               string
 		serviceType        v1.ServiceType
 		clusterIPs         []string
-		ipFamilies         []v1.IPFamily
-		expectedIPFamilies []v1.IPFamily
+		ipFamilies         []common.IPFamily
+		expectedIPFamilies []common.IPFamily
 		ipFamilyPolicy     v1.IPFamilyPolicy
 		expectError        bool
 	}{
@@ -764,7 +765,7 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        false,
 		},
@@ -773,7 +774,7 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -782,7 +783,7 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
 			ipFamilies:         nil,
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -790,8 +791,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -799,8 +800,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -808,8 +809,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -817,8 +818,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -826,8 +827,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -835,8 +836,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -845,8 +846,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -854,8 +855,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv4 IPv6 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -863,8 +864,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Single Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicySingleStack,
 			expectError:        true,
 		},
@@ -872,8 +873,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Prefer Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyPreferDualStack,
 			expectError:        false,
 		},
@@ -881,8 +882,8 @@ func TestCreateServiceDualStackIPv6IPv4(t *testing.T) {
 			name:               "Type ClusterIP - Server Allocated IP - IPv6 IPv4 Family - Policy Required Dual Stack",
 			serviceType:        v1.ServiceTypeClusterIP,
 			clusterIPs:         []string{},
-			ipFamilies:         []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
-			expectedIPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:         []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
+			expectedIPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy:     v1.IPFamilyPolicyRequireDualStack,
 			expectError:        false,
 		},
@@ -995,7 +996,7 @@ func TestUpgradeDowngrade(t *testing.T) {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
 
-	if err := validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol} /* default cluster config */); err != nil {
+	if err := validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4} /* default cluster config */); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 
@@ -1006,7 +1007,7 @@ func TestUpgradeDowngrade(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error upgrading service to dual stack. %v", err)
 	}
-	if err := validateServiceAndClusterIPFamily(upgraded, []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol} /* +1 family */); err != nil {
+	if err := validateServiceAndClusterIPFamily(upgraded, []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6} /* +1 family */); err != nil {
 		t.Fatalf("Unexpected error validating the service(after upgrade) %s %v", svc.Name, err)
 	}
 
@@ -1019,7 +1020,7 @@ func TestUpgradeDowngrade(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error downgrading service to single stack. %v", err)
 	}
-	if err := validateServiceAndClusterIPFamily(downgraded, []v1.IPFamily{v1.IPv4Protocol} /* -1 family */); err != nil {
+	if err := validateServiceAndClusterIPFamily(downgraded, []common.IPFamily{common.IPFamilyIPv4} /* -1 family */); err != nil {
 		t.Fatalf("unexpected error validating the service(after downgrade) %s %v", svc.Name, err)
 	}
 
@@ -1029,7 +1030,7 @@ func TestUpgradeDowngrade(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error upgrading service to dual stack. %v", err)
 	}
-	if err := validateServiceAndClusterIPFamily(upgradedAgain, []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol} /* +1 family */); err != nil {
+	if err := validateServiceAndClusterIPFamily(upgradedAgain, []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6} /* +1 family */); err != nil {
 		t.Fatalf("Unexpected error validating the service(after upgrade) %s %v", svc.Name, err)
 	}
 
@@ -1040,7 +1041,7 @@ func TestUpgradeDowngrade(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error downgrading service to single stack. %v", err)
 	}
-	if err := validateServiceAndClusterIPFamily(downgradedAgain, []v1.IPFamily{v1.IPv4Protocol} /* -1 family */); err != nil {
+	if err := validateServiceAndClusterIPFamily(downgradedAgain, []common.IPFamily{common.IPFamilyIPv4} /* -1 family */); err != nil {
 		t.Fatalf("unexpected error validating the service(after downgrade) %s %v", svc.Name, err)
 	}
 }
@@ -1108,7 +1109,7 @@ func TestConvertToFromExternalName(t *testing.T) {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
 
-	if err := validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol}); err != nil {
+	if err := validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 
@@ -1133,7 +1134,7 @@ func TestConvertToFromExternalName(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error converting service to ClusterIP. %v", err)
 	}
-	if err := validateServiceAndClusterIPFamily(clusterIPSvc, []v1.IPFamily{v1.IPv4Protocol}); err != nil {
+	if err := validateServiceAndClusterIPFamily(clusterIPSvc, []common.IPFamily{common.IPFamilyIPv4}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 }
@@ -1204,7 +1205,7 @@ func TestPreferDualStack(t *testing.T) {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
 
-	if err := validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol}); err != nil {
+	if err := validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 
@@ -1214,7 +1215,7 @@ func TestPreferDualStack(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error upgrading service to dual stack. %v", err)
 	}
-	if err := validateServiceAndClusterIPFamily(upgraded, []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol}); err != nil {
+	if err := validateServiceAndClusterIPFamily(upgraded, []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6}); err != nil {
 		t.Fatalf("Unexpected error validating the service(after upgrade) %s %v", svc.Name, err)
 	}
 }
@@ -1342,7 +1343,7 @@ func TestServiceUpdate(t *testing.T) {
 }
 
 // validateServiceAndClusterIPFamily checks that the service has the expected IPFamilies
-func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []v1.IPFamily) error {
+func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []common.IPFamily) error {
 	// create a slice for the errors
 	var errstrings []string
 
@@ -1375,7 +1376,7 @@ func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []v1.
 		}
 
 		// the clusterIP assigned should have the same IPFamily requested
-		if netutils.IsIPv6String(ip) != (expectedIPFamilies[j] == v1.IPv6Protocol) {
+		if netutils.IsIPv6String(ip) != (expectedIPFamilies[j] == common.IPFamilyIPv6) {
 			errstrings = append(errstrings, fmt.Sprintf("got unexpected service ip %s, should belong to %s ip family", ip, expectedIPFamilies[j]))
 		}
 	}
@@ -1444,7 +1445,7 @@ func TestUpgradeServicePreferToDualStack(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
-	if err := validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol}); err != nil {
+	if err := validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 
@@ -1478,7 +1479,7 @@ func TestUpgradeServicePreferToDualStack(t *testing.T) {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
 	// service should remain single stack
-	if err = validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol}); err != nil {
+	if err = validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 }
@@ -1541,7 +1542,7 @@ func TestDowngradeServicePreferToDualStack(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
-	if err := validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol}); err != nil {
+	if err := validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 	// reconfigure the apiserver to be sinlge stack
@@ -1569,7 +1570,7 @@ func TestDowngradeServicePreferToDualStack(t *testing.T) {
 		t.Fatalf("Unexpected error to get the service %s %v", svc.Name, err)
 	}
 	// service should remain dual stack
-	if err = validateServiceAndClusterIPFamily(svc, []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol}); err != nil {
+	if err = validateServiceAndClusterIPFamily(svc, []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6}); err != nil {
 		t.Fatalf("Unexpected error validating the service %s %v", svc.Name, err)
 	}
 }

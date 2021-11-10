@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,12 +55,12 @@ var triggerTime = time.Date(2018, 01, 01, 0, 0, 0, 0, time.UTC)
 var triggerTimeString = triggerTime.Format(time.RFC3339Nano)
 var oldTriggerTimeString = triggerTime.Add(-time.Hour).Format(time.RFC3339Nano)
 
-var ipv4only = []v1.IPFamily{v1.IPv4Protocol}
-var ipv6only = []v1.IPFamily{v1.IPv6Protocol}
-var ipv4ipv6 = []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol}
-var ipv6ipv4 = []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol}
+var ipv4only = []common.IPFamily{common.IPFamilyIPv4}
+var ipv6only = []common.IPFamily{common.IPFamilyIPv6}
+var ipv4ipv6 = []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6}
+var ipv6ipv4 = []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4}
 
-func testPod(namespace string, id int, nPorts int, isReady bool, ipFamilies []v1.IPFamily) *v1.Pod {
+func testPod(namespace string, id int, nPorts int, isReady bool, ipFamilies []common.IPFamily) *v1.Pod {
 	p := &v1.Pod{
 		TypeMeta: metav1.TypeMeta{APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{
@@ -88,7 +89,7 @@ func testPod(namespace string, id int, nPorts int, isReady bool, ipFamilies []v1
 	}
 	for _, family := range ipFamilies {
 		var ip string
-		if family == v1.IPv4Protocol {
+		if family == common.IPFamilyIPv4 {
 			ip = fmt.Sprintf("1.2.3.%d", 4+id)
 		} else {
 			ip = fmt.Sprintf("2000::%d", 4+id)
@@ -100,7 +101,7 @@ func testPod(namespace string, id int, nPorts int, isReady bool, ipFamilies []v1
 	return p
 }
 
-func addPods(store cache.Store, namespace string, nPods int, nPorts int, nNotReady int, ipFamilies []v1.IPFamily) {
+func addPods(store cache.Store, namespace string, nPods int, nPorts int, nNotReady int, ipFamilies []common.IPFamily) {
 	for i := 0; i < nPods+nNotReady; i++ {
 		isReady := i < nPods
 		pod := testPod(namespace, i, nPorts, isReady, ipFamilies)
@@ -1200,14 +1201,14 @@ func TestShouldPodBeInEndpoints(t *testing.T) {
 }
 
 func TestPodToEndpointAddressForService(t *testing.T) {
-	ipv4 := v1.IPv4Protocol
-	ipv6 := v1.IPv6Protocol
+	ipv4 := common.IPFamilyIPv4
+	ipv6 := common.IPFamilyIPv6
 
 	testCases := []struct {
 		name                   string
-		ipFamilies             []v1.IPFamily
+		ipFamilies             []common.IPFamily
 		service                v1.Service
-		expectedEndpointFamily v1.IPFamily
+		expectedEndpointFamily common.IPFamily
 		expectError            bool
 	}{
 		{
@@ -1256,7 +1257,7 @@ func TestPodToEndpointAddressForService(t *testing.T) {
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIP:  v1.ClusterIPNone,
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 			expectedEndpointFamily: ipv4,
@@ -1307,7 +1308,7 @@ func TestPodToEndpointAddressForService(t *testing.T) {
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIP:  v1.ClusterIPNone,
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol}, // <- set by a api-server defaulting logic
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6}, // <- set by a api-server defaulting logic
 				},
 			},
 			expectedEndpointFamily: ipv6,

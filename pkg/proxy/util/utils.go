@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	utilrand "k8s.io/apimachinery/pkg/util/rand"
@@ -268,8 +269,8 @@ func LogAndEmitIncorrectIPVersionEvent(recorder events.EventRecorder, fieldName,
 }
 
 // MapIPsByIPFamily maps a slice of IPs to their respective IP families (v4 or v6)
-func MapIPsByIPFamily(ipStrings []string) map[v1.IPFamily][]string {
-	ipFamilyMap := map[v1.IPFamily][]string{}
+func MapIPsByIPFamily(ipStrings []string) map[common.IPFamily][]string {
+	ipFamilyMap := map[common.IPFamily][]string{}
 	for _, ip := range ipStrings {
 		// Handle only the valid IPs
 		if ipFamily, err := getIPFamilyFromIP(ip); err == nil {
@@ -290,8 +291,8 @@ func MapIPsByIPFamily(ipStrings []string) map[v1.IPFamily][]string {
 }
 
 // MapCIDRsByIPFamily maps a slice of IPs to their respective IP families (v4 or v6)
-func MapCIDRsByIPFamily(cidrStrings []string) map[v1.IPFamily][]string {
-	ipFamilyMap := map[v1.IPFamily][]string{}
+func MapCIDRsByIPFamily(cidrStrings []string) map[common.IPFamily][]string {
+	ipFamilyMap := map[common.IPFamily][]string{}
 	for _, cidr := range cidrStrings {
 		// Handle only the valid CIDRs
 		if ipFamily, err := getIPFamilyFromCIDR(cidr); err == nil {
@@ -303,36 +304,36 @@ func MapCIDRsByIPFamily(cidrStrings []string) map[v1.IPFamily][]string {
 	return ipFamilyMap
 }
 
-func getIPFamilyFromIP(ipStr string) (v1.IPFamily, error) {
+func getIPFamilyFromIP(ipStr string) (common.IPFamily, error) {
 	netIP := netutils.ParseIPSloppy(ipStr)
 	if netIP == nil {
 		return "", ErrAddressNotAllowed
 	}
 
 	if netutils.IsIPv6(netIP) {
-		return v1.IPv6Protocol, nil
+		return common.IPFamilyIPv6, nil
 	}
-	return v1.IPv4Protocol, nil
+	return common.IPFamilyIPv4, nil
 }
 
-func getIPFamilyFromCIDR(cidrStr string) (v1.IPFamily, error) {
+func getIPFamilyFromCIDR(cidrStr string) (common.IPFamily, error) {
 	_, netCIDR, err := netutils.ParseCIDRSloppy(cidrStr)
 	if err != nil {
 		return "", ErrAddressNotAllowed
 	}
 	if netutils.IsIPv6CIDR(netCIDR) {
-		return v1.IPv6Protocol, nil
+		return common.IPFamilyIPv6, nil
 	}
-	return v1.IPv4Protocol, nil
+	return common.IPFamilyIPv4, nil
 }
 
 // OtherIPFamily returns the other ip family
-func OtherIPFamily(ipFamily v1.IPFamily) v1.IPFamily {
-	if ipFamily == v1.IPv6Protocol {
-		return v1.IPv4Protocol
+func OtherIPFamily(ipFamily common.IPFamily) common.IPFamily {
+	if ipFamily == common.IPFamilyIPv6 {
+		return common.IPFamilyIPv4
 	}
 
-	return v1.IPv6Protocol
+	return common.IPFamilyIPv6
 }
 
 // AppendPortIfNeeded appends the given port to IP address unless it is already in
@@ -442,14 +443,14 @@ func NewFilteredDialContext(wrapped DialContext, resolv Resolver, opts *Filtered
 }
 
 // GetClusterIPByFamily returns a service clusterip by family
-func GetClusterIPByFamily(ipFamily v1.IPFamily, service *v1.Service) string {
+func GetClusterIPByFamily(ipFamily common.IPFamily, service *v1.Service) string {
 	// allowing skew
 	if len(service.Spec.IPFamilies) == 0 {
 		if len(service.Spec.ClusterIP) == 0 || service.Spec.ClusterIP == v1.ClusterIPNone {
 			return ""
 		}
 
-		IsIPv6Family := (ipFamily == v1.IPv6Protocol)
+		IsIPv6Family := (ipFamily == common.IPFamilyIPv6)
 		if IsIPv6Family == netutils.IsIPv6String(service.Spec.ClusterIP) {
 			return service.Spec.ClusterIP
 		}

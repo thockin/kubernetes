@@ -705,9 +705,9 @@ func NewProxier(
 		isIPv6Mode:          isIPv6,
 	}
 
-	ipFamily := v1.IPv4Protocol
+	ipFamily := common.IPFamilyIPv4
 	if isIPv6 {
-		ipFamily = v1.IPv6Protocol
+		ipFamily = common.IPFamilyIPv6
 	}
 	serviceChanges := proxy.NewServiceChangeTracker(proxier.newServiceInfo, ipFamily, recorder, proxier.serviceMapChange)
 	endPointChangeTracker := proxy.NewEndpointChangeTracker(hostname, proxier.newEndpointInfo, ipFamily, recorder, proxier.endpointsMapChange)

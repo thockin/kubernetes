@@ -21,6 +21,7 @@ import (
 	"net"
 	"reflect"
 
+	"k8s.io/api/common"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -45,43 +46,43 @@ type svcStrategy struct {
 	runtime.ObjectTyper
 	names.NameGenerator
 
-	ipFamilies []api.IPFamily
+	ipFamilies []common.IPFamily
 }
 
 // StrategyForServiceCIDRs returns the appropriate service strategy for the given configuration.
-func StrategyForServiceCIDRs(primaryCIDR net.IPNet, hasSecondary bool) (Strategy, api.IPFamily) {
+func StrategyForServiceCIDRs(primaryCIDR net.IPNet, hasSecondary bool) (Strategy, common.IPFamily) {
 	// detect this cluster default Service IPFamily (ipfamily of --service-cluster-ip-range)
 	// we do it once here, to avoid having to do it over and over during ipfamily assignment
-	serviceIPFamily := api.IPv4Protocol
+	serviceIPFamily := common.IPFamilyIPv4
 	if netutil.IsIPv6CIDR(&primaryCIDR) {
-		serviceIPFamily = api.IPv6Protocol
+		serviceIPFamily = common.IPFamilyIPv6
 	}
 
 	var strategy Strategy
 	switch {
-	case hasSecondary && serviceIPFamily == api.IPv4Protocol:
+	case hasSecondary && serviceIPFamily == common.IPFamilyIPv4:
 		strategy = svcStrategy{
 			ObjectTyper:   legacyscheme.Scheme,
 			NameGenerator: names.SimpleNameGenerator,
-			ipFamilies:    []api.IPFamily{api.IPv4Protocol, api.IPv6Protocol},
+			ipFamilies:    []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 		}
-	case hasSecondary && serviceIPFamily == api.IPv6Protocol:
+	case hasSecondary && serviceIPFamily == common.IPFamilyIPv6:
 		strategy = svcStrategy{
 			ObjectTyper:   legacyscheme.Scheme,
 			NameGenerator: names.SimpleNameGenerator,
-			ipFamilies:    []api.IPFamily{api.IPv6Protocol, api.IPv4Protocol},
+			ipFamilies:    []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 		}
-	case serviceIPFamily == api.IPv6Protocol:
+	case serviceIPFamily == common.IPFamilyIPv6:
 		strategy = svcStrategy{
 			ObjectTyper:   legacyscheme.Scheme,
 			NameGenerator: names.SimpleNameGenerator,
-			ipFamilies:    []api.IPFamily{api.IPv6Protocol},
+			ipFamilies:    []common.IPFamily{common.IPFamilyIPv6},
 		}
 	default:
 		strategy = svcStrategy{
 			ObjectTyper:   legacyscheme.Scheme,
 			NameGenerator: names.SimpleNameGenerator,
-			ipFamilies:    []api.IPFamily{api.IPv4Protocol},
+			ipFamilies:    []common.IPFamily{common.IPFamilyIPv4},
 		}
 	}
 	return strategy, serviceIPFamily

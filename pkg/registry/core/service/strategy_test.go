@@ -20,6 +20,7 @@ import (
 	"reflect"
 	"testing"
 
+	"k8s.io/api/common"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/diff"
@@ -90,7 +91,7 @@ func makeValidService() *api.Service {
 			ClusterIP:             "1.2.3.4",
 			ClusterIPs:            []string{"1.2.3.4", "5:6:7::8"},
 			IPFamilyPolicy:        &preferDual,
-			IPFamilies:            []api.IPFamily{"IPv4", "IPv6"},
+			IPFamilies:            []common.IPFamily{"IPv4", "IPv6"},
 			InternalTrafficPolicy: &clusterInternalTrafficPolicy,
 		},
 	}

@@ -62,10 +62,10 @@ var _ = common.SIGDescribe("HostPort", func() {
 	framework.ConformanceIt("validates that there is no conflict between pods with same hostPort but different hostIP and protocol [LinuxOnly]", func() {
 
 		localhost := "127.0.0.1"
-		family := v1.IPv4Protocol
+		family := apicommon.IPFamilyIPv4
 		if framework.TestContext.ClusterIsIPv6() {
 			localhost = "::1"
-			family = v1.IPv6Protocol
+			family = apicommon.IPFamilyIPv6
 		}
 		// Get a node where to schedule the pods
 		nodes, err := e2enode.GetBoundedReadySchedulableNodes(cs, 1)

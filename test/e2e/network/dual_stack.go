@@ -220,9 +220,9 @@ var _ = common.SIGDescribe("[Feature:IPv6DualStack]", func() {
 		validateNumOfServicePorts(svc, 2)
 
 		expectedPolicy := v1.IPFamilyPolicySingleStack
-		expectedFamilies := []v1.IPFamily{v1.IPv4Protocol}
+		expectedFamilies := []apicommon.IPFamily{apicommon.IPFamilyIPv4}
 		if framework.TestContext.ClusterIsIPv6() {
-			expectedFamilies = []v1.IPFamily{v1.IPv6Protocol}
+			expectedFamilies = []apicommon.IPFamily{apicommon.IPFamilyIPv6}
 		}
 
 		// check the spec has been set to default ip family
@@ -259,7 +259,7 @@ var _ = common.SIGDescribe("[Feature:IPv6DualStack]", func() {
 		ginkgo.By("creating service " + ns + "/" + serviceName + " with Service.Spec.IPFamily IPv4" + ns)
 
 		expectedPolicy := v1.IPFamilyPolicySingleStack
-		expectedFamilies := []v1.IPFamily{v1.IPv4Protocol}
+		expectedFamilies := []apicommon.IPFamily{apicommon.IPFamilyIPv4}
 
 		service := createService(t.ServiceName, t.Namespace, t.Labels, nil, expectedFamilies)
 
@@ -290,7 +290,7 @@ var _ = common.SIGDescribe("[Feature:IPv6DualStack]", func() {
 	ginkgo.It("should create service with ipv6 cluster ip", func() {
 		serviceName := "ipv6clusterip"
 		ns := f.Namespace.Name
-		ipv6 := v1.IPv6Protocol
+		ipv6 := apicommon.IPFamilyIPv6
 
 		jig := e2eservice.NewTestJig(cs, ns, serviceName)
 
@@ -304,7 +304,7 @@ var _ = common.SIGDescribe("[Feature:IPv6DualStack]", func() {
 
 		ginkgo.By("creating service " + ns + "/" + serviceName + " with Service.Spec.IPFamily IPv6" + ns)
 		expectedPolicy := v1.IPFamilyPolicySingleStack
-		expectedFamilies := []v1.IPFamily{v1.IPv6Protocol}
+		expectedFamilies := []apicommon.IPFamily{apicommon.IPFamilyIPv6}
 
 		service := createService(t.ServiceName, t.Namespace, t.Labels, nil, expectedFamilies)
 
@@ -349,7 +349,7 @@ var _ = common.SIGDescribe("[Feature:IPv6DualStack]", func() {
 		ginkgo.By("creating service " + ns + "/" + serviceName + " with Service.Spec.IPFamily IPv4, IPv6" + ns)
 
 		expectedPolicy := v1.IPFamilyPolicyRequireDualStack
-		expectedFamilies := []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol}
+		expectedFamilies := []apicommon.IPFamily{apicommon.IPFamilyIPv4, apicommon.IPFamilyIPv6}
 
 		service := createService(t.ServiceName, t.Namespace, t.Labels, &expectedPolicy, expectedFamilies)
 
@@ -394,7 +394,7 @@ var _ = common.SIGDescribe("[Feature:IPv6DualStack]", func() {
 		ginkgo.By("creating service " + ns + "/" + serviceName + " with Service.Spec.IPFamily IPv4, IPv6" + ns)
 
 		expectedPolicy := v1.IPFamilyPolicyRequireDualStack
-		expectedFamilies := []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol}
+		expectedFamilies := []apicommon.IPFamily{apicommon.IPFamilyIPv6, apicommon.IPFamilyIPv4}
 
 		service := createService(t.ServiceName, t.Namespace, t.Labels, &expectedPolicy, expectedFamilies)
 
@@ -689,7 +689,7 @@ func validateNumOfServicePorts(svc *v1.Service, expectedNumOfPorts int) {
 	}
 }
 
-func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []v1.IPFamily, expectedPolicy *v1.IPFamilyPolicy) {
+func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []apicommon.IPFamily, expectedPolicy *v1.IPFamilyPolicy) {
 	if len(svc.Spec.IPFamilies) != len(expectedIPFamilies) {
 		framework.Failf("service ip family nil for service %s/%s", svc.Namespace, svc.Name)
 	}
@@ -706,7 +706,7 @@ func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []v1.
 	}
 
 	for idx, family := range svc.Spec.IPFamilies {
-		if (family == v1.IPv6Protocol) != netutils.IsIPv6String(svc.Spec.ClusterIPs[idx]) {
+		if (family == apicommon.IPFamilyIPv6) != netutils.IsIPv6String(svc.Spec.ClusterIPs[idx]) {
 			framework.Failf("service %s/%s assigned ips at [%v]:%v does not match family:%v", svc.Namespace, svc.Name, idx, svc.Spec.ClusterIPs[idx], family)
 		}
 	}
@@ -723,13 +723,13 @@ func validateServiceAndClusterIPFamily(svc *v1.Service, expectedIPFamilies []v1.
 	}
 }
 
-func validateEndpointsBelongToIPFamily(svc *v1.Service, endpoint *v1.Endpoints, expectedIPFamily v1.IPFamily) {
+func validateEndpointsBelongToIPFamily(svc *v1.Service, endpoint *v1.Endpoints, expectedIPFamily apicommon.IPFamily) {
 	if len(endpoint.Subsets) == 0 {
 		framework.Failf("Endpoint has no subsets, cannot determine service ip family matches endpoints ip family for service %s/%s", svc.Namespace, svc.Name)
 	}
 	for _, ss := range endpoint.Subsets {
 		for _, e := range ss.Addresses {
-			if (expectedIPFamily == v1.IPv6Protocol) != netutils.IsIPv6String(e.IP) {
+			if (expectedIPFamily == apicommon.IPFamilyIPv6) != netutils.IsIPv6String(e.IP) {
 				framework.Failf("service endpoint %s doesn't belong to %s ip family", e.IP, expectedIPFamily)
 			}
 		}
@@ -772,7 +772,7 @@ func checkNetworkConnectivity(ip, port string, timeout int) []string {
 }
 
 // createService returns a service spec with defined arguments
-func createService(name, ns string, labels map[string]string, ipFamilyPolicy *v1.IPFamilyPolicy, ipFamilies []v1.IPFamily) *v1.Service {
+func createService(name, ns string, labels map[string]string, ipFamilyPolicy *v1.IPFamilyPolicy, ipFamilies []apicommon.IPFamily) *v1.Service {
 	return &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,

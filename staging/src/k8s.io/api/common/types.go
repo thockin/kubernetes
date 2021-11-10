@@ -16,6 +16,16 @@ limitations under the License.
 
 package common
 
+// IPFamily represents an IP Family (IPv4 or IPv6).
+type IPFamily string
+
+const (
+	// IPFamilyIPv4 indicates the IPv4 protocol.
+	IPFamilyIPv4 IPFamily = "IPv4"
+	// IPFamilyIPv6 indicates the IPv6 protocol.
+	IPFamilyIPv6 IPFamily = "IPv6"
+)
+
 // Protocol defines an IP protocol.
 type Protocol string
 

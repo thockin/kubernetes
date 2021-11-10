@@ -22,6 +22,7 @@ import (
 	"net"
 	"strconv"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/kubernetes/pkg/cluster/ports"
@@ -44,9 +45,9 @@ var _ = SIGDescribe("[Feature:NodeAuthenticator]", func() {
 		nodes, err := e2enode.GetBoundedReadySchedulableNodes(f.ClientSet, 1)
 		framework.ExpectNoError(err)
 
-		family := v1.IPv4Protocol
+		family := common.IPFamilyIPv4
 		if framework.TestContext.ClusterIsIPv6() {
-			family = v1.IPv6Protocol
+			family = common.IPFamilyIPv6
 		}
 
 		nodeIPs := e2enode.GetAddressesByTypeAndFamily(&nodes.Items[0], v1.NodeInternalIP, family)

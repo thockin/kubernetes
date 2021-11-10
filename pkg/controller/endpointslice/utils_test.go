@@ -1005,7 +1005,7 @@ func newServiceAndEndpointMeta(name, namespace string) (v1.Service, endpointMeta
 				Name:       name,
 			}},
 			Selector:   map[string]string{"foo": "bar"},
-			IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 		},
 	}
 
@@ -1066,7 +1066,7 @@ func TestSupportedServiceAddressType(t *testing.T) {
 			expectedAddressTypes: []discovery.AddressType{discovery.AddressTypeIPv4},
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 		},
@@ -1075,7 +1075,7 @@ func TestSupportedServiceAddressType(t *testing.T) {
 			expectedAddressTypes: []discovery.AddressType{discovery.AddressTypeIPv6},
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 				},
 			},
 		},
@@ -1084,7 +1084,7 @@ func TestSupportedServiceAddressType(t *testing.T) {
 			expectedAddressTypes: []discovery.AddressType{discovery.AddressTypeIPv4, discovery.AddressTypeIPv6},
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 				},
 			},
 		},
@@ -1093,7 +1093,7 @@ func TestSupportedServiceAddressType(t *testing.T) {
 			expectedAddressTypes: []discovery.AddressType{discovery.AddressTypeIPv6, discovery.AddressTypeIPv4},
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 				},
 			},
 		},
@@ -1125,7 +1125,7 @@ func TestSupportedServiceAddressType(t *testing.T) {
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIP:  v1.ClusterIPNone,
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 				},
 			},
 		},
@@ -1136,7 +1136,7 @@ func TestSupportedServiceAddressType(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Selector:   map[string]string{"foo": "bar"},
 					ClusterIP:  v1.ClusterIPNone,
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 				},
 			},
 		},

@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -64,11 +65,11 @@ var _ = common.SIGDescribe("KubeProxy", func() {
 			nodeIP string
 		}
 
-		var family v1.IPFamily
+		var family apicommon.IPFamily
 		if framework.TestContext.ClusterIsIPv6() {
-			family = v1.IPv6Protocol
+			family = apicommon.IPFamilyIPv6
 		} else {
-			family = v1.IPv4Protocol
+			family = apicommon.IPFamilyIPv4
 		}
 
 		ips := e2enode.GetAddressesByTypeAndFamily(&nodes.Items[0], v1.NodeInternalIP, family)

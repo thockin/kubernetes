@@ -4148,13 +4148,13 @@ type LoadBalancerIngress struct {
 
 // IPFamily represents the IP Family (IPv4 or IPv6). This type is used
 // to express the family of an IP expressed by a type (e.g. service.spec.ipFamilies).
-type IPFamily string
+type IPFamily = common.IPFamily
 
 const (
-	// IPv4Protocol indicates that this IP is IPv4 protocol
-	IPv4Protocol IPFamily = "IPv4"
-	// IPv6Protocol indicates that this IP is IPv6 protocol
-	IPv6Protocol IPFamily = "IPv6"
+	// IPFamilyIPv4 indicates that this IP is IPv4 protocol
+	IPFamilyIPv4 = common.IPFamilyIPv4
+	// IPFamilyIPv6 indicates that this IP is IPv6 protocol
+	IPFamilyIPv6 = common.IPFamilyIPv6
 )
 
 // IPFamilyPolicy represents the dual-stack-ness requested or required by a Service
@@ -4364,7 +4364,7 @@ type ServiceSpec struct {
 	// governed by the ipFamilyPolicy field.
 	// +listType=atomic
 	// +optional
-	IPFamilies []IPFamily `json:"ipFamilies,omitempty" protobuf:"bytes,19,opt,name=ipFamilies,casttype=IPFamily"`
+	IPFamilies []common.IPFamily `json:"ipFamilies,omitempty" protobuf:"bytes,19,opt,name=ipFamilies,casttype=IPFamily"`
 
 	// IPFamilyPolicy represents the dual-stack-ness requested or required by
 	// this Service. If there is no value provided, then this field will be set

@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -771,12 +772,12 @@ func TestMapIPsByIPFamily(t *testing.T) {
 
 	for _, testcase := range testCases {
 		t.Run(testcase.desc, func(t *testing.T) {
-			ipFamily := v1.IPv4Protocol
-			otherIPFamily := v1.IPv6Protocol
+			ipFamily := common.IPFamilyIPv4
+			otherIPFamily := common.IPFamilyIPv6
 
 			if testcase.wantIPv6 {
-				ipFamily = v1.IPv6Protocol
-				otherIPFamily = v1.IPv4Protocol
+				ipFamily = common.IPFamilyIPv6
+				otherIPFamily = common.IPFamilyIPv4
 			}
 
 			ipMap := MapIPsByIPFamily(testcase.ipString)
@@ -873,12 +874,12 @@ func TestMapCIDRsByIPFamily(t *testing.T) {
 
 	for _, testcase := range testCases {
 		t.Run(testcase.desc, func(t *testing.T) {
-			ipFamily := v1.IPv4Protocol
-			otherIPFamily := v1.IPv6Protocol
+			ipFamily := common.IPFamilyIPv4
+			otherIPFamily := common.IPFamilyIPv6
 
 			if testcase.wantIPv6 {
-				ipFamily = v1.IPv6Protocol
-				otherIPFamily = v1.IPv4Protocol
+				ipFamily = common.IPFamilyIPv6
+				otherIPFamily = common.IPFamilyIPv4
 			}
 
 			cidrMap := MapCIDRsByIPFamily(testcase.ipString)
@@ -897,12 +898,12 @@ func TestGetClusterIPByFamily(t *testing.T) {
 	testCases := []struct {
 		name           string
 		service        v1.Service
-		requestFamily  v1.IPFamily
+		requestFamily  common.IPFamily
 		expectedResult string
 	}{
 		{
 			name:           "old style service ipv4. want ipv4",
-			requestFamily:  v1.IPv4Protocol,
+			requestFamily:  common.IPFamilyIPv4,
 			expectedResult: "10.0.0.10",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
@@ -913,7 +914,7 @@ func TestGetClusterIPByFamily(t *testing.T) {
 
 		{
 			name:           "old style service ipv4. want ipv6",
-			requestFamily:  v1.IPv6Protocol,
+			requestFamily:  common.IPFamilyIPv6,
 			expectedResult: "",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
@@ -924,7 +925,7 @@ func TestGetClusterIPByFamily(t *testing.T) {
 
 		{
 			name:           "old style service ipv6. want ipv6",
-			requestFamily:  v1.IPv6Protocol,
+			requestFamily:  common.IPFamilyIPv6,
 			expectedResult: "2000::1",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
@@ -935,7 +936,7 @@ func TestGetClusterIPByFamily(t *testing.T) {
 
 		{
 			name:           "old style service ipv6. want ipv4",
-			requestFamily:  v1.IPv4Protocol,
+			requestFamily:  common.IPFamilyIPv4,
 			expectedResult: "",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
@@ -946,96 +947,96 @@ func TestGetClusterIPByFamily(t *testing.T) {
 
 		{
 			name:           "service single stack ipv4. want ipv4",
-			requestFamily:  v1.IPv4Protocol,
+			requestFamily:  common.IPFamilyIPv4,
 			expectedResult: "10.0.0.10",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"10.0.0.10"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 		},
 
 		{
 			name:           "service single stack ipv4. want ipv6",
-			requestFamily:  v1.IPv6Protocol,
+			requestFamily:  common.IPFamilyIPv6,
 			expectedResult: "",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"10.0.0.10"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 		},
 
 		{
 			name:           "service single stack ipv6. want ipv6",
-			requestFamily:  v1.IPv6Protocol,
+			requestFamily:  common.IPFamilyIPv6,
 			expectedResult: "2000::1",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"2000::1"},
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 				},
 			},
 		},
 
 		{
 			name:           "service single stack ipv6. want ipv4",
-			requestFamily:  v1.IPv4Protocol,
+			requestFamily:  common.IPFamilyIPv4,
 			expectedResult: "",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"2000::1"},
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 				},
 			},
 		},
 		// dual stack
 		{
 			name:           "service dual stack ipv4,6. want ipv4",
-			requestFamily:  v1.IPv4Protocol,
+			requestFamily:  common.IPFamilyIPv4,
 			expectedResult: "10.0.0.10",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"10.0.0.10", "2000::1"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 				},
 			},
 		},
 
 		{
 			name:           "service dual stack ipv4,6. want ipv6",
-			requestFamily:  v1.IPv6Protocol,
+			requestFamily:  common.IPFamilyIPv6,
 			expectedResult: "2000::1",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"10.0.0.10", "2000::1"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 				},
 			},
 		},
 
 		{
 			name:           "service dual stack ipv6,4. want ipv6",
-			requestFamily:  v1.IPv6Protocol,
+			requestFamily:  common.IPFamilyIPv6,
 			expectedResult: "2000::1",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"2000::1", "10.0.0.10"},
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 				},
 			},
 		},
 
 		{
 			name:           "service dual stack ipv6,4. want ipv4",
-			requestFamily:  v1.IPv4Protocol,
+			requestFamily:  common.IPFamilyIPv4,
 			expectedResult: "10.0.0.10",
 			service: v1.Service{
 				Spec: v1.ServiceSpec{
 					ClusterIPs: []string{"2000::1", "10.0.0.10"},
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 				},
 			},
 		},

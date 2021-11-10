@@ -20,6 +20,7 @@ import (
 	"net"
 	"testing"
 
+	"k8s.io/api/common"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/component-base/metrics/testutil"
 	api "k8s.io/kubernetes/pkg/apis/core"
@@ -30,7 +31,7 @@ func TestAllocate(t *testing.T) {
 	testCases := []struct {
 		name             string
 		cidr             string
-		family           api.IPFamily
+		family           common.IPFamily
 		free             int
 		released         string
 		outOfRange       []string
@@ -39,7 +40,7 @@ func TestAllocate(t *testing.T) {
 		{
 			name:     "IPv4",
 			cidr:     "192.168.1.0/24",
-			family:   api.IPv4Protocol,
+			family:   common.IPFamilyIPv4,
 			free:     254,
 			released: "192.168.1.5",
 			outOfRange: []string{
@@ -53,7 +54,7 @@ func TestAllocate(t *testing.T) {
 		{
 			name:     "IPv6",
 			cidr:     "2001:db8:1::/48",
-			family:   api.IPv6Protocol,
+			family:   common.IPFamilyIPv6,
 			free:     65535,
 			released: "2001:db8:1::5",
 			outOfRange: []string{
@@ -519,15 +520,15 @@ func TestDryRun(t *testing.T) {
 	testCases := []struct {
 		name   string
 		cidr   string
-		family api.IPFamily
+		family common.IPFamily
 	}{{
 		name:   "IPv4",
 		cidr:   "192.168.1.0/24",
-		family: api.IPv4Protocol,
+		family: common.IPFamilyIPv4,
 	}, {
 		name:   "IPv6",
 		cidr:   "2001:db8:1::/48",
-		family: api.IPv6Protocol,
+		family: common.IPFamilyIPv6,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

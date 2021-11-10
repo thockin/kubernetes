@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/common"
 	discovery "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -50,7 +50,7 @@ type EndpointSliceCache struct {
 
 	makeEndpointInfo makeEndpointFunc
 	hostname         string
-	ipFamily         v1.IPFamily
+	ipFamily         common.IPFamily
 	recorder         events.EventRecorder
 }
 
@@ -93,7 +93,7 @@ type endpointInfo struct {
 type spToEndpointMap map[ServicePortName]map[string]Endpoint
 
 // NewEndpointSliceCache initializes an EndpointSliceCache.
-func NewEndpointSliceCache(hostname string, ipFamily v1.IPFamily, recorder events.EventRecorder, makeEndpointInfo makeEndpointFunc) *EndpointSliceCache {
+func NewEndpointSliceCache(hostname string, ipFamily common.IPFamily, recorder events.EventRecorder, makeEndpointInfo makeEndpointFunc) *EndpointSliceCache {
 	if makeEndpointInfo == nil {
 		makeEndpointInfo = standardEndpointInfo
 	}
@@ -272,7 +272,7 @@ func (cache *EndpointSliceCache) addEndpoints(serviceNN types.NamespacedName, po
 
 		// Filter out the incorrect IP version case. Any endpoint port that
 		// contains incorrect IP version will be ignored.
-		if (cache.ipFamily == v1.IPv6Protocol) != utilnet.IsIPv6String(endpoint.Addresses[0]) {
+		if (cache.ipFamily == common.IPFamilyIPv6) != utilnet.IsIPv6String(endpoint.Addresses[0]) {
 			// Emit event on the corresponding service which had a different IP
 			// version than the endpoint.
 			utilproxy.LogAndEmitIncorrectIPVersionEvent(cache.recorder, "endpointslice", endpoint.Addresses[0], serviceNN.Namespace, serviceNN.Name, "")

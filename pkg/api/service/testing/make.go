@@ -17,6 +17,7 @@ limitations under the License.
 package testing
 
 import (
+	"k8s.io/api/common"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	utilpointer "k8s.io/utils/pointer"
@@ -146,7 +147,7 @@ func SetClusterIPs(ips ...string) Tweak {
 }
 
 // SetIPFamilies sets the service IPFamilies field.
-func SetIPFamilies(families ...api.IPFamily) Tweak {
+func SetIPFamilies(families ...common.IPFamily) Tweak {
 	return func(svc *api.Service) {
 		svc.Spec.IPFamilies = families
 	}

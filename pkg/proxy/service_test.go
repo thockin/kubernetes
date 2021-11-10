@@ -98,18 +98,18 @@ func TestServiceToServiceMap(t *testing.T) {
 		desc     string
 		service  *v1.Service
 		expected map[ServicePortName]*BaseServiceInfo
-		ipFamily v1.IPFamily
+		ipFamily common.IPFamily
 	}{
 		{
 			desc:     "nothing",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service:  nil,
 			expected: map[ServicePortName]*BaseServiceInfo{},
 		},
 		{
 			desc:     "headless service",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns2", "headless", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeClusterIP
@@ -120,7 +120,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "headless sctp service",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns2", "headless", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeClusterIP
@@ -131,7 +131,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "headless service without port",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns2", "headless-without-port", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeClusterIP
@@ -141,7 +141,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "cluster ip service",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns2", "cluster-ip", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeClusterIP
@@ -156,7 +156,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "nodeport service",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns2", "node-port", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeNodePort
@@ -171,7 +171,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "load balancer service",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns1", "load-balancer", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeLoadBalancer
@@ -192,7 +192,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "load balancer service with only local traffic policy",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns1", "only-local-load-balancer", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeLoadBalancer
@@ -215,7 +215,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "external name service",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: makeTestService("ns2", "external-name", func(svc *v1.Service) {
 				svc.Spec.Type = v1.ServiceTypeExternalName
@@ -227,7 +227,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with ipv6 clusterIP under ipv4 mode, service should be filtered",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -256,7 +256,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with ipv4 clusterIP under ipv6 mode, service should be filtered",
-			ipFamily: v1.IPv6Protocol,
+			ipFamily: common.IPFamilyIPv6,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -285,7 +285,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with ipv4 configurations under ipv4 mode",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -323,7 +323,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with ipv6 configurations under ipv6 mode",
-			ipFamily: v1.IPv6Protocol,
+			ipFamily: common.IPFamilyIPv6,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -361,7 +361,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with both ipv4 and ipv6 configurations under ipv4 mode, ipv6 fields should be filtered",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -399,7 +399,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with both ipv4 and ipv6 configurations under ipv6 mode, ipv4 fields should be filtered",
-			ipFamily: v1.IPv6Protocol,
+			ipFamily: common.IPFamilyIPv6,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -437,7 +437,7 @@ func TestServiceToServiceMap(t *testing.T) {
 		},
 		{
 			desc:     "service with extra space in LoadBalancerSourceRanges",
-			ipFamily: v1.IPv4Protocol,
+			ipFamily: common.IPFamilyIPv4,
 
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
@@ -513,7 +513,7 @@ type FakeProxier struct {
 	hostname         string
 }
 
-func newFakeProxier(ipFamily v1.IPFamily, t time.Time) *FakeProxier {
+func newFakeProxier(ipFamily common.IPFamily, t time.Time) *FakeProxier {
 	return &FakeProxier{
 		serviceMap:     make(ServiceMap),
 		serviceChanges: NewServiceChangeTracker(nil, ipFamily, nil, nil),
@@ -550,7 +550,7 @@ func (fake *FakeProxier) deleteService(service *v1.Service) {
 }
 
 func TestServiceMapUpdateHeadless(t *testing.T) {
-	fp := newFakeProxier(v1.IPv4Protocol, time.Time{})
+	fp := newFakeProxier(common.IPFamilyIPv4, time.Time{})
 
 	makeServiceMap(fp,
 		makeTestService("ns2", "headless", func(svc *v1.Service) {
@@ -581,7 +581,7 @@ func TestServiceMapUpdateHeadless(t *testing.T) {
 }
 
 func TestUpdateServiceTypeExternalName(t *testing.T) {
-	fp := newFakeProxier(v1.IPv4Protocol, time.Time{})
+	fp := newFakeProxier(common.IPFamilyIPv4, time.Time{})
 
 	makeServiceMap(fp,
 		makeTestService("ns2", "external-name", func(svc *v1.Service) {
@@ -606,7 +606,7 @@ func TestUpdateServiceTypeExternalName(t *testing.T) {
 }
 
 func TestBuildServiceMapAddRemove(t *testing.T) {
-	fp := newFakeProxier(v1.IPv4Protocol, time.Time{})
+	fp := newFakeProxier(common.IPFamilyIPv4, time.Time{})
 
 	services := []*v1.Service{
 		makeTestService("ns2", "cluster-ip", func(svc *v1.Service) {
@@ -709,7 +709,7 @@ func TestBuildServiceMapAddRemove(t *testing.T) {
 }
 
 func TestBuildServiceMapServiceUpdate(t *testing.T) {
-	fp := newFakeProxier(v1.IPv4Protocol, time.Time{})
+	fp := newFakeProxier(common.IPFamilyIPv4, time.Time{})
 
 	servicev1 := makeTestService("ns1", "svc1", func(svc *v1.Service) {
 		svc.Spec.Type = v1.ServiceTypeClusterIP

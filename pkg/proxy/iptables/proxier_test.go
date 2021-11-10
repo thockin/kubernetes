@@ -489,9 +489,9 @@ const testHostname = "test-hostname"
 func NewFakeProxier(ipt utiliptables.Interface) *Proxier {
 	// TODO: Call NewProxier after refactoring out the goroutine
 	// invocation into a Run() method.
-	ipfamily := v1.IPv4Protocol
+	ipfamily := common.IPFamilyIPv4
 	if ipt.IsIPv6() {
-		ipfamily = v1.IPv6Protocol
+		ipfamily = common.IPFamilyIPv6
 	}
 	detectLocal, _ := proxyutiliptables.NewDetectLocalByCIDR("10.0.0.0/24", ipt)
 	p := &Proxier{

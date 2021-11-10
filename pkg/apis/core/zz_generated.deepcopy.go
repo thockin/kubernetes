@@ -22,6 +22,7 @@ limitations under the License.
 package core
 
 import (
+	common "k8s.io/api/common"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	types "k8s.io/apimachinery/pkg/types"
@@ -5327,7 +5328,7 @@ func (in *ServiceSpec) DeepCopyInto(out *ServiceSpec) {
 	}
 	if in.IPFamilies != nil {
 		in, out := &in.IPFamilies, &out.IPFamilies
-		*out = make([]IPFamily, len(*in))
+		*out = make([]common.IPFamily, len(*in))
 		copy(*out, *in)
 	}
 	if in.IPFamilyPolicy != nil {

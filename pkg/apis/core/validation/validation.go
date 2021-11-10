@@ -4441,7 +4441,7 @@ var supportedServiceType = sets.NewString(string(core.ServiceTypeClusterIP), str
 
 var supportedServiceInternalTrafficPolicy = sets.NewString(string(core.ServiceInternalTrafficPolicyCluster), string(core.ServiceExternalTrafficPolicyLocal))
 
-var supportedServiceIPFamily = sets.NewString(string(core.IPv4Protocol), string(core.IPv6Protocol))
+var supportedServiceIPFamily = sets.NewString(string(common.IPFamilyIPv4), string(common.IPFamilyIPv6))
 var supportedServiceIPFamilyPolicy = sets.NewString(string(core.IPFamilyPolicySingleStack), string(core.IPFamilyPolicyPreferDualStack), string(core.IPFamilyPolicyRequireDualStack))
 
 // ValidateService tests if required fields/annotations of a Service are valid.
@@ -6599,11 +6599,11 @@ func ValidateServiceClusterIPsRelatedFields(service *core.Service) field.ErrorLi
 			}
 
 			// 4=>6
-			if service.Spec.IPFamilies[i] == core.IPv4Protocol && netutils.IsIPv6String(ip) {
+			if service.Spec.IPFamilies[i] == common.IPFamilyIPv4 && netutils.IsIPv6String(ip) {
 				allErrs = append(allErrs, field.Invalid(clusterIPsField.Index(i), ip, fmt.Sprintf("expected an IPv4 value as indicated by `ipFamilies[%v]`", i)))
 			}
 			// 6=>4
-			if service.Spec.IPFamilies[i] == core.IPv6Protocol && !netutils.IsIPv6String(ip) {
+			if service.Spec.IPFamilies[i] == common.IPFamilyIPv6 && !netutils.IsIPv6String(ip) {
 				allErrs = append(allErrs, field.Invalid(clusterIPsField.Index(i), ip, fmt.Sprintf("expected an IPv6 value as indicated by `ipFamilies[%v]`", i)))
 			}
 		}

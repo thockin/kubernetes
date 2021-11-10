@@ -27,6 +27,7 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -250,7 +251,7 @@ func GetInternalIP(node *v1.Node) (string, error) {
 }
 
 // FirstAddressByTypeAndFamily returns the first address that matches the given type and family of the list of nodes
-func FirstAddressByTypeAndFamily(nodelist *v1.NodeList, addrType v1.NodeAddressType, family v1.IPFamily) string {
+func FirstAddressByTypeAndFamily(nodelist *v1.NodeList, addrType v1.NodeAddressType, family common.IPFamily) string {
 	for _, n := range nodelist.Items {
 		addresses := GetAddressesByTypeAndFamily(&n, addrType, family)
 		if len(addresses) > 0 {
@@ -262,7 +263,7 @@ func FirstAddressByTypeAndFamily(nodelist *v1.NodeList, addrType v1.NodeAddressT
 
 // GetAddressesByTypeAndFamily returns a list of addresses of the given addressType for the given node
 // and filtered by IPFamily
-func GetAddressesByTypeAndFamily(node *v1.Node, addressType v1.NodeAddressType, family v1.IPFamily) (ips []string) {
+func GetAddressesByTypeAndFamily(node *v1.Node, addressType v1.NodeAddressType, family common.IPFamily) (ips []string) {
 	for _, nodeAddress := range node.Status.Addresses {
 		if nodeAddress.Type != addressType {
 			continue
@@ -270,10 +271,10 @@ func GetAddressesByTypeAndFamily(node *v1.Node, addressType v1.NodeAddressType, 
 		if nodeAddress.Address == "" {
 			continue
 		}
-		if family == v1.IPv6Protocol && netutil.IsIPv6String(nodeAddress.Address) {
+		if family == common.IPFamilyIPv6 && netutil.IsIPv6String(nodeAddress.Address) {
 			ips = append(ips, nodeAddress.Address)
 		}
-		if family == v1.IPv4Protocol && !netutil.IsIPv6String(nodeAddress.Address) {
+		if family == common.IPFamilyIPv4 && !netutil.IsIPv6String(nodeAddress.Address) {
 			ips = append(ips, nodeAddress.Address)
 		}
 	}

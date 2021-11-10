@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"time"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
@@ -312,17 +313,17 @@ func (sl endpointSliceEndpointLen) Less(i, j int) bool {
 func getAddressTypesForService(service *corev1.Service) map[discovery.AddressType]struct{} {
 	serviceSupportedAddresses := make(map[discovery.AddressType]struct{})
 	// TODO: (khenidak) when address types are removed in favor of
-	// v1.IPFamily this will need to be removed, and work directly with
-	// v1.IPFamily types
+	// common.IPFamily this will need to be removed, and work directly with
+	// common.IPFamily types
 
 	// IMPORTANT: we assume that IP of (discovery.AddressType enum) is never in use
 	// as it gets deprecated
 	for _, family := range service.Spec.IPFamilies {
-		if family == corev1.IPv4Protocol {
+		if family == common.IPFamilyIPv4 {
 			serviceSupportedAddresses[discovery.AddressTypeIPv4] = struct{}{}
 		}
 
-		if family == corev1.IPv6Protocol {
+		if family == common.IPFamilyIPv6 {
 			serviceSupportedAddresses[discovery.AddressTypeIPv6] = struct{}{}
 		}
 	}

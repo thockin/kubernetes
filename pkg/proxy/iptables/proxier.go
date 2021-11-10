@@ -284,9 +284,9 @@ func NewProxier(ipt utiliptables.Interface,
 
 	serviceHealthServer := healthcheck.NewServiceHealthServer(hostname, recorder, nodePortAddresses)
 
-	ipFamily := v1.IPv4Protocol
+	ipFamily := common.IPFamilyIPv4
 	if ipt.IsIPv6() {
-		ipFamily = v1.IPv6Protocol
+		ipFamily = common.IPFamilyIPv6
 	}
 
 	ipFamilyMap := utilproxy.MapCIDRsByIPFamily(nodePortAddresses)
@@ -364,14 +364,14 @@ func NewDualStackProxier(
 	ipFamilyMap := utilproxy.MapCIDRsByIPFamily(nodePortAddresses)
 	ipv4Proxier, err := NewProxier(ipt[0], sysctl,
 		exec, syncPeriod, minSyncPeriod, masqueradeAll, masqueradeBit, localDetectors[0], hostname,
-		nodeIP[0], recorder, healthzServer, ipFamilyMap[v1.IPv4Protocol])
+		nodeIP[0], recorder, healthzServer, ipFamilyMap[common.IPFamilyIPv4])
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ipv4 proxier: %v", err)
 	}
 
 	ipv6Proxier, err := NewProxier(ipt[1], sysctl,
 		exec, syncPeriod, minSyncPeriod, masqueradeAll, masqueradeBit, localDetectors[1], hostname,
-		nodeIP[1], recorder, healthzServer, ipFamilyMap[v1.IPv6Protocol])
+		nodeIP[1], recorder, healthzServer, ipFamilyMap[common.IPFamilyIPv6])
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ipv6 proxier: %v", err)
 	}

@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -125,31 +126,31 @@ func TestDualStackEndpoints(t *testing.T) {
 	var testcases = []struct {
 		name           string
 		serviceType    v1.ServiceType
-		ipFamilies     []v1.IPFamily
+		ipFamilies     []common.IPFamily
 		ipFamilyPolicy v1.IPFamilyPolicy
 	}{
 		{
 			name:           "Service IPv4 Only",
 			serviceType:    v1.ServiceTypeClusterIP,
-			ipFamilies:     []v1.IPFamily{v1.IPv4Protocol},
+			ipFamilies:     []common.IPFamily{common.IPFamilyIPv4},
 			ipFamilyPolicy: v1.IPFamilyPolicySingleStack,
 		},
 		{
 			name:           "Service IPv6 Only",
 			serviceType:    v1.ServiceTypeClusterIP,
-			ipFamilies:     []v1.IPFamily{v1.IPv6Protocol},
+			ipFamilies:     []common.IPFamily{common.IPFamilyIPv6},
 			ipFamilyPolicy: v1.IPFamilyPolicySingleStack,
 		},
 		{
 			name:           "Service IPv6 IPv4 Dual Stack",
 			serviceType:    v1.ServiceTypeClusterIP,
-			ipFamilies:     []v1.IPFamily{v1.IPv6Protocol, v1.IPv4Protocol},
+			ipFamilies:     []common.IPFamily{common.IPFamilyIPv6, common.IPFamilyIPv4},
 			ipFamilyPolicy: v1.IPFamilyPolicyRequireDualStack,
 		},
 		{
 			name:           "Service IPv4 IPv6 Dual Stack",
 			serviceType:    v1.ServiceTypeClusterIP,
-			ipFamilies:     []v1.IPFamily{v1.IPv4Protocol, v1.IPv6Protocol},
+			ipFamilies:     []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6},
 			ipFamilyPolicy: v1.IPFamilyPolicyRequireDualStack,
 		},
 	}
@@ -183,10 +184,10 @@ func TestDualStackEndpoints(t *testing.T) {
 			}
 
 			// Set pod IPs
-			podIPbyFamily := map[v1.IPFamily]string{v1.IPv4Protocol: "1.1.1.1", v1.IPv6Protocol: "2001:db2::65"}
+			podIPbyFamily := map[common.IPFamily]string{common.IPFamilyIPv4: "1.1.1.1", common.IPFamilyIPv6: "2001:db2::65"}
 			createdPod.Status = v1.PodStatus{
 				Phase:  v1.PodRunning,
-				PodIPs: []v1.PodIP{{IP: podIPbyFamily[v1.IPv4Protocol]}, {IP: podIPbyFamily[v1.IPv6Protocol]}},
+				PodIPs: []v1.PodIP{{IP: podIPbyFamily[common.IPFamilyIPv4]}, {IP: podIPbyFamily[common.IPFamilyIPv6]}},
 			}
 			_, err = client.CoreV1().Pods(ns.Name).UpdateStatus(context.TODO(), createdPod, metav1.UpdateOptions{})
 			if err != nil {

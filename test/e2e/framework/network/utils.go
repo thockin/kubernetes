@@ -809,11 +809,11 @@ func (config *NetworkingTestConfig) setup(selector map[string]string) {
 	// Obtain the primary IP family of the Cluster based on the first ClusterIP
 	// TODO: Eventually we should just be getting these from Spec.IPFamilies
 	// but for now that would only if the feature gate is enabled.
-	family := v1.IPv4Protocol
-	secondaryFamily := v1.IPv6Protocol
+	family := common.IPFamilyIPv4
+	secondaryFamily := common.IPFamilyIPv6
 	if netutils.IsIPv6String(config.ClusterIP) {
-		family = v1.IPv6Protocol
-		secondaryFamily = v1.IPv4Protocol
+		family = common.IPFamilyIPv6
+		secondaryFamily = common.IPFamilyIPv4
 	}
 	// Get Node IPs from the cluster, ExternalIPs take precedence
 	config.NodeIP = e2enode.FirstAddressByTypeAndFamily(nodeList, v1.NodeExternalIP, family)

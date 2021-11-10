@@ -252,13 +252,13 @@ type ServiceChangeTracker struct {
 	// makeServiceInfo allows proxier to inject customized information when processing service.
 	makeServiceInfo         makeServicePortFunc
 	processServiceMapChange processServiceMapChangeFunc
-	ipFamily                v1.IPFamily
+	ipFamily                common.IPFamily
 
 	recorder events.EventRecorder
 }
 
 // NewServiceChangeTracker initializes a ServiceChangeTracker
-func NewServiceChangeTracker(makeServiceInfo makeServicePortFunc, ipFamily v1.IPFamily, recorder events.EventRecorder, processServiceMapChange processServiceMapChangeFunc) *ServiceChangeTracker {
+func NewServiceChangeTracker(makeServiceInfo makeServicePortFunc, ipFamily common.IPFamily, recorder events.EventRecorder, processServiceMapChange processServiceMapChangeFunc) *ServiceChangeTracker {
 	return &ServiceChangeTracker{
 		items:                   make(map[types.NamespacedName]*serviceChange),
 		makeServiceInfo:         makeServiceInfo,

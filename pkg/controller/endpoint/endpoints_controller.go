@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -225,7 +226,7 @@ func (e *Controller) addPod(obj interface{}) {
 
 func podToEndpointAddressForService(svc *v1.Service, pod *v1.Pod) (*v1.EndpointAddress, error) {
 	var endpointIP string
-	ipFamily := v1.IPv4Protocol
+	ipFamily := common.IPFamilyIPv4
 
 	if len(svc.Spec.IPFamilies) > 0 {
 		// controller is connected to an api-server that correctly sets IPFamilies
@@ -238,7 +239,7 @@ func podToEndpointAddressForService(svc *v1.Service, pod *v1.Pod) (*v1.EndpointA
 		if len(svc.Spec.ClusterIP) > 0 && svc.Spec.ClusterIP != v1.ClusterIPNone {
 			// headful service. detect via service clusterIP
 			if utilnet.IsIPv6String(svc.Spec.ClusterIP) {
-				ipFamily = v1.IPv6Protocol
+				ipFamily = common.IPFamilyIPv6
 			}
 		} else {
 			// Since this is a headless service we use podIP to identify the family.
@@ -249,14 +250,14 @@ func podToEndpointAddressForService(svc *v1.Service, pod *v1.Pod) (*v1.EndpointA
 			// if the family was incorrectly identified then this will be corrected once the
 			// the upgrade is completed (controller connects to api-server that correctly defaults services)
 			if utilnet.IsIPv6String(pod.Status.PodIP) {
-				ipFamily = v1.IPv6Protocol
+				ipFamily = common.IPFamilyIPv6
 			}
 		}
 	}
 
 	// find an ip that matches the family
 	for _, podIP := range pod.Status.PodIPs {
-		if (ipFamily == v1.IPv6Protocol) == utilnet.IsIPv6String(podIP.IP) {
+		if (ipFamily == common.IPFamilyIPv6) == utilnet.IsIPv6String(podIP.IP) {
 			endpointIP = podIP.IP
 			break
 		}

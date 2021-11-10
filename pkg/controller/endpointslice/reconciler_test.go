@@ -90,15 +90,15 @@ func TestReconcile1Pod(t *testing.T) {
 	svcv4BadLabels.Labels = map[string]string{discovery.LabelServiceName: "bad",
 		discovery.LabelManagedBy: "actor", corev1.IsHeadlessService: "invalid"}
 	svcv6, _ := newServiceAndEndpointMeta("foo", namespace)
-	svcv6.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol}
+	svcv6.Spec.IPFamilies = []common.IPFamily{common.IPFamilyIPv6}
 	svcv6ClusterIP, _ := newServiceAndEndpointMeta("foo", namespace)
 	svcv6ClusterIP.Spec.ClusterIP = "1234::5678:0000:0000:9abc:def1"
 	// newServiceAndEndpointMeta generates v4 single stack
-	svcv6ClusterIP.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv6Protocol}
+	svcv6ClusterIP.Spec.IPFamilies = []common.IPFamily{common.IPFamilyIPv6}
 
 	// dual stack
 	dualStackSvc, _ := newServiceAndEndpointMeta("foo", namespace)
-	dualStackSvc.Spec.IPFamilies = []corev1.IPFamily{corev1.IPv4Protocol, corev1.IPv6Protocol}
+	dualStackSvc.Spec.IPFamilies = []common.IPFamily{common.IPFamilyIPv4, common.IPFamilyIPv6}
 	dualStackSvc.Spec.ClusterIP = "10.0.0.10"
 	dualStackSvc.Spec.ClusterIPs = []string{"10.0.0.10", "2000::1"}
 
@@ -1022,7 +1022,7 @@ func TestReconcileEndpointSlicesNamedPorts(t *testing.T) {
 				Protocol:   common.ProtocolTCP,
 			}},
 			Selector:   map[string]string{"foo": "bar"},
-			IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+			IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 		},
 	}
 

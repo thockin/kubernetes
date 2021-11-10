@@ -7669,7 +7669,7 @@ func autoConvert_v1_ServiceSpec_To_core_ServiceSpec(in *v1.ServiceSpec, out *cor
 	out.HealthCheckNodePort = in.HealthCheckNodePort
 	out.PublishNotReadyAddresses = in.PublishNotReadyAddresses
 	out.SessionAffinityConfig = (*core.SessionAffinityConfig)(unsafe.Pointer(in.SessionAffinityConfig))
-	out.IPFamilies = *(*[]core.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPFamilies = *(*[]common.IPFamily)(unsafe.Pointer(&in.IPFamilies))
 	out.IPFamilyPolicy = (*core.IPFamilyPolicy)(unsafe.Pointer(in.IPFamilyPolicy))
 	out.AllocateLoadBalancerNodePorts = (*bool)(unsafe.Pointer(in.AllocateLoadBalancerNodePorts))
 	out.LoadBalancerClass = (*string)(unsafe.Pointer(in.LoadBalancerClass))
@@ -7688,7 +7688,7 @@ func autoConvert_core_ServiceSpec_To_v1_ServiceSpec(in *core.ServiceSpec, out *v
 	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
 	out.ClusterIP = in.ClusterIP
 	out.ClusterIPs = *(*[]string)(unsafe.Pointer(&in.ClusterIPs))
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPFamilies = *(*[]common.IPFamily)(unsafe.Pointer(&in.IPFamilies))
 	out.IPFamilyPolicy = (*v1.IPFamilyPolicy)(unsafe.Pointer(in.IPFamilyPolicy))
 	out.ExternalName = in.ExternalName
 	out.ExternalIPs = *(*[]string)(unsafe.Pointer(&in.ExternalIPs))

@@ -22,6 +22,7 @@ import (
 	"net"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -57,10 +58,10 @@ type Repair struct {
 	interval      time.Duration
 	serviceClient corev1client.ServicesGetter
 
-	networkByFamily   map[v1.IPFamily]*net.IPNet                    // networks we operate on, by their family
-	allocatorByFamily map[v1.IPFamily]rangeallocation.RangeRegistry // allocators we use, by their family
+	networkByFamily   map[common.IPFamily]*net.IPNet                    // networks we operate on, by their family
+	allocatorByFamily map[common.IPFamily]rangeallocation.RangeRegistry // allocators we use, by their family
 
-	leaksByFamily map[v1.IPFamily]map[string]int // counter per leaked IP per family
+	leaksByFamily map[common.IPFamily]map[string]int // counter per leaked IP per family
 	recorder      record.EventRecorder
 }
 
@@ -76,14 +77,14 @@ func NewRepair(interval time.Duration, serviceClient corev1client.ServicesGetter
 	recorder := eventBroadcaster.NewRecorder(legacyscheme.Scheme, v1.EventSource{Component: "ipallocator-repair-controller"})
 
 	// build *ByFamily struct members
-	networkByFamily := make(map[v1.IPFamily]*net.IPNet)
-	allocatorByFamily := make(map[v1.IPFamily]rangeallocation.RangeRegistry)
-	leaksByFamily := make(map[v1.IPFamily]map[string]int)
+	networkByFamily := make(map[common.IPFamily]*net.IPNet)
+	allocatorByFamily := make(map[common.IPFamily]rangeallocation.RangeRegistry)
+	leaksByFamily := make(map[common.IPFamily]map[string]int)
 
-	primary := v1.IPv4Protocol
-	secondary := v1.IPv6Protocol
+	primary := common.IPFamilyIPv4
+	secondary := common.IPFamilyIPv6
 	if netutils.IsIPv6(network.IP) {
-		primary = v1.IPv6Protocol
+		primary = common.IPFamilyIPv6
 	}
 
 	networkByFamily[primary] = network
@@ -91,8 +92,8 @@ func NewRepair(interval time.Duration, serviceClient corev1client.ServicesGetter
 	leaksByFamily[primary] = make(map[string]int)
 
 	if secondaryNetwork != nil && secondaryNetwork.IP != nil {
-		if primary == v1.IPv6Protocol {
-			secondary = v1.IPv4Protocol
+		if primary == common.IPFamilyIPv6 {
+			secondary = common.IPFamilyIPv4
 		}
 		networkByFamily[secondary] = secondaryNetwork
 		allocatorByFamily[secondary] = secondaryAlloc
@@ -136,8 +137,8 @@ func (c *Repair) runOnce() error {
 
 	// If etcd server is not running we should wait for some time and fail only then. This is particularly
 	// important when we start apiserver and etcd at the same time.
-	snapshotByFamily := make(map[v1.IPFamily]*api.RangeAllocation)
-	storedByFamily := make(map[v1.IPFamily]ipallocator.Interface)
+	snapshotByFamily := make(map[common.IPFamily]*api.RangeAllocation)
+	storedByFamily := make(map[common.IPFamily]ipallocator.Interface)
 
 	err := wait.PollImmediate(time.Second, 10*time.Second, func() (bool, error) {
 		for family, allocator := range c.allocatorByFamily {
@@ -175,7 +176,7 @@ func (c *Repair) runOnce() error {
 		storedByFamily[family] = stored
 	}
 
-	rebuiltByFamily := make(map[v1.IPFamily]*ipallocator.Range)
+	rebuiltByFamily := make(map[common.IPFamily]*ipallocator.Range)
 
 	for family, network := range c.networkByFamily {
 		rebuilt, err := ipallocator.NewInMemory(network)
@@ -195,11 +196,11 @@ func (c *Repair) runOnce() error {
 		return fmt.Errorf("unable to refresh the service IP block: %v", err)
 	}
 
-	getFamilyByIP := func(ip net.IP) v1.IPFamily {
+	getFamilyByIP := func(ip net.IP) common.IPFamily {
 		if netutils.IsIPv6(ip) {
-			return v1.IPv6Protocol
+			return common.IPFamilyIPv6
 		}
-		return v1.IPv4Protocol
+		return common.IPFamilyIPv4
 	}
 
 	// Check every Service's ClusterIP, and rebuild the state as we think it should be.

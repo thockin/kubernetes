@@ -2848,9 +2848,9 @@ func execAffinityTestForSessionAffinityTimeout(f *framework.Framework, cs client
 		nodes, err := e2enode.GetReadySchedulableNodes(cs)
 		framework.ExpectNoError(err)
 		// The node addresses must have the same IP family as the ClusterIP
-		family := v1.IPv4Protocol
+		family := apicommon.IPFamilyIPv4
 		if netutils.IsIPv6String(svc.Spec.ClusterIP) {
-			family = v1.IPv6Protocol
+			family = apicommon.IPFamilyIPv6
 		}
 		svcIP = e2enode.FirstAddressByTypeAndFamily(nodes, v1.NodeInternalIP, family)
 		framework.ExpectNotEqual(svcIP, "", "failed to get Node internal IP for family: %s", family)
@@ -2931,9 +2931,9 @@ func execAffinityTestForNonLBServiceWithOptionalTransition(f *framework.Framewor
 		nodes, err := e2enode.GetReadySchedulableNodes(cs)
 		framework.ExpectNoError(err)
 		// The node addresses must have the same IP family as the ClusterIP
-		family := v1.IPv4Protocol
+		family := apicommon.IPFamilyIPv4
 		if netutils.IsIPv6String(svc.Spec.ClusterIP) {
-			family = v1.IPv6Protocol
+			family = apicommon.IPFamilyIPv6
 		}
 		svcIP = e2enode.FirstAddressByTypeAndFamily(nodes, v1.NodeInternalIP, family)
 		framework.ExpectNotEqual(svcIP, "", "failed to get Node internal IP for family: %s", family)

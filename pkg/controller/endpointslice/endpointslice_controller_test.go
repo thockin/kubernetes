@@ -396,7 +396,7 @@ func TestSyncService(t *testing.T) {
 						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 			pods: []*v1.Pod{
@@ -509,7 +509,7 @@ func TestSyncService(t *testing.T) {
 						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv6Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv6},
 				},
 			},
 			pods: []*v1.Pod{
@@ -614,7 +614,7 @@ func TestSyncService(t *testing.T) {
 						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 			pods: []*v1.Pod{
@@ -730,7 +730,7 @@ func TestSyncService(t *testing.T) {
 						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 			pods: []*v1.Pod{
@@ -834,7 +834,7 @@ func TestSyncService(t *testing.T) {
 						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 			pods: []*v1.Pod{
@@ -950,7 +950,7 @@ func TestSyncService(t *testing.T) {
 						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 				},
 			},
 			pods: []*v1.Pod{
@@ -1159,7 +1159,7 @@ func TestPodAddsBatching(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: ns},
 				Spec: v1.ServiceSpec{
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 					Ports:      []v1.ServicePort{{Port: 80}},
 				},
 			})
@@ -1295,7 +1295,7 @@ func TestPodUpdatesBatching(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: ns},
 				Spec: v1.ServiceSpec{
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 					Ports:      []v1.ServicePort{{Port: 80}},
 				},
 			})
@@ -1432,7 +1432,7 @@ func TestPodDeleteBatching(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{Name: "foo", Namespace: ns},
 				Spec: v1.ServiceSpec{
 					Selector:   map[string]string{"foo": "bar"},
-					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+					IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 					Ports:      []v1.ServicePort{{Port: 80}},
 				},
 			})
@@ -1738,7 +1738,7 @@ func createService(t *testing.T, esController *endpointSliceController, namespac
 		Spec: v1.ServiceSpec{
 			Ports:      []v1.ServicePort{{TargetPort: intstr.FromInt(80)}},
 			Selector:   map[string]string{"foo": "bar"},
-			IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
+			IPFamilies: []common.IPFamily{common.IPFamilyIPv4},
 		},
 	}
 	esController.serviceStore.Add(service)

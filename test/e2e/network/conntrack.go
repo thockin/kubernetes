@@ -106,9 +106,9 @@ var _ = common.SIGDescribe("Conntrack", func() {
 				len(nodes.Items))
 		}
 
-		family := v1.IPv4Protocol
+		family := apicommon.IPFamilyIPv4
 		if framework.TestContext.ClusterIsIPv6() {
-			family = v1.IPv6Protocol
+			family = apicommon.IPFamilyIPv6
 		}
 
 		ips := e2enode.GetAddressesByTypeAndFamily(&nodes.Items[0], v1.NodeInternalIP, family)

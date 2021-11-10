@@ -17,6 +17,7 @@ limitations under the License.
 package discovery
 
 import (
+	common "k8s.io/api/common"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	api "k8s.io/kubernetes/pkg/apis/core"
 )
@@ -58,9 +59,9 @@ type AddressType string
 
 const (
 	// AddressTypeIPv4 represents an IPv4 Address.
-	AddressTypeIPv4 = AddressType(api.IPv4Protocol)
+	AddressTypeIPv4 = AddressType(common.IPFamilyIPv4)
 	// AddressTypeIPv6 represents an IPv6 Address.
-	AddressTypeIPv6 = AddressType(api.IPv6Protocol)
+	AddressTypeIPv6 = AddressType(common.IPFamilyIPv6)
 	// AddressTypeFQDN represents a FQDN.
 	AddressTypeFQDN = AddressType("FQDN")
 )

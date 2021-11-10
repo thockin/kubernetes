@@ -212,7 +212,7 @@ const (
 // and services that provide the actual backends.
 type Proxier struct {
 	// the ipfamily on which this proxy is operating on.
-	ipFamily v1.IPFamily
+	ipFamily common.IPFamily
 	// endpointsChanges and serviceChanges contains all changes to endpoints and
 	// services that happened since last syncProxyRules call. For a single object,
 	// changes are accumulated, i.e. previous is state from before all of them,
@@ -430,9 +430,9 @@ func NewProxier(ipt utiliptables.Interface,
 	masqueradeValue := 1 << uint(masqueradeBit)
 	masqueradeMark := fmt.Sprintf("%#08x", masqueradeValue)
 
-	ipFamily := v1.IPv4Protocol
+	ipFamily := common.IPFamilyIPv4
 	if ipt.IsIPv6() {
-		ipFamily = v1.IPv6Protocol
+		ipFamily = common.IPFamilyIPv6
 	}
 
 	klog.V(2).InfoS("Record nodeIP and family", "nodeIP", nodeIP, "family", ipFamily)
@@ -477,14 +477,14 @@ func NewProxier(ipt utiliptables.Interface,
 		healthzServer:         healthzServer,
 		ipvs:                  ipvs,
 		ipvsScheduler:         scheduler,
-		ipGetter:              &realIPGetter{nl: NewNetLinkHandle(ipFamily == v1.IPv6Protocol)},
+		ipGetter:              &realIPGetter{nl: NewNetLinkHandle(ipFamily == common.IPFamilyIPv6)},
 		iptablesData:          bytes.NewBuffer(nil),
 		filterChainsData:      bytes.NewBuffer(nil),
 		natChains:             utilproxy.LineBuffer{},
 		natRules:              utilproxy.LineBuffer{},
 		filterChains:          utilproxy.LineBuffer{},
 		filterRules:           utilproxy.LineBuffer{},
-		netlinkHandle:         NewNetLinkHandle(ipFamily == v1.IPv6Protocol),
+		netlinkHandle:         NewNetLinkHandle(ipFamily == common.IPFamilyIPv6),
 		ipset:                 ipset,
 		nodePortAddresses:     nodePortAddresses,
 		networkInterfacer:     utilproxy.RealNetwork{},
@@ -493,7 +493,7 @@ func NewProxier(ipt utiliptables.Interface,
 	// initialize ipsetList with all sets we needed
 	proxier.ipsetList = make(map[string]*IPSet)
 	for _, is := range ipsetInfo {
-		proxier.ipsetList[is.name] = NewIPSet(ipset, is.name, is.setType, (ipFamily == v1.IPv6Protocol), is.comment)
+		proxier.ipsetList[is.name] = NewIPSet(ipset, is.name, is.setType, (ipFamily == common.IPFamilyIPv6), is.comment)
 	}
 	burstSyncs := 2
 	klog.V(2).InfoS("ipvs sync params", "ipFamily", ipt.Protocol(), "minSyncPeriod", minSyncPeriod, "syncPeriod", syncPeriod, "burstSyncs", burstSyncs)
@@ -537,7 +537,7 @@ func NewDualStackProxier(
 		exec, syncPeriod, minSyncPeriod, filterCIDRs(false, excludeCIDRs), strictARP,
 		tcpTimeout, tcpFinTimeout, udpTimeout, masqueradeAll, masqueradeBit,
 		localDetectors[0], hostname, nodeIP[0],
-		recorder, healthzServer, scheduler, ipFamilyMap[v1.IPv4Protocol], kernelHandler)
+		recorder, healthzServer, scheduler, ipFamilyMap[common.IPFamilyIPv4], kernelHandler)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ipv4 proxier: %v", err)
 	}
@@ -546,7 +546,7 @@ func NewDualStackProxier(
 		exec, syncPeriod, minSyncPeriod, filterCIDRs(true, excludeCIDRs), strictARP,
 		tcpTimeout, tcpFinTimeout, udpTimeout, masqueradeAll, masqueradeBit,
 		localDetectors[1], hostname, nodeIP[1],
-		nil, nil, scheduler, ipFamilyMap[v1.IPv6Protocol], kernelHandler)
+		nil, nil, scheduler, ipFamilyMap[common.IPFamilyIPv6], kernelHandler)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ipv6 proxier: %v", err)
 	}
@@ -1122,7 +1122,7 @@ func (proxier *Proxier) syncProxyRules() {
 	// filter node IPs by proxier ipfamily
 	idx := 0
 	for _, nodeIP := range nodeIPs {
-		if (proxier.ipFamily == v1.IPv6Protocol) == netutils.IsIPv6(nodeIP) {
+		if (proxier.ipFamily == common.IPFamilyIPv6) == netutils.IsIPv6(nodeIP) {
 			nodeIPs[idx] = nodeIP
 			idx++
 		}
