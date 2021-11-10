@@ -4668,7 +4668,7 @@ func TestTestInternalTrafficPolicyE2E(t *testing.T) {
 
 	testCases := []struct {
 		name                     string
-		internalTrafficPolicy    *v1.ServiceInternalTrafficPolicyType
+		internalTrafficPolicy    *v1.ServiceInternalTrafficPolicy
 		endpoints                []endpoint
 		expectVirtualServer      bool
 		expectLocalEntries       bool

@@ -4066,17 +4066,18 @@ const (
 	ServiceTypeExternalName ServiceType = "ExternalName"
 )
 
-// ServiceInternalTrafficPolicyType describes the type of traffic routing for
+// ServiceInternalTrafficPolicy describes the type of traffic routing for
 // internal traffic
-type ServiceInternalTrafficPolicyType string
+type ServiceInternalTrafficPolicy string
+type ServiceInternalTrafficPolicyType = ServiceInternalTrafficPolicy
 
 const (
 	// ServiceInternalTrafficPolicyCluster routes traffic to all endpoints
-	ServiceInternalTrafficPolicyCluster ServiceInternalTrafficPolicyType = "Cluster"
+	ServiceInternalTrafficPolicyCluster ServiceInternalTrafficPolicy = "Cluster"
 
 	// ServiceInternalTrafficPolicyLocal only routes to node-local
 	// endpoints, otherwise drops the traffic
-	ServiceInternalTrafficPolicyLocal ServiceInternalTrafficPolicyType = "Local"
+	ServiceInternalTrafficPolicyLocal ServiceInternalTrafficPolicy = "Local"
 )
 
 // ServiceExternalTrafficPolicy describes the type of traffic routing for
@@ -4409,7 +4410,7 @@ type ServiceSpec struct {
 	// The default value is "Cluster".
 	// +featureGate=ServiceInternalTrafficPolicy
 	// +optional
-	InternalTrafficPolicy *ServiceInternalTrafficPolicyType `json:"internalTrafficPolicy,omitempty" protobuf:"bytes,22,opt,name=internalTrafficPolicy"`
+	InternalTrafficPolicy *ServiceInternalTrafficPolicy `json:"internalTrafficPolicy,omitempty" protobuf:"bytes,22,opt,name=internalTrafficPolicy"`
 }
 
 // ServicePort contains information on service's port.

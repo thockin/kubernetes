@@ -5377,7 +5377,7 @@ func (in *ServiceSpec) DeepCopyInto(out *ServiceSpec) {
 	}
 	if in.InternalTrafficPolicy != nil {
 		in, out := &in.InternalTrafficPolicy, &out.InternalTrafficPolicy
-		*out = new(ServiceInternalTrafficPolicyType)
+		*out = new(ServiceInternalTrafficPolicy)
 		**out = **in
 	}
 	return

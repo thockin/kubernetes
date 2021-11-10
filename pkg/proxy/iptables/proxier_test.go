@@ -4112,7 +4112,7 @@ COMMIT
 
 	testCases := []struct {
 		name                      string
-		internalTrafficPolicy     *v1.ServiceInternalTrafficPolicyType
+		internalTrafficPolicy     *v1.ServiceInternalTrafficPolicy
 		featureGateOn             bool
 		endpoints                 []endpoint
 		expectEndpointRule        bool
