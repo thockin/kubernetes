@@ -4079,14 +4079,19 @@ const (
 	ServiceInternalTrafficPolicyLocal ServiceInternalTrafficPolicyType = "Local"
 )
 
-// Service External Traffic Policy Type string
-type ServiceExternalTrafficPolicyType string
+// ServiceExternalTrafficPolicy describes the type of traffic routing for
+// external traffic.
+type ServiceExternalTrafficPolicy string
+type ServiceExternalTrafficPolicyType = ServiceExternalTrafficPolicy // for backwards compat
 
 const (
-	// ServiceExternalTrafficPolicyTypeLocal specifies node-local endpoints behavior.
-	ServiceExternalTrafficPolicyTypeLocal ServiceExternalTrafficPolicyType = "Local"
-	// ServiceExternalTrafficPolicyTypeCluster specifies node-global (legacy) behavior.
-	ServiceExternalTrafficPolicyTypeCluster ServiceExternalTrafficPolicyType = "Cluster"
+	// ServiceExternalTrafficPolicyLocal specifies node-local endpoints behavior.
+	ServiceExternalTrafficPolicyLocal ServiceExternalTrafficPolicy = "Local"
+	// ServiceExternalTrafficPolicyCluster specifies node-global (legacy) behavior.
+	ServiceExternalTrafficPolicyCluster ServiceExternalTrafficPolicy = "Cluster"
+
+	ServiceExternalTrafficPolicyTypeLocal   = ServiceExternalTrafficPolicyLocal
+	ServiceExternalTrafficPolicyTypeCluster = ServiceExternalTrafficPolicyCluster
 )
 
 // These are the valid conditions of a service.
@@ -4304,7 +4309,7 @@ type ServiceSpec struct {
 	// "Cluster" obscures the client source IP and may cause a second hop to
 	// another node, but should have good overall load-spreading.
 	// +optional
-	ExternalTrafficPolicy ServiceExternalTrafficPolicyType `json:"externalTrafficPolicy,omitempty" protobuf:"bytes,11,opt,name=externalTrafficPolicy"`
+	ExternalTrafficPolicy ServiceExternalTrafficPolicy `json:"externalTrafficPolicy,omitempty" protobuf:"bytes,11,opt,name=externalTrafficPolicy"`
 
 	// healthCheckNodePort specifies the healthcheck nodePort for the service.
 	// This only applies when type is set to LoadBalancer and

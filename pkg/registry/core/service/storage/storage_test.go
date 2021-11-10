@@ -439,13 +439,13 @@ func TestPatchAllocatedValues(t *testing.T) {
 		name: "all_patched",
 		before: svctest.MakeService("foo",
 			svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetClusterIPs("10.0.0.93", "2000::76"),
 			svctest.SetUniqueNodePorts,
 			svctest.SetHealthCheckNodePort(31234)),
 		update: svctest.MakeService("foo",
 			svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		expectSameClusterIPs: true,
 		expectSameNodePort:   true,
 		expectSameHCNP:       true,
@@ -477,13 +477,13 @@ func TestPatchAllocatedValues(t *testing.T) {
 		name: "HCNP_patched",
 		before: svctest.MakeService("foo",
 			svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetClusterIPs("10.0.0.93", "2000::76"),
 			svctest.SetUniqueNodePorts,
 			svctest.SetHealthCheckNodePort(31234)),
 		update: svctest.MakeService("foo",
 			svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetClusterIPs("10.0.0.93", "2000::76"),
 			svctest.SetUniqueNodePorts),
 		expectSameClusterIPs: true,
@@ -494,13 +494,13 @@ func TestPatchAllocatedValues(t *testing.T) {
 		before: svctest.MakeService("foo",
 			svctest.SetTypeExternalName,
 			// these are not valid, but prove the test
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetClusterIPs("10.0.0.93", "2000::76"),
 			svctest.SetUniqueNodePorts,
 			svctest.SetHealthCheckNodePort(31234)),
 		update: svctest.MakeService("foo",
 			svctest.SetTypeExternalName,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 	}}
 
 	for _, tc := range testCases {
@@ -975,41 +975,41 @@ func TestVerifyEquiv(t *testing.T) {
 		name: "HealthCheckNodePort_unspecified",
 		input: svcTestCase{
 			svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
 		},
 		output: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetHealthCheckNodePort(93)),
 		expect: true,
 	}, {
 		name: "HealthCheckNodePort_specified",
 		input: svcTestCase{
 			svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(93)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
 		},
 		output: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetHealthCheckNodePort(93)),
 		expect: true,
 	}, {
 		name: "HealthCheckNodePort_wrong",
 		input: svcTestCase{
 			svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(93)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
 		},
 		output: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 			svctest.SetHealthCheckNodePort(76)),
 		expect: false,
 	}}
@@ -6632,7 +6632,7 @@ func TestDeleteWithFinalizer(t *testing.T) {
 
 	// This will allocate cluster IPs, NodePort, and HealthCheckNodePort.
 	svc := svctest.MakeService(svcName, svctest.SetTypeLoadBalancer,
-		svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+		svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 		func(s *api.Service) {
 			s.Finalizers = []string{"example.com/test"}
 		})
@@ -6707,7 +6707,7 @@ func TestDeleteDryRun(t *testing.T) {
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
 				svctest.SetIPFamilies(api.IPv4Protocol),
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		},
 		{
 			name: "v4v6",
@@ -6715,7 +6715,7 @@ func TestDeleteDryRun(t *testing.T) {
 				svctest.SetTypeLoadBalancer,
 				svctest.SetIPFamilyPolicy(api.IPFamilyPolicyRequireDualStack),
 				svctest.SetIPFamilies(api.IPv4Protocol, api.IPv6Protocol),
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		}}
 
 	for _, tc := range testCases {
@@ -6763,13 +6763,13 @@ func TestUpdateDryRun(t *testing.T) {
 		clusterFamilies: []api.IPFamily{api.IPv4Protocol},
 		svc:             svctest.MakeService("foo", svctest.SetTypeExternalName),
 		update: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		verifyDryAllocs: true, // make sure values were not allocated.
 	}, {
 		name:            "singlestack:v4_Allocs-NoAllocs",
 		clusterFamilies: []api.IPFamily{api.IPv4Protocol},
 		svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		update:          svctest.MakeService("foo", svctest.SetTypeExternalName),
 		verifyDryAllocs: false, // make sure values were not released.
 	}, {
@@ -6777,13 +6777,13 @@ func TestUpdateDryRun(t *testing.T) {
 		clusterFamilies: []api.IPFamily{api.IPv6Protocol},
 		svc:             svctest.MakeService("foo", svctest.SetTypeExternalName),
 		update: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		verifyDryAllocs: true, // make sure values were not allocated.
 	}, {
 		name:            "singlestack:v6_Allocs-NoAllocs",
 		clusterFamilies: []api.IPFamily{api.IPv6Protocol},
 		svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		update:          svctest.MakeService("foo", svctest.SetTypeExternalName),
 		verifyDryAllocs: false, // make sure values were not released.
 	}, {
@@ -6791,13 +6791,13 @@ func TestUpdateDryRun(t *testing.T) {
 		clusterFamilies: []api.IPFamily{api.IPv4Protocol, api.IPv6Protocol},
 		svc:             svctest.MakeService("foo", svctest.SetTypeExternalName),
 		update: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		verifyDryAllocs: true, // make sure values were not allocated.
 	}, {
 		name:            "dualstack:v4v6_Allocs-NoAllocs",
 		clusterFamilies: []api.IPFamily{api.IPv4Protocol, api.IPv6Protocol},
 		svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		update:          svctest.MakeService("foo", svctest.SetTypeExternalName),
 		verifyDryAllocs: false, // make sure values were not released.
 	}, {
@@ -6805,13 +6805,13 @@ func TestUpdateDryRun(t *testing.T) {
 		clusterFamilies: []api.IPFamily{api.IPv6Protocol, api.IPv4Protocol},
 		svc:             svctest.MakeService("foo", svctest.SetTypeExternalName),
 		update: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		verifyDryAllocs: true, // make sure values were not allocated.
 	}, {
 		name:            "dualstack:v6v4_Allocs-NoAllocs",
 		clusterFamilies: []api.IPFamily{api.IPv6Protocol, api.IPv4Protocol},
 		svc: svctest.MakeService("foo", svctest.SetTypeLoadBalancer,
-			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+			svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 		update:          svctest.MakeService("foo", svctest.SetTypeExternalName),
 		verifyDryAllocs: false, // make sure values were not released.
 	}}
@@ -6954,7 +6954,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetClusterIPs("10.0.0.1"),
 				svctest.SetNodePorts(30093),
 				svctest.SetHealthCheckNodePort(30118)),
@@ -6965,7 +6965,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
@@ -6979,7 +6979,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetIPFamilyPolicy(api.IPFamilyPolicyPreferDualStack),
 				svctest.SetClusterIPs("10.0.0.1", "2000::1"),
 				svctest.SetPorts(
@@ -6994,7 +6994,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP))),
@@ -7013,7 +7013,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetIPFamilyPolicy(api.IPFamilyPolicyPreferDualStack),
 				svctest.SetClusterIPs("10.0.0.1", "2000::1"),
 				svctest.SetPorts(
@@ -7028,7 +7028,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetClusterIPs("10.0.0.1")),
 			expectError: true,
 		},
@@ -7037,7 +7037,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7050,7 +7050,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7068,7 +7068,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7081,7 +7081,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					// swapped from above
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP),
@@ -7099,7 +7099,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7112,7 +7112,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7131,7 +7131,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7144,7 +7144,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7156,7 +7156,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -7169,7 +7169,7 @@ func TestUpdatePatchAllocatedValues(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetPorts(
 					svctest.MakeServicePort("p", 867, intstr.FromInt(867), api.ProtocolTCP),
 					svctest.MakeServicePort("q", 5309, intstr.FromInt(5309), api.ProtocolTCP)),
@@ -11115,7 +11115,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeExternalName,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectError: true,
 		},
 	}, {
@@ -11123,7 +11123,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeExternalName,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11132,7 +11132,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeExternalName,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectError: true,
 		},
 	}, {
@@ -11140,7 +11140,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeExternalName,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11155,7 +11155,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeClusterIP,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectError: true,
 		},
 	}, {
@@ -11172,7 +11172,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeClusterIP,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectError: true,
 		},
 	}, {
@@ -11180,7 +11180,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeClusterIP,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11189,7 +11189,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeClusterIP,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectError: true,
 		},
 	}, {
@@ -11197,7 +11197,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeClusterIP,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11223,7 +11223,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeNodePort,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11231,7 +11231,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeNodePort,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11241,7 +11241,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeNodePort,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11250,7 +11250,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeNodePort,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11258,7 +11258,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeNodePort,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11268,7 +11268,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeNodePort,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11294,7 +11294,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11302,7 +11302,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
@@ -11312,7 +11312,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11320,7 +11320,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
@@ -11331,7 +11331,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectError: true,
 		},
@@ -11340,7 +11340,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
@@ -11348,7 +11348,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11358,7 +11358,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
@@ -11367,7 +11367,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeCluster)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyCluster)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: false,
@@ -11377,7 +11377,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30000)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
@@ -11386,7 +11386,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		update: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(30001)),
 			expectError: true,
 		},
@@ -11395,7 +11395,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal)),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal)),
 			expectClusterIPs:          true,
 			expectNodePorts:           true,
 			expectHealthCheckNodePort: true,
@@ -11411,7 +11411,7 @@ func TestFeatureExternalTrafficPolicy(t *testing.T) {
 		create: svcTestCase{
 			svc: svctest.MakeService("foo",
 				svctest.SetTypeLoadBalancer,
-				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyTypeLocal),
+				svctest.SetExternalTrafficPolicy(api.ServiceExternalTrafficPolicyLocal),
 				svctest.SetHealthCheckNodePort(-1)),
 			expectError: true,
 		},

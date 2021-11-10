@@ -3607,14 +3607,18 @@ const (
 	ServiceInternalTrafficPolicyLocal ServiceInternalTrafficPolicyType = "Local"
 )
 
-// ServiceExternalTrafficPolicyType string
-type ServiceExternalTrafficPolicyType string
+// ServiceExternalTrafficPolicy string
+type ServiceExternalTrafficPolicy string
+type ServiceExternalTrafficPolicyType = ServiceExternalTrafficPolicy // for backwards compat
 
 const (
-	// ServiceExternalTrafficPolicyTypeLocal specifies node-local endpoints behavior.
-	ServiceExternalTrafficPolicyTypeLocal ServiceExternalTrafficPolicyType = "Local"
-	// ServiceExternalTrafficPolicyTypeCluster specifies cluster-wide (legacy) behavior.
-	ServiceExternalTrafficPolicyTypeCluster ServiceExternalTrafficPolicyType = "Cluster"
+	// ServiceExternalTrafficPolicyLocal specifies node-local endpoints behavior.
+	ServiceExternalTrafficPolicyLocal ServiceExternalTrafficPolicy = "Local"
+	// ServiceExternalTrafficPolicyCluster specifies cluster-wide (legacy) behavior.
+	ServiceExternalTrafficPolicyCluster ServiceExternalTrafficPolicy = "Cluster"
+
+	ServiceExternalTrafficPolicyTypeLocal   = ServiceExternalTrafficPolicyLocal
+	ServiceExternalTrafficPolicyTypeCluster = ServiceExternalTrafficPolicyCluster
 )
 
 // These are the valid conditions of a service.
@@ -3810,7 +3814,7 @@ type ServiceSpec struct {
 	// "Cluster" obscures the client source IP and may cause a second hop to
 	// another node, but should have good overall load-spreading.
 	// +optional
-	ExternalTrafficPolicy ServiceExternalTrafficPolicyType
+	ExternalTrafficPolicy ServiceExternalTrafficPolicy
 
 	// healthCheckNodePort specifies the healthcheck nodePort for the service.
 	// If not specified, HealthCheckNodePort is created by the service api
