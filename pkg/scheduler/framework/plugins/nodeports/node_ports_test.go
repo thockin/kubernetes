@@ -24,6 +24,7 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/kubernetes/pkg/scheduler/framework"
@@ -38,7 +39,7 @@ func newPod(host string, hostPortInfos ...string) *v1.Pod {
 		networkPorts = append(networkPorts, v1.ContainerPort{
 			HostIP:   splited[1],
 			HostPort: int32(hostPort),
-			Protocol: v1.Protocol(splited[0]),
+			Protocol: common.Protocol(splited[0]),
 		})
 	}
 	return &v1.Pod{
@@ -191,11 +192,11 @@ func TestGetContainerPorts(t *testing.T) {
 							Ports: []v1.ContainerPort{
 								{
 									ContainerPort: 8001,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 								{
 									ContainerPort: 8002,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 							},
 						},
@@ -203,11 +204,11 @@ func TestGetContainerPorts(t *testing.T) {
 							Ports: []v1.ContainerPort{
 								{
 									ContainerPort: 8003,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 								{
 									ContainerPort: 8004,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 							},
 						},
@@ -221,11 +222,11 @@ func TestGetContainerPorts(t *testing.T) {
 							Ports: []v1.ContainerPort{
 								{
 									ContainerPort: 8011,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 								{
 									ContainerPort: 8012,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 							},
 						},
@@ -233,11 +234,11 @@ func TestGetContainerPorts(t *testing.T) {
 							Ports: []v1.ContainerPort{
 								{
 									ContainerPort: 8013,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 								{
 									ContainerPort: 8014,
-									Protocol:      v1.ProtocolTCP,
+									Protocol:      common.ProtocolTCP,
 								},
 							},
 						},
@@ -247,35 +248,35 @@ func TestGetContainerPorts(t *testing.T) {
 			expected: []*v1.ContainerPort{
 				{
 					ContainerPort: 8001,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8002,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8003,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8004,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8011,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8012,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8013,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 				{
 					ContainerPort: 8014,
-					Protocol:      v1.ProtocolTCP,
+					Protocol:      common.ProtocolTCP,
 				},
 			},
 		},

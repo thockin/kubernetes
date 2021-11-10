@@ -19,7 +19,8 @@ package validation
 import (
 	"testing"
 
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -315,7 +316,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8080,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},
@@ -323,7 +324,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8080,
-							Protocol: v1.ProtocolTCP,
+							Protocol: common.ProtocolTCP,
 						},
 					},
 				},
@@ -338,7 +339,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8080,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},
@@ -346,7 +347,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8081,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},
@@ -375,7 +376,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8080,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},
@@ -383,7 +384,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8080,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},
@@ -398,7 +399,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8080,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},
@@ -406,7 +407,7 @@ func TestAccumulateUniqueHostPorts(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							HostPort: 8081,
-							Protocol: v1.ProtocolUDP,
+							Protocol: common.ProtocolUDP,
 						},
 					},
 				},

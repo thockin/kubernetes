@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -172,7 +173,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolUDP,
+						Protocol: common.ProtocolUDP,
 					}},
 					Type: v1.ServiceTypeLoadBalancer,
 				},
@@ -193,7 +194,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolTCP,
+						Protocol: common.ProtocolTCP,
 					}},
 					Type: v1.ServiceTypeLoadBalancer,
 				},
@@ -214,7 +215,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolSCTP,
+						Protocol: common.ProtocolSCTP,
 					}},
 					Type: v1.ServiceTypeLoadBalancer,
 				},
@@ -251,7 +252,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolSCTP,
+						Protocol: common.ProtocolSCTP,
 					}},
 					Type:              v1.ServiceTypeLoadBalancer,
 					LoadBalancerClass: nil,
@@ -303,7 +304,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolTCP,
+						Protocol: common.ProtocolTCP,
 					}},
 					Type: v1.ServiceTypeLoadBalancer,
 				},
@@ -332,7 +333,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolTCP,
+						Protocol: common.ProtocolTCP,
 					}},
 					Type: v1.ServiceTypeLoadBalancer,
 				},
@@ -354,7 +355,7 @@ func TestSyncLoadBalancerIfNeeded(t *testing.T) {
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{{
 						Port:     80,
-						Protocol: v1.ProtocolTCP,
+						Protocol: common.ProtocolTCP,
 					}},
 					Type: v1.ServiceTypeLoadBalancer,
 				},
@@ -1195,7 +1196,7 @@ func TestNeedsUpdate(t *testing.T) {
 					Spec: v1.ServiceSpec{
 						Ports: []v1.ServicePort{{
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.Parse("20"),
 						}},
 						Type: v1.ServiceTypeLoadBalancer,
@@ -1217,7 +1218,7 @@ func TestNeedsUpdate(t *testing.T) {
 					Spec: v1.ServiceSpec{
 						Ports: []v1.ServicePort{{
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.Parse("22"),
 						}},
 						Type: v1.ServiceTypeLoadBalancer,

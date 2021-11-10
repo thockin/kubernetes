@@ -22,6 +22,7 @@ limitations under the License.
 package discovery
 
 import (
+	common "k8s.io/api/common"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	core "k8s.io/kubernetes/pkg/apis/core"
 )
@@ -142,7 +143,7 @@ func (in *EndpointPort) DeepCopyInto(out *EndpointPort) {
 	}
 	if in.Protocol != nil {
 		in, out := &in.Protocol, &out.Protocol
-		*out = new(core.Protocol)
+		*out = new(common.Protocol)
 		**out = **in
 	}
 	if in.Port != nil {

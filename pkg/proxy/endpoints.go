@@ -26,6 +26,7 @@ import (
 	"k8s.io/client-go/tools/events"
 	"k8s.io/klog/v2"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -541,7 +542,7 @@ func detectStaleConnections(oldEndpointsMap, newEndpointsMap EndpointsMap, stale
 	// Detect stale endpoints: an endpoint can have stale conntrack entries if it was receiving traffic
 	// and then goes unready or changes its IP address.
 	for svcPortName, epList := range oldEndpointsMap {
-		if svcPortName.Protocol != v1.ProtocolUDP {
+		if svcPortName.Protocol != common.ProtocolUDP {
 			continue
 		}
 
@@ -571,7 +572,7 @@ func detectStaleConnections(oldEndpointsMap, newEndpointsMap EndpointsMap, stale
 	// For udp service, if its backend changes from 0 to non-0 ready endpoints.
 	// There may exist a conntrack entry that could blackhole traffic to the service.
 	for svcPortName, epList := range newEndpointsMap {
-		if svcPortName.Protocol != v1.ProtocolUDP {
+		if svcPortName.Protocol != common.ProtocolUDP {
 			continue
 		}
 

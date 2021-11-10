@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -231,7 +232,7 @@ func collectServiceNodePorts(service *corev1.Service) []int {
 	if healthPort != 0 {
 		s := seen[healthPort]
 		// TODO: is it safe to assume the protocol is always TCP?
-		if s == nil || s.Has(string(corev1.ProtocolTCP)) {
+		if s == nil || s.Has(string(common.ProtocolTCP)) {
 			servicePorts = append(servicePorts, healthPort)
 		}
 	}

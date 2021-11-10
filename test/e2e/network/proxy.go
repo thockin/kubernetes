@@ -29,6 +29,7 @@ import (
 	"sync"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -324,7 +325,7 @@ var _ = common.SIGDescribe("Proxy", func() {
 					Ports: []v1.ServicePort{{
 						Port:       80,
 						TargetPort: intstr.FromInt(80),
-						Protocol:   v1.ProtocolTCP,
+						Protocol:   apicommon.ProtocolTCP,
 					}},
 					Selector: map[string]string{
 						"test": "response",
@@ -410,7 +411,7 @@ var _ = common.SIGDescribe("Proxy", func() {
 					Ports: []v1.ServicePort{{
 						Port:       80,
 						TargetPort: intstr.FromInt(80),
-						Protocol:   v1.ProtocolTCP,
+						Protocol:   apicommon.ProtocolTCP,
 					}},
 					Selector: map[string]string{
 						"e2e-test": "proxy-endpoints",

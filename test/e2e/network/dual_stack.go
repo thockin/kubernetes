@@ -27,6 +27,7 @@ import (
 	"github.com/onsi/gomega"
 
 	appsv1 "k8s.io/api/apps/v1"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -786,12 +787,12 @@ func createService(name, ns string, labels map[string]string, ipFamilyPolicy *v1
 				{
 					Name:     "tcp-port",
 					Port:     53,
-					Protocol: v1.ProtocolTCP,
+					Protocol: apicommon.ProtocolTCP,
 				},
 				{
 					Name:     "udp-port",
 					Port:     53,
-					Protocol: v1.ProtocolUDP,
+					Protocol: apicommon.ProtocolUDP,
 				},
 			},
 		},

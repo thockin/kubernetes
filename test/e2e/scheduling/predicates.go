@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	nodev1 "k8s.io/api/node/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -674,13 +675,13 @@ var _ = SIGDescribe("SchedulerPredicates [Serial]", func() {
 
 		port := int32(54321)
 		ginkgo.By(fmt.Sprintf("Trying to create a pod(pod1) with hostport %v and hostIP %s and expect scheduled", port, localhost))
-		createHostPortPodOnNode(f, "pod1", ns, localhost, port, v1.ProtocolTCP, nodeSelector, true)
+		createHostPortPodOnNode(f, "pod1", ns, localhost, port, common.ProtocolTCP, nodeSelector, true)
 
 		ginkgo.By(fmt.Sprintf("Trying to create another pod(pod2) with hostport %v but hostIP %s on the node which pod1 resides and expect scheduled", port, hostIP))
-		createHostPortPodOnNode(f, "pod2", ns, hostIP, port, v1.ProtocolTCP, nodeSelector, true)
+		createHostPortPodOnNode(f, "pod2", ns, hostIP, port, common.ProtocolTCP, nodeSelector, true)
 
 		ginkgo.By(fmt.Sprintf("Trying to create a third pod(pod3) with hostport %v, hostIP %s but use UDP protocol on the node which pod2 resides", port, hostIP))
-		createHostPortPodOnNode(f, "pod3", ns, hostIP, port, v1.ProtocolUDP, nodeSelector, true)
+		createHostPortPodOnNode(f, "pod3", ns, hostIP, port, common.ProtocolUDP, nodeSelector, true)
 
 	})
 
@@ -707,10 +708,10 @@ var _ = SIGDescribe("SchedulerPredicates [Serial]", func() {
 
 		port := int32(54322)
 		ginkgo.By(fmt.Sprintf("Trying to create a pod(pod4) with hostport %v and hostIP 0.0.0.0(empty string here) and expect scheduled", port))
-		createHostPortPodOnNode(f, "pod4", ns, "", port, v1.ProtocolTCP, nodeSelector, true)
+		createHostPortPodOnNode(f, "pod4", ns, "", port, common.ProtocolTCP, nodeSelector, true)
 
 		ginkgo.By(fmt.Sprintf("Trying to create another pod(pod5) with hostport %v but hostIP %s on the node which pod4 resides and expect not scheduled", port, hostIP))
-		createHostPortPodOnNode(f, "pod5", ns, hostIP, port, v1.ProtocolTCP, nodeSelector, false)
+		createHostPortPodOnNode(f, "pod5", ns, hostIP, port, common.ProtocolTCP, nodeSelector, false)
 	})
 
 	ginkgo.Context("PodTopologySpread Filtering", func() {
@@ -1025,7 +1026,7 @@ func CreateNodeSelectorPods(f *framework.Framework, id string, replicas int, nod
 
 // create pod which using hostport on the specified node according to the nodeSelector
 // it starts an http server on the exposed port
-func createHostPortPodOnNode(f *framework.Framework, podName, ns, hostIP string, port int32, protocol v1.Protocol, nodeSelector map[string]string, expectScheduled bool) {
+func createHostPortPodOnNode(f *framework.Framework, podName, ns, hostIP string, port int32, protocol common.Protocol, nodeSelector map[string]string, expectScheduled bool) {
 	hostPortPod := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: podName,

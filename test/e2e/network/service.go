@@ -30,6 +30,7 @@ import (
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
 
@@ -103,7 +104,7 @@ var (
 			Ports: []v1.ServicePort{{
 				Port:       int32(defaultServeHostnameServicePort),
 				TargetPort: intstr.FromInt(9376),
-				Protocol:   v1.ProtocolTCP,
+				Protocol:   apicommon.ProtocolTCP,
 			}},
 			Selector: map[string]string{
 				"name": defaultServeHostnameServiceName,
@@ -1179,7 +1180,7 @@ var _ = common.SIGDescribe("Services", func() {
 		nodePortService, err := jig.CreateTCPService(func(svc *v1.Service) {
 			svc.Spec.Type = v1.ServiceTypeNodePort
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
 			}
 		})
 		framework.ExpectNoError(err)
@@ -1211,7 +1212,7 @@ var _ = common.SIGDescribe("Services", func() {
 			svc.Spec.Type = v1.ServiceTypeClusterIP
 			svc.Spec.ExternalIPs = []string{externalIP}
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
 			}
 		})
 		if err != nil && strings.Contains(err.Error(), "Use of external IPs is denied by admission control") {
@@ -1255,7 +1256,7 @@ var _ = common.SIGDescribe("Services", func() {
 				{
 					Name:       "tcp-port",
 					Port:       80,
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 					TargetPort: intstr.FromInt(9376),
 				},
 			}
@@ -1275,13 +1276,13 @@ var _ = common.SIGDescribe("Services", func() {
 				{
 					Name:       "tcp-port",
 					Port:       80,
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 					TargetPort: intstr.FromInt(9376),
 				},
 				{
 					Name:       "udp-port",
 					Port:       80,
-					Protocol:   v1.ProtocolUDP,
+					Protocol:   apicommon.ProtocolUDP,
 					TargetPort: intstr.FromInt(9376),
 				},
 			}
@@ -1324,7 +1325,7 @@ var _ = common.SIGDescribe("Services", func() {
 			s.Spec.Type = v1.ServiceTypeClusterIP
 			s.Spec.ExternalName = ""
 			s.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
 			}
 		})
 		framework.ExpectNoError(err)
@@ -1363,7 +1364,7 @@ var _ = common.SIGDescribe("Services", func() {
 			s.Spec.Type = v1.ServiceTypeNodePort
 			s.Spec.ExternalName = ""
 			s.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(9376)},
 			}
 		})
 		framework.ExpectNoError(err)
@@ -1682,7 +1683,7 @@ var _ = common.SIGDescribe("Services", func() {
 			Args:  []string{"netexec", fmt.Sprintf("--http-port=%d", port)},
 			Name:  t.Name,
 			Image: t.Image,
-			Ports: []v1.ContainerPort{{ContainerPort: int32(port), Protocol: v1.ProtocolTCP}},
+			Ports: []v1.ContainerPort{{ContainerPort: int32(port), Protocol: apicommon.ProtocolTCP}},
 			ReadinessProbe: &v1.Probe{
 				ProbeHandler: v1.ProbeHandler{
 					Exec: &v1.ExecAction{
@@ -2066,7 +2067,7 @@ var _ = common.SIGDescribe("Services", func() {
 		jig := e2eservice.NewTestJig(cs, ns, serviceName)
 		svc, err := jig.CreateTCPService(func(svc *v1.Service) {
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(80)},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(80)},
 			}
 			svc.Spec.InternalTrafficPolicy = &local
 		})
@@ -2144,7 +2145,7 @@ var _ = common.SIGDescribe("Services", func() {
 		jig := e2eservice.NewTestJig(cs, ns, serviceName)
 		svc, err := jig.CreateTCPService(func(svc *v1.Service) {
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 8000, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(8000)},
+				{Port: 8000, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(8000)},
 			}
 			svc.Spec.InternalTrafficPolicy = &local
 		})
@@ -2228,7 +2229,7 @@ var _ = common.SIGDescribe("Services", func() {
 		jig := e2eservice.NewTestJig(cs, ns, serviceName)
 		svc, err := jig.CreateTCPService(func(svc *v1.Service) {
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(endpointPort)},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP, TargetPort: intstr.FromInt(endpointPort)},
 			}
 			svc.Spec.InternalTrafficPolicy = &local
 		})
@@ -2349,7 +2350,7 @@ var _ = common.SIGDescribe("Services", func() {
 				Ports: []v1.EndpointPort{{
 					Name:     "http",
 					Port:     80,
-					Protocol: v1.ProtocolTCP,
+					Protocol: apicommon.ProtocolTCP,
 				}},
 			}},
 		}
@@ -2544,7 +2545,7 @@ var _ = common.SIGDescribe("Services", func() {
 				Type: "ClusterIP",
 				Ports: []v1.ServicePort{{
 					Name:       "http",
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 					Port:       int32(80),
 					TargetPort: intstr.FromInt(80),
 				}},
@@ -2778,7 +2779,7 @@ var _ = common.SIGDescribe("Services", func() {
 						Type: "ClusterIP",
 						Ports: []v1.ServicePort{{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   apicommon.ProtocolTCP,
 							Port:       int32(testService.port),
 							TargetPort: intstr.FromInt(testService.port),
 						}},
@@ -3275,7 +3276,7 @@ var _ = common.SIGDescribe("SCTP [LinuxOnly]", func() {
 
 		name1 := "pod1"
 
-		createPodOrFail(f, ns, name1, jig.Labels, []v1.ContainerPort{{ContainerPort: 5060, Protocol: v1.ProtocolSCTP}})
+		createPodOrFail(f, ns, name1, jig.Labels, []v1.ContainerPort{{ContainerPort: 5060, Protocol: apicommon.ProtocolSCTP}})
 		names[name1] = true
 		defer func() {
 			for name := range names {
@@ -3313,7 +3314,7 @@ var _ = common.SIGDescribe("SCTP [LinuxOnly]", func() {
 
 		ginkgo.By("creating a pod with hostport on the selected node")
 		podName := "hostport"
-		ports := []v1.ContainerPort{{Protocol: v1.ProtocolSCTP, ContainerPort: 5060, HostPort: 5060}}
+		ports := []v1.ContainerPort{{Protocol: apicommon.ProtocolSCTP, ContainerPort: 5060, HostPort: 5060}}
 		podSpec := e2epod.NewAgnhostPod(f.Namespace.Name, podName, nil, nil, ports)
 		nodeSelection := e2epod.NodeSelection{Name: node.Name}
 		e2epod.SetNodeSelection(&podSpec.Spec, nodeSelection)
@@ -3374,7 +3375,7 @@ var _ = common.SIGDescribe("SCTP [LinuxOnly]", func() {
 		ginkgo.By("creating service " + serviceName + " in namespace " + ns)
 		_, err = jig.CreateSCTPServiceWithPort(func(svc *v1.Service) {
 			svc.Spec.Type = v1.ServiceTypeClusterIP
-			svc.Spec.Ports = []v1.ServicePort{{Protocol: v1.ProtocolSCTP, Port: 5060}}
+			svc.Spec.Ports = []v1.ServicePort{{Protocol: apicommon.ProtocolSCTP, Port: 5060}}
 		}, 5060)
 		framework.ExpectNoError(err)
 		defer func() {

@@ -25,6 +25,7 @@ import (
 	gapi "github.com/heketi/heketi/pkg/glusterfs/api"
 	"k8s.io/mount-utils"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -210,7 +211,7 @@ func TestPersistentClaimReadOnlyFlag(t *testing.T) {
 		},
 		Subsets: []v1.EndpointSubset{{
 			Addresses: []v1.EndpointAddress{{IP: "127.0.0.1"}},
-			Ports:     []v1.EndpointPort{{Name: "foo", Port: 80, Protocol: v1.ProtocolTCP}},
+			Ports:     []v1.EndpointPort{{Name: "foo", Port: 80, Protocol: common.ProtocolTCP}},
 		}},
 	}
 

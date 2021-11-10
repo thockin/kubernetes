@@ -24,6 +24,7 @@ import (
 	"strconv"
 
 	"github.com/onsi/ginkgo"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -84,13 +85,13 @@ var _ = common.SIGDescribe("HostPort", func() {
 
 		// Create pods with the same HostPort
 		ginkgo.By(fmt.Sprintf("Trying to create a pod(pod1) with hostport %v and hostIP %s and expect scheduled", port, localhost))
-		createHostPortPodOnNode(f, "pod1", ns, localhost, port, v1.ProtocolTCP, randomNode.Name)
+		createHostPortPodOnNode(f, "pod1", ns, localhost, port, apicommon.ProtocolTCP, randomNode.Name)
 
 		ginkgo.By(fmt.Sprintf("Trying to create another pod(pod2) with hostport %v but hostIP %s on the node which pod1 resides and expect scheduled", port, hostIP))
-		createHostPortPodOnNode(f, "pod2", ns, hostIP, port, v1.ProtocolTCP, randomNode.Name)
+		createHostPortPodOnNode(f, "pod2", ns, hostIP, port, apicommon.ProtocolTCP, randomNode.Name)
 
 		ginkgo.By(fmt.Sprintf("Trying to create a third pod(pod3) with hostport %v, hostIP %s but use UDP protocol on the node which pod2 resides", port, hostIP))
-		createHostPortPodOnNode(f, "pod3", ns, hostIP, port, v1.ProtocolUDP, randomNode.Name)
+		createHostPortPodOnNode(f, "pod3", ns, hostIP, port, apicommon.ProtocolUDP, randomNode.Name)
 
 		// check that the port is being actually exposed to each container
 		// create a pod on the host network in the same node
@@ -154,7 +155,7 @@ var _ = common.SIGDescribe("HostPort", func() {
 
 // create pod which using hostport on the specified node according to the nodeSelector
 // it starts an http server on the exposed port
-func createHostPortPodOnNode(f *framework.Framework, podName, ns, hostIP string, port int32, protocol v1.Protocol, nodeName string) {
+func createHostPortPodOnNode(f *framework.Framework, podName, ns, hostIP string, port int32, protocol apicommon.Protocol, nodeName string) {
 	hostPortPod := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: podName,

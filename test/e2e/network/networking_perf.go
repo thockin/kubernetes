@@ -24,6 +24,7 @@ import (
 
 	"github.com/onsi/ginkgo"
 	appsv1 "k8s.io/api/apps/v1"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,7 +78,7 @@ func iperf2ServerDeployment(client clientset.Interface, namespace string, isIPV6
 	deploymentSpec.Spec.Template.Spec.Containers[0].Ports = []v1.ContainerPort{
 		{
 			ContainerPort: iperf2Port,
-			Protocol:      v1.ProtocolTCP,
+			Protocol:      apicommon.ProtocolTCP,
 		},
 	}
 
@@ -102,7 +103,7 @@ func iperf2ServerService(client clientset.Interface, namespace string) (*v1.Serv
 				labelKey: serverLabelValue,
 			},
 			Ports: []v1.ServicePort{
-				{Protocol: v1.ProtocolTCP, Port: iperf2Port},
+				{Protocol: apicommon.ProtocolTCP, Port: iperf2Port},
 			},
 		},
 	}

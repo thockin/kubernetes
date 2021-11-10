@@ -26,7 +26,8 @@ import (
 	"strings"
 
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud"
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -42,7 +43,7 @@ func makeInstanceGroupName(clusterID string) string {
 	return fmt.Sprintf("%s--%s", prefix, clusterID)
 }
 
-func makeBackendServiceName(loadBalancerName, clusterID string, shared bool, scheme cloud.LbScheme, protocol v1.Protocol, svcAffinity v1.ServiceAffinity) string {
+func makeBackendServiceName(loadBalancerName, clusterID string, shared bool, scheme cloud.LbScheme, protocol common.Protocol, svcAffinity v1.ServiceAffinity) string {
 	if shared {
 		hash := sha1.New()
 

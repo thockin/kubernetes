@@ -22,6 +22,7 @@ limitations under the License.
 package networking
 
 import (
+	common "k8s.io/api/common"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
@@ -582,7 +583,7 @@ func (in *NetworkPolicyPort) DeepCopyInto(out *NetworkPolicyPort) {
 	*out = *in
 	if in.Protocol != nil {
 		in, out := &in.Protocol, &out.Protocol
-		*out = new(core.Protocol)
+		*out = new(common.Protocol)
 		**out = **in
 	}
 	if in.Port != nil {

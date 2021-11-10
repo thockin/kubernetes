@@ -31,7 +31,8 @@ import (
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/meta"
 	"github.com/google/go-cmp/cmp"
 	compute "google.golang.org/api/compute/v1"
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 	cloudprovider "k8s.io/cloud-provider"
@@ -87,7 +88,7 @@ func (g *Cloud) ensureInternalLoadBalancer(clusterName, clusterID string, svc *v
 	}
 
 	ports, _, protocol := getPortsAndProtocol(svc.Spec.Ports)
-	if protocol != v1.ProtocolTCP && protocol != v1.ProtocolUDP {
+	if protocol != common.ProtocolTCP && protocol != v1.ProtocolUDP {
 		return nil, fmt.Errorf("Invalid protocol %s, only TCP and UDP are supported", string(protocol))
 	}
 	scheme := cloud.SchemeInternal
@@ -414,7 +415,7 @@ func (g *Cloud) teardownInternalHealthCheckAndFirewall(svc *v1.Service, hcName s
 	return nil
 }
 
-func (g *Cloud) ensureInternalFirewall(svc *v1.Service, fwName, fwDesc string, sourceRanges []string, portRanges []string, protocol v1.Protocol, nodes []*v1.Node, legacyFwName string) error {
+func (g *Cloud) ensureInternalFirewall(svc *v1.Service, fwName, fwDesc string, sourceRanges []string, portRanges []string, protocol common.Protocol, nodes []*v1.Node, legacyFwName string) error {
 	klog.V(2).Infof("ensureInternalFirewall(%v): checking existing firewall", fwName)
 	targetTags, err := g.GetNodeTags(nodeNames(nodes))
 	if err != nil {
@@ -504,7 +505,7 @@ func (g *Cloud) ensureInternalFirewalls(loadBalancerName, ipAddress, clusterID s
 	// Second firewall is for health checking nodes / services
 	fwHCName := makeHealthCheckFirewallName(loadBalancerName, clusterID, sharedHealthCheck)
 	hcSrcRanges := L4LoadBalancerSrcRanges()
-	return g.ensureInternalFirewall(svc, fwHCName, "", hcSrcRanges, []string{healthCheckPort}, v1.ProtocolTCP, nodes, "")
+	return g.ensureInternalFirewall(svc, fwHCName, "", hcSrcRanges, []string{healthCheckPort}, common.ProtocolTCP, nodes, "")
 }
 
 func (g *Cloud) ensureInternalHealthCheck(name string, svcName types.NamespacedName, shared bool, path string, port int32) (*compute.HealthCheck, error) {
@@ -649,7 +650,7 @@ func (g *Cloud) ensureInternalInstanceGroupsDeleted(name string) error {
 	return nil
 }
 
-func (g *Cloud) ensureInternalBackendService(name, description string, affinityType v1.ServiceAffinity, scheme cloud.LbScheme, protocol v1.Protocol, igLinks []string, hcLink string) error {
+func (g *Cloud) ensureInternalBackendService(name, description string, affinityType v1.ServiceAffinity, scheme cloud.LbScheme, protocol common.Protocol, igLinks []string, hcLink string) error {
 	klog.V(2).Infof("ensureInternalBackendService(%v, %v, %v): checking existing backend service with %d groups", name, scheme, protocol, len(igLinks))
 	bs, err := g.GetRegionBackendService(name, g.region)
 	if err != nil && !isNotFound(err) {
@@ -828,9 +829,9 @@ func backendSvcEqual(a, b *compute.BackendService) bool {
 		backendsListEqual(a.Backends, b.Backends)
 }
 
-func getPortsAndProtocol(svcPorts []v1.ServicePort) (ports []string, portRanges []string, protocol v1.Protocol) {
+func getPortsAndProtocol(svcPorts []v1.ServicePort) (ports []string, portRanges []string, protocol common.Protocol) {
 	if len(svcPorts) == 0 {
-		return []string{}, []string{}, v1.ProtocolUDP
+		return []string{}, []string{}, common.ProtocolUDP
 	}
 
 	// GCP doesn't support multiple protocols for a single load balancer

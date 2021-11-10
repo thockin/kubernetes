@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"testing"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -347,7 +348,7 @@ func generateEndpointsAndSlice(name, namespace string, ports []int, addresses []
 		endpointPort := corev1.EndpointPort{
 			Name:     fmt.Sprintf("port-%d", i),
 			Port:     int32(port),
-			Protocol: corev1.ProtocolTCP,
+			Protocol: common.ProtocolTCP,
 		}
 		subset.Ports = append(subset.Ports, endpointPort)
 		epSlice.Ports = append(epSlice.Ports, discovery.EndpointPort{

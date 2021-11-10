@@ -17,14 +17,14 @@ limitations under the License.
 package v1
 
 import (
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/common"
 	discoveryv1 "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
 var (
 	defaultPortName = ""
-	defaultProtocol = v1.ProtocolTCP
+	defaultProtocol = common.ProtocolTCP
 )
 
 func addDefaultingFuncs(scheme *runtime.Scheme) error {

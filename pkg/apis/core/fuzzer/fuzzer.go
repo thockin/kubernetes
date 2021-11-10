@@ -23,6 +23,7 @@ import (
 
 	fuzz "github.com/google/gofuzz"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -276,8 +277,8 @@ var Funcs = func(codecs runtimeserializer.CodecFactory) []interface{} {
 			policies := []core.DNSPolicy{core.DNSClusterFirst, core.DNSDefault}
 			*d = policies[c.Rand.Intn(len(policies))]
 		},
-		func(p *core.Protocol, c fuzz.Continue) {
-			protocols := []core.Protocol{core.ProtocolTCP, core.ProtocolUDP, core.ProtocolSCTP}
+		func(p *common.Protocol, c fuzz.Continue) {
+			protocols := []common.Protocol{common.ProtocolTCP, common.ProtocolUDP, common.ProtocolSCTP}
 			*p = protocols[c.Rand.Intn(len(protocols))]
 		},
 		func(p *core.ServiceAffinity, c fuzz.Continue) {

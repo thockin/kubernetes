@@ -33,6 +33,7 @@ import (
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/meta"
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/mock"
 	"google.golang.org/api/compute/v1"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -590,7 +591,7 @@ func TestClearPreviousInternalResources(t *testing.T) {
 	hc2, err := gce.ensureInternalHealthCheck("hc2", nm, false, "healthz", 12346)
 	require.NoError(t, err)
 
-	err = gce.ensureInternalBackendService(svc.ObjectMeta.Name, "", svc.Spec.SessionAffinity, cloud.SchemeInternal, v1.ProtocolTCP, []string{}, "")
+	err = gce.ensureInternalBackendService(svc.ObjectMeta.Name, "", svc.Spec.SessionAffinity, cloud.SchemeInternal, common.ProtocolTCP, []string{}, "")
 	require.NoError(t, err)
 	backendSvc, err := gce.GetRegionBackendService(svc.ObjectMeta.Name, gce.region)
 	require.NoError(t, err)
@@ -661,7 +662,7 @@ func TestEnsureInternalFirewallDeletesLegacyFirewall(t *testing.T) {
 		"firewall with legacy name",
 		sourceRange,
 		[]string{"123"},
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		"")
 	if err != nil {
@@ -675,7 +676,7 @@ func TestEnsureInternalFirewallDeletesLegacyFirewall(t *testing.T) {
 		"firewall with new name",
 		sourceRange,
 		[]string{"123", "456"},
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		lbName)
 	if err != nil {
@@ -697,7 +698,7 @@ func TestEnsureInternalFirewallDeletesLegacyFirewall(t *testing.T) {
 		"firewall with new name",
 		sourceRange,
 		[]string{"123", "456", "789"},
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		lbName)
 	if err != nil {
@@ -741,7 +742,7 @@ func TestEnsureInternalFirewallSucceedsOnXPN(t *testing.T) {
 		"A sad little firewall",
 		sourceRange,
 		[]string{"123"},
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		lbName)
 	require.Nil(t, err, "Should success when XPN is on.")
@@ -759,7 +760,7 @@ func TestEnsureInternalFirewallSucceedsOnXPN(t *testing.T) {
 		"A sad little firewall",
 		sourceRange,
 		[]string{"123"},
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		lbName)
 	require.NoError(t, err)
@@ -778,7 +779,7 @@ func TestEnsureInternalFirewallSucceedsOnXPN(t *testing.T) {
 		"A happy little firewall",
 		sourceRange,
 		[]string{"123"},
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		lbName)
 	require.Nil(t, err, "Should success when XPN is on.")
@@ -1636,7 +1637,7 @@ func TestEnsureInternalFirewallPortRanges(t *testing.T) {
 		"firewall with legacy name",
 		sourceRange,
 		getPortRanges(tc.Input),
-		v1.ProtocolTCP,
+		common.ProtocolTCP,
 		nodes,
 		"")
 	if err != nil {
@@ -1793,7 +1794,7 @@ func TestEnsureInternalLoadBalancerModifyProtocol(t *testing.T) {
 	}
 
 	// change the protocol to UDP
-	svc.Spec.Ports[0].Protocol = v1.ProtocolUDP
+	svc.Spec.Ports[0].Protocol = common.ProtocolUDP
 	status, err = gce.EnsureLoadBalancer(context.Background(), vals.ClusterName, svc, nodes)
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)

@@ -29,6 +29,7 @@ import (
 	"k8s.io/kubernetes/test/e2e/storage/utils"
 
 	"github.com/onsi/ginkgo"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -74,7 +75,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 	ginkgo.Context("NetworkPolicy between server and client", func() {
 		ginkgo.BeforeEach(func() {
 			ginkgo.By("Creating a simple server that serves on port 80 and 81.")
-			podServer, service = createServerPodAndService(f, f.Namespace, "server", []protocolPort{{80, v1.ProtocolTCP}, {81, v1.ProtocolTCP}})
+			podServer, service = createServerPodAndService(f, f.Namespace, "server", []protocolPort{{80, apicommon.ProtocolTCP}, {81, v1.ProtocolTCP}})
 
 			ginkgo.By("Waiting for pod ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podServer.Name, f.Namespace.Name, framework.PodStartTimeout)
@@ -123,7 +124,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			framework.ExpectNoError(err, "Error occurred while creating namespace-b.")
 
 			ginkgo.By("Creating a simple server in another namespace that serves on port 80 and 81.")
-			podB, serviceB := createServerPodAndService(f, nsB, "pod-b", []protocolPort{{80, v1.ProtocolTCP}, {81, v1.ProtocolTCP}})
+			podB, serviceB := createServerPodAndService(f, nsB, "pod-b", []protocolPort{{80, apicommon.ProtocolTCP}, {81, v1.ProtocolTCP}})
 
 			ginkgo.By("Waiting for pod ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podB.Name, nsB.Name, framework.PodStartTimeout)
@@ -911,7 +912,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			ginkgo.By(fmt.Sprintf("Creating client pod %s that should not be able to connect to %s.", "client-a", service.Name))
 			// Specify RestartPolicy to OnFailure so we can check the client pod fails in the beginning and succeeds
 			// after updating its label, otherwise it would not restart after the first failure.
-			podClient := createNetworkClientPodWithRestartPolicy(f, f.Namespace, "client-a", service, allowedPort, v1.ProtocolTCP, v1.RestartPolicyOnFailure)
+			podClient := createNetworkClientPodWithRestartPolicy(f, f.Namespace, "client-a", service, allowedPort, apicommon.ProtocolTCP, v1.RestartPolicyOnFailure)
 			defer func() {
 				ginkgo.By(fmt.Sprintf("Cleaning up the pod %s", podClient.Name))
 				if err := f.ClientSet.CoreV1().Pods(f.Namespace.Name).Delete(context.TODO(), podClient.Name, metav1.DeleteOptions{}); err != nil {
@@ -971,7 +972,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			})
 			framework.ExpectNoError(err, "Error occurred while creating namespace-b.")
 
-			podB, serviceB := createServerPodAndService(f, nsB, "pod-b", []protocolPort{{allowedPort, v1.ProtocolTCP}, {notAllowedPort, v1.ProtocolTCP}})
+			podB, serviceB := createServerPodAndService(f, nsB, "pod-b", []protocolPort{{allowedPort, apicommon.ProtocolTCP}, {notAllowedPort, v1.ProtocolTCP}})
 			defer cleanupServerPodAndService(f, podB, serviceB)
 
 			// Wait for Server with Service in NS-B to be ready
@@ -1050,9 +1051,9 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			framework.ExpectNoError(err, "Error occurred while creating namespace-b.")
 
 			// Creating pods and services in namespace-b
-			nsBpodServerA, nsBserviceA = createServerPodAndService(f, nsB, "ns-b-server-a", []protocolPort{{80, v1.ProtocolTCP}})
+			nsBpodServerA, nsBserviceA = createServerPodAndService(f, nsB, "ns-b-server-a", []protocolPort{{80, apicommon.ProtocolTCP}})
 			defer cleanupServerPodAndService(f, nsBpodServerA, nsBserviceA)
-			nsBpodServerB, nsBserviceB = createServerPodAndService(f, nsB, "ns-b-server-b", []protocolPort{{80, v1.ProtocolTCP}})
+			nsBpodServerB, nsBserviceB = createServerPodAndService(f, nsB, "ns-b-server-b", []protocolPort{{80, apicommon.ProtocolTCP}})
 			defer cleanupServerPodAndService(f, nsBpodServerB, nsBserviceB)
 
 			// Wait for Server with Service in NS-A to be ready
@@ -1186,7 +1187,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 		})
 
 		ginkgo.It("should enforce multiple egress policies with egress allow-all policy taking precedence [Feature:NetworkPolicy]", func() {
-			podServerB, serviceB := createServerPodAndService(f, f.Namespace, "server-b", []protocolPort{{80, v1.ProtocolTCP}})
+			podServerB, serviceB := createServerPodAndService(f, f.Namespace, "server-b", []protocolPort{{80, apicommon.ProtocolTCP}})
 			defer cleanupServerPodAndService(f, podServerB, serviceB)
 
 			ginkgo.By("Waiting for pod ready", func() {
@@ -1353,7 +1354,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			podServerCIDR := fmt.Sprintf("%s/%d", podServerStatus.Status.PodIP, hostMask)
 
 			// Creating pod-b and service-b
-			podServerB, serviceB = createServerPodAndService(f, f.Namespace, "pod-b", []protocolPort{{80, v1.ProtocolTCP}})
+			podServerB, serviceB = createServerPodAndService(f, f.Namespace, "pod-b", []protocolPort{{80, apicommon.ProtocolTCP}})
 			ginkgo.By("Waiting for pod-b to be ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podServerB.Name, f.Namespace.Name, framework.PodStartTimeout)
 				framework.ExpectNoError(err, "Error occurred while waiting for pod type: Ready.")
@@ -1589,7 +1590,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			var err error
 
 			// Before applying policy, communication should be successful between pod-a and pod-b
-			podA, serviceA = createServerPodAndService(f, f.Namespace, "pod-a", []protocolPort{{80, v1.ProtocolTCP}})
+			podA, serviceA = createServerPodAndService(f, f.Namespace, "pod-a", []protocolPort{{80, apicommon.ProtocolTCP}})
 			ginkgo.By("Waiting for pod-a to be ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podA.Name, f.Namespace.Name, framework.PodStartTimeout)
 				framework.ExpectNoError(err, "Error occurred while waiting for pod type: Ready.")
@@ -1599,7 +1600,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			})
 			cleanupServerPodAndService(f, podA, serviceA)
 
-			podB, serviceB = createServerPodAndService(f, f.Namespace, "pod-b", []protocolPort{{80, v1.ProtocolTCP}})
+			podB, serviceB = createServerPodAndService(f, f.Namespace, "pod-b", []protocolPort{{80, apicommon.ProtocolTCP}})
 			ginkgo.By("Waiting for pod-b to be ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podB.Name, f.Namespace.Name, framework.PodStartTimeout)
 				framework.ExpectNoError(err, "Error occurred while waiting for pod type: Ready.")
@@ -1672,7 +1673,7 @@ var _ = common.SIGDescribe("NetworkPolicyLegacy [LinuxOnly]", func() {
 			cleanupServerPodAndService(f, podB, serviceB)
 
 			// Creating server pod with label "pod-name": "pod-a" to deny traffic from client pod with label "pod-name": "pod-b"
-			podA, serviceA = createServerPodAndService(f, f.Namespace, "pod-a", []protocolPort{{80, v1.ProtocolTCP}})
+			podA, serviceA = createServerPodAndService(f, f.Namespace, "pod-a", []protocolPort{{80, apicommon.ProtocolTCP}})
 			ginkgo.By("Waiting for pod-a to be ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podA.Name, f.Namespace.Name, framework.PodStartTimeout)
 				framework.ExpectNoError(err, "Error occurred while waiting for pod type: Ready.")
@@ -1740,7 +1741,7 @@ var _ = common.SIGDescribe("NetworkPolicy [Feature:SCTPConnectivity][LinuxOnly][
 	ginkgo.Context("NetworkPolicy between server and client using SCTP", func() {
 		ginkgo.BeforeEach(func() {
 			ginkgo.By("Creating a simple server that serves on port 80 and 81.")
-			podServer, service = createServerPodAndService(f, f.Namespace, "server", []protocolPort{{80, v1.ProtocolSCTP}, {81, v1.ProtocolSCTP}})
+			podServer, service = createServerPodAndService(f, f.Namespace, "server", []protocolPort{{80, apicommon.ProtocolSCTP}, {81, v1.ProtocolSCTP}})
 
 			ginkgo.By("Waiting for pod ready", func() {
 				err := e2epod.WaitTimeoutForPodReadyInNamespace(f.ClientSet, podServer.Name, f.Namespace.Name, framework.PodStartTimeout)
@@ -1752,8 +1753,8 @@ var _ = common.SIGDescribe("NetworkPolicy [Feature:SCTPConnectivity][LinuxOnly][
 
 			// Create pods, which should be able to communicate with the server on port 80 and 81.
 			ginkgo.By("Testing pods can connect to both ports when no policy is present.")
-			testCanConnectProtocol(f, f.Namespace, "client-can-connect-80", service, 80, v1.ProtocolSCTP)
-			testCanConnectProtocol(f, f.Namespace, "client-can-connect-81", service, 81, v1.ProtocolSCTP)
+			testCanConnectProtocol(f, f.Namespace, "client-can-connect-80", service, 80, apicommon.ProtocolSCTP)
+			testCanConnectProtocol(f, f.Namespace, "client-can-connect-81", service, 81, apicommon.ProtocolSCTP)
 		})
 
 		ginkgo.AfterEach(func() {
@@ -1807,8 +1808,8 @@ var _ = common.SIGDescribe("NetworkPolicy [Feature:SCTPConnectivity][LinuxOnly][
 			defer cleanupNetworkPolicy(f, policy)
 
 			ginkgo.By("Testing pods can connect only to the port allowed by the policy.")
-			testCannotConnectProtocol(f, f.Namespace, "client-a", service, 80, v1.ProtocolSCTP)
-			testCanConnectProtocol(f, f.Namespace, "client-b", service, 81, v1.ProtocolSCTP)
+			testCannotConnectProtocol(f, f.Namespace, "client-a", service, 80, apicommon.ProtocolSCTP)
+			testCanConnectProtocol(f, f.Namespace, "client-b", service, 81, apicommon.ProtocolSCTP)
 		})
 
 		ginkgo.It("should enforce policy to allow traffic only from a pod in a different namespace based on PodSelector and NamespaceSelector [Feature:NetworkPolicy]", func() {
@@ -1826,16 +1827,16 @@ var _ = common.SIGDescribe("NetworkPolicy [Feature:SCTPConnectivity][LinuxOnly][
 
 			// Before application of the policy, all communication should be successful.
 			ginkgo.By("Creating client-a, in server's namespace, which should be able to contact the server.", func() {
-				testCanConnectProtocol(f, nsA, "client-a", service, 80, v1.ProtocolSCTP)
+				testCanConnectProtocol(f, nsA, "client-a", service, 80, apicommon.ProtocolSCTP)
 			})
 			ginkgo.By("Creating client-b, in server's namespace, which should be able to contact the server.", func() {
-				testCanConnectProtocol(f, nsA, "client-b", service, 80, v1.ProtocolSCTP)
+				testCanConnectProtocol(f, nsA, "client-b", service, 80, apicommon.ProtocolSCTP)
 			})
 			ginkgo.By("Creating client-a, not in server's namespace, which should be able to contact the server.", func() {
-				testCanConnectProtocol(f, nsB, "client-a", service, 80, v1.ProtocolSCTP)
+				testCanConnectProtocol(f, nsB, "client-a", service, 80, apicommon.ProtocolSCTP)
 			})
 			ginkgo.By("Creating client-b, not in server's namespace, which should be able to contact the server.", func() {
-				testCanConnectProtocol(f, nsB, "client-b", service, 80, v1.ProtocolSCTP)
+				testCanConnectProtocol(f, nsB, "client-b", service, 80, apicommon.ProtocolSCTP)
 			})
 
 			ginkgo.By("Creating a network policy for the server which allows traffic only from client-a in namespace-b.")
@@ -1874,30 +1875,30 @@ var _ = common.SIGDescribe("NetworkPolicy [Feature:SCTPConnectivity][LinuxOnly][
 			defer cleanupNetworkPolicy(f, policy)
 
 			ginkgo.By("Creating client-a, in server's namespace, which should not be able to contact the server.", func() {
-				testCannotConnectProtocol(f, nsA, "client-a", service, 80, v1.ProtocolSCTP)
+				testCannotConnectProtocol(f, nsA, "client-a", service, 80, apicommon.ProtocolSCTP)
 			})
 			ginkgo.By("Creating client-b, in server's namespace, which should not be able to contact the server.", func() {
-				testCannotConnectProtocol(f, nsA, "client-b", service, 80, v1.ProtocolSCTP)
+				testCannotConnectProtocol(f, nsA, "client-b", service, 80, apicommon.ProtocolSCTP)
 			})
 			ginkgo.By("Creating client-a, not in server's namespace, which should be able to contact the server.", func() {
-				testCanConnectProtocol(f, nsB, "client-a", service, 80, v1.ProtocolSCTP)
+				testCanConnectProtocol(f, nsB, "client-a", service, 80, apicommon.ProtocolSCTP)
 			})
 			ginkgo.By("Creating client-b, not in server's namespace, which should not be able to contact the server.", func() {
-				testCannotConnectProtocol(f, nsB, "client-b", service, 80, v1.ProtocolSCTP)
+				testCannotConnectProtocol(f, nsB, "client-b", service, 80, apicommon.ProtocolSCTP)
 			})
 		})
 	})
 })
 
 func testCanConnect(f *framework.Framework, ns *v1.Namespace, podName string, service *v1.Service, targetPort int) {
-	testCanConnectProtocol(f, ns, podName, service, targetPort, v1.ProtocolTCP)
+	testCanConnectProtocol(f, ns, podName, service, targetPort, apicommon.ProtocolTCP)
 }
 
 func testCannotConnect(f *framework.Framework, ns *v1.Namespace, podName string, service *v1.Service, targetPort int) {
-	testCannotConnectProtocol(f, ns, podName, service, targetPort, v1.ProtocolTCP)
+	testCannotConnectProtocol(f, ns, podName, service, targetPort, apicommon.ProtocolTCP)
 }
 
-func testCanConnectProtocol(f *framework.Framework, ns *v1.Namespace, podName string, service *v1.Service, targetPort int, protocol v1.Protocol) {
+func testCanConnectProtocol(f *framework.Framework, ns *v1.Namespace, podName string, service *v1.Service, targetPort int, protocol apicommon.Protocol) {
 	ginkgo.By(fmt.Sprintf("Creating client pod %s that should successfully connect to %s.", podName, service.Name))
 	podClient := createNetworkClientPod(f, ns, podName, service, targetPort, protocol)
 	defer func() {
@@ -1909,7 +1910,7 @@ func testCanConnectProtocol(f *framework.Framework, ns *v1.Namespace, podName st
 	checkConnectivity(f, ns, podClient, service)
 }
 
-func testCannotConnectProtocol(f *framework.Framework, ns *v1.Namespace, podName string, service *v1.Service, targetPort int, protocol v1.Protocol) {
+func testCannotConnectProtocol(f *framework.Framework, ns *v1.Namespace, podName string, service *v1.Service, targetPort int, protocol apicommon.Protocol) {
 	ginkgo.By(fmt.Sprintf("Creating client pod %s that should not be able to connect to %s.", podName, service.Name))
 	podClient := createNetworkClientPod(f, ns, podName, service, targetPort, protocol)
 	defer func() {
@@ -2017,10 +2018,10 @@ func createServerPodAndService(f *framework.Framework, namespace *v1.Namespace, 
 		var porterPort string
 		var connectProtocol string
 		switch portProtocol.protocol {
-		case v1.ProtocolTCP:
+		case apicommon.ProtocolTCP:
 			porterPort = fmt.Sprintf("SERVE_PORT_%d", portProtocol.port)
 			connectProtocol = "tcp"
-		case v1.ProtocolSCTP:
+		case apicommon.ProtocolSCTP:
 			porterPort = fmt.Sprintf("SERVE_SCTP_PORT_%d", portProtocol.port)
 			connectProtocol = "sctp"
 		default:
@@ -2111,18 +2112,18 @@ func cleanupServerPodAndService(f *framework.Framework, pod *v1.Pod, service *v1
 // Create a client pod which will attempt a netcat to the provided service, on the specified port.
 // This client will attempt a one-shot connection, then die, without restarting the pod.
 // Test can then be asserted based on whether the pod quit with an error or not.
-func createNetworkClientPod(f *framework.Framework, namespace *v1.Namespace, podName string, targetService *v1.Service, targetPort int, protocol v1.Protocol) *v1.Pod {
+func createNetworkClientPod(f *framework.Framework, namespace *v1.Namespace, podName string, targetService *v1.Service, targetPort int, protocol apicommon.Protocol) *v1.Pod {
 	return createNetworkClientPodWithRestartPolicy(f, namespace, podName, targetService, targetPort, protocol, v1.RestartPolicyNever)
 }
 
 // Create a client pod which will attempt a netcat to the provided service, on the specified port.
 // It is similar to createNetworkClientPod but supports specifying RestartPolicy.
-func createNetworkClientPodWithRestartPolicy(f *framework.Framework, namespace *v1.Namespace, podName string, targetService *v1.Service, targetPort int, protocol v1.Protocol, restartPolicy v1.RestartPolicy) *v1.Pod {
+func createNetworkClientPodWithRestartPolicy(f *framework.Framework, namespace *v1.Namespace, podName string, targetService *v1.Service, targetPort int, protocol apicommon.Protocol, restartPolicy v1.RestartPolicy) *v1.Pod {
 	var connectProtocol string
 	switch protocol {
-	case v1.ProtocolTCP:
+	case apicommon.ProtocolTCP:
 		connectProtocol = "tcp"
-	case v1.ProtocolSCTP:
+	case apicommon.ProtocolSCTP:
 		connectProtocol = "sctp"
 	default:
 		framework.Failf("createNetworkClientPodWithRestartPolicy, unexpected protocol %v", protocol)

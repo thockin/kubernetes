@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -53,7 +54,7 @@ func CreateServiceSpec(serviceName, externalName string, isHeadless bool, select
 		headlessService.Spec.ExternalName = externalName
 	} else {
 		headlessService.Spec.Ports = []v1.ServicePort{
-			{Port: 80, Name: "http", Protocol: v1.ProtocolTCP},
+			{Port: 80, Name: "http", Protocol: common.ProtocolTCP},
 		}
 	}
 	if isHeadless {
@@ -146,7 +147,7 @@ func CreateServiceForSimpleApp(c clientset.Interface, contPort, svcPort int, nam
 			return nil
 		}
 		return []v1.ServicePort{{
-			Protocol:   v1.ProtocolTCP,
+			Protocol:   common.ProtocolTCP,
 			Port:       int32(svcPort),
 			TargetPort: intstr.FromInt(contPort),
 		}}

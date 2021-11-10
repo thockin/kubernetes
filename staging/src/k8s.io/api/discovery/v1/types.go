@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -167,7 +168,7 @@ type EndpointPort struct {
 	// The IP protocol for this port.
 	// Must be UDP, TCP, or SCTP.
 	// Default is TCP.
-	Protocol *v1.Protocol `json:"protocol,omitempty" protobuf:"bytes,2,name=protocol"`
+	Protocol *common.Protocol `json:"protocol,omitempty" protobuf:"bytes,2,name=protocol"`
 	// The port number of the endpoint.
 	// If this is not specified, ports are not restricted and must be
 	// interpreted in the context of the specific consumer.

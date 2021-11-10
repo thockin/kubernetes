@@ -31,6 +31,7 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -374,7 +375,7 @@ func StartExternalProvisioner(c clientset.Interface, ns string, externalPluginNa
 						{Name: "nfs", ContainerPort: 2049},
 						{Name: "mountd", ContainerPort: 20048},
 						{Name: "rpcbind", ContainerPort: 111},
-						{Name: "rpcbind-udp", ContainerPort: 111, Protocol: v1.ProtocolUDP},
+						{Name: "rpcbind-udp", ContainerPort: 111, Protocol: common.ProtocolUDP},
 					},
 					Env: []v1.EnvVar{
 						{

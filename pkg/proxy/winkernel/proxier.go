@@ -31,6 +31,7 @@ import (
 
 	"github.com/Microsoft/hcsshim"
 	"github.com/Microsoft/hcsshim/hcn"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -561,14 +562,14 @@ func (lp *localPort) String() string {
 	return fmt.Sprintf("%q (%s:%d/%s)", lp.desc, lp.ip, lp.port, lp.protocol)
 }
 
-func Enum(p v1.Protocol) uint16 {
-	if p == v1.ProtocolTCP {
+func Enum(p common.Protocol) uint16 {
+	if p == common.ProtocolTCP {
 		return 6
 	}
-	if p == v1.ProtocolUDP {
+	if p == common.ProtocolUDP {
 		return 17
 	}
-	if p == v1.ProtocolSCTP {
+	if p == common.ProtocolSCTP {
 		return 132
 	}
 	return 0
@@ -1006,7 +1007,7 @@ func (proxier *Proxier) syncProxyRules() {
 	staleServices := serviceUpdateResult.UDPStaleClusterIP
 	// merge stale services gathered from updateEndpointsMap
 	for _, svcPortName := range endpointUpdateResult.StaleServiceNames {
-		if svcInfo, ok := proxier.serviceMap[svcPortName]; ok && svcInfo != nil && svcInfo.Protocol() == v1.ProtocolUDP {
+		if svcInfo, ok := proxier.serviceMap[svcPortName]; ok && svcInfo != nil && svcInfo.Protocol() == common.ProtocolUDP {
 			klog.V(2).InfoS("Stale udp service", "servicePortName", svcPortName, "clusterIP", svcInfo.ClusterIP())
 			staleServices.Insert(svcInfo.ClusterIP().String())
 		}

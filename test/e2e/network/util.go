@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -182,7 +183,7 @@ func createSecondNodePortService(f *framework.Framework, config *e2enetwork.Netw
 				{
 					Port:       e2enetwork.ClusterHTTPPort,
 					Name:       "http",
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 					TargetPort: intstr.FromInt(e2enetwork.EndpointHTTPPort),
 				},
 			},
@@ -198,7 +199,7 @@ func createSecondNodePortService(f *framework.Framework, config *e2enetwork.Netw
 	var httpPort int
 	for _, p := range createdService.Spec.Ports {
 		switch p.Protocol {
-		case v1.ProtocolTCP:
+		case apicommon.ProtocolTCP:
 			httpPort = int(p.NodePort)
 		default:
 			continue

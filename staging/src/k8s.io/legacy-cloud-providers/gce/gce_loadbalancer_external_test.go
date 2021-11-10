@@ -34,7 +34,8 @@ import (
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud"
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/meta"
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/mock"
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/json"
@@ -176,7 +177,7 @@ func TestCreateForwardingRuleWithTier(t *testing.T) {
 	t.Parallel()
 
 	// Common variables among the tests.
-	ports := []v1.ServicePort{{Name: "foo", Protocol: v1.ProtocolTCP, Port: int32(123)}}
+	ports := []v1.ServicePort{{Name: "foo", Protocol: common.ProtocolTCP, Port: int32(123)}}
 	target := "test-target-pool"
 	vals := DefaultTestClusterValues()
 	serviceName := "foo-svc"
@@ -599,7 +600,7 @@ func TestForwardingRuleNeedsUpdate(t *testing.T) {
 	wrongPorts[0].Port = wrongPorts[0].Port + 1
 
 	wrongProtocolPorts := []v1.ServicePort{svc.Spec.Ports[0]}
-	wrongProtocolPorts[0].Protocol = v1.ProtocolUDP
+	wrongProtocolPorts[0].Protocol = common.ProtocolUDP
 
 	for desc, tc := range map[string]struct {
 		lbIP         string
@@ -768,13 +769,13 @@ func TestFirewallNeedsUpdate(t *testing.T) {
 	require.NoError(t, err)
 	svc := fakeLoadbalancerService("")
 	svc.Spec.Ports = []v1.ServicePort{
-		{Name: "port1", Protocol: v1.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
-		{Name: "port2", Protocol: v1.ProtocolTCP, Port: int32(81), TargetPort: intstr.FromInt(81)},
-		{Name: "port3", Protocol: v1.ProtocolTCP, Port: int32(82), TargetPort: intstr.FromInt(82)},
-		{Name: "port4", Protocol: v1.ProtocolTCP, Port: int32(84), TargetPort: intstr.FromInt(84)},
-		{Name: "port5", Protocol: v1.ProtocolTCP, Port: int32(85), TargetPort: intstr.FromInt(85)},
-		{Name: "port6", Protocol: v1.ProtocolTCP, Port: int32(86), TargetPort: intstr.FromInt(86)},
-		{Name: "port7", Protocol: v1.ProtocolTCP, Port: int32(88), TargetPort: intstr.FromInt(87)},
+		{Name: "port1", Protocol: common.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
+		{Name: "port2", Protocol: common.ProtocolTCP, Port: int32(81), TargetPort: intstr.FromInt(81)},
+		{Name: "port3", Protocol: common.ProtocolTCP, Port: int32(82), TargetPort: intstr.FromInt(82)},
+		{Name: "port4", Protocol: common.ProtocolTCP, Port: int32(84), TargetPort: intstr.FromInt(84)},
+		{Name: "port5", Protocol: common.ProtocolTCP, Port: int32(85), TargetPort: intstr.FromInt(85)},
+		{Name: "port6", Protocol: common.ProtocolTCP, Port: int32(86), TargetPort: intstr.FromInt(86)},
+		{Name: "port7", Protocol: common.ProtocolTCP, Port: int32(88), TargetPort: intstr.FromInt(87)},
 	}
 
 	status, err := createExternalLoadBalancer(gce, svc, []string{"test-node-1"}, vals.ClusterName, vals.ClusterID, vals.ZoneName)
@@ -845,7 +846,7 @@ func TestFirewallNeedsUpdate(t *testing.T) {
 		"When the ports don't match.": {
 			lbName:       lbName,
 			ipAddr:       ipAddr,
-			ports:        []v1.ServicePort{{Protocol: v1.ProtocolTCP, Port: int32(666)}},
+			ports:        []v1.ServicePort{{Protocol: common.ProtocolTCP, Port: int32(666)}},
 			ipnet:        ipnet,
 			fwIPProtocol: "tcp",
 			getHook:      nil,
@@ -1460,7 +1461,7 @@ func TestFirewallObject(t *testing.T) {
 			desc:         "empty source ranges",
 			sourceRanges: utilnet.IPNetSet{},
 			svcPorts: []v1.ServicePort{
-				{Name: "port1", Protocol: v1.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
+				{Name: "port1", Protocol: common.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
 			},
 			expectedFirewall: func(fw compute.Firewall) compute.Firewall {
 				return fw
@@ -1470,7 +1471,7 @@ func TestFirewallObject(t *testing.T) {
 			desc:         "has source ranges",
 			sourceRanges: sourceRanges,
 			svcPorts: []v1.ServicePort{
-				{Name: "port1", Protocol: v1.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
+				{Name: "port1", Protocol: common.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
 			},
 			expectedFirewall: func(fw compute.Firewall) compute.Firewall {
 				fw.SourceRanges = srcRanges
@@ -1481,9 +1482,9 @@ func TestFirewallObject(t *testing.T) {
 			desc:         "has multiple ports",
 			sourceRanges: sourceRanges,
 			svcPorts: []v1.ServicePort{
-				{Name: "port1", Protocol: v1.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
-				{Name: "port2", Protocol: v1.ProtocolTCP, Port: int32(82), TargetPort: intstr.FromInt(82)},
-				{Name: "port3", Protocol: v1.ProtocolTCP, Port: int32(84), TargetPort: intstr.FromInt(84)},
+				{Name: "port1", Protocol: common.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
+				{Name: "port2", Protocol: common.ProtocolTCP, Port: int32(82), TargetPort: intstr.FromInt(82)},
+				{Name: "port3", Protocol: common.ProtocolTCP, Port: int32(84), TargetPort: intstr.FromInt(84)},
 			},
 			expectedFirewall: func(fw compute.Firewall) compute.Firewall {
 				fw.Allowed = []*compute.FirewallAllowed{
@@ -1500,13 +1501,13 @@ func TestFirewallObject(t *testing.T) {
 			desc:         "has multiple ports",
 			sourceRanges: sourceRanges,
 			svcPorts: []v1.ServicePort{
-				{Name: "port1", Protocol: v1.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
-				{Name: "port2", Protocol: v1.ProtocolTCP, Port: int32(81), TargetPort: intstr.FromInt(81)},
-				{Name: "port3", Protocol: v1.ProtocolTCP, Port: int32(82), TargetPort: intstr.FromInt(82)},
-				{Name: "port4", Protocol: v1.ProtocolTCP, Port: int32(84), TargetPort: intstr.FromInt(84)},
-				{Name: "port5", Protocol: v1.ProtocolTCP, Port: int32(85), TargetPort: intstr.FromInt(85)},
-				{Name: "port6", Protocol: v1.ProtocolTCP, Port: int32(86), TargetPort: intstr.FromInt(86)},
-				{Name: "port7", Protocol: v1.ProtocolTCP, Port: int32(88), TargetPort: intstr.FromInt(87)},
+				{Name: "port1", Protocol: common.ProtocolTCP, Port: int32(80), TargetPort: intstr.FromInt(80)},
+				{Name: "port2", Protocol: common.ProtocolTCP, Port: int32(81), TargetPort: intstr.FromInt(81)},
+				{Name: "port3", Protocol: common.ProtocolTCP, Port: int32(82), TargetPort: intstr.FromInt(82)},
+				{Name: "port4", Protocol: common.ProtocolTCP, Port: int32(84), TargetPort: intstr.FromInt(84)},
+				{Name: "port5", Protocol: common.ProtocolTCP, Port: int32(85), TargetPort: intstr.FromInt(85)},
+				{Name: "port6", Protocol: common.ProtocolTCP, Port: int32(86), TargetPort: intstr.FromInt(86)},
+				{Name: "port7", Protocol: common.ProtocolTCP, Port: int32(88), TargetPort: intstr.FromInt(87)},
 			},
 			expectedFirewall: func(fw compute.Firewall) compute.Firewall {
 				fw.Allowed = []*compute.FirewallAllowed{

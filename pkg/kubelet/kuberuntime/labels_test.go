@@ -20,6 +20,7 @@ import (
 	"reflect"
 	"testing"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -120,13 +121,13 @@ func TestContainerAnnotations(t *testing.T) {
 			Name:          "http",
 			HostPort:      80,
 			ContainerPort: 8080,
-			Protocol:      v1.ProtocolTCP,
+			Protocol:      common.ProtocolTCP,
 		},
 		{
 			Name:          "https",
 			HostPort:      443,
 			ContainerPort: 6443,
-			Protocol:      v1.ProtocolTCP,
+			Protocol:      common.ProtocolTCP,
 		},
 	}
 	container := &v1.Container{

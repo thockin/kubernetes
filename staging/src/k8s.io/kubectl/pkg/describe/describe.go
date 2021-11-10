@@ -40,6 +40,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	certificatesv1beta1 "k8s.io/api/certificates/v1beta1"
+	"k8s.io/api/common"
 	coordinationv1 "k8s.io/api/coordination/v1"
 	corev1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
@@ -4414,11 +4415,11 @@ func printNetworkPolicySpecIngressFrom(npirs []networkingv1.NetworkPolicyIngress
 			w.Write(LEVEL_0, "%s%s\n", initialIndent, "To Port: <any> (traffic allowed to all ports)")
 		} else {
 			for _, port := range npir.Ports {
-				var proto corev1.Protocol
+				var proto common.Protocol
 				if port.Protocol != nil {
 					proto = *port.Protocol
 				} else {
-					proto = corev1.ProtocolTCP
+					proto = common.ProtocolTCP
 				}
 				w.Write(LEVEL_0, "%s%s: %s/%s\n", initialIndent, "To Port", port.Port, proto)
 			}
@@ -4458,11 +4459,11 @@ func printNetworkPolicySpecEgressTo(npers []networkingv1.NetworkPolicyEgressRule
 			w.Write(LEVEL_0, "%s%s\n", initialIndent, "To Port: <any> (traffic allowed to all ports)")
 		} else {
 			for _, port := range nper.Ports {
-				var proto corev1.Protocol
+				var proto common.Protocol
 				if port.Protocol != nil {
 					proto = *port.Protocol
 				} else {
-					proto = corev1.ProtocolTCP
+					proto = common.ProtocolTCP
 				}
 				w.Write(LEVEL_0, "%s%s: %s/%s\n", initialIndent, "To Port", port.Port, proto)
 			}

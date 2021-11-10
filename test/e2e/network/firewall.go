@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -92,7 +93,7 @@ var _ = common.SIGDescribe("Firewall rule", func() {
 
 		ginkgo.By("Creating a LoadBalancer type service with ExternalTrafficPolicy=Global")
 		svc, err := jig.CreateLoadBalancerService(e2eservice.GetServiceLoadBalancerCreationTimeout(cs), func(svc *v1.Service) {
-			svc.Spec.Ports = []v1.ServicePort{{Protocol: v1.ProtocolTCP, Port: firewallTestHTTPPort}}
+			svc.Spec.Ports = []v1.ServicePort{{Protocol: apicommon.ProtocolTCP, Port: firewallTestHTTPPort}}
 			svc.Spec.LoadBalancerSourceRanges = firewallTestSourceRanges
 		})
 		framework.ExpectNoError(err)

@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
@@ -35,7 +36,7 @@ import (
 
 func TestNewEndpointSlice(t *testing.T) {
 	portName := "foo"
-	protocol := v1.ProtocolTCP
+	protocol := common.ProtocolTCP
 
 	ports := []discovery.EndpointPort{{Name: &portName, Protocol: &protocol}}
 	addrType := discovery.AddressTypeIPv4

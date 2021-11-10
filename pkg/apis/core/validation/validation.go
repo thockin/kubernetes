@@ -29,6 +29,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -2236,7 +2237,7 @@ func ValidatePersistentVolumeClaimStatusUpdate(newPvc, oldPvc *core.PersistentVo
 	return allErrs
 }
 
-var supportedPortProtocols = sets.NewString(string(core.ProtocolTCP), string(core.ProtocolUDP), string(core.ProtocolSCTP))
+var supportedPortProtocols = sets.NewString(string(common.ProtocolTCP), string(common.ProtocolUDP), string(common.ProtocolSCTP))
 
 func validateContainerPorts(ports []core.ContainerPort, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}

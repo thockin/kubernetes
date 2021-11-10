@@ -39,6 +39,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -1723,7 +1724,7 @@ func TestCheckMixedProtocol(t *testing.T) {
 			annotations: make(map[string]string),
 			ports: []v1.ServicePort{
 				{
-					Protocol: v1.ProtocolTCP,
+					Protocol: common.ProtocolTCP,
 					Port:     int32(8080),
 				},
 			},
@@ -1734,7 +1735,7 @@ func TestCheckMixedProtocol(t *testing.T) {
 			annotations: map[string]string{ServiceAnnotationLoadBalancerType: "nlb"},
 			ports: []v1.ServicePort{
 				{
-					Protocol: v1.ProtocolUDP,
+					Protocol: common.ProtocolUDP,
 					Port:     int32(8080),
 				},
 			},
@@ -1745,11 +1746,11 @@ func TestCheckMixedProtocol(t *testing.T) {
 			annotations: map[string]string{ServiceAnnotationLoadBalancerType: "nlb"},
 			ports: []v1.ServicePort{
 				{
-					Protocol: v1.ProtocolUDP,
+					Protocol: common.ProtocolUDP,
 					Port:     int32(53),
 				},
 				{
-					Protocol: v1.ProtocolTCP,
+					Protocol: common.ProtocolTCP,
 					Port:     int32(53),
 				},
 			},
@@ -1780,25 +1781,25 @@ func TestCheckProtocol(t *testing.T) {
 		{
 			name:        "TCP with ELB",
 			annotations: make(map[string]string),
-			port:        v1.ServicePort{Protocol: v1.ProtocolTCP, Port: int32(8080)},
+			port:        v1.ServicePort{Protocol: common.ProtocolTCP, Port: int32(8080)},
 			wantErr:     nil,
 		},
 		{
 			name:        "TCP with NLB",
 			annotations: map[string]string{ServiceAnnotationLoadBalancerType: "nlb"},
-			port:        v1.ServicePort{Protocol: v1.ProtocolTCP, Port: int32(8080)},
+			port:        v1.ServicePort{Protocol: common.ProtocolTCP, Port: int32(8080)},
 			wantErr:     nil,
 		},
 		{
 			name:        "UDP with ELB",
 			annotations: make(map[string]string),
-			port:        v1.ServicePort{Protocol: v1.ProtocolUDP, Port: int32(8080)},
+			port:        v1.ServicePort{Protocol: common.ProtocolUDP, Port: int32(8080)},
 			wantErr:     fmt.Errorf("Protocol UDP not supported by load balancer"),
 		},
 		{
 			name:        "UDP with NLB",
 			annotations: map[string]string{ServiceAnnotationLoadBalancerType: "nlb"},
-			port:        v1.ServicePort{Protocol: v1.ProtocolUDP, Port: int32(8080)},
+			port:        v1.ServicePort{Protocol: common.ProtocolUDP, Port: int32(8080)},
 			wantErr:     nil,
 		},
 	}
@@ -1919,7 +1920,7 @@ func TestBuildListener(t *testing.T) {
 			NodePort: int32(test.instancePort),
 			Port:     int32(test.lbPort),
 			Name:     test.portName,
-			Protocol: v1.Protocol("tcp"),
+			Protocol: common.Protocol("tcp"),
 		}, annotations, ports)
 		if test.expectError {
 			if err == nil {
@@ -3075,7 +3076,7 @@ func TestNLBNodeRegistration(t *testing.T) {
 					Port:       8080,
 					NodePort:   31173,
 					TargetPort: intstr.FromInt(31173),
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   common.ProtocolTCP,
 				},
 			},
 			SessionAffinity: v1.ServiceAffinityNone,
@@ -3256,7 +3257,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3287,7 +3288,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3329,7 +3330,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3369,7 +3370,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3402,7 +3403,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3435,7 +3436,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3467,7 +3468,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,
@@ -3493,7 +3494,7 @@ func TestCloud_buildNLBHealthCheckConfiguration(t *testing.T) {
 					Ports: []v1.ServicePort{
 						{
 							Name:       "http",
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8880),
 							NodePort:   32205,

@@ -33,6 +33,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2019-06-01/network"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -193,18 +194,18 @@ func getLastSegment(ID, separator string) (string, error) {
 
 // returns the equivalent LoadBalancerRule, SecurityRule and LoadBalancerProbe
 // protocol types for the given Kubernetes protocol type.
-func getProtocolsFromKubernetesProtocol(protocol v1.Protocol) (*network.TransportProtocol, *network.SecurityRuleProtocol, *network.ProbeProtocol, error) {
+func getProtocolsFromKubernetesProtocol(protocol common.Protocol) (*network.TransportProtocol, *network.SecurityRuleProtocol, *network.ProbeProtocol, error) {
 	var transportProto network.TransportProtocol
 	var securityProto network.SecurityRuleProtocol
 	var probeProto network.ProbeProtocol
 
 	switch protocol {
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		transportProto = network.TransportProtocolTCP
 		securityProto = network.SecurityRuleProtocolTCP
 		probeProto = network.ProbeProtocolTCP
 		return &transportProto, &securityProto, &probeProto, nil
-	case v1.ProtocolUDP:
+	case common.ProtocolUDP:
 		transportProto = network.TransportProtocolUDP
 		securityProto = network.SecurityRuleProtocolUDP
 		return &transportProto, &securityProto, nil, nil
@@ -290,7 +291,7 @@ func getBackendPoolName(clusterName string, service *v1.Service) string {
 	return clusterName
 }
 
-func (az *Cloud) getLoadBalancerRuleName(service *v1.Service, protocol v1.Protocol, port int32) string {
+func (az *Cloud) getLoadBalancerRuleName(service *v1.Service, protocol common.Protocol, port int32) string {
 	prefix := az.getRulePrefix(service)
 	ruleName := fmt.Sprintf("%s-%s-%d", prefix, protocol, port)
 	subnet := subnet(service)

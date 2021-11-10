@@ -19,7 +19,7 @@ package v1beta1
 import (
 	"math"
 
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/common"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -156,7 +156,7 @@ func SetDefaults_NetworkPolicy(obj *extensionsv1beta1.NetworkPolicy) {
 	for _, i := range obj.Spec.Ingress {
 		for _, p := range i.Ports {
 			if p.Protocol == nil {
-				proto := v1.ProtocolTCP
+				proto := common.ProtocolTCP
 				p.Protocol = &proto
 			}
 		}

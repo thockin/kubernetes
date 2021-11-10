@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/kubernetes/test/e2e/framework"
@@ -42,7 +43,7 @@ type Model struct {
 
 // NewWindowsModel returns a model specific to windows testing.
 func NewWindowsModel(namespaces []string, podNames []string, ports []int32, dnsDomain string) *Model {
-	return NewModel(namespaces, podNames, ports, []v1.Protocol{v1.ProtocolTCP}, dnsDomain)
+	return NewModel(namespaces, podNames, ports, []common.Protocol{v1.ProtocolTCP}, dnsDomain)
 }
 
 // NewModel instantiates a model based on:
@@ -53,7 +54,7 @@ func NewWindowsModel(namespaces []string, podNames []string, ports []int32, dnsD
 // The total number of pods is the number of namespaces x the number of pods per namespace.
 // The number of containers per pod is the number of ports x the number of protocols.
 // The *total* number of containers is namespaces x pods x ports x protocols.
-func NewModel(namespaces []string, podNames []string, ports []int32, protocols []v1.Protocol, dnsDomain string) *Model {
+func NewModel(namespaces []string, podNames []string, ports []int32, protocols []common.Protocol, dnsDomain string) *Model {
 	model := &Model{
 		NamespaceNames: namespaces,
 		PodNames:       podNames,
@@ -296,11 +297,11 @@ func (c *Container) Spec() v1.Container {
 	)
 
 	switch c.Protocol {
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		cmd = []string{"/agnhost", "serve-hostname", "--tcp", "--http=false", "--port", fmt.Sprintf("%d", c.Port)}
-	case v1.ProtocolUDP:
+	case common.ProtocolUDP:
 		cmd = []string{"/agnhost", "serve-hostname", "--udp", "--http=false", "--port", fmt.Sprintf("%d", c.Port)}
-	case v1.ProtocolSCTP:
+	case common.ProtocolSCTP:
 		env = append(env, v1.EnvVar{
 			Name:  fmt.Sprintf("SERVE_SCTP_PORT_%d", c.Port),
 			Value: "foo",

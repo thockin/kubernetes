@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -390,9 +391,9 @@ func TestSyncService(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
-						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP},
-						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: v1.ProtocolUDP},
-						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: v1.ProtocolSCTP},
+						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP},
+						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: common.ProtocolUDP},
+						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
 					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
@@ -460,17 +461,17 @@ func TestSyncService(t *testing.T) {
 			expectedEndpointPorts: []discovery.EndpointPort{
 				{
 					Name:     utilpointer.StringPtr("sctp-example"),
-					Protocol: protoPtr(v1.ProtocolSCTP),
+					Protocol: protoPtr(common.ProtocolSCTP),
 					Port:     utilpointer.Int32Ptr(int32(3456)),
 				},
 				{
 					Name:     utilpointer.StringPtr("udp-example"),
-					Protocol: protoPtr(v1.ProtocolUDP),
+					Protocol: protoPtr(common.ProtocolUDP),
 					Port:     utilpointer.Int32Ptr(int32(161)),
 				},
 				{
 					Name:     utilpointer.StringPtr("tcp-example"),
-					Protocol: protoPtr(v1.ProtocolTCP),
+					Protocol: protoPtr(common.ProtocolTCP),
 					Port:     utilpointer.Int32Ptr(int32(80)),
 				},
 			},
@@ -503,9 +504,9 @@ func TestSyncService(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
-						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP},
-						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: v1.ProtocolUDP},
-						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: v1.ProtocolSCTP},
+						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP},
+						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: common.ProtocolUDP},
+						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
 					IPFamilies: []v1.IPFamily{v1.IPv6Protocol},
@@ -573,17 +574,17 @@ func TestSyncService(t *testing.T) {
 			expectedEndpointPorts: []discovery.EndpointPort{
 				{
 					Name:     utilpointer.StringPtr("sctp-example"),
-					Protocol: protoPtr(v1.ProtocolSCTP),
+					Protocol: protoPtr(common.ProtocolSCTP),
 					Port:     utilpointer.Int32Ptr(int32(3456)),
 				},
 				{
 					Name:     utilpointer.StringPtr("udp-example"),
-					Protocol: protoPtr(v1.ProtocolUDP),
+					Protocol: protoPtr(common.ProtocolUDP),
 					Port:     utilpointer.Int32Ptr(int32(161)),
 				},
 				{
 					Name:     utilpointer.StringPtr("tcp-example"),
-					Protocol: protoPtr(v1.ProtocolTCP),
+					Protocol: protoPtr(common.ProtocolTCP),
 					Port:     utilpointer.Int32Ptr(int32(80)),
 				},
 			},
@@ -608,9 +609,9 @@ func TestSyncService(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
-						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP},
-						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: v1.ProtocolUDP},
-						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: v1.ProtocolSCTP},
+						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP},
+						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: common.ProtocolUDP},
+						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
 					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
@@ -676,17 +677,17 @@ func TestSyncService(t *testing.T) {
 			expectedEndpointPorts: []discovery.EndpointPort{
 				{
 					Name:     utilpointer.StringPtr("sctp-example"),
-					Protocol: protoPtr(v1.ProtocolSCTP),
+					Protocol: protoPtr(common.ProtocolSCTP),
 					Port:     utilpointer.Int32Ptr(int32(3456)),
 				},
 				{
 					Name:     utilpointer.StringPtr("udp-example"),
-					Protocol: protoPtr(v1.ProtocolUDP),
+					Protocol: protoPtr(common.ProtocolUDP),
 					Port:     utilpointer.Int32Ptr(int32(161)),
 				},
 				{
 					Name:     utilpointer.StringPtr("tcp-example"),
-					Protocol: protoPtr(v1.ProtocolTCP),
+					Protocol: protoPtr(common.ProtocolTCP),
 					Port:     utilpointer.Int32Ptr(int32(80)),
 				},
 			},
@@ -724,9 +725,9 @@ func TestSyncService(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
-						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP},
-						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: v1.ProtocolUDP},
-						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: v1.ProtocolSCTP},
+						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP},
+						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: common.ProtocolUDP},
+						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
 					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
@@ -792,17 +793,17 @@ func TestSyncService(t *testing.T) {
 			expectedEndpointPorts: []discovery.EndpointPort{
 				{
 					Name:     utilpointer.StringPtr("sctp-example"),
-					Protocol: protoPtr(v1.ProtocolSCTP),
+					Protocol: protoPtr(common.ProtocolSCTP),
 					Port:     utilpointer.Int32Ptr(int32(3456)),
 				},
 				{
 					Name:     utilpointer.StringPtr("udp-example"),
-					Protocol: protoPtr(v1.ProtocolUDP),
+					Protocol: protoPtr(common.ProtocolUDP),
 					Port:     utilpointer.Int32Ptr(int32(161)),
 				},
 				{
 					Name:     utilpointer.StringPtr("tcp-example"),
-					Protocol: protoPtr(v1.ProtocolTCP),
+					Protocol: protoPtr(common.ProtocolTCP),
 					Port:     utilpointer.Int32Ptr(int32(80)),
 				},
 			},
@@ -828,9 +829,9 @@ func TestSyncService(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
-						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP},
-						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: v1.ProtocolUDP},
-						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: v1.ProtocolSCTP},
+						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP},
+						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: common.ProtocolUDP},
+						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
 					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
@@ -896,17 +897,17 @@ func TestSyncService(t *testing.T) {
 			expectedEndpointPorts: []discovery.EndpointPort{
 				{
 					Name:     utilpointer.StringPtr("sctp-example"),
-					Protocol: protoPtr(v1.ProtocolSCTP),
+					Protocol: protoPtr(common.ProtocolSCTP),
 					Port:     utilpointer.Int32Ptr(int32(3456)),
 				},
 				{
 					Name:     utilpointer.StringPtr("udp-example"),
-					Protocol: protoPtr(v1.ProtocolUDP),
+					Protocol: protoPtr(common.ProtocolUDP),
 					Port:     utilpointer.Int32Ptr(int32(161)),
 				},
 				{
 					Name:     utilpointer.StringPtr("tcp-example"),
-					Protocol: protoPtr(v1.ProtocolTCP),
+					Protocol: protoPtr(common.ProtocolTCP),
 					Port:     utilpointer.Int32Ptr(int32(80)),
 				},
 			},
@@ -944,9 +945,9 @@ func TestSyncService(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
-						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP},
-						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: v1.ProtocolUDP},
-						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: v1.ProtocolSCTP},
+						{Name: "tcp-example", TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP},
+						{Name: "udp-example", TargetPort: intstr.FromInt(161), Protocol: common.ProtocolUDP},
+						{Name: "sctp-example", TargetPort: intstr.FromInt(3456), Protocol: common.ProtocolSCTP},
 					},
 					Selector:   map[string]string{"foo": "bar"},
 					IPFamilies: []v1.IPFamily{v1.IPv4Protocol},
@@ -1012,17 +1013,17 @@ func TestSyncService(t *testing.T) {
 			expectedEndpointPorts: []discovery.EndpointPort{
 				{
 					Name:     utilpointer.StringPtr("sctp-example"),
-					Protocol: protoPtr(v1.ProtocolSCTP),
+					Protocol: protoPtr(common.ProtocolSCTP),
 					Port:     utilpointer.Int32Ptr(int32(3456)),
 				},
 				{
 					Name:     utilpointer.StringPtr("udp-example"),
-					Protocol: protoPtr(v1.ProtocolUDP),
+					Protocol: protoPtr(common.ProtocolUDP),
 					Port:     utilpointer.Int32Ptr(int32(161)),
 				},
 				{
 					Name:     utilpointer.StringPtr("tcp-example"),
-					Protocol: protoPtr(v1.ProtocolTCP),
+					Protocol: protoPtr(common.ProtocolTCP),
 					Port:     utilpointer.Int32Ptr(int32(80)),
 				},
 			},
@@ -1763,7 +1764,7 @@ func expectAction(t *testing.T, actions []k8stesting.Action, index int, verb, re
 }
 
 // protoPtr takes a Protocol and returns a pointer to it.
-func protoPtr(proto v1.Protocol) *v1.Protocol {
+func protoPtr(proto common.Protocol) *v1.Protocol {
 	return &proto
 }
 

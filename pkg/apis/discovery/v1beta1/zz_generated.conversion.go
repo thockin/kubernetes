@@ -24,6 +24,7 @@ package v1beta1
 import (
 	unsafe "unsafe"
 
+	common "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	v1beta1 "k8s.io/api/discovery/v1beta1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
@@ -185,7 +186,7 @@ func Convert_discovery_EndpointHints_To_v1beta1_EndpointHints(in *discovery.Endp
 
 func autoConvert_v1beta1_EndpointPort_To_discovery_EndpointPort(in *v1beta1.EndpointPort, out *discovery.EndpointPort, s conversion.Scope) error {
 	out.Name = (*string)(unsafe.Pointer(in.Name))
-	out.Protocol = (*core.Protocol)(unsafe.Pointer(in.Protocol))
+	out.Protocol = (*common.Protocol)(unsafe.Pointer(in.Protocol))
 	out.Port = (*int32)(unsafe.Pointer(in.Port))
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	return nil
@@ -198,7 +199,7 @@ func Convert_v1beta1_EndpointPort_To_discovery_EndpointPort(in *v1beta1.Endpoint
 
 func autoConvert_discovery_EndpointPort_To_v1beta1_EndpointPort(in *discovery.EndpointPort, out *v1beta1.EndpointPort, s conversion.Scope) error {
 	out.Name = (*string)(unsafe.Pointer(in.Name))
-	out.Protocol = (*v1.Protocol)(unsafe.Pointer(in.Protocol))
+	out.Protocol = (*common.Protocol)(unsafe.Pointer(in.Protocol))
 	out.Port = (*int32)(unsafe.Pointer(in.Port))
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	return nil

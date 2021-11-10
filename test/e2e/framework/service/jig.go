@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
 	policyv1 "k8s.io/api/policy/v1"
@@ -84,7 +85,7 @@ func NewTestJig(client clientset.Interface, namespace, name string) *TestJig {
 // newServiceTemplate returns the default v1.Service template for this j, but
 // does not actually create the Service.  The default Service has the same name
 // as the j and exposes the given port.
-func (j *TestJig) newServiceTemplate(proto v1.Protocol, port int32) *v1.Service {
+func (j *TestJig) newServiceTemplate(proto common.Protocol, port int32) *v1.Service {
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: j.Namespace,
@@ -108,7 +109,7 @@ func (j *TestJig) newServiceTemplate(proto v1.Protocol, port int32) *v1.Service 
 // j's defaults. Callers can provide a function to tweak the Service object before
 // it is created.
 func (j *TestJig) CreateTCPServiceWithPort(tweak func(svc *v1.Service), port int32) (*v1.Service, error) {
-	svc := j.newServiceTemplate(v1.ProtocolTCP, port)
+	svc := j.newServiceTemplate(common.ProtocolTCP, port)
 	if tweak != nil {
 		tweak(svc)
 	}
@@ -130,7 +131,7 @@ func (j *TestJig) CreateTCPService(tweak func(svc *v1.Service)) (*v1.Service, er
 // defaults.  Callers can provide a function to tweak the Service object before
 // it is created.
 func (j *TestJig) CreateUDPService(tweak func(svc *v1.Service)) (*v1.Service, error) {
-	svc := j.newServiceTemplate(v1.ProtocolUDP, 80)
+	svc := j.newServiceTemplate(common.ProtocolUDP, 80)
 	if tweak != nil {
 		tweak(svc)
 	}
@@ -196,7 +197,7 @@ func (j *TestJig) CreateOnlyLocalNodePortService(createPod bool) (*v1.Service, e
 	svc, err := j.CreateTCPService(func(svc *v1.Service) {
 		svc.Spec.Type = v1.ServiceTypeNodePort
 		svc.Spec.ExternalTrafficPolicy = v1.ServiceExternalTrafficPolicyLocal
-		svc.Spec.Ports = []v1.ServicePort{{Protocol: v1.ProtocolTCP, Port: 80}}
+		svc.Spec.Ports = []v1.ServicePort{{Protocol: common.ProtocolTCP, Port: 80}}
 	})
 	if err != nil {
 		return nil, err
@@ -244,7 +245,7 @@ func (j *TestJig) CreateOnlyLocalLoadBalancerService(timeout time.Duration, crea
 // for it to acquire an ingress IP.
 func (j *TestJig) CreateLoadBalancerService(timeout time.Duration, tweak func(svc *v1.Service)) (*v1.Service, error) {
 	ginkgo.By("creating a service " + j.Namespace + "/" + j.Name + " with type=LoadBalancer")
-	svc := j.newServiceTemplate(v1.ProtocolTCP, 80)
+	svc := j.newServiceTemplate(common.ProtocolTCP, 80)
 	svc.Spec.Type = v1.ServiceTypeLoadBalancer
 	// We need to turn affinity off for our LB distribution tests
 	svc.Spec.SessionAffinity = v1.ServiceAffinityNone
@@ -882,13 +883,13 @@ func isInvalidOrLocalhostAddress(ip string) bool {
 // testEndpointReachability tests reachability to endpoints (i.e. IP, ServiceName) and ports. Test request is initiated from specified execPod.
 // TCP and UDP protocol based service are supported at this moment
 // TODO: add support to test SCTP Protocol based services.
-func testEndpointReachability(endpoint string, port int32, protocol v1.Protocol, execPod *v1.Pod) error {
+func testEndpointReachability(endpoint string, port int32, protocol common.Protocol, execPod *v1.Pod) error {
 	ep := net.JoinHostPort(endpoint, strconv.Itoa(int(port)))
 	cmd := ""
 	switch protocol {
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		cmd = fmt.Sprintf("echo hostName | nc -v -t -w 2 %s %v", endpoint, port)
-	case v1.ProtocolUDP:
+	case common.ProtocolUDP:
 		cmd = fmt.Sprintf("echo hostName | nc -v -u -w 2 %s %v", endpoint, port)
 	default:
 		return fmt.Errorf("service reachability check is not supported for %v", protocol)
@@ -1043,7 +1044,7 @@ func (j *TestJig) CreateServicePods(replica int) error {
 // j's defaults. Callers can provide a function to tweak the Service object before
 // it is created.
 func (j *TestJig) CreateSCTPServiceWithPort(tweak func(svc *v1.Service), port int32) (*v1.Service, error) {
-	svc := j.newServiceTemplate(v1.ProtocolSCTP, port)
+	svc := j.newServiceTemplate(common.ProtocolSCTP, port)
 	if tweak != nil {
 		tweak(svc)
 	}

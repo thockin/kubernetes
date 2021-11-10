@@ -36,7 +36,8 @@ import (
 	cadvisorclient "github.com/google/cadvisor/client/v2"
 	cadvisorapiv2 "github.com/google/cadvisor/info/v2"
 	"github.com/opencontainers/runc/libcontainer/cgroups"
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -314,7 +315,7 @@ func getCadvisorPod() *v1.Pod {
 							Name:          "http",
 							HostPort:      cadvisorPort,
 							ContainerPort: cadvisorPort,
-							Protocol:      v1.ProtocolTCP,
+							Protocol:      common.ProtocolTCP,
 						},
 					},
 					VolumeMounts: []v1.VolumeMount{

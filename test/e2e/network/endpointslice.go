@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -108,7 +109,7 @@ var _ = common.SIGDescribe("EndpointSlice", func() {
 				Ports: []v1.ServicePort{{
 					Name:     "example",
 					Port:     80,
-					Protocol: v1.ProtocolTCP,
+					Protocol: apicommon.ProtocolTCP,
 				}},
 			},
 		})
@@ -264,7 +265,7 @@ var _ = common.SIGDescribe("EndpointSlice", func() {
 					Name:       "example",
 					Port:       80,
 					TargetPort: intstr.FromInt(3000),
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 				}},
 			},
 		})
@@ -280,7 +281,7 @@ var _ = common.SIGDescribe("EndpointSlice", func() {
 					Name:       "http",
 					Port:       80,
 					TargetPort: intstr.FromString("example-name"),
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 				}},
 			},
 		})
@@ -296,7 +297,7 @@ var _ = common.SIGDescribe("EndpointSlice", func() {
 					Name:       "example-no-match",
 					Port:       80,
 					TargetPort: intstr.FromInt(8080),
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 				}},
 			},
 		})

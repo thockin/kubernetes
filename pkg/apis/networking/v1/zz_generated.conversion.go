@@ -24,6 +24,7 @@ package v1
 import (
 	unsafe "unsafe"
 
+	common "k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -810,7 +811,7 @@ func Convert_networking_NetworkPolicyPeer_To_v1_NetworkPolicyPeer(in *networking
 }
 
 func autoConvert_v1_NetworkPolicyPort_To_networking_NetworkPolicyPort(in *v1.NetworkPolicyPort, out *networking.NetworkPolicyPort, s conversion.Scope) error {
-	out.Protocol = (*core.Protocol)(unsafe.Pointer(in.Protocol))
+	out.Protocol = (*common.Protocol)(unsafe.Pointer(in.Protocol))
 	out.Port = (*intstr.IntOrString)(unsafe.Pointer(in.Port))
 	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
 	return nil
@@ -822,7 +823,7 @@ func Convert_v1_NetworkPolicyPort_To_networking_NetworkPolicyPort(in *v1.Network
 }
 
 func autoConvert_networking_NetworkPolicyPort_To_v1_NetworkPolicyPort(in *networking.NetworkPolicyPort, out *v1.NetworkPolicyPort, s conversion.Scope) error {
-	out.Protocol = (*corev1.Protocol)(unsafe.Pointer(in.Protocol))
+	out.Protocol = (*common.Protocol)(unsafe.Pointer(in.Protocol))
 	out.Port = (*intstr.IntOrString)(unsafe.Pointer(in.Port))
 	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
 	return nil

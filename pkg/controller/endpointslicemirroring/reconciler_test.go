@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,8 +39,8 @@ const defaultMaxEndpointsPerSubset = int32(1000)
 // TestReconcile ensures that Endpoints are reconciled into corresponding
 // EndpointSlices with appropriate fields.
 func TestReconcile(t *testing.T) {
-	protoTCP := corev1.ProtocolTCP
-	protoUDP := corev1.ProtocolUDP
+	protoTCP := common.ProtocolTCP
+	protoUDP := common.ProtocolUDP
 
 	testCases := []struct {
 		testName                 string
@@ -65,7 +66,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 		}},
 		existingEndpointSlices: []*discovery.EndpointSlice{},
@@ -78,7 +79,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -96,7 +97,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -114,7 +115,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -145,7 +146,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -177,7 +178,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -210,11 +211,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -236,11 +237,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			NotReadyAddresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -262,11 +263,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.1.1.1",
@@ -297,11 +298,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -316,11 +317,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.1.1",
@@ -346,11 +347,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -365,11 +366,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.1.1",
@@ -409,11 +410,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -428,11 +429,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.1.1",
@@ -479,11 +480,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -498,11 +499,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.1.1",
@@ -553,11 +554,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "2001:db8:2222:3333:4444:5555:6666:7777",
@@ -572,11 +573,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.1.1",
@@ -602,11 +603,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "2001:db8:1111:3333:4444:5555:6666:7777",
@@ -621,11 +622,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "2001:db8:3333:3333:4444:5555:6666:7777",
@@ -651,11 +652,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "2001:db8:1111:3333:4444:5555:6666:7777",
@@ -670,11 +671,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "this-is-also-not-an-ip",
@@ -700,11 +701,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "this-is-not-an-ip1",
@@ -719,11 +720,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "this-is-not-an-ip11",
@@ -749,11 +750,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     443,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -768,11 +769,11 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     3000,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}, {
 				Name:     "https",
 				Port:     3001,
-				Protocol: corev1.ProtocolUDP,
+				Protocol: common.ProtocolUDP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.1.1",
@@ -802,7 +803,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -819,7 +820,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -839,7 +840,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -860,7 +861,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",
@@ -877,7 +878,7 @@ func TestReconcile(t *testing.T) {
 			Ports: []corev1.EndpointPort{{
 				Name:     "http",
 				Port:     80,
-				Protocol: corev1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 			}},
 			Addresses: []corev1.EndpointAddress{{
 				IP:       "10.0.0.1",

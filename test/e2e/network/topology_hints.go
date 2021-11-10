@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,7 +73,7 @@ var _ = common.SIGDescribe("Feature:Topology Hints", func() {
 					Name:       "example",
 					Port:       80,
 					TargetPort: intstr.FromInt(portNum),
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 				}},
 			},
 		})

@@ -29,7 +29,7 @@ import (
 	"strings"
 	"sync"
 
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/common"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/klog/v2"
 	iptablesproxy "k8s.io/kubernetes/pkg/proxy/iptables"
@@ -130,7 +130,7 @@ func (hm *hostportManager) Add(id string, podPortMapping *PodPortMapping, natInt
 		protocol := strings.ToLower(string(pm.Protocol))
 		chain := getHostportChain(id, pm)
 		newChains = append(newChains, chain)
-		if pm.Protocol == v1.ProtocolUDP {
+		if pm.Protocol == common.ProtocolUDP {
 			conntrackPortsToRemove = append(conntrackPortsToRemove, int(pm.HostPort))
 		}
 
@@ -192,7 +192,7 @@ func (hm *hostportManager) Add(id string, podPortMapping *PodPortMapping, natInt
 	if hm.execer != nil && hm.conntrackFound {
 		klog.InfoS("Starting to delete udp conntrack entries", "conntrackEntries", conntrackPortsToRemove, "isIPv6", isIPv6)
 		for _, port := range conntrackPortsToRemove {
-			err = conntrack.ClearEntriesForPort(hm.execer, port, isIPv6, v1.ProtocolUDP)
+			err = conntrack.ClearEntriesForPort(hm.execer, port, isIPv6, common.ProtocolUDP)
 			if err != nil {
 				klog.ErrorS(err, "Failed to clear udp conntrack for port", "port", port)
 			}
@@ -289,7 +289,7 @@ func (hm *hostportManager) openHostports(podPortMapping *PodPortMapping) (map[ho
 		}
 
 		// We do not open host ports for SCTP ports, as we agreed in the Support of SCTP KEP
-		if pm.Protocol == v1.ProtocolSCTP {
+		if pm.Protocol == common.ProtocolSCTP {
 			continue
 		}
 

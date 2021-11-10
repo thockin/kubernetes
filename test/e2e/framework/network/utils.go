@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -589,7 +590,7 @@ func (config *NetworkingTestConfig) createNetShellPodSpec(podName, hostname stri
 						{
 							Name:          "udp",
 							ContainerPort: EndpointUDPPort,
-							Protocol:      v1.ProtocolUDP,
+							Protocol:      common.ProtocolUDP,
 						},
 					},
 					LivenessProbe:  probe,
@@ -607,7 +608,7 @@ func (config *NetworkingTestConfig) createNetShellPodSpec(podName, hostname stri
 		pod.Spec.Containers[0].Ports = append(pod.Spec.Containers[0].Ports, v1.ContainerPort{
 			Name:          "sctp",
 			ContainerPort: EndpointSCTPPort,
-			Protocol:      v1.ProtocolSCTP,
+			Protocol:      common.ProtocolSCTP,
 		})
 	}
 
@@ -679,8 +680,8 @@ func (config *NetworkingTestConfig) createNodePortServiceSpec(svcName string, se
 		Spec: v1.ServiceSpec{
 			Type: v1.ServiceTypeNodePort,
 			Ports: []v1.ServicePort{
-				{Port: ClusterHTTPPort, Name: "http", Protocol: v1.ProtocolTCP, TargetPort: intstr.FromInt(EndpointHTTPPort)},
-				{Port: ClusterUDPPort, Name: "udp", Protocol: v1.ProtocolUDP, TargetPort: intstr.FromInt(EndpointUDPPort)},
+				{Port: ClusterHTTPPort, Name: "http", Protocol: common.ProtocolTCP, TargetPort: intstr.FromInt(EndpointHTTPPort)},
+				{Port: ClusterUDPPort, Name: "udp", Protocol: common.ProtocolUDP, TargetPort: intstr.FromInt(EndpointUDPPort)},
 			},
 			Selector:        selector,
 			SessionAffinity: sessionAffinity,
@@ -688,7 +689,7 @@ func (config *NetworkingTestConfig) createNodePortServiceSpec(svcName string, se
 	}
 
 	if config.SCTPEnabled {
-		res.Spec.Ports = append(res.Spec.Ports, v1.ServicePort{Port: ClusterSCTPPort, Name: "sctp", Protocol: v1.ProtocolSCTP, TargetPort: intstr.FromInt(EndpointSCTPPort)})
+		res.Spec.Ports = append(res.Spec.Ports, v1.ServicePort{Port: ClusterSCTPPort, Name: "sctp", Protocol: common.ProtocolSCTP, TargetPort: intstr.FromInt(EndpointSCTPPort)})
 	}
 	if config.DualStackEnabled {
 		requireDual := v1.IPFamilyPolicyRequireDualStack
@@ -788,11 +789,11 @@ func (config *NetworkingTestConfig) setup(selector map[string]string) {
 
 	for _, p := range config.NodePortService.Spec.Ports {
 		switch p.Protocol {
-		case v1.ProtocolUDP:
+		case common.ProtocolUDP:
 			config.NodeUDPPort = int(p.NodePort)
-		case v1.ProtocolTCP:
+		case common.ProtocolTCP:
 			config.NodeHTTPPort = int(p.NodePort)
-		case v1.ProtocolSCTP:
+		case common.ProtocolSCTP:
 			config.NodeSCTPPort = int(p.NodePort)
 		default:
 			continue

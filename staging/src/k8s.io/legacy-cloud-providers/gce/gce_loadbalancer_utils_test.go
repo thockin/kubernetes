@@ -35,6 +35,7 @@ import (
 	compute "google.golang.org/api/compute/v1"
 
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/record"
@@ -67,7 +68,7 @@ func fakeLoadbalancerServiceHelper(lbType string, annotationKey string) *v1.Serv
 		Spec: v1.ServiceSpec{
 			SessionAffinity: v1.ServiceAffinityClientIP,
 			Type:            v1.ServiceTypeLoadBalancer,
-			Ports:           []v1.ServicePort{{Protocol: v1.ProtocolTCP, Port: int32(123)}},
+			Ports:           []v1.ServicePort{{Protocol: common.ProtocolTCP, Port: int32(123)}},
 		},
 	}
 }

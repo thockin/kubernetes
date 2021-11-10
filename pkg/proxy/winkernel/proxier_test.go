@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -157,7 +158,7 @@ func TestCreateServiceVip(t *testing.T) {
 	svcPortName := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 	timeoutSeconds := v1.DefaultClientIPServiceAffinitySeconds
 
@@ -175,7 +176,7 @@ func TestCreateServiceVip(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName.Port,
 				Port:     int32(svcPort),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort),
 			}}
 		}),
@@ -211,9 +212,9 @@ func TestCreateRemoteEndpointOverlay(t *testing.T) {
 	svcPortName := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 
 	makeServiceMap(proxier,
 		makeTestService(svcPortName.Namespace, svcPortName.Name, func(svc *v1.Service) {
@@ -222,7 +223,7 @@ func TestCreateRemoteEndpointOverlay(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName.Port,
 				Port:     int32(svcPort),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort),
 			}}
 		}),
@@ -270,7 +271,7 @@ func TestCreateRemoteEndpointL2Bridge(t *testing.T) {
 		t.Error()
 	}
 
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 	svcIP := "10.20.30.41"
 	svcPort := 80
 	svcNodePort := 3001
@@ -328,7 +329,7 @@ func TestCreateRemoteEndpointL2Bridge(t *testing.T) {
 }
 func TestSharedRemoteEndpointDelete(t *testing.T) {
 	syncPeriod := 30 * time.Second
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), "L2Bridge")
 	if proxier == nil {
 		t.Error()
@@ -340,7 +341,7 @@ func TestSharedRemoteEndpointDelete(t *testing.T) {
 	svcPortName1 := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	svcIP2 := "10.20.30.42"
@@ -349,7 +350,7 @@ func TestSharedRemoteEndpointDelete(t *testing.T) {
 	svcPortName2 := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc2"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	makeServiceMap(proxier,
@@ -359,7 +360,7 @@ func TestSharedRemoteEndpointDelete(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName1.Port,
 				Port:     int32(svcPort1),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort1),
 			}}
 		}),
@@ -369,7 +370,7 @@ func TestSharedRemoteEndpointDelete(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName2.Port,
 				Port:     int32(svcPort2),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort2),
 			}}
 		}),
@@ -427,7 +428,7 @@ func TestSharedRemoteEndpointDelete(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName2.Port,
 				Port:     int32(svcPort2),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort2),
 			}}
 		}),
@@ -482,7 +483,7 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 	svcPortName1 := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	svcIP2 := "10.20.30.42"
@@ -491,7 +492,7 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 	svcPortName2 := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc2"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	makeServiceMap(proxier,
@@ -501,7 +502,7 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName1.Port,
 				Port:     int32(svcPort1),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort1),
 			}}
 		}),
@@ -511,13 +512,13 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName2.Port,
 				Port:     int32(svcPort2),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort2),
 			}}
 		}),
 	)
 
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 	populateEndpointSlices(proxier,
 		makeTestEndpointSlice(svcPortName1.Namespace, svcPortName1.Name, 1, func(eps *discovery.EndpointSlice) {
 			eps.AddressType = discovery.AddressTypeIPv4
@@ -572,7 +573,7 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName1.Port,
 				Port:     int32(svcPort1),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort1),
 			}}
 		}),
@@ -582,7 +583,7 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName1.Port,
 				Port:     int32(svcPort1),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(3003),
 			}}
 		}))
@@ -645,7 +646,7 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 }
 func TestCreateLoadBalancer(t *testing.T) {
 	syncPeriod := 30 * time.Second
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
@@ -657,7 +658,7 @@ func TestCreateLoadBalancer(t *testing.T) {
 	svcPortName := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	makeServiceMap(proxier,
@@ -667,7 +668,7 @@ func TestCreateLoadBalancer(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName.Port,
 				Port:     int32(svcPort),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort),
 			}}
 		}),
@@ -715,7 +716,7 @@ func TestCreateDsrLoadBalancer(t *testing.T) {
 	svcPortName := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	makeServiceMap(proxier,
@@ -726,12 +727,12 @@ func TestCreateDsrLoadBalancer(t *testing.T) {
 			svc.Spec.Ports = []v1.ServicePort{{
 				Name:     svcPortName.Port,
 				Port:     int32(svcPort),
-				Protocol: v1.ProtocolTCP,
+				Protocol: common.ProtocolTCP,
 				NodePort: int32(svcNodePort),
 			}}
 		}),
 	)
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 	populateEndpointSlices(proxier,
 		makeTestEndpointSlice(svcPortName.Namespace, svcPortName.Name, 1, func(eps *discovery.EndpointSlice) {
 			eps.AddressType = discovery.AddressTypeIPv4
@@ -777,7 +778,7 @@ func TestEndpointSlice(t *testing.T) {
 	svcPortName := proxy.ServicePortName{
 		NamespacedName: makeNSN("ns1", "svc1"),
 		Port:           "p80",
-		Protocol:       v1.ProtocolTCP,
+		Protocol:       common.ProtocolTCP,
 	}
 
 	proxier.OnServiceAdd(&v1.Service{
@@ -785,12 +786,12 @@ func TestEndpointSlice(t *testing.T) {
 		Spec: v1.ServiceSpec{
 			ClusterIP: "172.20.1.1",
 			Selector:  map[string]string{"foo": "bar"},
-			Ports:     []v1.ServicePort{{Name: svcPortName.Port, TargetPort: intstr.FromInt(80), Protocol: v1.ProtocolTCP}},
+			Ports:     []v1.ServicePort{{Name: svcPortName.Port, TargetPort: intstr.FromInt(80), Protocol: common.ProtocolTCP}},
 		},
 	})
 
 	// Add initial endpoint slice
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 	endpointSlice := &discovery.EndpointSlice{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-1", svcPortName.Name),

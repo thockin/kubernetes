@@ -24,6 +24,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -849,7 +850,7 @@ func NewProtocolPort(protocol string, port int32) *ProtocolPort {
 	}
 
 	if len(pp.Protocol) == 0 {
-		pp.Protocol = string(v1.ProtocolTCP)
+		pp.Protocol = string(common.ProtocolTCP)
 	}
 
 	return pp
@@ -942,6 +943,6 @@ func (h HostPortInfo) sanitize(ip, protocol *string) {
 		*ip = DefaultBindAllHostIP
 	}
 	if len(*protocol) == 0 {
-		*protocol = string(v1.ProtocolTCP)
+		*protocol = string(common.ProtocolTCP)
 	}
 }

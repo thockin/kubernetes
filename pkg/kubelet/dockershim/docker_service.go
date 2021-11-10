@@ -32,9 +32,9 @@ import (
 
 	"github.com/blang/semver"
 	dockertypes "github.com/docker/docker/api/types"
+	"k8s.io/api/common"
 	"k8s.io/klog/v2"
 
-	v1 "k8s.io/api/core/v1"
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
 	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
 	"k8s.io/kubernetes/pkg/kubelet/checkpointmanager"
@@ -536,17 +536,17 @@ func (ds *dockerService) getDockerVersionFromCache() (*dockertypes.Version, erro
 	return dv, nil
 }
 
-func toAPIProtocol(protocol Protocol) v1.Protocol {
+func toAPIProtocol(protocol Protocol) common.Protocol {
 	switch protocol {
 	case protocolTCP:
-		return v1.ProtocolTCP
+		return common.ProtocolTCP
 	case protocolUDP:
-		return v1.ProtocolUDP
+		return common.ProtocolUDP
 	case protocolSCTP:
-		return v1.ProtocolSCTP
+		return common.ProtocolSCTP
 	}
 	klog.InfoS("Unknown protocol, defaulting to TCP", "protocol", protocol)
-	return v1.ProtocolTCP
+	return common.ProtocolTCP
 }
 
 // effectiveHairpinMode determines the effective hairpin mode given the

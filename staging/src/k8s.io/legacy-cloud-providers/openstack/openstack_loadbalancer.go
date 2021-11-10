@@ -42,6 +42,7 @@ import (
 	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -386,27 +387,27 @@ func waitLoadbalancerDeleted(client *gophercloud.ServiceClient, loadbalancerID s
 	return err
 }
 
-func toRuleProtocol(protocol v1.Protocol) rules.RuleProtocol {
+func toRuleProtocol(protocol common.Protocol) rules.RuleProtocol {
 	switch protocol {
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		return rules.ProtocolTCP
-	case v1.ProtocolUDP:
+	case common.ProtocolUDP:
 		return rules.ProtocolUDP
 	default:
 		return rules.RuleProtocol(strings.ToLower(string(protocol)))
 	}
 }
 
-func toListenersProtocol(protocol v1.Protocol) listeners.Protocol {
+func toListenersProtocol(protocol common.Protocol) listeners.Protocol {
 	switch protocol {
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		return listeners.ProtocolTCP
 	default:
 		return listeners.Protocol(string(protocol))
 	}
 }
 
-func createNodeSecurityGroup(client *gophercloud.ServiceClient, nodeSecurityGroupID string, port int, protocol v1.Protocol, lbSecGroup string) error {
+func createNodeSecurityGroup(client *gophercloud.ServiceClient, nodeSecurityGroupID string, port int, protocol common.Protocol, lbSecGroup string) error {
 	v4NodeSecGroupRuleCreateOpts := rules.CreateOpts{
 		Direction:     rules.DirIngress,
 		PortRangeMax:  port,
@@ -718,7 +719,7 @@ func (lbaas *LbaasV2) EnsureLoadBalancer(ctx context.Context, clusterName string
 	// Check for TCP protocol on each port
 	// TODO: Convert all error messages to use an event recorder
 	for _, port := range ports {
-		if port.Protocol != v1.ProtocolTCP {
+		if port.Protocol != common.ProtocolTCP {
 			return nil, fmt.Errorf("only TCP LoadBalancer is supported for openstack load balancers")
 		}
 	}

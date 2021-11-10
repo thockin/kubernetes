@@ -23,6 +23,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	appsv1beta1 "k8s.io/api/apps/v1beta1"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -67,7 +68,7 @@ func getProtocols(spec corev1.PodSpec) map[string]string {
 		for _, port := range container.Ports {
 			// Empty protocol must be defaulted (TCP)
 			if len(port.Protocol) == 0 {
-				port.Protocol = corev1.ProtocolTCP
+				port.Protocol = common.ProtocolTCP
 			}
 			result[strconv.Itoa(int(port.ContainerPort))] = string(port.Protocol)
 		}
@@ -81,7 +82,7 @@ func getServiceProtocols(spec corev1.ServiceSpec) map[string]string {
 	for _, servicePort := range spec.Ports {
 		// Empty protocol must be defaulted (TCP)
 		if len(servicePort.Protocol) == 0 {
-			servicePort.Protocol = corev1.ProtocolTCP
+			servicePort.Protocol = common.ProtocolTCP
 		}
 		result[strconv.Itoa(int(servicePort.Port))] = string(servicePort.Protocol)
 	}

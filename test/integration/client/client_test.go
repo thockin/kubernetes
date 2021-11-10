@@ -29,6 +29,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	eventsv1 "k8s.io/api/events/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -348,7 +349,7 @@ func TestPatchWithCreateOnUpdate(t *testing.T) {
 		Subsets: []v1.EndpointSubset{
 			{
 				Addresses: []v1.EndpointAddress{{IP: "1.2.3.4"}},
-				Ports:     []v1.EndpointPort{{Port: 80, Protocol: v1.ProtocolTCP}},
+				Ports:     []v1.EndpointPort{{Port: 80, Protocol: common.ProtocolTCP}},
 			},
 		},
 	}
@@ -1045,7 +1046,7 @@ func TestApplyWithApplyConfiguration(t *testing.T) {
 						WithStdin(true).
 						WithPorts(corev1ac.ContainerPort().
 							WithContainerPort(8080).
-							WithProtocol(v1.ProtocolTCP),
+							WithProtocol(common.ProtocolTCP),
 						).
 						WithResources(corev1ac.ResourceRequirements().
 							WithLimits(v1.ResourceList{

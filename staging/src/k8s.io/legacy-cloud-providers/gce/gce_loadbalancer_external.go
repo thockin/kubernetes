@@ -27,7 +27,8 @@ import (
 	"strings"
 
 	"github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud"
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -821,7 +822,7 @@ func loadBalancerPortRange(ports []v1.ServicePort) (string, error) {
 	}
 
 	// The service controller verified all the protocols match on the ports, just check and use the first one
-	if ports[0].Protocol != v1.ProtocolTCP && ports[0].Protocol != v1.ProtocolUDP {
+	if ports[0].Protocol != common.ProtocolTCP && ports[0].Protocol != v1.ProtocolUDP {
 		return "", fmt.Errorf("invalid protocol %s, only TCP and UDP are supported", string(ports[0].Protocol))
 	}
 

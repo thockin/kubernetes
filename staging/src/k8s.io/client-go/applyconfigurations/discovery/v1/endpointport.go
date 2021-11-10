@@ -18,17 +18,15 @@ limitations under the License.
 
 package v1
 
-import (
-	v1 "k8s.io/api/core/v1"
-)
+import "k8s.io/api/common"
 
 // EndpointPortApplyConfiguration represents an declarative configuration of the EndpointPort type for use
 // with apply.
 type EndpointPortApplyConfiguration struct {
-	Name        *string      `json:"name,omitempty"`
-	Protocol    *v1.Protocol `json:"protocol,omitempty"`
-	Port        *int32       `json:"port,omitempty"`
-	AppProtocol *string      `json:"appProtocol,omitempty"`
+	Name        *string          `json:"name,omitempty"`
+	Protocol    *common.Protocol `json:"protocol,omitempty"`
+	Port        *int32           `json:"port,omitempty"`
+	AppProtocol *string          `json:"appProtocol,omitempty"`
 }
 
 // EndpointPortApplyConfiguration constructs an declarative configuration of the EndpointPort type for use with
@@ -48,7 +46,7 @@ func (b *EndpointPortApplyConfiguration) WithName(value string) *EndpointPortApp
 // WithProtocol sets the Protocol field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Protocol field is set to the value of the last call.
-func (b *EndpointPortApplyConfiguration) WithProtocol(value v1.Protocol) *EndpointPortApplyConfiguration {
+func (b *EndpointPortApplyConfiguration) WithProtocol(value common.Protocol) *EndpointPortApplyConfiguration {
 	b.Protocol = &value
 	return b
 }

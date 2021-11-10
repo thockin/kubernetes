@@ -24,6 +24,7 @@ import (
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -435,7 +436,7 @@ func generateScaleTestServiceSpec(suffix string) *v1.Service {
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{{
 				Name:       "http",
-				Protocol:   v1.ProtocolTCP,
+				Protocol:   common.ProtocolTCP,
 				Port:       80,
 				TargetPort: intstr.FromInt(8080),
 			}},

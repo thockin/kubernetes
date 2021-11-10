@@ -41,6 +41,7 @@ import (
 	netutils "k8s.io/utils/net"
 
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -1089,7 +1090,7 @@ func generateBacksideHTTPSServiceSpec() *v1.Service {
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{{
 				Name:       "my-https-port",
-				Protocol:   v1.ProtocolTCP,
+				Protocol:   common.ProtocolTCP,
 				Port:       443,
 				TargetPort: intstr.FromString("echo-443"),
 			}},

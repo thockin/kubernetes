@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -46,7 +47,7 @@ var _ = SIGDescribe("Container Lifecycle Hook", func() {
 		ports := []v1.ContainerPort{
 			{
 				ContainerPort: 8080,
-				Protocol:      v1.ProtocolTCP,
+				Protocol:      common.ProtocolTCP,
 			},
 		}
 		podHandleHookRequest := e2epod.NewAgnhostPod("", "pod-handle-http-request", nil, nil, ports, "netexec")

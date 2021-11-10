@@ -33,6 +33,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -817,7 +818,7 @@ func (proxier *Proxier) syncProxyRules() {
 				conntrackCleanupServiceIPs.Insert(lbIP)
 			}
 			nodePort := svcInfo.NodePort()
-			if svcInfo.Protocol() == v1.ProtocolUDP && nodePort != 0 {
+			if svcInfo.Protocol() == common.ProtocolUDP && nodePort != 0 {
 				klog.V(2).InfoS("Stale service", "protocol", strings.ToLower(string(svcInfo.Protocol())), "servicePortName", svcPortName, "nodePort", nodePort)
 				conntrackCleanupServiceNodePorts.Insert(nodePort)
 			}
@@ -1143,7 +1144,7 @@ func (proxier *Proxier) syncProxyRules() {
 			// If the "external" IP happens to be an IP that is local to this
 			// machine, hold the local port open so no other process can open it
 			// (because the socket might open but it would never work).
-			if (svcInfo.Protocol() != v1.ProtocolSCTP) && localAddrSet.Has(netutils.ParseIPSloppy(externalIP)) {
+			if (svcInfo.Protocol() != common.ProtocolSCTP) && localAddrSet.Has(netutils.ParseIPSloppy(externalIP)) {
 				lp := netutils.LocalPort{
 					Description: "externalIP for " + svcNameString,
 					IP:          externalIP,
@@ -1335,7 +1336,7 @@ func (proxier *Proxier) syncProxyRules() {
 				if proxier.portsMap[lp] != nil {
 					klog.V(4).InfoS("Port was open before and is still needed", "port", lp)
 					replacementPortsMap[lp] = proxier.portsMap[lp]
-				} else if svcInfo.Protocol() != v1.ProtocolSCTP {
+				} else if svcInfo.Protocol() != common.ProtocolSCTP {
 					socket, err := proxier.portMapper.OpenLocalPort(&lp)
 					if err != nil {
 						msg := fmt.Sprintf("can't open port %s, skipping it", lp.String())
@@ -1677,13 +1678,13 @@ func (proxier *Proxier) syncProxyRules() {
 	// TODO: these could be made more consistent.
 	klog.V(4).InfoS("Deleting conntrack stale entries for services", "IPs", conntrackCleanupServiceIPs.UnsortedList())
 	for _, svcIP := range conntrackCleanupServiceIPs.UnsortedList() {
-		if err := conntrack.ClearEntriesForIP(proxier.exec, svcIP, v1.ProtocolUDP); err != nil {
+		if err := conntrack.ClearEntriesForIP(proxier.exec, svcIP, common.ProtocolUDP); err != nil {
 			klog.ErrorS(err, "Failed to delete stale service connections", "IP", svcIP)
 		}
 	}
 	klog.V(4).InfoS("Deleting conntrack stale entries for services", "nodePorts", conntrackCleanupServiceNodePorts.UnsortedList())
 	for _, nodePort := range conntrackCleanupServiceNodePorts.UnsortedList() {
-		err := conntrack.ClearEntriesForPort(proxier.exec, nodePort, isIPv6, v1.ProtocolUDP)
+		err := conntrack.ClearEntriesForPort(proxier.exec, nodePort, isIPv6, common.ProtocolUDP)
 		if err != nil {
 			klog.ErrorS(err, "Failed to clear udp conntrack", "nodePort", nodePort)
 		}

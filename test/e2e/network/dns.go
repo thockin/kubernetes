@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -375,7 +376,7 @@ var _ = common.SIGDescribe("DNS", func() {
 		_, err = e2eservice.UpdateService(f.ClientSet, f.Namespace.Name, serviceName, func(s *v1.Service) {
 			s.Spec.Type = v1.ServiceTypeClusterIP
 			s.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "http", Protocol: v1.ProtocolTCP},
+				{Port: 80, Name: "http", Protocol: apicommon.ProtocolTCP},
 			}
 		})
 		framework.ExpectNoError(err, "failed to change service type to ClusterIP for service: %s", serviceName)

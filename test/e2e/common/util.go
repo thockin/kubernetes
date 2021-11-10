@@ -23,6 +23,7 @@ import (
 	"text/template"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -145,7 +146,7 @@ func NewRCByName(c clientset.Interface, ns, name string, replicas int32, gracePe
 	}
 
 	return c.CoreV1().ReplicationControllers(ns).Create(context.TODO(), rcByNamePort(
-		name, replicas, framework.ServeHostnameImage, containerArgs, 9376, v1.ProtocolTCP, map[string]string{}, gracePeriod), metav1.CreateOptions{})
+		name, replicas, framework.ServeHostnameImage, containerArgs, 9376, common.ProtocolTCP, map[string]string{}, gracePeriod), metav1.CreateOptions{})
 }
 
 // RestartNodes restarts specific nodes.
@@ -196,7 +197,7 @@ func RestartNodes(c clientset.Interface, nodes []v1.Node) error {
 }
 
 // rcByNamePort returns a ReplicationController with specified name and port
-func rcByNamePort(name string, replicas int32, image string, containerArgs []string, port int, protocol v1.Protocol,
+func rcByNamePort(name string, replicas int32, image string, containerArgs []string, port int, protocol common.Protocol,
 	labels map[string]string, gracePeriod *int64) *v1.ReplicationController {
 
 	return e2erc.ByNameContainer(name, replicas, labels, v1.Container{

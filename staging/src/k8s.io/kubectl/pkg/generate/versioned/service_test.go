@@ -20,7 +20,8 @@ import (
 	"reflect"
 	"testing"
 
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/kubectl/pkg/generate"
@@ -398,13 +399,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromString("foobar"),
 						},
 						{
 							Name:       "port-2",
 							Port:       443,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromString("foobar"),
 						},
 					},
@@ -433,13 +434,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							TargetPort: intstr.FromInt(1234),
 						},
 						{
 							Name:       "port-2",
 							Port:       443,
-							Protocol:   v1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							TargetPort: intstr.FromInt(1234),
 						},
 					},
@@ -467,13 +468,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
 							Port:       443,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(443),
 						},
 					},
@@ -501,13 +502,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
 							Port:       8080,
-							Protocol:   v1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							TargetPort: intstr.FromInt(8080),
 						},
 					},
@@ -535,19 +536,19 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
 							Port:       8080,
-							Protocol:   v1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							TargetPort: intstr.FromInt(8080),
 						},
 						{
 							Name:       "port-3",
 							Port:       8081,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(8081),
 						},
 					},
@@ -801,13 +802,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							TargetPort: intstr.FromString("foobar"),
 						},
 						{
 							Name:       "port-2",
 							Port:       443,
-							Protocol:   v1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							TargetPort: intstr.FromString("foobar"),
 						},
 					},
@@ -834,13 +835,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
 							Port:       443,
-							Protocol:   v1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							TargetPort: intstr.FromInt(443),
 						},
 					},
@@ -867,13 +868,13 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
 							Port:       8080,
-							Protocol:   v1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							TargetPort: intstr.FromInt(8080),
 						},
 					},
@@ -900,25 +901,25 @@ func TestGenerateService(t *testing.T) {
 						{
 							Name:       "port-1",
 							Port:       80,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
 							Port:       8080,
-							Protocol:   v1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							TargetPort: intstr.FromInt(8080),
 						},
 						{
 							Name:       "port-3",
 							Port:       8081,
-							Protocol:   v1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							TargetPort: intstr.FromInt(8081),
 						},
 						{
 							Name:       "port-4",
 							Port:       8082,
-							Protocol:   v1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							TargetPort: intstr.FromInt(8082),
 						},
 					},

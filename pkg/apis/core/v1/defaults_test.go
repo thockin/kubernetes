@@ -23,6 +23,7 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -809,7 +810,7 @@ func TestSetDefaultReplicationControllerInitContainers(t *testing.T) {
 					Ports: []v1.ContainerPort{
 						{
 							Name:     "default",
-							Protocol: v1.ProtocolTCP,
+							Protocol: common.ProtocolTCP,
 						},
 					},
 				},
@@ -1311,8 +1312,8 @@ func TestSetDefaultEndpointsProtocol(t *testing.T) {
 	for i := range out.Subsets {
 		for j := range out.Subsets[i].Ports {
 			if in.Subsets[i].Ports[j].Protocol == "" {
-				if out.Subsets[i].Ports[j].Protocol != v1.ProtocolTCP {
-					t.Errorf("Expected protocol %s, got %s", v1.ProtocolTCP, out.Subsets[i].Ports[j].Protocol)
+				if out.Subsets[i].Ports[j].Protocol != common.ProtocolTCP {
+					t.Errorf("Expected protocol %s, got %s", common.ProtocolTCP, out.Subsets[i].Ports[j].Protocol)
 				}
 			} else {
 				if out.Subsets[i].Ports[j].Protocol != in.Subsets[i].Ports[j].Protocol {
@@ -1348,14 +1349,14 @@ func TestSetDefaultServicePort(t *testing.T) {
 		},
 	}}
 	out := roundTrip(t, runtime.Object(in)).(*v1.Service)
-	if out.Spec.Ports[0].Protocol != v1.ProtocolUDP {
-		t.Errorf("Expected protocol %s, got %s", v1.ProtocolUDP, out.Spec.Ports[0].Protocol)
+	if out.Spec.Ports[0].Protocol != common.ProtocolUDP {
+		t.Errorf("Expected protocol %s, got %s", common.ProtocolUDP, out.Spec.Ports[0].Protocol)
 	}
 	if out.Spec.Ports[0].TargetPort != intstr.FromString("p") {
 		t.Errorf("Expected port %v, got %v", in.Spec.Ports[0].Port, out.Spec.Ports[0].TargetPort)
 	}
-	if out.Spec.Ports[1].Protocol != v1.ProtocolUDP {
-		t.Errorf("Expected protocol %s, got %s", v1.ProtocolUDP, out.Spec.Ports[1].Protocol)
+	if out.Spec.Ports[1].Protocol != common.ProtocolUDP {
+		t.Errorf("Expected protocol %s, got %s", common.ProtocolUDP, out.Spec.Ports[1].Protocol)
 	}
 	if out.Spec.Ports[1].TargetPort != intstr.FromInt(309) {
 		t.Errorf("Expected port %v, got %v", in.Spec.Ports[1].Port, out.Spec.Ports[1].TargetPort)
@@ -1369,14 +1370,14 @@ func TestSetDefaultServicePort(t *testing.T) {
 		},
 	}}
 	out = roundTrip(t, runtime.Object(in)).(*v1.Service)
-	if out.Spec.Ports[0].Protocol != v1.ProtocolTCP {
-		t.Errorf("Expected protocol %s, got %s", v1.ProtocolTCP, out.Spec.Ports[0].Protocol)
+	if out.Spec.Ports[0].Protocol != common.ProtocolTCP {
+		t.Errorf("Expected protocol %s, got %s", common.ProtocolTCP, out.Spec.Ports[0].Protocol)
 	}
 	if out.Spec.Ports[0].TargetPort != intstr.FromInt(int(in.Spec.Ports[0].Port)) {
 		t.Errorf("Expected port %v, got %v", in.Spec.Ports[0].Port, out.Spec.Ports[0].TargetPort)
 	}
-	if out.Spec.Ports[1].Protocol != v1.ProtocolTCP {
-		t.Errorf("Expected protocol %s, got %s", v1.ProtocolTCP, out.Spec.Ports[1].Protocol)
+	if out.Spec.Ports[1].Protocol != common.ProtocolTCP {
+		t.Errorf("Expected protocol %s, got %s", common.ProtocolTCP, out.Spec.Ports[1].Protocol)
 	}
 	if out.Spec.Ports[1].TargetPort != intstr.FromInt(int(in.Spec.Ports[1].Port)) {
 		t.Errorf("Expected port %v, got %v", in.Spec.Ports[1].Port, out.Spec.Ports[1].TargetPort)

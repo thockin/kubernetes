@@ -34,9 +34,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 
-	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -831,7 +832,7 @@ func (c *Cloud) updateInstanceSecurityGroupsForNLB(lbName string, instances map[
 				}
 			}
 			healthCheckPorts.Insert(hcPort)
-			if port.TrafficProtocol == string(v1.ProtocolUDP) {
+			if port.TrafficProtocol == string(common.ProtocolUDP) {
 				clientProtocol = "udp"
 			}
 		}

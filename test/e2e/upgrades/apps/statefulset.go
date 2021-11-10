@@ -18,10 +18,12 @@ package apps
 
 import (
 	"context"
+
 	"github.com/onsi/ginkgo"
 
 	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/version"
 
@@ -41,7 +43,7 @@ func createStatefulSetService(name string, labels map[string]string) *v1.Service
 		},
 	}
 	headlessService.Spec.Ports = []v1.ServicePort{
-		{Port: 80, Name: "http", Protocol: v1.ProtocolTCP},
+		{Port: 80, Name: "http", Protocol: common.ProtocolTCP},
 	}
 	headlessService.Spec.ClusterIP = "None"
 	return headlessService

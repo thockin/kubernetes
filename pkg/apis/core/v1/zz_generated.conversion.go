@@ -25,6 +25,7 @@ import (
 	url "net/url"
 	unsafe "unsafe"
 
+	common "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -2971,7 +2972,7 @@ func autoConvert_v1_ContainerPort_To_core_ContainerPort(in *v1.ContainerPort, ou
 	out.Name = in.Name
 	out.HostPort = in.HostPort
 	out.ContainerPort = in.ContainerPort
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.HostIP = in.HostIP
 	return nil
 }
@@ -2985,7 +2986,7 @@ func autoConvert_core_ContainerPort_To_v1_ContainerPort(in *core.ContainerPort, 
 	out.Name = in.Name
 	out.HostPort = in.HostPort
 	out.ContainerPort = in.ContainerPort
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.HostIP = in.HostIP
 	return nil
 }
@@ -3276,7 +3277,7 @@ func Convert_core_EndpointAddress_To_v1_EndpointAddress(in *core.EndpointAddress
 func autoConvert_v1_EndpointPort_To_core_EndpointPort(in *v1.EndpointPort, out *core.EndpointPort, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Port = in.Port
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	return nil
 }
@@ -3289,7 +3290,7 @@ func Convert_v1_EndpointPort_To_core_EndpointPort(in *v1.EndpointPort, out *core
 func autoConvert_core_EndpointPort_To_v1_EndpointPort(in *core.EndpointPort, out *v1.EndpointPort, s conversion.Scope) error {
 	out.Name = in.Name
 	out.Port = in.Port
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	return nil
 }
@@ -6349,7 +6350,7 @@ func autoConvert_core_PodTemplateSpec_To_v1_PodTemplateSpec(in *core.PodTemplate
 
 func autoConvert_v1_PortStatus_To_core_PortStatus(in *v1.PortStatus, out *core.PortStatus, s conversion.Scope) error {
 	out.Port = in.Port
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.Error = (*string)(unsafe.Pointer(in.Error))
 	return nil
 }
@@ -6361,7 +6362,7 @@ func Convert_v1_PortStatus_To_core_PortStatus(in *v1.PortStatus, out *core.PortS
 
 func autoConvert_core_PortStatus_To_v1_PortStatus(in *core.PortStatus, out *v1.PortStatus, s conversion.Scope) error {
 	out.Port = in.Port
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.Error = (*string)(unsafe.Pointer(in.Error))
 	return nil
 }
@@ -7587,7 +7588,7 @@ func Convert_core_ServiceList_To_v1_ServiceList(in *core.ServiceList, out *v1.Se
 
 func autoConvert_v1_ServicePort_To_core_ServicePort(in *v1.ServicePort, out *core.ServicePort, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	out.Port = in.Port
 	out.TargetPort = in.TargetPort
@@ -7602,7 +7603,7 @@ func Convert_v1_ServicePort_To_core_ServicePort(in *v1.ServicePort, out *core.Se
 
 func autoConvert_core_ServicePort_To_v1_ServicePort(in *core.ServicePort, out *v1.ServicePort, s conversion.Scope) error {
 	out.Name = in.Name
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = common.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	out.Port = in.Port
 	out.TargetPort = in.TargetPort

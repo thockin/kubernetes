@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 	"k8s.io/utils/exec"
@@ -32,7 +33,7 @@ import (
 // NoConnectionToDelete is the error string returned by conntrack when no matching connections are found
 const NoConnectionToDelete = "0 flow entries have been deleted"
 
-func protoStr(proto v1.Protocol) string {
+func protoStr(proto common.Protocol) string {
 	return strings.ToLower(string(proto))
 }
 
@@ -45,7 +46,7 @@ func parametersWithFamily(isIPv6 bool, parameters ...string) []string {
 
 // ClearEntriesForIP uses the conntrack tool to delete the conntrack entries
 // for the UDP connections specified by the given service IP
-func ClearEntriesForIP(execer exec.Interface, ip string, protocol v1.Protocol) error {
+func ClearEntriesForIP(execer exec.Interface, ip string, protocol common.Protocol) error {
 	parameters := parametersWithFamily(utilnet.IsIPv6String(ip), "-D", "--orig-dst", ip, "-p", protoStr(protocol))
 	err := Exec(execer, parameters...)
 	if err != nil && !strings.Contains(err.Error(), NoConnectionToDelete) {
@@ -84,7 +85,7 @@ func Exists(execer exec.Interface) bool {
 // The solution is clearing the conntrack. Known issues:
 // https://github.com/docker/docker/issues/8795
 // https://github.com/kubernetes/kubernetes/issues/31983
-func ClearEntriesForPort(execer exec.Interface, port int, isIPv6 bool, protocol v1.Protocol) error {
+func ClearEntriesForPort(execer exec.Interface, port int, isIPv6 bool, protocol common.Protocol) error {
 	if port <= 0 {
 		return fmt.Errorf("Wrong port number. The port number must be greater than zero")
 	}
@@ -98,7 +99,7 @@ func ClearEntriesForPort(execer exec.Interface, port int, isIPv6 bool, protocol 
 
 // ClearEntriesForNAT uses the conntrack tool to delete the conntrack entries
 // for connections specified by the {origin, dest} IP pair.
-func ClearEntriesForNAT(execer exec.Interface, origin, dest string, protocol v1.Protocol) error {
+func ClearEntriesForNAT(execer exec.Interface, origin, dest string, protocol common.Protocol) error {
 	parameters := parametersWithFamily(utilnet.IsIPv6String(origin), "-D", "--orig-dst", origin, "--dst-nat", dest,
 		"-p", protoStr(protocol))
 	err := Exec(execer, parameters...)
@@ -115,7 +116,7 @@ func ClearEntriesForNAT(execer exec.Interface, origin, dest string, protocol v1.
 // for connections specified by the {dest IP, port} pair.
 // Known issue:
 // https://github.com/kubernetes/kubernetes/issues/59368
-func ClearEntriesForPortNAT(execer exec.Interface, dest string, port int, protocol v1.Protocol) error {
+func ClearEntriesForPortNAT(execer exec.Interface, dest string, port int, protocol common.Protocol) error {
 	if port <= 0 {
 		return fmt.Errorf("Wrong port number. The port number must be greater than zero")
 	}
@@ -128,6 +129,6 @@ func ClearEntriesForPortNAT(execer exec.Interface, dest string, port int, protoc
 }
 
 // IsClearConntrackNeeded returns true if protocol requires conntrack cleanup for the stale connections
-func IsClearConntrackNeeded(proto v1.Protocol) bool {
-	return proto == v1.ProtocolUDP || proto == v1.ProtocolSCTP
+func IsClearConntrackNeeded(proto common.Protocol) bool {
+	return proto == common.ProtocolUDP || proto == v1.ProtocolSCTP
 }

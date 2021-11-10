@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/onsi/ginkgo"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/kubernetes/test/e2e/framework"
 	netutils "k8s.io/utils/net"
@@ -27,7 +28,7 @@ import (
 
 // decouple us from k8smanager.go
 type Prober interface {
-	probeConnectivity(nsFrom string, podFrom string, containerFrom string, addrTo string, protocol v1.Protocol, toPort int, timeoutSeconds int) (bool, string, error)
+	probeConnectivity(nsFrom string, podFrom string, containerFrom string, addrTo string, protocol common.Protocol, toPort int, timeoutSeconds int) (bool, string, error)
 }
 
 // ProbeJob packages the data for the input of a pod->pod connectivity probe

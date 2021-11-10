@@ -24,6 +24,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -163,7 +164,7 @@ func (o *ServiceOptions) createService() (*corev1.Service, error) {
 			Name:       portName,
 			Port:       port,
 			TargetPort: targetPort,
-			Protocol:   corev1.Protocol("TCP"),
+			Protocol:   common.Protocol("TCP"),
 			NodePort:   int32(o.NodePort),
 		})
 	}

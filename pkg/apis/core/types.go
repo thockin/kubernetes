@@ -17,6 +17,7 @@ limitations under the License.
 package core
 
 import (
+	"k8s.io/api/common"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metainternalversion "k8s.io/apimachinery/pkg/apis/meta/internalversion"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -633,15 +634,15 @@ const (
 )
 
 // Protocol defines network protocols supported for things like container ports.
-type Protocol string
+type Protocol = common.Protocol
 
 const (
 	// ProtocolTCP is the TCP protocol.
-	ProtocolTCP Protocol = "TCP"
+	ProtocolTCP = common.ProtocolTCP
 	// ProtocolUDP is the UDP protocol.
-	ProtocolUDP Protocol = "UDP"
+	ProtocolUDP = common.ProtocolUDP
 	// ProtocolSCTP is the SCTP protocol.
-	ProtocolSCTP Protocol = "SCTP"
+	ProtocolSCTP = common.ProtocolUDP
 )
 
 // GCEPersistentDiskVolumeSource represents a Persistent Disk resource in Google Compute Engine.
@@ -1770,7 +1771,7 @@ type ContainerPort struct {
 	ContainerPort int32
 	// Required: Supports "TCP", "UDP" and "SCTP"
 	// +optional
-	Protocol Protocol
+	Protocol common.Protocol
 	// Optional: What host IP to bind the external port to.
 	// +optional
 	HostIP string
@@ -3881,7 +3882,7 @@ type ServicePort struct {
 	Name string
 
 	// The IP protocol for this port.  Supports "TCP", "UDP", and "SCTP".
-	Protocol Protocol
+	Protocol common.Protocol
 
 	// The application protocol for this port.
 	// This field follows standard Kubernetes label syntax.
@@ -4031,7 +4032,7 @@ type EndpointPort struct {
 	Port int32
 
 	// The IP protocol for this port.
-	Protocol Protocol
+	Protocol common.Protocol
 
 	// The application protocol for this port.
 	// This field follows standard Kubernetes label syntax.
@@ -5617,7 +5618,7 @@ type PortStatus struct {
 	// Port is the port number of the service port of which status is recorded here
 	Port int32
 	// Protocol is the protocol of the service port of which status is recorded here
-	Protocol Protocol
+	Protocol common.Protocol
 	// Error is to record the problem with the service port
 	// The format of the error shall comply with the following rules:
 	// - built-in error values shall be specified in this file and those shall use

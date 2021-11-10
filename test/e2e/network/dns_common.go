@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -191,7 +192,7 @@ func (t *dnsTestCommon) createUtilPodLabel(baseName string) {
 	// Actual port # doesn't matter, just needs to exist.
 	const servicePort = 10101
 	podName := fmt.Sprintf("%s-%s", baseName, string(uuid.NewUUID()))
-	ports := []v1.ContainerPort{{ContainerPort: servicePort, Protocol: v1.ProtocolTCP}}
+	ports := []v1.ContainerPort{{ContainerPort: servicePort, Protocol: apicommon.ProtocolTCP}}
 	t.utilPod = e2epod.NewAgnhostPod(t.f.Namespace.Name, podName, nil, nil, ports)
 
 	var err error
@@ -213,7 +214,7 @@ func (t *dnsTestCommon) createUtilPodLabel(baseName string) {
 			Selector: map[string]string{"app": baseName},
 			Ports: []v1.ServicePort{
 				{
-					Protocol:   v1.ProtocolTCP,
+					Protocol:   apicommon.ProtocolTCP,
 					Port:       servicePort,
 					TargetPort: intstr.FromInt(servicePort),
 				},

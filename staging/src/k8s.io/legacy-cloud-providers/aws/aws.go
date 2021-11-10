@@ -47,6 +47,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"gopkg.in/gcfg.v1"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
@@ -3955,7 +3956,7 @@ func (c *Cloud) EnsureLoadBalancer(ctx context.Context, clusterName string, apiS
 			}
 
 			certificateARN := annotations[ServiceAnnotationLoadBalancerCertificate]
-			if port.Protocol != v1.ProtocolUDP && certificateARN != "" && (sslPorts == nil || sslPorts.numbers.Has(int64(port.Port)) || sslPorts.names.Has(port.Name)) {
+			if port.Protocol != common.ProtocolUDP && certificateARN != "" && (sslPorts == nil || sslPorts.numbers.Has(int64(port.Port)) || sslPorts.names.Has(port.Name)) {
 				portMapping.FrontendProtocol = elbv2.ProtocolEnumTls
 				portMapping.SSLCertificateARN = certificateARN
 				portMapping.SSLPolicy = annotations[ServiceAnnotationLoadBalancerSSLNegotiationPolicy]
@@ -5028,11 +5029,11 @@ func checkMixedProtocol(ports []v1.ServicePort) error {
 
 func checkProtocol(port v1.ServicePort, annotations map[string]string) error {
 	// nlb supports tcp, udp
-	if isNLB(annotations) && (port.Protocol == v1.ProtocolTCP || port.Protocol == v1.ProtocolUDP) {
+	if isNLB(annotations) && (port.Protocol == common.ProtocolTCP || port.Protocol == v1.ProtocolUDP) {
 		return nil
 	}
 	// elb only supports tcp
-	if !isNLB(annotations) && port.Protocol == v1.ProtocolTCP {
+	if !isNLB(annotations) && port.Protocol == common.ProtocolTCP {
 		return nil
 	}
 	return fmt.Errorf("Protocol %s not supported by LoadBalancer", port.Protocol)

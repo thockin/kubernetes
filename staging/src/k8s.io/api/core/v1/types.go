@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	"k8s.io/api/common"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -939,15 +940,15 @@ const (
 )
 
 // Protocol defines network protocols supported for things like container ports.
-type Protocol string
+type Protocol = common.Protocol
 
 const (
 	// ProtocolTCP is the TCP protocol.
-	ProtocolTCP Protocol = "TCP"
+	ProtocolTCP = common.ProtocolTCP
 	// ProtocolUDP is the UDP protocol.
-	ProtocolUDP Protocol = "UDP"
+	ProtocolUDP = common.ProtocolUDP
 	// ProtocolSCTP is the SCTP protocol.
-	ProtocolSCTP Protocol = "SCTP"
+	ProtocolSCTP = common.ProtocolSCTP
 )
 
 // Represents a Persistent Disk resource in Google Compute Engine.
@@ -1856,7 +1857,7 @@ type ContainerPort struct {
 	// Defaults to "TCP".
 	// +optional
 	// +default="TCP"
-	Protocol Protocol `json:"protocol,omitempty" protobuf:"bytes,4,opt,name=protocol,casttype=Protocol"`
+	Protocol common.Protocol `json:"protocol,omitempty" protobuf:"bytes,4,opt,name=protocol,casttype=Protocol"`
 	// What host IP to bind the external port to.
 	// +optional
 	HostIP string `json:"hostIP,omitempty" protobuf:"bytes,5,opt,name=hostIP"`
@@ -4427,7 +4428,7 @@ type ServicePort struct {
 	// Default is TCP.
 	// +default="TCP"
 	// +optional
-	Protocol Protocol `json:"protocol,omitempty" protobuf:"bytes,2,opt,name=protocol,casttype=Protocol"`
+	Protocol common.Protocol `json:"protocol,omitempty" protobuf:"bytes,2,opt,name=protocol,casttype=Protocol"`
 
 	// The application protocol for this port.
 	// This field follows standard Kubernetes label syntax.
@@ -4658,7 +4659,7 @@ type EndpointPort struct {
 	// Must be UDP, TCP, or SCTP.
 	// Default is TCP.
 	// +optional
-	Protocol Protocol `json:"protocol,omitempty" protobuf:"bytes,3,opt,name=protocol,casttype=Protocol"`
+	Protocol common.Protocol `json:"protocol,omitempty" protobuf:"bytes,3,opt,name=protocol,casttype=Protocol"`
 
 	// The application protocol for this port.
 	// This field follows standard Kubernetes label syntax.
@@ -6440,7 +6441,7 @@ type PortStatus struct {
 	Port int32 `json:"port" protobuf:"varint,1,opt,name=port"`
 	// Protocol is the protocol of the service port of which status is recorded here
 	// The supported values are: "TCP", "UDP", "SCTP"
-	Protocol Protocol `json:"protocol" protobuf:"bytes,2,opt,name=protocol,casttype=Protocol"`
+	Protocol common.Protocol `json:"protocol" protobuf:"bytes,2,opt,name=protocol,casttype=Protocol"`
 	// Error is to record the problem with the service port
 	// The format of the error shall comply with the following rules:
 	// - built-in error values shall be specified in this file and those shall use

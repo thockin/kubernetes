@@ -27,6 +27,7 @@ import (
 	"time"
 
 	libcontaineruserns "github.com/opencontainers/runc/libcontainer/userns"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -119,7 +120,7 @@ func logTimeout(err error) bool {
 }
 
 // ProxySocketFunc is a function which constructs a ProxySocket from a protocol, ip, and port
-type ProxySocketFunc func(protocol v1.Protocol, ip net.IP, port int) (ProxySocket, error)
+type ProxySocketFunc func(protocol common.Protocol, ip net.IP, port int) (ProxySocket, error)
 
 const numBurstSyncs int = 2
 
@@ -450,7 +451,7 @@ func (proxier *Proxier) getServiceInfo(service proxy.ServicePortName) (*ServiceI
 // addServiceOnPortInternal starts listening for a new service, returning the ServiceInfo.
 // Pass proxyPort=0 to allocate a random port. The timeout only applies to UDP
 // connections, for now.
-func (proxier *Proxier) addServiceOnPortInternal(service proxy.ServicePortName, protocol v1.Protocol, proxyPort int, timeout time.Duration) (*ServiceInfo, error) {
+func (proxier *Proxier) addServiceOnPortInternal(service proxy.ServicePortName, protocol common.Protocol, proxyPort int, timeout time.Duration) (*ServiceInfo, error) {
 	sock, err := proxier.makeProxySocket(protocol, proxier.listenIP, proxyPort)
 	if err != nil {
 		return nil, err
@@ -583,7 +584,7 @@ func (proxier *Proxier) unmergeService(service *v1.Service, existingPorts sets.S
 			continue
 		}
 
-		if proxier.serviceMap[serviceName].protocol == v1.ProtocolUDP {
+		if proxier.serviceMap[serviceName].protocol == common.ProtocolUDP {
 			staleUDPServices.Insert(proxier.serviceMap[serviceName].portal.ip.String())
 		}
 
@@ -594,7 +595,7 @@ func (proxier *Proxier) unmergeService(service *v1.Service, existingPorts sets.S
 		info.setFinished()
 	}
 	for _, svcIP := range staleUDPServices.UnsortedList() {
-		if err := conntrack.ClearEntriesForIP(proxier.exec, svcIP, v1.ProtocolUDP); err != nil {
+		if err := conntrack.ClearEntriesForIP(proxier.exec, svcIP, common.ProtocolUDP); err != nil {
 			klog.ErrorS(err, "Failed to delete stale service IP connections", "ip", svcIP)
 		}
 	}
@@ -766,7 +767,7 @@ func (proxier *Proxier) openPortal(service proxy.ServicePortName, info *ServiceI
 	return nil
 }
 
-func (proxier *Proxier) openOnePortal(portal portal, protocol v1.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) error {
+func (proxier *Proxier) openOnePortal(portal portal, protocol common.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) error {
 	if proxier.localAddrs.Has(portal.ip) {
 		err := proxier.claimNodePort(portal.ip, portal.port, protocol, name)
 		if err != nil {
@@ -823,7 +824,7 @@ func (proxier *Proxier) openOnePortal(portal portal, protocol v1.Protocol, proxy
 
 // Marks a port as being owned by a particular service, or returns error if already claimed.
 // Idempotent: reclaiming with the same owner is not an error
-func (proxier *Proxier) claimNodePort(ip net.IP, port int, protocol v1.Protocol, owner proxy.ServicePortName) error {
+func (proxier *Proxier) claimNodePort(ip net.IP, port int, protocol common.Protocol, owner proxy.ServicePortName) error {
 	proxier.portMapMutex.Lock()
 	defer proxier.portMapMutex.Unlock()
 
@@ -856,7 +857,7 @@ func (proxier *Proxier) claimNodePort(ip net.IP, port int, protocol v1.Protocol,
 
 // Release a claim on a port.  Returns an error if the owner does not match the claim.
 // Tolerates release on an unclaimed port, to simplify .
-func (proxier *Proxier) releaseNodePort(ip net.IP, port int, protocol v1.Protocol, owner proxy.ServicePortName) error {
+func (proxier *Proxier) releaseNodePort(ip net.IP, port int, protocol common.Protocol, owner proxy.ServicePortName) error {
 	proxier.portMapMutex.Lock()
 	defer proxier.portMapMutex.Unlock()
 
@@ -875,7 +876,7 @@ func (proxier *Proxier) releaseNodePort(ip net.IP, port int, protocol v1.Protoco
 	return nil
 }
 
-func (proxier *Proxier) openNodePort(nodePort int, protocol v1.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) error {
+func (proxier *Proxier) openNodePort(nodePort int, protocol common.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) error {
 	// TODO: Do we want to allow containers to access public services?  Probably yes.
 	// TODO: We could refactor this to be the same code as portal, but with IP == nil
 
@@ -941,7 +942,7 @@ func (proxier *Proxier) closePortal(service proxy.ServicePortName, info *Service
 	return utilerrors.NewAggregate(el)
 }
 
-func (proxier *Proxier) closeOnePortal(portal portal, protocol v1.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) []error {
+func (proxier *Proxier) closeOnePortal(portal portal, protocol common.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) []error {
 	el := []error{}
 	if proxier.localAddrs.Has(portal.ip) {
 		if err := proxier.releaseNodePort(portal.ip, portal.port, protocol, name); err != nil {
@@ -981,7 +982,7 @@ func (proxier *Proxier) closeOnePortal(portal portal, protocol v1.Protocol, prox
 	return el
 }
 
-func (proxier *Proxier) closeNodePort(nodePort int, protocol v1.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) []error {
+func (proxier *Proxier) closeNodePort(nodePort int, protocol common.Protocol, proxyIP net.IP, proxyPort int, name proxy.ServicePortName) []error {
 	el := []error{}
 
 	// Handle traffic from containers.
@@ -1123,7 +1124,7 @@ var zeroIPv6 = netutils.ParseIPSloppy("::")
 var localhostIPv6 = netutils.ParseIPSloppy("::1")
 
 // Build a slice of iptables args that are common to from-container and from-host portal rules.
-func iptablesCommonPortalArgs(destIP net.IP, addPhysicalInterfaceMatch bool, addDstLocalMatch bool, destPort int, protocol v1.Protocol, service proxy.ServicePortName) []string {
+func iptablesCommonPortalArgs(destIP net.IP, addPhysicalInterfaceMatch bool, addDstLocalMatch bool, destPort int, protocol common.Protocol, service proxy.ServicePortName) []string {
 	// This list needs to include all fields as they are eventually spit out
 	// by iptables-save.  This is because some systems do not support the
 	// 'iptables -C' arg, and so fall back on parsing iptables-save output.
@@ -1156,7 +1157,7 @@ func iptablesCommonPortalArgs(destIP net.IP, addPhysicalInterfaceMatch bool, add
 }
 
 // Build a slice of iptables args for a from-container portal rule.
-func (proxier *Proxier) iptablesContainerPortalArgs(destIP net.IP, addPhysicalInterfaceMatch bool, addDstLocalMatch bool, destPort int, protocol v1.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
+func (proxier *Proxier) iptablesContainerPortalArgs(destIP net.IP, addPhysicalInterfaceMatch bool, addDstLocalMatch bool, destPort int, protocol common.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
 	args := iptablesCommonPortalArgs(destIP, addPhysicalInterfaceMatch, addDstLocalMatch, destPort, protocol, service)
 
 	// This is tricky.
@@ -1203,7 +1204,7 @@ func (proxier *Proxier) iptablesContainerPortalArgs(destIP net.IP, addPhysicalIn
 }
 
 // Build a slice of iptables args for a from-host portal rule.
-func (proxier *Proxier) iptablesHostPortalArgs(destIP net.IP, addDstLocalMatch bool, destPort int, protocol v1.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
+func (proxier *Proxier) iptablesHostPortalArgs(destIP net.IP, addDstLocalMatch bool, destPort int, protocol common.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
 	args := iptablesCommonPortalArgs(destIP, false, addDstLocalMatch, destPort, protocol, service)
 
 	// This is tricky.
@@ -1238,7 +1239,7 @@ func (proxier *Proxier) iptablesHostPortalArgs(destIP net.IP, addDstLocalMatch b
 // Build a slice of iptables args for a from-host public-port rule.
 // See iptablesHostPortalArgs
 // TODO: Should we just reuse iptablesHostPortalArgs?
-func (proxier *Proxier) iptablesHostNodePortArgs(nodePort int, protocol v1.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
+func (proxier *Proxier) iptablesHostNodePortArgs(nodePort int, protocol common.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
 	args := iptablesCommonPortalArgs(nil, false, false, nodePort, protocol, service)
 
 	if proxyIP.Equal(zeroIPv4) || proxyIP.Equal(zeroIPv6) {
@@ -1250,7 +1251,7 @@ func (proxier *Proxier) iptablesHostNodePortArgs(nodePort int, protocol v1.Proto
 }
 
 // Build a slice of iptables args for an from-non-local public-port rule.
-func (proxier *Proxier) iptablesNonLocalNodePortArgs(nodePort int, protocol v1.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
+func (proxier *Proxier) iptablesNonLocalNodePortArgs(nodePort int, protocol common.Protocol, proxyIP net.IP, proxyPort int, service proxy.ServicePortName) []string {
 	args := iptablesCommonPortalArgs(nil, false, false, proxyPort, protocol, service)
 	args = append(args, "-m", "state", "--state", "NEW", "-j", "ACCEPT")
 	return args

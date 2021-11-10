@@ -22,6 +22,7 @@ limitations under the License.
 package v1beta1
 
 import (
+	common "k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -909,7 +910,7 @@ func (in *NetworkPolicyPort) DeepCopyInto(out *NetworkPolicyPort) {
 	*out = *in
 	if in.Protocol != nil {
 		in, out := &in.Protocol, &out.Protocol
-		*out = new(corev1.Protocol)
+		*out = new(common.Protocol)
 		**out = **in
 	}
 	if in.Port != nil {

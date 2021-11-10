@@ -27,6 +27,7 @@ import (
 	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -86,7 +87,7 @@ func (info *BaseServiceInfo) StickyMaxAgeSeconds() int {
 }
 
 // Protocol is part of ServicePort interface.
-func (info *BaseServiceInfo) Protocol() v1.Protocol {
+func (info *BaseServiceInfo) Protocol() common.Protocol {
 	return info.protocol
 }
 
@@ -442,7 +443,7 @@ func (sm *ServiceMap) unmerge(other ServiceMap, UDPStaleClusterIP sets.String) {
 		info, exists := (*sm)[svcPortName]
 		if exists {
 			klog.V(1).InfoS("Removing service port", "portName", svcPortName)
-			if info.Protocol() == v1.ProtocolUDP {
+			if info.Protocol() == common.ProtocolUDP {
 				UDPStaleClusterIP.Insert(info.ClusterIP().String())
 			}
 			delete(*sm, svcPortName)

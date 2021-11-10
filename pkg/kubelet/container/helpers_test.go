@@ -24,6 +24,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -549,7 +550,7 @@ func TestHasPrivilegedContainer(t *testing.T) {
 }
 
 func TestMakePortMappings(t *testing.T) {
-	port := func(name string, protocol v1.Protocol, containerPort, hostPort int32, ip string) v1.ContainerPort {
+	port := func(name string, protocol common.Protocol, containerPort, hostPort int32, ip string) v1.ContainerPort {
 		return v1.ContainerPort{
 			Name:          name,
 			Protocol:      protocol,
@@ -558,7 +559,7 @@ func TestMakePortMappings(t *testing.T) {
 			HostIP:        ip,
 		}
 	}
-	portMapping := func(protocol v1.Protocol, containerPort, hostPort int, ip string) PortMapping {
+	portMapping := func(protocol common.Protocol, containerPort, hostPort int, ip string) PortMapping {
 		return PortMapping{
 			Protocol:      protocol,
 			ContainerPort: containerPort,
@@ -575,23 +576,23 @@ func TestMakePortMappings(t *testing.T) {
 			&v1.Container{
 				Name: "fooContainer",
 				Ports: []v1.ContainerPort{
-					port("", v1.ProtocolTCP, 80, 8080, "127.0.0.1"),
-					port("", v1.ProtocolTCP, 443, 4343, "192.168.0.1"),
-					port("foo", v1.ProtocolUDP, 555, 5555, ""),
+					port("", common.ProtocolTCP, 80, 8080, "127.0.0.1"),
+					port("", common.ProtocolTCP, 443, 4343, "192.168.0.1"),
+					port("foo", common.ProtocolUDP, 555, 5555, ""),
 					// Duplicated, should be ignored.
-					port("foo", v1.ProtocolUDP, 888, 8888, ""),
+					port("foo", common.ProtocolUDP, 888, 8888, ""),
 					// Duplicated with different address family, shouldn't be ignored
-					port("", v1.ProtocolTCP, 80, 8080, "::"),
+					port("", common.ProtocolTCP, 80, 8080, "::"),
 					// No address family specified
-					port("", v1.ProtocolTCP, 1234, 5678, ""),
+					port("", common.ProtocolTCP, 1234, 5678, ""),
 				},
 			},
 			[]PortMapping{
-				portMapping(v1.ProtocolTCP, 80, 8080, "127.0.0.1"),
-				portMapping(v1.ProtocolTCP, 443, 4343, "192.168.0.1"),
-				portMapping(v1.ProtocolUDP, 555, 5555, ""),
-				portMapping(v1.ProtocolTCP, 80, 8080, "::"),
-				portMapping(v1.ProtocolTCP, 1234, 5678, ""),
+				portMapping(common.ProtocolTCP, 80, 8080, "127.0.0.1"),
+				portMapping(common.ProtocolTCP, 443, 4343, "192.168.0.1"),
+				portMapping(common.ProtocolUDP, 555, 5555, ""),
+				portMapping(common.ProtocolTCP, 80, 8080, "::"),
+				portMapping(common.ProtocolTCP, 1234, 5678, ""),
 			},
 		},
 		{
@@ -599,13 +600,13 @@ func TestMakePortMappings(t *testing.T) {
 			&v1.Container{
 				Name: "fooContainer",
 				Ports: []v1.ContainerPort{
-					port("", v1.ProtocolTCP, 443, 4343, "192.168.0.1"),
-					port("", v1.ProtocolTCP, 4343, 4343, "192.168.0.1"),
+					port("", common.ProtocolTCP, 443, 4343, "192.168.0.1"),
+					port("", common.ProtocolTCP, 4343, 4343, "192.168.0.1"),
 				},
 			},
 			[]PortMapping{
-				portMapping(v1.ProtocolTCP, 443, 4343, "192.168.0.1"),
-				portMapping(v1.ProtocolTCP, 4343, 4343, "192.168.0.1"),
+				portMapping(common.ProtocolTCP, 443, 4343, "192.168.0.1"),
+				portMapping(common.ProtocolTCP, 4343, 4343, "192.168.0.1"),
 			},
 		},
 		{
@@ -613,12 +614,12 @@ func TestMakePortMappings(t *testing.T) {
 			&v1.Container{
 				Name: "fooContainer",
 				Ports: []v1.ContainerPort{
-					port("", v1.ProtocolTCP, 443, 4343, ""),
-					port("", v1.ProtocolTCP, 443, 4343, ""),
+					port("", common.ProtocolTCP, 443, 4343, ""),
+					port("", common.ProtocolTCP, 443, 4343, ""),
 				},
 			},
 			[]PortMapping{
-				portMapping(v1.ProtocolTCP, 443, 4343, ""),
+				portMapping(common.ProtocolTCP, 443, 4343, ""),
 			},
 		},
 		{
@@ -626,13 +627,13 @@ func TestMakePortMappings(t *testing.T) {
 			&v1.Container{
 				Name: "fooContainer",
 				Ports: []v1.ContainerPort{
-					port("", v1.ProtocolTCP, 443, 4343, "192.168.0.1"),
-					port("", v1.ProtocolTCP, 443, 4343, "172.16.0.1"),
+					port("", common.ProtocolTCP, 443, 4343, "192.168.0.1"),
+					port("", common.ProtocolTCP, 443, 4343, "172.16.0.1"),
 				},
 			},
 			[]PortMapping{
-				portMapping(v1.ProtocolTCP, 443, 4343, "192.168.0.1"),
-				portMapping(v1.ProtocolTCP, 443, 4343, "172.16.0.1"),
+				portMapping(common.ProtocolTCP, 443, 4343, "192.168.0.1"),
+				portMapping(common.ProtocolTCP, 443, 4343, "172.16.0.1"),
 			},
 		},
 	}

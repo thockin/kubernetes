@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"testing"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -43,12 +44,12 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 1, 3, 999, 999, []string{"host1", "host2"}, []*int32{utilpointer.Int32Ptr(80), utilpointer.Int32Ptr(443)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: true, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.3:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 				},
-				makeServicePortName("ns1", "svc1", "port-1", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-1", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:443", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:443", IsLocal: true, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.3:443", IsLocal: false, Ready: true, Serving: true, Terminating: false},
@@ -62,7 +63,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 2, 3, 999, 999, []string{}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.3:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
@@ -81,7 +82,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 1, 4, 999, 999, []string{}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.3:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
@@ -100,7 +101,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 1, 10, 6, 999, []string{}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.10:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
@@ -122,7 +123,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 1, 10, 6, 5, []string{}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.10:80", IsLocal: false, Ready: false, Serving: true, Terminating: true},
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
@@ -143,7 +144,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 1, 10, 1, 999, []string{}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.10:80", IsLocal: false, Ready: false, Serving: false, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: false, Serving: false, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: false, Ready: false, Serving: false, Terminating: false},
@@ -165,7 +166,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSlice("svc1", "ns2", 3, 3, 999, 999, []string{}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.3:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
@@ -192,7 +193,7 @@ func TestEndpointsMapFromESC(t *testing.T) {
 				generateEndpointSliceWithOffset("svc1", "ns1", 2, 1, 2, 999, 999, []string{"host1", "host2"}, []*int32{utilpointer.Int32Ptr(8080)}),
 			},
 			expectedMap: map[ServicePortName][]*BaseEndpointInfo{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:80", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.1:8080", IsLocal: false, Ready: true, Serving: true, Terminating: false},
 					&BaseEndpointInfo{Endpoint: "10.0.1.2:80", IsLocal: true, Ready: true, Serving: true, Terminating: false},
@@ -231,7 +232,7 @@ func TestEndpointInfoByServicePort(t *testing.T) {
 				generateEndpointSlice("svc1", "ns1", 1, 3, 999, 999, []string{"host1", "host2"}, []*int32{utilpointer.Int32Ptr(80)}),
 			},
 			expectedMap: spToEndpointMap{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					"10.0.1.1:80": &BaseEndpointInfo{
 						Endpoint:    "10.0.1.1:80",
 						IsLocal:     false,
@@ -267,7 +268,7 @@ func TestEndpointInfoByServicePort(t *testing.T) {
 				generateEndpointSliceWithOffset("svc1", "ns1", 2, 1, 2, 999, 999, []string{"host1", "host2"}, []*int32{utilpointer.Int32Ptr(8080)}),
 			},
 			expectedMap: spToEndpointMap{
-				makeServicePortName("ns1", "svc1", "port-0", v1.ProtocolTCP): {
+				makeServicePortName("ns1", "svc1", "port-0", common.ProtocolTCP): {
 					"10.0.1.1:80": &BaseEndpointInfo{
 						Endpoint:    "10.0.1.1:80",
 						IsLocal:     false,
@@ -324,7 +325,7 @@ func TestEndpointInfoByServicePort(t *testing.T) {
 func TestEsInfoChanged(t *testing.T) {
 	p80 := int32(80)
 	p443 := int32(443)
-	tcpProto := v1.ProtocolTCP
+	tcpProto := common.ProtocolTCP
 	port80 := discovery.EndpointPort{Port: &p80, Name: utilpointer.StringPtr("http"), Protocol: &tcpProto}
 	port443 := discovery.EndpointPort{Port: &p443, Name: utilpointer.StringPtr("https"), Protocol: &tcpProto}
 	endpoint1 := discovery.Endpoint{Addresses: []string{"10.0.1.0"}}
@@ -461,7 +462,7 @@ func TestEsInfoChanged(t *testing.T) {
 }
 
 func generateEndpointSliceWithOffset(serviceName, namespace string, sliceNum, offset, numEndpoints, unreadyMod int, terminatingMod int, hosts []string, portNums []*int32) *discovery.EndpointSlice {
-	tcpProtocol := v1.ProtocolTCP
+	tcpProtocol := common.ProtocolTCP
 
 	endpointSlice := &discovery.EndpointSlice{
 		ObjectMeta: metav1.ObjectMeta{

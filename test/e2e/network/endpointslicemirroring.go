@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -57,7 +58,7 @@ var _ = common.SIGDescribe("EndpointSliceMirroring", func() {
 				Ports: []v1.ServicePort{{
 					Name:     "example",
 					Port:     80,
-					Protocol: v1.ProtocolTCP,
+					Protocol: apicommon.ProtocolTCP,
 				}},
 			},
 		})

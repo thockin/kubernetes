@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,29 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+package common
 
-import (
-	"k8s.io/api/common"
-	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
-	"k8s.io/apimachinery/pkg/runtime"
+// Protocol defines an IP protocol.
+type Protocol string
+
+const (
+	// ProtocolTCP is the TCP protocol.
+	ProtocolTCP Protocol = "TCP"
+	// ProtocolUDP is the UDP protocol.
+	ProtocolUDP Protocol = "UDP"
+	// ProtocolSCTP is the SCTP protocol.
+	ProtocolSCTP Protocol = "SCTP"
 )
-
-var (
-	defaultPortName = ""
-	defaultProtocol = common.ProtocolTCP
-)
-
-func addDefaultingFuncs(scheme *runtime.Scheme) error {
-	return RegisterDefaults(scheme)
-}
-
-func SetDefaults_EndpointPort(obj *discoveryv1beta1.EndpointPort) {
-	if obj.Name == nil {
-		obj.Name = &defaultPortName
-	}
-
-	if obj.Protocol == nil {
-		obj.Protocol = &defaultProtocol
-	}
-}

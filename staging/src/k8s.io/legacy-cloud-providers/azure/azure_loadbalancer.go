@@ -32,6 +32,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2019-06-01/network"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -1670,7 +1671,7 @@ func (az *Cloud) reconcileLoadBalancerRule(
 					NumberOfProbes:    to.Int32Ptr(2),
 				},
 			})
-		} else if port.Protocol != v1.ProtocolUDP && port.Protocol != v1.ProtocolSCTP {
+		} else if port.Protocol != common.ProtocolUDP && port.Protocol != v1.ProtocolSCTP {
 			// we only add the expected probe if we're doing TCP
 			if probeProtocol == "" {
 				probeProtocol = string(*probeProto)
@@ -1719,7 +1720,7 @@ func (az *Cloud) reconcileLoadBalancerRule(
 			},
 		}
 
-		if port.Protocol == v1.ProtocolTCP {
+		if port.Protocol == common.ProtocolTCP {
 			expectedRule.LoadBalancingRulePropertiesFormat.IdleTimeoutInMinutes = lbIdleTimeout
 		}
 
@@ -1734,7 +1735,7 @@ func (az *Cloud) reconcileLoadBalancerRule(
 
 		// we didn't construct the probe objects for UDP or SCTP because they're not allowed on Azure.
 		// However, when externalTrafficPolicy is Local, Kubernetes HTTP health check would be used for probing.
-		if servicehelpers.NeedsHealthCheck(service) || (port.Protocol != v1.ProtocolUDP && port.Protocol != v1.ProtocolSCTP) {
+		if servicehelpers.NeedsHealthCheck(service) || (port.Protocol != common.ProtocolUDP && port.Protocol != v1.ProtocolSCTP) {
 			expectedRule.Probe = &network.SubResource{
 				ID: to.StringPtr(az.getLoadBalancerProbeID(lbName, az.getLoadBalancerResourceGroup(), lbRuleName)),
 			}

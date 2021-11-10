@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/common"
 	discovery "k8s.io/api/discovery/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
@@ -31,8 +31,8 @@ import (
 func TestSetDefaultEndpointPort(t *testing.T) {
 	emptyStr := ""
 	fooStr := "foo"
-	protoTCP := v1.ProtocolTCP
-	protoUDP := v1.ProtocolUDP
+	protoTCP := common.ProtocolTCP
+	protoUDP := common.ProtocolUDP
 
 	tests := map[string]struct {
 		original *discovery.EndpointSlice

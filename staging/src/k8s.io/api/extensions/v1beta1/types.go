@@ -18,6 +18,7 @@ package v1beta1
 
 import (
 	appsv1beta1 "k8s.io/api/apps/v1beta1"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -1480,7 +1481,7 @@ type NetworkPolicyPort struct {
 	// Optional.  The protocol (TCP, UDP, or SCTP) which traffic must match.
 	// If not specified, this field defaults to TCP.
 	// +optional
-	Protocol *v1.Protocol `json:"protocol,omitempty" protobuf:"bytes,1,opt,name=protocol,casttype=k8s.io/api/core/v1.Protocol"`
+	Protocol *common.Protocol `json:"protocol,omitempty" protobuf:"bytes,1,opt,name=protocol,casttype=k8s.io/api/core/v1.Protocol"`
 
 	// The port on the given protocol. This can either be a numerical or named
 	// port on a pod. If this field is not provided, this matches all port names and

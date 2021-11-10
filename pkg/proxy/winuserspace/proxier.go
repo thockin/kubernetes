@@ -28,6 +28,7 @@ import (
 	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	utilnet "k8s.io/apimachinery/pkg/util/net"
@@ -206,7 +207,7 @@ func (proxier *Proxier) setServiceInfo(service ServicePortPortalName, info *serv
 
 // addServicePortPortal starts listening for a new service, returning the serviceInfo.
 // The timeout only applies to UDP connections, for now.
-func (proxier *Proxier) addServicePortPortal(servicePortPortalName ServicePortPortalName, protocol v1.Protocol, listenIP string, port int, timeout time.Duration) (*serviceInfo, error) {
+func (proxier *Proxier) addServicePortPortal(servicePortPortalName ServicePortPortalName, protocol common.Protocol, listenIP string, port int, timeout time.Duration) (*serviceInfo, error) {
 	var serviceIP net.IP
 	if listenIP != allAvailableInterfaces {
 		if serviceIP = netutils.ParseIPSloppy(listenIP); serviceIP == nil {
@@ -458,7 +459,7 @@ func (proxier *Proxier) OnEndpointsSynced() {
 	proxier.loadBalancer.OnEndpointsSynced()
 }
 
-func sameConfig(info *serviceInfo, service *v1.Service, protocol v1.Protocol, listenPort int) bool {
+func sameConfig(info *serviceInfo, service *v1.Service, protocol common.Protocol, listenPort int) bool {
 	return info.protocol == protocol && info.portal.port == listenPort && info.sessionAffinityType == service.Spec.SessionAffinity
 }
 

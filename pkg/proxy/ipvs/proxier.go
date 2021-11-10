@@ -36,6 +36,7 @@ import (
 	utilexec "k8s.io/utils/exec"
 	netutils "k8s.io/utils/net"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -1227,7 +1228,7 @@ func (proxier *Proxier) syncProxyRules() {
 			// If the "external" IP happens to be an IP that is local to this
 			// machine, hold the local port open so no other process can open it
 			// (because the socket might open but it would never work).
-			if (svcInfo.Protocol() != v1.ProtocolSCTP) && localAddrSet.Has(netutils.ParseIPSloppy(externalIP)) {
+			if (svcInfo.Protocol() != common.ProtocolSCTP) && localAddrSet.Has(netutils.ParseIPSloppy(externalIP)) {
 				// We do not start listening on SCTP ports, according to our agreement in the SCTP support KEP
 				lp := netutils.LocalPort{
 					Description: "externalIP for " + svcNameString,
@@ -1439,7 +1440,7 @@ func (proxier *Proxier) syncProxyRules() {
 					replacementPortsMap[lp] = proxier.portsMap[lp]
 					// We do not start listening on SCTP ports, according to our agreement in the
 					// SCTP support KEP
-				} else if svcInfo.Protocol() != v1.ProtocolSCTP {
+				} else if svcInfo.Protocol() != common.ProtocolSCTP {
 					socket, err := proxier.portMapper.OpenLocalPort(&lp)
 					if err != nil {
 						msg := fmt.Sprintf("can't open port %s, skipping it", lp.String())
@@ -1457,7 +1458,7 @@ func (proxier *Proxier) syncProxyRules() {
 					klog.V(2).InfoS("Opened local port", "port", lp)
 
 					if lp.Protocol == netutils.UDP {
-						conntrack.ClearEntriesForPort(proxier.exec, lp.Port, isIPv6, v1.ProtocolUDP)
+						conntrack.ClearEntriesForPort(proxier.exec, lp.Port, isIPv6, common.ProtocolUDP)
 					}
 					replacementPortsMap[lp] = socket
 				} // We're holding the port, so it's OK to install ipvs rules.
@@ -1670,7 +1671,7 @@ func (proxier *Proxier) syncProxyRules() {
 	// Finish housekeeping.
 	// TODO: these could be made more consistent.
 	for _, svcIP := range staleServices.UnsortedList() {
-		if err := conntrack.ClearEntriesForIP(proxier.exec, svcIP, v1.ProtocolUDP); err != nil {
+		if err := conntrack.ClearEntriesForIP(proxier.exec, svcIP, common.ProtocolUDP); err != nil {
 			klog.ErrorS(err, "Failed to delete stale service IP connections", "IP", svcIP)
 		}
 	}

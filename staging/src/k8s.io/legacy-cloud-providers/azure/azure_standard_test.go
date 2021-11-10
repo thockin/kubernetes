@@ -31,6 +31,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -325,7 +326,7 @@ func TestGetLoadBalancingRuleName(t *testing.T) {
 			subnetName:    "shortsubnet",
 			isInternal:    true,
 			useStandardLB: true,
-			protocol:      v1.ProtocolTCP,
+			protocol:      common.ProtocolTCP,
 			port:          9000,
 			expected:      "a257b965551374ad2b091ef3f07043ad-shortsubnet-TCP-9000",
 		},
@@ -334,7 +335,7 @@ func TestGetLoadBalancingRuleName(t *testing.T) {
 			subnetName:    "averylonnnngggnnnnnnnnnnnnnnnnnnnnnngggggggggggggggggggggggggggggggggggggsubet",
 			isInternal:    true,
 			useStandardLB: true,
-			protocol:      v1.ProtocolTCP,
+			protocol:      common.ProtocolTCP,
 			port:          9000,
 			expected:      "a257b965551374ad2b091ef3f07043ad-averylonnnngggnnnnnnnnnnnnnnnnnnnnnngg-TCP-9000",
 		},
@@ -343,7 +344,7 @@ func TestGetLoadBalancingRuleName(t *testing.T) {
 			subnetName:    "averylonnnngggnnnnnnnnnnnnnnnnnnnnnngggggggggggggggggggggggggggggggggggggsubet",
 			isInternal:    true,
 			useStandardLB: false,
-			protocol:      v1.ProtocolTCP,
+			protocol:      common.ProtocolTCP,
 			port:          9000,
 			expected:      "a257b965551374ad2b091ef3f07043ad-averylonnnngggnnnnnnnnnnnnnnnnnnnnnngg-TCP-9000",
 		},
@@ -352,7 +353,7 @@ func TestGetLoadBalancingRuleName(t *testing.T) {
 			subnetName:    "shortsubnet",
 			isInternal:    false,
 			useStandardLB: true,
-			protocol:      v1.ProtocolTCP,
+			protocol:      common.ProtocolTCP,
 			port:          9000,
 			expected:      "a257b965551374ad2b091ef3f07043ad-TCP-9000",
 		},
@@ -361,7 +362,7 @@ func TestGetLoadBalancingRuleName(t *testing.T) {
 			subnetName:    "shortsubnet",
 			isInternal:    false,
 			useStandardLB: false,
-			protocol:      v1.ProtocolTCP,
+			protocol:      common.ProtocolTCP,
 			port:          9000,
 			expected:      "a257b965551374ad2b091ef3f07043ad-TCP-9000",
 		},
@@ -545,21 +546,21 @@ func TestGetProtocolsFromKubernetesProtocol(t *testing.T) {
 	}{
 		{
 			Name:                       "getProtocolsFromKubernetesProtocol should get TCP protocol",
-			protocol:                   v1.ProtocolTCP,
+			protocol:                   common.ProtocolTCP,
 			expectedTransportProto:     network.TransportProtocolTCP,
 			expectedSecurityGroupProto: network.SecurityRuleProtocolTCP,
 			expectedProbeProto:         network.ProbeProtocolTCP,
 		},
 		{
 			Name:                       "getProtocolsFromKubernetesProtocol should get UDP protocol",
-			protocol:                   v1.ProtocolUDP,
+			protocol:                   common.ProtocolUDP,
 			expectedTransportProto:     network.TransportProtocolUDP,
 			expectedSecurityGroupProto: network.SecurityRuleProtocolUDP,
 			nilProbeProto:              true,
 		},
 		{
 			Name:           "getProtocolsFromKubernetesProtocol should report error",
-			protocol:       v1.ProtocolSCTP,
+			protocol:       common.ProtocolSCTP,
 			expectedErrMsg: fmt.Errorf("only TCP and UDP are supported for Azure LoadBalancers"),
 		},
 	}
@@ -833,13 +834,13 @@ func TestGetBackendPoolName(t *testing.T) {
 	}{
 		{
 			name:             "GetBackendPoolName should return <clusterName>-IPv6",
-			service:          getTestService("test1", v1.ProtocolTCP, nil, true, 80),
+			service:          getTestService("test1", common.ProtocolTCP, nil, true, 80),
 			clusterName:      "azure",
 			expectedPoolName: "azure-IPv6",
 		},
 		{
 			name:             "GetBackendPoolName should return <clusterName>",
-			service:          getTestService("test1", v1.ProtocolTCP, nil, false, 80),
+			service:          getTestService("test1", common.ProtocolTCP, nil, false, 80),
 			clusterName:      "azure",
 			expectedPoolName: "azure",
 		},
@@ -1705,7 +1706,7 @@ func TestStandardEnsureBackendPoolDeleted(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	cloud := GetTestCloud(ctrl)
-	service := getTestService("test", v1.ProtocolTCP, nil, false, 80)
+	service := getTestService("test", common.ProtocolTCP, nil, false, 80)
 	backendPoolID := "backendPoolID"
 	vmSetName := "AS"
 

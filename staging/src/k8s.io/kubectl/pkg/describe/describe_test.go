@@ -29,6 +29,7 @@ import (
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	autoscalingv2beta2 "k8s.io/api/autoscaling/v2beta2"
 	batchv1 "k8s.io/api/batch/v1"
+	"k8s.io/api/common"
 	coordinationv1 "k8s.io/api/coordination/v1"
 	corev1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
@@ -389,7 +390,7 @@ func TestDescribeService(t *testing.T) {
 					Ports: []corev1.ServicePort{{
 						Name:       "port-tcp",
 						Port:       8080,
-						Protocol:   corev1.ProtocolTCP,
+						Protocol:   common.ProtocolTCP,
 						TargetPort: intstr.FromInt(9527),
 						NodePort:   31111,
 					}},
@@ -428,7 +429,7 @@ func TestDescribeService(t *testing.T) {
 					Ports: []corev1.ServicePort{{
 						Name:       "port-tcp",
 						Port:       8080,
-						Protocol:   corev1.ProtocolTCP,
+						Protocol:   common.ProtocolTCP,
 						TargetPort: intstr.FromString("targetPort"),
 						NodePort:   31111,
 					}},
@@ -467,7 +468,7 @@ func TestDescribeService(t *testing.T) {
 					Ports: []corev1.ServicePort{{
 						Name:       "port-tcp",
 						Port:       8080,
-						Protocol:   corev1.ProtocolTCP,
+						Protocol:   common.ProtocolTCP,
 						TargetPort: intstr.FromString("targetPort"),
 						NodePort:   31111,
 					}},
@@ -507,7 +508,7 @@ func TestDescribeService(t *testing.T) {
 					Ports: []corev1.ServicePort{{
 						Name:       "port-tcp",
 						Port:       8080,
-						Protocol:   corev1.ProtocolTCP,
+						Protocol:   common.ProtocolTCP,
 						TargetPort: intstr.FromString("targetPort"),
 						NodePort:   31111,
 					}},
@@ -4280,7 +4281,7 @@ Spec:
 
 	port80 := intstr.FromInt(80)
 	port82 := intstr.FromInt(82)
-	protoTCP := corev1.ProtocolTCP
+	protoTCP := common.ProtocolTCP
 
 	versionedFake := fake.NewSimpleClientset(&networkingv1.NetworkPolicy{
 		ObjectMeta: metav1.ObjectMeta{
@@ -4465,7 +4466,7 @@ Spec:
 
 	port80 := intstr.FromInt(80)
 	port82 := intstr.FromInt(82)
-	protoTCP := corev1.ProtocolTCP
+	protoTCP := common.ProtocolTCP
 
 	versionedFake := fake.NewSimpleClientset(&networkingv1.NetworkPolicy{
 		ObjectMeta: metav1.ObjectMeta{
@@ -4593,7 +4594,7 @@ Spec:
 
 	port80 := intstr.FromInt(80)
 	port82 := intstr.FromInt(82)
-	protoTCP := corev1.ProtocolTCP
+	protoTCP := common.ProtocolTCP
 
 	versionedFake := fake.NewSimpleClientset(&networkingv1.NetworkPolicy{
 		ObjectMeta: metav1.ObjectMeta{
@@ -4876,7 +4877,7 @@ func TestDescribeStatefulSet(t *testing.T) {
 }
 
 func TestDescribeEndpointSlice(t *testing.T) {
-	protocolTCP := corev1.ProtocolTCP
+	protocolTCP := common.ProtocolTCP
 	port80 := int32(80)
 
 	testcases := map[string]struct {

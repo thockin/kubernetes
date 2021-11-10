@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -1018,7 +1019,7 @@ func TestReconcileEndpointSlicesNamedPorts(t *testing.T) {
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{{
 				TargetPort: portNameIntStr,
-				Protocol:   corev1.ProtocolTCP,
+				Protocol:   common.ProtocolTCP,
 			}},
 			Selector:   map[string]string{"foo": "bar"},
 			IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
@@ -1034,7 +1035,7 @@ func TestReconcileEndpointSlicesNamedPorts(t *testing.T) {
 		pod.Spec.Containers[0].Ports = []corev1.ContainerPort{{
 			Name:          portNameIntStr.StrVal,
 			ContainerPort: int32(8080 + portOffset),
-			Protocol:      corev1.ProtocolTCP,
+			Protocol:      common.ProtocolTCP,
 		}}
 		pods = append(pods, pod)
 	}
@@ -1053,7 +1054,7 @@ func TestReconcileEndpointSlicesNamedPorts(t *testing.T) {
 	expectUnorderedSlicesWithLengths(t, fetchedSlices, []int{60, 60, 60, 60, 60})
 
 	// generate data structures for expected slice ports and address types
-	protoTCP := corev1.ProtocolTCP
+	protoTCP := common.ProtocolTCP
 	expectedSlices := []discovery.EndpointSlice{}
 	for i := range fetchedSlices {
 		expectedSlices = append(expectedSlices, discovery.EndpointSlice{

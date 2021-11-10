@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -339,7 +340,7 @@ func singleServiceLatency(f *framework.Framework, name string, q *endpointQuerie
 			GenerateName: "latency-svc-",
 		},
 		Spec: v1.ServiceSpec{
-			Ports:           []v1.ServicePort{{Protocol: v1.ProtocolTCP, Port: 80}},
+			Ports:           []v1.ServicePort{{Protocol: apicommon.ProtocolTCP, Port: 80}},
 			Selector:        map[string]string{"name": name},
 			Type:            v1.ServiceTypeClusterIP,
 			SessionAffinity: v1.ServiceAffinityNone,

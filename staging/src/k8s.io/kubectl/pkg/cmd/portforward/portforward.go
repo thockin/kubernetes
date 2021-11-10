@@ -29,6 +29,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -260,9 +261,9 @@ func checkUDPPortInService(ports []string, svc *corev1.Service) error {
 	for _, port := range svc.Spec.Ports {
 		portNum := int(port.Port)
 		switch port.Protocol {
-		case corev1.ProtocolUDP:
+		case common.ProtocolUDP:
 			udpPorts.Insert(portNum)
-		case corev1.ProtocolTCP:
+		case common.ProtocolTCP:
 			tcpPorts.Insert(portNum)
 		}
 	}
@@ -278,9 +279,9 @@ func checkUDPPortInPod(ports []string, pod *corev1.Pod) error {
 		for _, ctPort := range ct.Ports {
 			portNum := int(ctPort.ContainerPort)
 			switch ctPort.Protocol {
-			case corev1.ProtocolUDP:
+			case common.ProtocolUDP:
 				udpPorts.Insert(portNum)
-			case corev1.ProtocolTCP:
+			case common.ProtocolTCP:
 				tcpPorts.Insert(portNum)
 			}
 		}

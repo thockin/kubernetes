@@ -30,6 +30,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -370,7 +371,7 @@ func buildService(name, namespace, clusterIP, protocol string, port int) *v1.Ser
 		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{{
-				Protocol: v1.Protocol(protocol),
+				Protocol: common.Protocol(protocol),
 				Port:     int32(port),
 			}},
 			ClusterIP: clusterIP,

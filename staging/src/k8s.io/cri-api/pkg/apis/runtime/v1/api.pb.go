@@ -22,17 +22,18 @@ package v1
 import (
 	context "context"
 	fmt "fmt"
+	io "io"
+	math "math"
+	math_bits "math/bits"
+	reflect "reflect"
+	strings "strings"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-	reflect "reflect"
-	strings "strings"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -433,7 +434,7 @@ func (m *DNSConfig) GetOptions() []string {
 // PortMapping specifies the port mapping configurations of a sandbox.
 type PortMapping struct {
 	// Protocol of the port mapping.
-	Protocol Protocol `protobuf:"varint,1,opt,name=protocol,proto3,enum=runtime.v1.Protocol" json:"protocol,omitempty"`
+	Protocol Protocol `protobuf:"varint,1,opt,name=protocol,proto3,enum=runtime.common.Protocol" json:"protocol,omitempty"`
 	// Port number within the container. Default: 0 (not specified).
 	ContainerPort int32 `protobuf:"varint,2,opt,name=container_port,json=containerPort,proto3" json:"container_port,omitempty"`
 	// Port number on the host. Default: 0 (not specified).
@@ -7894,7 +7895,7 @@ func (m *ReopenContainerLogResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_ReopenContainerLogResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterEnum("runtime.v1.Protocol", Protocol_name, Protocol_value)
+	proto.RegisterEnum("runtime.common.Protocol", Protocol_name, Protocol_value)
 	proto.RegisterEnum("runtime.v1.MountPropagation", MountPropagation_name, MountPropagation_value)
 	proto.RegisterEnum("runtime.v1.NamespaceMode", NamespaceMode_name, NamespaceMode_value)
 	proto.RegisterEnum("runtime.v1.PodSandboxState", PodSandboxState_name, PodSandboxState_value)

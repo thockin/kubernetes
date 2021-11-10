@@ -19,6 +19,7 @@ package v1
 import (
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -117,7 +118,7 @@ func SetDefaults_Service(obj *v1.Service) {
 	for i := range obj.Spec.Ports {
 		sp := &obj.Spec.Ports[i]
 		if sp.Protocol == "" {
-			sp.Protocol = v1.ProtocolTCP
+			sp.Protocol = common.ProtocolTCP
 		}
 		if sp.TargetPort == intstr.FromInt(0) || sp.TargetPort == intstr.FromString("") {
 			sp.TargetPort = intstr.FromInt(int(sp.Port))
@@ -310,7 +311,7 @@ func SetDefaults_Endpoints(obj *v1.Endpoints) {
 		for i := range ss.Ports {
 			ep := &ss.Ports[i]
 			if ep.Protocol == "" {
-				ep.Protocol = v1.ProtocolTCP
+				ep.Protocol = common.ProtocolTCP
 			}
 		}
 	}

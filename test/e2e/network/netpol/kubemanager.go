@@ -26,6 +26,7 @@ import (
 	e2epod "k8s.io/kubernetes/test/e2e/framework/pod"
 	netutils "k8s.io/utils/net"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -116,7 +117,7 @@ func (k *kubeManager) getPod(ns string, name string) (*v1.Pod, error) {
 
 // probeConnectivity execs into a pod and checks its connectivity to another pod.
 // Implements the Prober interface.
-func (k *kubeManager) probeConnectivity(nsFrom string, podFrom string, containerFrom string, addrTo string, protocol v1.Protocol, toPort int, timeoutSeconds int) (bool, string, error) {
+func (k *kubeManager) probeConnectivity(nsFrom string, podFrom string, containerFrom string, addrTo string, protocol common.Protocol, toPort int, timeoutSeconds int) (bool, string, error) {
 	port := strconv.Itoa(toPort)
 	if addrTo == "" {
 		return false, "no IP provided", fmt.Errorf("empty addrTo field")
@@ -126,11 +127,11 @@ func (k *kubeManager) probeConnectivity(nsFrom string, podFrom string, container
 	timeout := fmt.Sprintf("--timeout=%vs", timeoutSeconds)
 
 	switch protocol {
-	case v1.ProtocolSCTP:
+	case common.ProtocolSCTP:
 		cmd = []string{"/agnhost", "connect", net.JoinHostPort(addrTo, port), timeout, "--protocol=sctp"}
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		cmd = []string{"/agnhost", "connect", net.JoinHostPort(addrTo, port), timeout, "--protocol=tcp"}
-	case v1.ProtocolUDP:
+	case common.ProtocolUDP:
 		cmd = []string{"/agnhost", "connect", net.JoinHostPort(addrTo, port), timeout, "--protocol=udp"}
 		if framework.NodeOSDistroIs("windows") {
 			framework.Logf("probing UDP for windows may result in cluster instability for certain windows nodes with low CPU/Memory, depending on CRI version")

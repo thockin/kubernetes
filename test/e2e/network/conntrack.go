@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/onsi/ginkgo"
+	apicommon "k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -135,7 +136,7 @@ var _ = common.SIGDescribe("Conntrack", func() {
 		udpService, err := udpJig.CreateUDPService(func(svc *v1.Service) {
 			svc.Spec.Type = v1.ServiceTypeNodePort
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "udp", Protocol: v1.ProtocolUDP, TargetPort: intstr.FromInt(80)},
+				{Port: 80, Name: "udp", Protocol: apicommon.ProtocolUDP, TargetPort: intstr.FromInt(80)},
 			}
 		})
 		framework.ExpectNoError(err)
@@ -211,7 +212,7 @@ var _ = common.SIGDescribe("Conntrack", func() {
 		udpService, err := udpJig.CreateUDPService(func(svc *v1.Service) {
 			svc.Spec.Type = v1.ServiceTypeClusterIP
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "udp", Protocol: v1.ProtocolUDP, TargetPort: intstr.FromInt(80)},
+				{Port: 80, Name: "udp", Protocol: apicommon.ProtocolUDP, TargetPort: intstr.FromInt(80)},
 			}
 		})
 		framework.ExpectNoError(err)
@@ -298,7 +299,7 @@ var _ = common.SIGDescribe("Conntrack", func() {
 		udpService, err := udpJig.CreateUDPService(func(svc *v1.Service) {
 			svc.Spec.Type = v1.ServiceTypeClusterIP
 			svc.Spec.Ports = []v1.ServicePort{
-				{Port: 80, Name: "udp", Protocol: v1.ProtocolUDP, TargetPort: intstr.FromInt(80)},
+				{Port: 80, Name: "udp", Protocol: apicommon.ProtocolUDP, TargetPort: intstr.FromInt(80)},
 			}
 		})
 		framework.ExpectNoError(err)
@@ -420,7 +421,7 @@ var _ = common.SIGDescribe("Conntrack", func() {
 				Selector: serverLabel,
 				Ports: []v1.ServicePort{
 					{
-						Protocol: v1.ProtocolTCP,
+						Protocol: apicommon.ProtocolTCP,
 						Port:     9000,
 					},
 				},

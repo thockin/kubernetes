@@ -25,6 +25,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -854,7 +855,7 @@ func TestCheckUDPPort(t *testing.T) {
 					Containers: []corev1.Container{
 						{
 							Ports: []corev1.ContainerPort{
-								{Protocol: corev1.ProtocolUDP, ContainerPort: 53},
+								{Protocol: common.ProtocolUDP, ContainerPort: 53},
 							},
 						},
 					},
@@ -870,7 +871,7 @@ func TestCheckUDPPort(t *testing.T) {
 					Containers: []corev1.Container{
 						{
 							Ports: []corev1.ContainerPort{
-								{Protocol: corev1.ProtocolUDP, ContainerPort: 53, Name: "dns"},
+								{Protocol: common.ProtocolUDP, ContainerPort: 53, Name: "dns"},
 							},
 						},
 					},
@@ -886,8 +887,8 @@ func TestCheckUDPPort(t *testing.T) {
 					Containers: []corev1.Container{
 						{
 							Ports: []corev1.ContainerPort{
-								{Protocol: corev1.ProtocolUDP, ContainerPort: 53},
-								{Protocol: corev1.ProtocolTCP, ContainerPort: 53},
+								{Protocol: common.ProtocolUDP, ContainerPort: 53},
+								{Protocol: common.ProtocolTCP, ContainerPort: 53},
 							},
 						},
 					},
@@ -902,8 +903,8 @@ func TestCheckUDPPort(t *testing.T) {
 					Containers: []corev1.Container{
 						{
 							Ports: []corev1.ContainerPort{
-								{Protocol: corev1.ProtocolTCP, ContainerPort: 53},
-								{Protocol: corev1.ProtocolUDP, ContainerPort: 53},
+								{Protocol: common.ProtocolTCP, ContainerPort: 53},
+								{Protocol: common.ProtocolUDP, ContainerPort: 53},
 							},
 						},
 					},
@@ -917,7 +918,7 @@ func TestCheckUDPPort(t *testing.T) {
 			service: &corev1.Service{
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
-						{Protocol: corev1.ProtocolUDP, Port: 53},
+						{Protocol: common.ProtocolUDP, Port: 53},
 					},
 				},
 			},
@@ -929,7 +930,7 @@ func TestCheckUDPPort(t *testing.T) {
 			service: &corev1.Service{
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
-						{Protocol: corev1.ProtocolUDP, Port: 53, Name: "dns"},
+						{Protocol: common.ProtocolUDP, Port: 53, Name: "dns"},
 					},
 				},
 			},
@@ -941,8 +942,8 @@ func TestCheckUDPPort(t *testing.T) {
 			service: &corev1.Service{
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
-						{Protocol: corev1.ProtocolUDP, Port: 53},
-						{Protocol: corev1.ProtocolTCP, Port: 53},
+						{Protocol: common.ProtocolUDP, Port: 53},
+						{Protocol: common.ProtocolTCP, Port: 53},
 					},
 				},
 			},
@@ -953,8 +954,8 @@ func TestCheckUDPPort(t *testing.T) {
 			service: &corev1.Service{
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
-						{Protocol: corev1.ProtocolTCP, Port: 53},
-						{Protocol: corev1.ProtocolUDP, Port: 53},
+						{Protocol: common.ProtocolTCP, Port: 53},
+						{Protocol: common.ProtocolUDP, Port: 53},
 					},
 				},
 			},

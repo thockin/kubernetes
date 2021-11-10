@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	"k8s.io/api/core/v1"
+	"k8s.io/api/common"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/pkg/proxy"
@@ -45,7 +45,7 @@ type ProxySocket interface {
 	ListenPort() int
 }
 
-func newProxySocket(protocol v1.Protocol, ip net.IP, port int) (ProxySocket, error) {
+func newProxySocket(protocol common.Protocol, ip net.IP, port int) (ProxySocket, error) {
 	host := ""
 	if ip != nil {
 		host = ip.String()

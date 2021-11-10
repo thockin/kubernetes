@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -64,7 +65,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -95,7 +96,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -127,7 +128,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       80,
 							TargetPort: intstr.FromInt(80),
 						},
@@ -158,7 +159,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -190,7 +191,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -223,7 +224,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -255,7 +256,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -313,7 +314,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -341,7 +342,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       90,
 							TargetPort: intstr.FromInt(90),
 						},
@@ -365,12 +366,12 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       80,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       443,
 							TargetPort: intstr.FromInt(443),
 						},
@@ -384,13 +385,13 @@ func TestRunExposeService(t *testing.T) {
 					Ports: []corev1.ServicePort{
 						{
 							Name:       "port-1",
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       80,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       443,
 							TargetPort: intstr.FromInt(443),
 						},
@@ -414,22 +415,22 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       80,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8080),
 						},
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       8081,
 							TargetPort: intstr.FromInt(8081),
 						},
 						{
-							Protocol:   corev1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							Port:       8082,
 							TargetPort: intstr.FromInt(8082),
 						},
@@ -443,25 +444,25 @@ func TestRunExposeService(t *testing.T) {
 					Ports: []corev1.ServicePort{
 						{
 							Name:       "port-1",
-							Protocol:   corev1.ProtocolTCP,
+							Protocol:   common.ProtocolTCP,
 							Port:       80,
 							TargetPort: intstr.FromInt(80),
 						},
 						{
 							Name:       "port-2",
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       8080,
 							TargetPort: intstr.FromInt(8080),
 						},
 						{
 							Name:       "port-3",
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       8081,
 							TargetPort: intstr.FromInt(8081),
 						},
 						{
 							Name:       "port-4",
-							Protocol:   corev1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							Port:       8082,
 							TargetPort: intstr.FromInt(8082),
 						},
@@ -492,7 +493,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -523,7 +524,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -554,7 +555,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -586,7 +587,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolSCTP,
+							Protocol:   common.ProtocolSCTP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -618,7 +619,7 @@ func TestRunExposeService(t *testing.T) {
 				Spec: corev1.ServiceSpec{
 					Ports: []corev1.ServicePort{
 						{
-							Protocol:   corev1.ProtocolUDP,
+							Protocol:   common.ProtocolUDP,
 							Port:       14,
 							TargetPort: intstr.FromInt(14),
 						},
@@ -816,7 +817,7 @@ status:
 							Spec: corev1.ServiceSpec{
 								Ports: []corev1.ServicePort{
 									{
-										Protocol:   corev1.ProtocolUDP,
+										Protocol:   common.ProtocolUDP,
 										Port:       14,
 										TargetPort: intstr.FromInt(14),
 									},

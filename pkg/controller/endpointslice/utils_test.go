@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -42,7 +43,7 @@ import (
 func TestNewEndpointSlice(t *testing.T) {
 	ipAddressType := discovery.AddressTypeIPv4
 	portName := "foo"
-	protocol := v1.ProtocolTCP
+	protocol := common.ProtocolTCP
 	endpointMeta := endpointMeta{
 		Ports:       []discovery.EndpointPort{{Name: &portName, Protocol: &protocol}},
 		AddressType: ipAddressType,
@@ -543,7 +544,7 @@ func TestServiceControllerKey(t *testing.T) {
 }
 
 func TestGetEndpointPorts(t *testing.T) {
-	protoTCP := v1.ProtocolTCP
+	protoTCP := common.ProtocolTCP
 
 	testCases := map[string]struct {
 		service       *v1.Service
@@ -1000,7 +1001,7 @@ func newServiceAndEndpointMeta(name, namespace string) (v1.Service, endpointMeta
 		Spec: v1.ServiceSpec{
 			Ports: []v1.ServicePort{{
 				TargetPort: portNameIntStr,
-				Protocol:   v1.ProtocolTCP,
+				Protocol:   common.ProtocolTCP,
 				Name:       name,
 			}},
 			Selector:   map[string]string{"foo": "bar"},
@@ -1009,7 +1010,7 @@ func newServiceAndEndpointMeta(name, namespace string) (v1.Service, endpointMeta
 	}
 
 	addressType := discovery.AddressTypeIPv4
-	protocol := v1.ProtocolTCP
+	protocol := common.ProtocolTCP
 	endpointMeta := endpointMeta{
 		AddressType: addressType,
 		Ports:       []discovery.EndpointPort{{Name: &name, Port: &portNum, Protocol: &protocol}},

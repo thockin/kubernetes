@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -79,7 +80,7 @@ func TestServicesFinalizersRepairLoop(t *testing.T) {
 				Port:       8443,
 				NodePort:   30443,
 				TargetPort: intstr.FromInt(8443),
-				Protocol:   v1.ProtocolTCP,
+				Protocol:   common.ProtocolTCP,
 			}},
 			Type: v1.ServiceTypeNodePort,
 		},

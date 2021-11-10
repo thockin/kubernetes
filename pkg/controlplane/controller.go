@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"time"
 
+	"k8s.io/api/common"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -256,7 +257,7 @@ func (c *Controller) UpdateKubernetesService(reconcile bool) error {
 func createPortAndServiceSpec(servicePort int, targetServicePort int, nodePort int, servicePortName string, extraServicePorts []corev1.ServicePort) ([]corev1.ServicePort, corev1.ServiceType) {
 	//Use the Cluster IP type for the service port if NodePort isn't provided.
 	//Otherwise, we will be binding the master service to a NodePort.
-	servicePorts := []corev1.ServicePort{{Protocol: corev1.ProtocolTCP,
+	servicePorts := []corev1.ServicePort{{Protocol: common.ProtocolTCP,
 		Port:       int32(servicePort),
 		Name:       servicePortName,
 		TargetPort: intstr.FromInt(targetServicePort)}}
@@ -273,7 +274,7 @@ func createPortAndServiceSpec(servicePort int, targetServicePort int, nodePort i
 
 // createEndpointPortSpec creates an array of endpoint ports
 func createEndpointPortSpec(endpointPort int, endpointPortName string, extraEndpointPorts []corev1.EndpointPort) []corev1.EndpointPort {
-	endpointPorts := []corev1.EndpointPort{{Protocol: corev1.ProtocolTCP,
+	endpointPorts := []corev1.EndpointPort{{Protocol: common.ProtocolTCP,
 		Port: int32(endpointPort),
 		Name: endpointPortName,
 	}}

@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/api/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
@@ -70,14 +71,14 @@ func toKubeContainerState(state runtimeapi.ContainerState) kubecontainer.State {
 	return kubecontainer.ContainerStateUnknown
 }
 
-// toRuntimeProtocol converts v1.Protocol to runtimeapi.Protocol.
-func toRuntimeProtocol(protocol v1.Protocol) runtimeapi.Protocol {
+// toRuntimeProtocol converts common.Protocol to runtimeapi.Protocol.
+func toRuntimeProtocol(protocol common.Protocol) runtimeapi.Protocol {
 	switch protocol {
-	case v1.ProtocolTCP:
+	case common.ProtocolTCP:
 		return runtimeapi.Protocol_TCP
-	case v1.ProtocolUDP:
+	case common.ProtocolUDP:
 		return runtimeapi.Protocol_UDP
-	case v1.ProtocolSCTP:
+	case common.ProtocolSCTP:
 		return runtimeapi.Protocol_SCTP
 	}
 
