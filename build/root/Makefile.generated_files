@@ -42,9 +42,7 @@ GO2MAKE_BY_PKG ?=
 # This rule collects all the generated file sets into a single rule.  Other
 # rules should depend on this to ensure generated files are rebuilt.
 .PHONY: generated_files
-#FIXME: disable codegens and fix them one at a time in further commits
-#generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion gen_openapi
-generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion
+generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion gen_openapi
 
 #
 # Helper logic to calculate Go's dependency DAG ourselves.
@@ -145,6 +143,7 @@ ALL_K8S_TAG_FILES := $(shell                             \
 ifeq ($(DBG_MAKEFILE),1)
     $(warning ***** found $(shell echo $(ALL_K8S_TAG_FILES) | wc -w) +k8s: tagged files)
 endif
+
 
 #
 # Code generation logic.
@@ -560,7 +559,6 @@ $(CONVERSION_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/
 	touch $@
 
 
-ifeq ($(DONOTRUN),1)
 # OpenAPI generation
 #
 # Any package that wants open-api functions generated must include a
@@ -652,15 +650,15 @@ endif
 # checked-in violation file, and prints error message to request developer to
 # fix either the API source code, or the known API rule violation file.
 $$($(prefix)_OPENAPI_OUTFILE): $$(OPENAPI_GEN) $$($(prefix)_KNOWN_VIOLATION_FILENAME)
-	kube::log::status "Generating openapi code for $(prefix)";                                   \
-	./hack/run-in-gopath.sh $$(OPENAPI_GEN)                                                      \
-	    --v $$(KUBE_VERBOSE)                                                                     \
-	    --logtostderr                                                                            \
-	    -h $$(BOILERPLATE_FILENAME)                                                              \
-	    -i $$$$(echo $$(addprefix $(PRJ_SRC_PATH)/, $$($(prefix)_OPENAPI_DIRS)) | sed 's/ /,/g') \
-	    -p $$(PRJ_SRC_PATH)/$$($(prefix)_OPENAPI_OUTPUT_PKG)                                     \
-	    -O $$(OPENAPI_BASENAME)                                                                  \
-	    -r $$($(prefix)_REPORT_FILENAME)                                                         \
+	kube::log::status "Generating openapi code for $(prefix)";                     \
+	$$(OPENAPI_GEN)                                                                \
+	    --v $$(KUBE_VERBOSE)                                                       \
+	    --logtostderr                                                              \
+	    -h $$(BOILERPLATE_FILENAME)                                                \
+	    -i $$$$(echo $$(addprefix ./, $($(prefix)_OPENAPI_DIRS)) | sed 's/ /,/g')  \
+	    -p ./$$($(prefix)_OPENAPI_OUTPUT_PKG)                                      \
+	    -O $$(OPENAPI_BASENAME)                                                    \
+	    -r $$($(prefix)_REPORT_FILENAME)                                           \
 	    "$$$$@"
 	test -f $$($(prefix)_KNOWN_VIOLATION_FILENAME) || touch $$($(prefix)_KNOWN_VIOLATION_FILENAME)
 	diff $$($(prefix)_REPORT_FILENAME) $$($(prefix)_KNOWN_VIOLATION_FILENAME) || \
@@ -685,4 +683,3 @@ $(OPENAPI_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/ope
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/openapi-gen
 	touch $@
-endif # DONOTRUN
