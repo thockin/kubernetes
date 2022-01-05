@@ -527,14 +527,10 @@ function codegen::openapi() {
             kube::log::status "DBG: finding all +k8s:openapi-gen tags for ${prefix}"
         fi
 
-        # FIXME: This tool needs inputs in the form:
-        # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
-        # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
         local tag_dirs=()
         kube::util::read-array tag_dirs < <(
             grep -l -Z --color=never '+k8s:openapi-gen=' $(indirect_array "${prefix}_tag_files") \
                 | xargs -0 -n1 dirname \
-                | sed 's|staging/src|vendor|g' \
                 | LC_ALL=C sort -u)
 
         if [[ "${DBG_CODEGEN}" == 1 ]]; then
@@ -543,7 +539,7 @@ function codegen::openapi() {
 
         local tag_pkgs=()
         for dir in "${tag_dirs[@]}"; do
-            tag_pkgs+=("${PRJ_SRC_PATH}/$dir")
+            tag_pkgs+=("./$dir")
         done
 
         kube::log::status "Generating openapi code for ${prefix}"
@@ -554,12 +550,12 @@ function codegen::openapi() {
             done
         fi
 
-        ./hack/run-in-gopath.sh ${gen_openapi_bin} \
+        ${gen_openapi_bin} \
             --v "${KUBE_VERBOSE}" \
             --logtostderr \
             -h "${BOILERPLATE_FILENAME}" \
             -O "${output_base}" \
-            -p "${PRJ_SRC_PATH}/${output_dir}" \
+            -p "./${output_dir}" \
             -r "${report_file}" \
             $(printf -- " -i %s" "${tag_pkgs[@]}") \
             "$@"
