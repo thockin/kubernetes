@@ -44,7 +44,7 @@ GO2MAKE_BY_PKG ?=
 .PHONY: generated_files
 #FIXME: disable codegens and fix them one at a time in further commits
 #generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion gen_openapi
-generated_files: gen_deepcopy gen_defaulter gen_conversion
+generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion
 
 #
 # Helper logic to calculate Go's dependency DAG ourselves.
@@ -154,7 +154,6 @@ endif
 # This is the header we stick at the top of every generated file.
 BOILERPLATE_FILENAME := staging/src/k8s.io/code-generator/hack/boilerplate.go.txt
 
-ifeq ($(DONOTRUN),1)
 # prerelease-lifecycle generation
 #
 # Any package that wants prerelease-lifecycle functions generated must include a
@@ -198,7 +197,7 @@ gen_prerelease_lifecycle: $(PRERELEASE_LIFECYCLE_GEN) $(META_DIR)/$(PRERELEASE_L
 	    fi;                                                                        \
 	    N=$$(cat $(META_DIR)/$(PRERELEASE_LIFECYCLE_GEN).todo | wc -l);            \
 	    kube::log::status "Generating prerelease lifecycle code for $$N targets";  \
-	    ./hack/run-in-gopath.sh $(PRERELEASE_LIFECYCLE_GEN)                        \
+	    $(PRERELEASE_LIFECYCLE_GEN)                                                \
 	        --v $(KUBE_VERBOSE)                                                    \
 	        --logtostderr                                                          \
 	        -h $(BOILERPLATE_FILENAME)                                             \
@@ -230,7 +229,7 @@ $(PRERELEASE_LIFECYCLE_FILES): $(PRERELEASE_LIFECYCLE_GEN)
 	    ls -lft --full-time $@ || true;                     \
 	    ls -lft --full-time $? || true;                     \
 	fi
-	echo $(PRJ_SRC_PATH)/$(@D) >> $(META_DIR)/$(PRERELEASE_LIFECYCLE_GEN).todo
+	echo ./$(@D) >> $(META_DIR)/$(PRERELEASE_LIFECYCLE_GEN).todo
 
 # How to build the generator tool.  The deps for this are defined in
 # the $(GO_PKGDEPS_FILE), above.
@@ -245,7 +244,6 @@ $(PRERELEASE_LIFECYCLE_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-gene
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen
 	touch $@
-endif # DONOTRUN
 
 
 # Deep-copy generation
