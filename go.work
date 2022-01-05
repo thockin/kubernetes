@@ -32,6 +32,7 @@ use (
 	./staging/src/k8s.io/sample-controller
 	./gengo2
 	./gengo2/v2
+	./kube-openapi-hack
 )
 
 replace bazil.org/fuse => bazil.org/fuse v0.0.0-20160811212531-371fbbdaa898
@@ -672,7 +673,7 @@ replace k8s.io/kube-aggregator v0.0.0 => ./staging/src/k8s.io/kube-aggregator
 
 replace k8s.io/kube-controller-manager v0.0.0 => ./staging/src/k8s.io/kube-controller-manager
 
-replace k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42
+replace k8s.io/kube-openapi v0.0.0 => ./kube-openapi-hack
 
 replace k8s.io/kube-proxy v0.0.0 => ./staging/src/k8s.io/kube-proxy
 
