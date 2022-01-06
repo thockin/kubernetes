@@ -297,7 +297,7 @@ gen_deepcopy: $(DEEPCOPY_GEN) $(META_DIR)/$(DEEPCOPY_GEN).todo
 	        --logtostderr                                              \
 	        -h $(BOILERPLATE_FILENAME)                                 \
 	        -i "$$pkgs"                                                \
-	        --bounding-dirs $(PRJ_SRC_PATH),"k8s.io/api"               \
+	        --bounding-dirs k8s.io/kubernetes,k8s.io/api               \
 	        -O $(DEEPCOPY_BASENAME)                                    \
 	        "$$@";                                                     \
 	fi
