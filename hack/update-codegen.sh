@@ -34,7 +34,6 @@ UPDATE_API_KNOWN_VIOLATIONS="${UPDATE_API_KNOWN_VIOLATIONS:-}"
 
 OUT_DIR="_output"
 BIN_DIR="${OUT_DIR}/bin"
-PRJ_SRC_PATH="k8s.io/kubernetes"
 BOILERPLATE_FILENAME="staging/src/k8s.io/code-generator/hack/boilerplate.go.txt"
 APPLYCONFIG_PKG="k8s.io/client-go/applyconfigurations"
 
@@ -209,7 +208,7 @@ function codegen::deepcopy() {
         --logtostderr \
         -h "${BOILERPLATE_FILENAME}" \
         -O "${output_base}" \
-        --bounding-dirs "${PRJ_SRC_PATH},k8s.io/api" \
+        --bounding-dirs "k8s.io/kubernetes,k8s.io/api" \
         $(printf -- " -i %s" "${tag_pkgs[@]}") \
         "$@"
 
