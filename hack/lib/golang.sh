@@ -570,9 +570,6 @@ EOF
 kube::golang::old::setup_env() {
   kube::golang::verify_go_version
 
-  # Set up GOPATH.  We have tools which depend on being in a GOPATH (see
-  # hack/run-in-gopath.sh).
-  #
   # Even in module mode, we need to set GOPATH for `go build` and `go install`
   # to work.  We build various tools (usually via `go install`) from a lot of
   # scripts.
@@ -586,9 +583,6 @@ kube::golang::old::setup_env() {
   # Instead we set it to a phony local path and process the results ourselves.
   # In particular, GOPATH[0]/bin will be used for `go install`, with
   # cross-compiles adding an extra directory under that.
-  #
-  # Eventually, when we no longer rely on run-in-gopath.sh we may be able to
-  # simplify this some.
   kube::golang::old::create_gopath_tree
   export GOPATH="${KUBE_GOPATH}"
 
@@ -631,9 +625,6 @@ kube::golang::old::setup_env() {
 kube::golang::new::setup_env() {
   kube::golang::verify_go_version
 
-  # Set up GOPATH.  We have tools which depend on being in a GOPATH (see
-  # hack/run-in-gopath.sh).
-  #
   # Even in module mode, we need to set GOPATH for `go build` and `go install`
   # to work.  We build various tools (usually via `go install`) from a lot of
   # scripts.
@@ -647,9 +638,6 @@ kube::golang::new::setup_env() {
   # Instead we set it to a phony local path and process the results ourselves.
   # In particular, GOPATH[0]/bin will be used for `go install`, with
   # cross-compiles adding an extra directory under that.
-  #
-  # Eventually, when we no longer rely on run-in-gopath.sh we may be able to
-  # simplify this some.
   export GOPATH="${KUBE_GOPATH}"
 
   # If these are not set, set them now.  This ensures that any subsequent
@@ -970,10 +958,8 @@ kube::golang::build_binaries() {
     # FIXME: decide if we need this or not
     goflags+=("-modcacherw") # since we keep GOMODCACHE locally
 
-    # This is $(pwd) because we use run-in-gopath to build.  Once that is
-    # excised, this can become ${KUBE_ROOT}.
     local trimroot # two lines to appease shellcheck SC2155
-    trimroot=$(pwd)
+    trimroot="${KUBE_ROOT}"
 
     goasmflags="all=-trimpath=${trimroot}"
 
