@@ -28,7 +28,7 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 export KUBE_ROOT
 source "${KUBE_ROOT}/hack/lib/init.sh"
 
-# Explicitly opt into go modules, even though we're inside a GOPATH directory
+# Explicitly opt into go modules
 export GO111MODULE=on
 
 _tmp="${KUBE_ROOT}/_tmp"
