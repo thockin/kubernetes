@@ -370,11 +370,11 @@ kube::golang::is_statically_linked_library() {
   return 1;
 }
 
-# binaries_from_targets takes a list of build targets, which might be go
-# targets (e.g. example.com/foo/bar or ./foo/bar) or local paths (e.g. foo/bar)
-# and produces a respective list (on stdout) of our best guess at Go target
-# names.
-kube::golang::binaries_from_targets() {
+# kube::golang::normalize_go_targets takes a list of build targets, which might
+# be Go-style names (e.g. example.com/foo/bar or ./foo/bar) or just local paths
+# (e.g. foo/bar) and produces a respective list (on stdout) of our best guess at
+# Go target names.
+kube::golang::normalize_go_targets() {
   # Doing this with `go list -find` would be more correct but is much slower.
   local target
   for target; do
@@ -395,13 +395,6 @@ kube::golang::binaries_from_targets() {
       continue
     fi
 
-    #FIXME: do we still need this?
-    if [[ "${target}" =~ ^vendor/ ]]; then
-      # Strip vendor/ prefix, since we're building in gomodule mode.
-      echo "${target#"vendor/"}"
-      continue
-    fi
-
     # If the target starts with "./", assume it is a local path which qualifies
     # as a Go target name.
     if [[ "${target}" =~ ^\./ ]]; then
@@ -411,6 +404,8 @@ kube::golang::binaries_from_targets() {
 
     #FIXME: do we need this or can we make the fully-qualified case be default?
     # Otherwise assume it is a relative path (e.g. foo/bar or foo/bar/bar.test).
+    # We can't really test if it exists or not, because the last element might
+    # be an output file (e.g. bar.test) or even "...".
     echo "./${target}"
   done
 }
@@ -932,7 +927,9 @@ kube::golang::build_binaries() {
     fi
 
     local -a binaries
-    while IFS="" read -r binary; do binaries+=("$binary"); done < <(kube::golang::binaries_from_targets "${targets[@]}")
+    while IFS="" read -r binary; do
+      binaries+=("$binary")
+    done < <(kube::golang::normalize_go_targets "${targets[@]}")
 
     local parallel=false
     if [[ ${#platforms[@]} -gt 1 ]]; then
