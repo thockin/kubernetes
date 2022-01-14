@@ -25,6 +25,7 @@ set -o pipefail
 
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "${KUBE_ROOT}/hack/lib/init.sh"
+export GO111MODULE=on # TODO(thockin): remove this when init.sh stops disabling it
 
 # Generates types_swagger_doc_generated file for the given group version.
 # $1: Name of the group version
