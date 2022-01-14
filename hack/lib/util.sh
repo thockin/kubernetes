@@ -310,14 +310,14 @@ kube::util::group-version-to-pkg-path() {
 
   while IFS=$'\n' read -r api; do
     if [[ "${api}" = "${group_version/.*k8s.io/}" ]]; then
-      echo "vendor/k8s.io/api/${group_version/.*k8s.io/}"
+      echo "staging/src/k8s.io/api/${group_version/.*k8s.io/}"
       return
     fi
   done < <(cd "${KUBE_ROOT}/staging/src/k8s.io/api" && find . -name types.go -exec dirname {} \; | sed "s|\./||g" | sort)
 
   # "v1" is the API GroupVersion
   if [[ "${group_version}" == "v1" ]]; then
-    echo "vendor/k8s.io/api/core/v1"
+    echo "staging/src/k8s.io/api/core/v1"
     return
   fi
 
@@ -330,13 +330,13 @@ kube::util::group-version-to-pkg-path() {
       echo "pkg/apis/core"
       ;;
     meta/v1)
-      echo "vendor/k8s.io/apimachinery/pkg/apis/meta/v1"
+      echo "staging/src/k8s.io/apimachinery/pkg/apis/meta/v1"
       ;;
     meta/v1beta1)
-      echo "vendor/k8s.io/apimachinery/pkg/apis/meta/v1beta1"
+      echo "staging/src/k8s.io/apimachinery/pkg/apis/meta/v1beta1"
       ;;
     internal.apiserver.k8s.io/v1alpha1)
-      echo "vendor/k8s.io/api/apiserverinternal/v1alpha1"
+      echo "staging/src/k8s.io/api/apiserverinternal/v1alpha1"
       ;;
     *.k8s.io)
       echo "pkg/apis/${group_version%.*k8s.io}"
