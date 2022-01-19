@@ -25,21 +25,16 @@ set -o pipefail
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 export KUBE_ROOT
 source "${KUBE_ROOT}/hack/lib/init.sh"
+export GO111MODULE=on # TODO(thockin): remove this when init.sh stops disabling it
 
 kube::util::ensure_clean_working_dir
 
 _tmpdir="$(kube::realpath "$(mktemp -d -t verify-generated-files.XXXXXX)")"
-kube::util::trap_add "rm -rf ${_tmpdir}" EXIT
+git worktree add -f -q "${_tmpdir}" HEAD
+kube::util::trap_add "git worktree remove -f ${_tmpdir}" EXIT
+ln -s "${KUBE_ROOT}/_output" "${_tmpdir}/_output" # for GOCACHE
+cd "${_tmpdir}"
 
-_tmp_gopath="${_tmpdir}/go"
-_tmp_kuberoot="${_tmp_gopath}/src/k8s.io/kubernetes"
-mkdir -p "${_tmp_kuberoot}/.."
-cp -a "${KUBE_ROOT}" "${_tmp_kuberoot}/.."
-
-cd "${_tmp_kuberoot}"
-
-# clean out anything from the temp dir that's not checked in
-git clean -ffxd
 # regenerate any generated code
 make generated_files
 
