@@ -38,6 +38,8 @@ PRINT_HELP ?=
 
 # We don't need make's built-in rules.
 MAKEFLAGS += --no-builtin-rules
+# Be pedantic about undefined variables.
+MAKEFLAGS += --warn-undefined-variables
 .SUFFIXES:
 
 # Constants used throughout.

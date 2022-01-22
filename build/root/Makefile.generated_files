@@ -24,7 +24,7 @@ ifeq ($(MAKECMDGOALS),)
 endif
 
 ifeq ($(DBG_MAKEFILE),1)
-    ifeq ($(MAKE_RESTARTS),)
+    ifndef MAKE_RESTARTS
         $(warning ***** starting Makefile.generated_files for goal(s) "$(MAKECMDGOALS)")
     else
         $(warning ***** restarting Makefile.generated_files for goal(s) "$(MAKECMDGOALS)")
@@ -65,10 +65,10 @@ include $(META_DIR)/$(GO_PKGDEPS_FILE)
 # Where go2make keeps state.
 META_DEPS := $(META_DIR)/deps
 
-# Only build and run go2make on the first pass.  If that generates a new
-# GO_PKGDEPS_FILE, make will restart the whole process and set MAKE_RESTARTS to
-# a numeric value.
-ifeq ($(MAKE_RESTARTS),)
+# Only build and run go2make on the first pass (MAKE_RESTARTS is undefined).
+# If that generates a new GO_PKGDEPS_FILE, make will restart the whole process
+# and set MAKE_RESTARTS to a numeric value.
+ifndef MAKE_RESTARTS
 # Update the set of Go deps for our project.  This will let us determine if
 # we really need to do expensive codegen.  We use FORCE because it is not a
 # PHONY file, but we do want it to be re-evaluated every time make is run.  The
