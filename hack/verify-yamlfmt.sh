@@ -26,12 +26,14 @@ set -o pipefail
 
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "${KUBE_ROOT}/hack/lib/init.sh"
+export GO111MODULE=on # TODO(thockin): remove this when init.sh stops disabling it
 
 kube::util::ensure_clean_working_dir
 
 _tmpdir="$(kube::realpath "$(mktemp -d -t $(basename $0).XXXXXX)")"
 git worktree add -f -q "${_tmpdir}" HEAD
 kube::util::trap_add "git worktree remove -f ${_tmpdir}" EXIT
+ln -s "${KUBE_ROOT}/_output" "${_tmpdir}/_output" # for GOCACHE
 cd "${_tmpdir}"
 
 # Format YAML files
