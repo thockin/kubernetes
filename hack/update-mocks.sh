@@ -36,6 +36,7 @@ function cleanup {
 
 trap cleanup EXIT
 
+kube::golang::new::setup_env
 kube::golang::verify_go_version
 
 echo 'installing mockgen'
@@ -68,18 +69,18 @@ for IFILE in $(find_files | xargs grep --files-with-matches -e '//go:generate mo
   temp_file_name=$(mktemp --tmpdir="${_tmp}")
   # serach for build tag used in file
   build_tag_string=$(grep -o '+build.*$' "$IFILE") || true
-  
+
   # if the file does not have build string
   if [ -n "$build_tag_string" ]
   then
     # write the build tag in the temp file
     echo -n "$build_tag_string" > "$temp_file_name"
-    
+
     # if +build tag is defined in interface file
-    BUILD_TAG_FILE=$temp_file_name go generate -v "$IFILE"
+    BUILD_TAG_FILE=$temp_file_name go generate -mod=readonly -v "$IFILE"
   else
     # if no +build tag is defined in interface file
-    go generate -v "$IFILE"
+    go generate -mod=readonly -v "$IFILE"
   fi
 done
 
