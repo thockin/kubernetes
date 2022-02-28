@@ -377,22 +377,30 @@ kube::golang::is_statically_linked_library() {
   return 1;
 }
 
-# kube::binaries_from_targets take a list of build targets and return the
-# full go package to be built
+# kube::binaries_from_targets takes a list of build targets, which might be go
+# targets (e.g. example.com/foo/bar or ./foo/bar) or local paths (e.g. foo/bar)
+# and produces a respective list (on stdout) of our best guess at Go target
+# names.
 kube::golang::binaries_from_targets() {
+  # Doing this with `go list -find` would be more correct but is much slower.
   local target
   for target; do
+    # If the target starts with what looks like a domain name, assume it has a
+    # fully-qualified Go package name.
     if [[ "${target}" =~ ^([[:alnum:]]+".")+[[:alnum:]]+"/" ]]; then
-      # If the target starts with what looks like a domain name, assume it has a
-      # fully-qualified package name rather than one that needs the Kubernetes
-      # package prepended.
       echo "${target}"
-    elif [[ "${target}" =~ ^vendor/ ]]; then
-      # Strip vendor/ prefix, since we're building in gomodule mode.
-      echo "${target#"vendor/"}"
-    else
-      echo "${KUBE_GO_PACKAGE}/${target}"
+      continue
     fi
+
+    # If the target starts with "./", assume it is a local path which qualifies
+    # as a Go target name.
+    if [[ "${target}" =~ ^\./ ]]; then
+      echo "${target}"
+      continue
+    fi
+
+    # Otherwise assume it is a relative path (e.g. foo/bar or foo/bar/bar.test).
+    echo "./${target}"
   done
 }
 

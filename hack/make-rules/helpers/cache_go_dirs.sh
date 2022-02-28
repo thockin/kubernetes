@@ -57,8 +57,7 @@ function kfind() {
             \) -prune              \
         \)                         \
         \)                         \
-        "$@"                       \
-        | sed 's|^./staging/src|vendor|'
+        "$@"
 }
 
 # It's *significantly* faster to check whether any directories are newer than
