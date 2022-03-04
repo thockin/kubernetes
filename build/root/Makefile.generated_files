@@ -50,7 +50,7 @@ generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_convers
 # each Go package in the project which tracks all of the transitive deps of
 # that package.  For example, the package k8s.io/api/core/v1 can be tracked
 # either by `$(META_DEPS)/by-pkg/k8s.io/api/core/v1/_pkg` or by
-# `$(META_DEPS)/by-path/staging/src/k8s.io/api/core/v1/_pkg`. This is roughly
+# `$(META_DEPS)/by-path/./staging/src/k8s.io/api/core/v1/_pkg`. This is roughly
 # the same DAG that the Go compiler uses.  These rules can be used to figure
 # out if, for example, generated code needs to be regenerated.
 GO_PKGDEPS_FILE = go-pkgdeps.mk
@@ -208,7 +208,7 @@ gen_prerelease_lifecycle: $(PRERELEASE_LIFECYCLE_GEN) $(META_DIR)/$(PRERELEASE_L
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
 $(foreach dir, $(PRERELEASE_LIFECYCLE_DIRS), $(eval                            \
-    $(dir)/$(PRERELEASE_LIFECYCLE_FILENAME): $(META_DEPS)/by-path/$(dir)/_pkg  \
+    $(dir)/$(PRERELEASE_LIFECYCLE_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
 ))
 
 # How to regenerate prerelease-lifecycle code.  This is a little slow to run,
@@ -232,7 +232,7 @@ $(PRERELEASE_LIFECYCLE_FILES): $(PRERELEASE_LIFECYCLE_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(PRERELEASE_LIFECYCLE_GEN): $(META_DEPS)/by-path/staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen/_pkg
+$(PRERELEASE_LIFECYCLE_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen/_pkg
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen
 	touch $@
@@ -304,7 +304,7 @@ gen_deepcopy: $(DEEPCOPY_GEN) $(META_DIR)/$(DEEPCOPY_GEN).todo
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
 $(foreach dir, $(DEEPCOPY_DIRS), $(eval                            \
-    $(dir)/$(DEEPCOPY_FILENAME): $(META_DEPS)/by-path/$(dir)/_pkg  \
+    $(dir)/$(DEEPCOPY_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
 ))
 
 # How to regenerate deep-copy code.  This is a little slow to run, so we batch
@@ -328,7 +328,7 @@ $(DEEPCOPY_FILES): $(DEEPCOPY_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(DEEPCOPY_GEN): $(META_DEPS)/by-path/staging/src/k8s.io/code-generator/cmd/deepcopy-gen/_pkg
+$(DEEPCOPY_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/deepcopy-gen/_pkg
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/deepcopy-gen
 	touch $@
@@ -406,7 +406,7 @@ gen_defaulter: $(DEFAULTER_GEN) $(META_DIR)/$(DEFAULTER_GEN).todo
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
 $(foreach dir, $(DEFAULTER_DIRS), $(eval                            \
-    $(dir)/$(DEFAULTER_FILENAME): $(META_DEPS)/by-path/$(dir)/_pkg  \
+    $(dir)/$(DEFAULTER_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
 ))
 
 # How to regenerate defaulter code.  This is a little slow to run, so we batch
@@ -430,7 +430,7 @@ $(DEFAULTER_FILES): $(DEFAULTER_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(DEFAULTER_GEN): $(META_DEPS)/by-path/staging/src/k8s.io/code-generator/cmd/defaulter-gen/_pkg
+$(DEFAULTER_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/defaulter-gen/_pkg
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/defaulter-gen
 	touch $@
@@ -521,7 +521,7 @@ gen_conversion: $(CONVERSION_GEN) $(META_DIR)/$(CONVERSION_GEN).todo
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
 $(foreach dir, $(CONVERSION_DIRS), $(eval                            \
-    $(dir)/$(CONVERSION_FILENAME): $(META_DEPS)/by-path/$(dir)/_pkg  \
+    $(dir)/$(CONVERSION_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
 ))
 
 # How to regenerate conversion code.  This is a little slow to run, so we batch
@@ -545,7 +545,7 @@ $(CONVERSION_FILES): $(CONVERSION_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to rebuild it over and over.  So we touch it,
 # and make is happy.
-$(CONVERSION_GEN): $(META_DEPS)/by-path/staging/src/k8s.io/code-generator/cmd/conversion-gen/_pkg
+$(CONVERSION_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/conversion-gen/_pkg
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/conversion-gen
 	touch $@
@@ -624,7 +624,7 @@ define OPENAPI_TARGETS_DEF
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
 $$(foreach dir, $$($(prefix)_OPENAPI_DIRS), $$(eval                    \
-    $$($(prefix)_OPENAPI_OUTFILE): $$(META_DEPS)/by-path/$$(dir)/_pkg  \
+    $$($(prefix)_OPENAPI_OUTFILE): $$(META_DEPS)/by-path/./$$(dir)/_pkg  \
 ))
 
 # When UPDATE_API_KNOWN_VIOLATIONS is set to be true, let the generator to write
@@ -672,7 +672,7 @@ gen_openapi: $(OPENAPI_GEN) $(KUBE_OPENAPI_OUTFILE) $(AGGREGATOR_OPENAPI_OUTFILE
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(OPENAPI_GEN): $(META_DEPS)/by-path/staging/src/k8s.io/code-generator/cmd/openapi-gen/_pkg
+$(OPENAPI_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/openapi-gen/_pkg
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/openapi-gen
 	touch $@

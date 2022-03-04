@@ -232,7 +232,7 @@ func keys(m map[string]*packages.Package) []string {
 
 func maybeRelative(path, relativeTo string) (string, bool) {
 	if path == relativeTo || strings.HasPrefix(path, relativeTo+"/") {
-		return strings.TrimPrefix(path, relativeTo+"/"), true
+		return "." + strings.TrimPrefix(path, relativeTo), true
 	}
 	return path, false
 }
@@ -250,7 +250,7 @@ func (emit emitter) emitMake(out io.Writer, pkgMap map[string]*packages.Package)
 			// newer than the saved file-list, but the file-list will only get
 			// touched (triggering downstream rebuilds) if the set of files
 			// actually changes.
-			fmt.Fprintf(out, "%s/by-pkg/%s/_files: %s\n", emit.stateDir, pkg.PkgPath, codeDir)
+			fmt.Fprintf(out, "%s/by-pkg/%s/_files: %s/\n", emit.stateDir, pkg.PkgPath, codeDir)
 			fmt.Fprintf(out, "\t@mkdir -p $(@D)\n")
 			fmt.Fprintf(out, "\t@ls $</*.go | LC_ALL=C sort > $@.tmp\n")
 			fmt.Fprintf(out, "\t@if ! cmp -s $@.tmp $@; then \\\n")
