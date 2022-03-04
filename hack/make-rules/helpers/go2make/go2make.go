@@ -34,11 +34,8 @@ var flHelp = pflag.BoolP("help", "h", false, "print help and exit")
 var flDbg = pflag.BoolP("debug", "d", false, "enable debugging output")
 var flDbgTime = pflag.BoolP("debug-time", "D", false, "enable debugging output with timestamps")
 var flOut = pflag.StringP("output", "o", "make", "output format (mainly for debugging): one of make | json)")
-var flRoots = pflag.StringSlice("root", nil, "only process packages under specific prefixes (may be specified multiple times)")
-var flPrune = pflag.StringSlice("prune", nil, "package prefixes to prune (recursive, may be specified multiple times)")
 var flTags = pflag.StringSlice("tag", nil, "build tags to pass to Go (see 'go help build', may be specified multiple times)")
 var flRelPath = pflag.String("relative-to", ".", "emit by-path rules for packages relative to this path")
-var flImports = pflag.Bool("imports", false, "process all imports of all packages, recursively")
 var flStateDir = pflag.String("state-dir", ".go2make", "directory in which to store state used by make")
 
 var lastDebugTime time.Time
@@ -63,11 +60,8 @@ func debug(items ...interface{}) {
 }
 
 type emitter struct {
-	roots    []string
-	prune    []string
 	tags     []string
 	relPath  string
-	imports  bool
 	stateDir string
 }
 
@@ -110,15 +104,10 @@ func main() {
 
 	// Gather flag values for easier testing.
 	emit := emitter{
-		roots:    forEach(*flRoots, dropTrailingSlash),
-		prune:    forEach(*flPrune, dropTrailingSlash),
 		tags:     *flTags,
-		relPath:  dropTrailingSlash(absOrExit(*flRelPath)),
-		imports:  *flImports,
-		stateDir: dropTrailingSlash(*flStateDir),
+		relPath:  strings.TrimRight(absOrExit(*flRelPath), "/"),
+		stateDir: strings.TrimRight(*flStateDir, "/"),
 	}
-	debug("roots:", emit.roots)
-	debug("prune:", emit.prune)
 	debug("tags:", emit.tags)
 	debug("relative-to:", emit.relPath)
 
@@ -187,26 +176,11 @@ func absOrExit(path string) string {
 	return abs
 }
 
-func dropTrailingSlash(s string) string {
-	return strings.TrimRight(s, "/")
-}
-
-func forEach(in []string, fn func(s string) string) []string {
-	out := make([]string, 0, len(in))
-	for _, s := range in {
-		out = append(out, fn(s))
-	}
-	return out
-}
-
 func (emit emitter) loadPackages(targets ...string) ([]*packages.Package, error) {
 	cfg := packages.Config{
-		Mode:       packages.NeedName | packages.NeedFiles | packages.NeedImports | packages.NeedModule,
+		Mode:       packages.NeedName | packages.NeedFiles | packages.NeedImports | packages.NeedDeps | packages.NeedModule,
 		Tests:      false,
 		BuildFlags: []string{"-tags", strings.Join(emit.tags, ",")},
-	}
-	if emit.imports {
-		cfg.Mode |= packages.NeedDeps
 	}
 	return packages.Load(&cfg, targets...)
 }
@@ -226,16 +200,6 @@ func (emit emitter) visitPackage(pkg *packages.Package, pkgMap map[string]*packa
 	debug("visiting package", pkg.PkgPath)
 	if pkgMap[pkg.PkgPath] == pkg {
 		debug("  ", pkg.PkgPath, "was already visited")
-		return nil
-	}
-
-	if len(emit.roots) > 0 && !rooted(pkg.PkgPath, emit.roots) {
-		debug("  ", pkg.PkgPath, "is not under an allowed root")
-		return nil
-	}
-
-	if len(emit.prune) > 0 && rooted(pkg.PkgPath, emit.prune) {
-		debug("  ", pkg.PkgPath, "pruned")
 		return nil
 	}
 
@@ -259,35 +223,7 @@ func (emit emitter) visitPackage(pkg *packages.Package, pkgMap map[string]*packa
 	debug("  ", pkg.PkgPath, "is new")
 	pkgMap[pkg.PkgPath] = pkg
 
-	if emit.imports && len(pkg.Imports) > 0 {
-		debug("  ", pkg.PkgPath, "has", len(pkg.Imports), "imports")
-
-		allErrs := []packages.Error{}
-		visitEach(pkg.Imports, func(imp *packages.Package) {
-			errs := emit.visitPackage(imp, pkgMap)
-			if len(errs) > 0 {
-				allErrs = append(allErrs, errs...)
-			}
-		})
-		return allErrs
-	}
-
 	return nil
-}
-
-func rooted(pkg string, list []string) bool {
-	for _, s := range list {
-		if pkg == s || strings.HasPrefix(pkg, s+"/") {
-			return true
-		}
-	}
-	return false
-}
-
-func visitEach(all map[string]*packages.Package, fn func(pkg *packages.Package)) {
-	for _, k := range keys(all) {
-		fn(all[k])
-	}
 }
 
 func keys(m map[string]*packages.Package) []string {
@@ -307,7 +243,9 @@ func maybeRelative(path, relativeTo string) (string, bool) {
 }
 
 func (emit emitter) emitMake(out io.Writer, pkgMap map[string]*packages.Package) {
-	visitEach(pkgMap, func(pkg *packages.Package) {
+	for _, k := range keys(pkgMap) {
+		pkg := pkgMap[k]
+
 		codeDir := ""
 		isRel := false
 		if len(pkg.GoFiles) > 0 {
@@ -359,7 +297,7 @@ func (emit emitter) emitMake(out io.Writer, pkgMap map[string]*packages.Package)
 			fmt.Fprintf(out, "\t@touch $@\n")
 			fmt.Fprintf(out, "\n")
 		}
-	})
+	}
 }
 
 func (emit emitter) emitJSON(out io.Writer, pkgMap map[string]*packages.Package) {
