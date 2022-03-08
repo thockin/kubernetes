@@ -37,6 +37,7 @@ var flOut = pflag.StringP("output", "o", "make", "output format (mainly for debu
 var flTags = pflag.StringSlice("tag", nil, "build tags to pass to Go (see 'go help build', may be specified multiple times)")
 var flRelPath = pflag.String("relative-to", ".", "emit by-path rules for packages relative to this path")
 var flStateDir = pflag.String("state-dir", ".go2make", "directory in which to store state used by make")
+var flIgnoreErrors = pflag.BoolP("ignore-errors", "e", false, "ignore package errors")
 
 var lastDebugTime time.Time
 
@@ -60,9 +61,10 @@ func debug(items ...interface{}) {
 }
 
 type emitter struct {
-	tags     []string
-	relPath  string
-	stateDir string
+	tags         []string
+	ignoreErrors bool
+	relPath      string
+	stateDir     string
 }
 
 func main() {
@@ -104,9 +106,10 @@ func main() {
 
 	// Gather flag values for easier testing.
 	emit := emitter{
-		tags:     *flTags,
-		relPath:  strings.TrimRight(absOrExit(*flRelPath), "/"),
-		stateDir: strings.TrimRight(*flStateDir, "/"),
+		tags:         *flTags,
+		ignoreErrors: *flIgnoreErrors,
+		relPath:      strings.TrimRight(absOrExit(*flRelPath), "/"),
+		stateDir:     strings.TrimRight(*flStateDir, "/"),
 	}
 	debug("tags:", emit.tags)
 	debug("relative-to:", emit.relPath)
@@ -117,12 +120,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	pkgMap, errs := emit.visitPackages(pkgs)
-	if len(errs) > 0 {
-		fmt.Fprintf(os.Stderr, "error processing packages:\n")
-		for _, e := range errs {
-			fmt.Fprintf(os.Stderr, "  %s\n", e.Msg)
-		}
+	pkgMap := emit.visitPackages(pkgs)
+	if pkgMap == nil {
 		os.Exit(1)
 	}
 
@@ -185,45 +184,41 @@ func (emit emitter) loadPackages(targets ...string) ([]*packages.Package, error)
 	return packages.Load(&cfg, targets...)
 }
 
-func (emit emitter) visitPackages(pkgs []*packages.Package) (map[string]*packages.Package, []packages.Error) {
+func (emit emitter) visitPackages(pkgs []*packages.Package) map[string]*packages.Package {
 	pkgMap := map[string]*packages.Package{}
+	errs := false
 	for _, p := range pkgs {
-		errs := emit.visitPackage(p, pkgMap)
-		if len(errs) > 0 {
-			return nil, errs
+		ok := emit.visitPackage(p, pkgMap)
+		if !ok {
+			errs = true
 		}
 	}
-	return pkgMap, nil
+	if errs {
+		return nil
+	}
+	return pkgMap
 }
 
-func (emit emitter) visitPackage(pkg *packages.Package, pkgMap map[string]*packages.Package) []packages.Error {
+func (emit emitter) visitPackage(pkg *packages.Package, pkgMap map[string]*packages.Package) bool {
 	debug("visiting package", pkg.PkgPath)
 	if pkgMap[pkg.PkgPath] == pkg {
 		debug("  ", pkg.PkgPath, "was already visited")
-		return nil
+		return true
 	}
-
-	if len(pkg.Errors) > 0 {
-		debug("  ", pkg.PkgPath, "has errors:")
-		errs := []packages.Error{}
-		for _, e := range pkg.Errors {
-			debug("    ", fmt.Sprintf("%q", e))
-			if e.Kind == packages.ListError {
-				// ignore errors like "build constraints exclude all Go files"
-				debug("    ignoring error")
-				continue
-			}
-			errs = append(errs, e)
-		}
-		if len(errs) > 0 {
-			return errs
-		}
-	}
-
 	debug("  ", pkg.PkgPath, "is new")
 	pkgMap[pkg.PkgPath] = pkg
 
-	return nil
+	ok := true
+	for _, e := range pkg.Errors {
+		if emit.ignoreErrors {
+			debug("    ignoring error:", e.Msg)
+		} else {
+			fmt.Fprintf(os.Stderr, "%s\n", e.Msg)
+			ok = false
+		}
+	}
+
+	return ok
 }
 
 func keys(m map[string]*packages.Package) []string {
