@@ -36,6 +36,8 @@ endif
 # Define variables so `make --warn-undefined-variables` works.
 DBG_CODEGEN ?=
 UPDATE_API_KNOWN_VIOLATIONS ?=
+GO2MAKE_BY_PATH ?=
+GO2MAKE_BY_PKG ?=
 
 # This rule collects all the generated file sets into a single rule.  Other
 # rules should depend on this to ensure generated files are rebuilt.
@@ -198,8 +200,8 @@ gen_prerelease_lifecycle: $(PRERELEASE_LIFECYCLE_GEN) $(META_DIR)/$(PRERELEASE_L
 	        "$$@";                                                                 \
 	fi
 
-# For each dir in PRERELEASE_LIFECYCLE_DIRS, this establishes a dependency between the
-# output file and the input files that should trigger a rebuild.
+# For each dir in PRERELEASE_LIFECYCLE_DIRS, this establishes a dependency
+# between the output file and the input files that should trigger a rebuild.
 #
 # Note that this is a deps-only statement, not a full rule (see below).  This
 # has to be done in a distinct step because wildcards don't work in static
@@ -207,8 +209,8 @@ gen_prerelease_lifecycle: $(PRERELEASE_LIFECYCLE_GEN) $(META_DIR)/$(PRERELEASE_L
 #
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
-$(foreach dir, $(PRERELEASE_LIFECYCLE_DIRS), $(eval                            \
-    $(dir)/$(PRERELEASE_LIFECYCLE_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
+$(foreach dir, $(PRERELEASE_LIFECYCLE_DIRS), $(eval                          \
+    $(dir)/$(PRERELEASE_LIFECYCLE_FILENAME): $(call GO2MAKE_BY_PATH,$(dir))  \
 ))
 
 # How to regenerate prerelease-lifecycle code.  This is a little slow to run,
@@ -232,7 +234,7 @@ $(PRERELEASE_LIFECYCLE_FILES): $(PRERELEASE_LIFECYCLE_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(PRERELEASE_LIFECYCLE_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen/_pkg
+$(PRERELEASE_LIFECYCLE_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen)
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/prerelease-lifecycle-gen
 	touch $@
@@ -303,8 +305,8 @@ gen_deepcopy: $(DEEPCOPY_GEN) $(META_DIR)/$(DEEPCOPY_GEN).todo
 #
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
-$(foreach dir, $(DEEPCOPY_DIRS), $(eval                            \
-    $(dir)/$(DEEPCOPY_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
+$(foreach dir, $(DEEPCOPY_DIRS), $(eval                          \
+    $(dir)/$(DEEPCOPY_FILENAME): $(call GO2MAKE_BY_PATH,$(dir))  \
 ))
 
 # How to regenerate deep-copy code.  This is a little slow to run, so we batch
@@ -328,7 +330,7 @@ $(DEEPCOPY_FILES): $(DEEPCOPY_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(DEEPCOPY_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/deepcopy-gen/_pkg
+$(DEEPCOPY_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/deepcopy-gen)
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/deepcopy-gen
 	touch $@
@@ -405,8 +407,8 @@ gen_defaulter: $(DEFAULTER_GEN) $(META_DIR)/$(DEFAULTER_GEN).todo
 #
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
-$(foreach dir, $(DEFAULTER_DIRS), $(eval                            \
-    $(dir)/$(DEFAULTER_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
+$(foreach dir, $(DEFAULTER_DIRS), $(eval                          \
+    $(dir)/$(DEFAULTER_FILENAME): $(call GO2MAKE_BY_PATH,$(dir))  \
 ))
 
 # How to regenerate defaulter code.  This is a little slow to run, so we batch
@@ -430,7 +432,7 @@ $(DEFAULTER_FILES): $(DEFAULTER_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(DEFAULTER_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/defaulter-gen/_pkg
+$(DEFAULTER_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/defaulter-gen)
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/defaulter-gen
 	touch $@
@@ -520,8 +522,8 @@ gen_conversion: $(CONVERSION_GEN) $(META_DIR)/$(CONVERSION_GEN).todo
 #
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
-$(foreach dir, $(CONVERSION_DIRS), $(eval                            \
-    $(dir)/$(CONVERSION_FILENAME): $(META_DEPS)/by-path/./$(dir)/_pkg  \
+$(foreach dir, $(CONVERSION_DIRS), $(eval                          \
+    $(dir)/$(CONVERSION_FILENAME): $(call GO2MAKE_BY_PATH,$(dir))  \
 ))
 
 # How to regenerate conversion code.  This is a little slow to run, so we batch
@@ -545,7 +547,7 @@ $(CONVERSION_FILES): $(CONVERSION_GEN)
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to rebuild it over and over.  So we touch it,
 # and make is happy.
-$(CONVERSION_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/conversion-gen/_pkg
+$(CONVERSION_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/conversion-gen)
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/conversion-gen
 	touch $@
@@ -623,8 +625,8 @@ define OPENAPI_TARGETS_DEF
 #
 # The 'eval' is needed because this has a different RHS for each LHS, and
 # would otherwise produce results that make can't parse.
-$$(foreach dir, $$($(prefix)_OPENAPI_DIRS), $$(eval                    \
-    $$($(prefix)_OPENAPI_OUTFILE): $$(META_DEPS)/by-path/./$$(dir)/_pkg  \
+$$(foreach dir, $$($(prefix)_OPENAPI_DIRS), $$(eval                  \
+    $$($(prefix)_OPENAPI_OUTFILE): $$(call GO2MAKE_BY_PATH,$$(dir))  \
 ))
 
 # When UPDATE_API_KNOWN_VIOLATIONS is set to be true, let the generator to write
@@ -672,7 +674,7 @@ gen_openapi: $(OPENAPI_GEN) $(KUBE_OPENAPI_OUTFILE) $(AGGREGATOR_OPENAPI_OUTFILE
 # have to be rebuilt.  In that case, make will forever see the dependency as
 # newer than the binary, and try to "rebuild" it over and over.  So we touch
 # it, and make is happy.
-$(OPENAPI_GEN): $(META_DEPS)/by-path/./staging/src/k8s.io/code-generator/cmd/openapi-gen/_pkg
+$(OPENAPI_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/openapi-gen)
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/openapi-gen
 	touch $@
