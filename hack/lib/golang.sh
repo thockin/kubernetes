@@ -468,7 +468,8 @@ kube::golang::set_platform_envs() {
 }
 
 # Create the GOPATH tree under $KUBE_OUTPUT
-kube::golang::create_gopath_tree() {
+#FIXME: remove this when kube::golang::old::setup_env() is removed
+kube::golang::old::create_gopath_tree() {
   local go_pkg_dir="${KUBE_GOPATH}/src/${KUBE_GO_PACKAGE}"
   local go_pkg_basedir
   go_pkg_basedir=$(dirname "${go_pkg_dir}")
@@ -514,7 +515,8 @@ EOF
 #   env-var GOBIN is unset (we want binaries in a predictable place)
 #   env-var GO15VENDOREXPERIMENT=1
 #   current directory is within GOPATH
-kube::golang::setup_env() {
+#FIXME: remove this when all callers are converted
+kube::golang::old::setup_env() {
   kube::golang::verify_go_version
 
   # Set up GOPATH.  We have tools which depend on being in a GOPATH (see
@@ -536,7 +538,7 @@ kube::golang::setup_env() {
   #
   # Eventually, when we no longer rely on run-in-gopath.sh we may be able to
   # simplify this some.
-  kube::golang::create_gopath_tree
+  kube::golang::old::create_gopath_tree
   export GOPATH="${KUBE_GOPATH}"
 
   #FIXME: thockin: remove this commit
@@ -563,6 +565,54 @@ kube::golang::setup_env() {
 
   # This seems to matter to some tools
   export GO15VENDOREXPERIMENT=1
+}
+
+# kube::golang::setup_env will check that the `go` commands is available in
+# ${PATH}. It will also check that the Go version is good enough for the
+# Kubernetes build.
+#
+# Outputs:
+#   env-var GOPATH points to our local output dir
+#   env-var GOBIN is unset (we want binaries in a predictable place)
+#   env-var PATH includes the local GOPATH
+#FIXME: rename this when all callers are converted
+kube::golang::new::setup_env() {
+  kube::golang::verify_go_version
+
+  # Set up GOPATH.  We have tools which depend on being in a GOPATH (see
+  # hack/run-in-gopath.sh).
+  #
+  # Even in module mode, we need to set GOPATH for `go build` and `go install`
+  # to work.  We build various tools (usually via `go install`) from a lot of
+  # scripts.
+  #   * We can't just set GOBIN because that does not work on cross-compiles.
+  #   * We could always use `go build -o <something>`, but it's subtle wrt
+  #     cross-compiles and whether the <something> is a file or a directory,
+  #     and EVERY caller has to get it *just* right.
+  #   * We could leave GOPATH alone and let `go install` write binaries
+  #     wherever the user's GOPATH says (or doesn't say).
+  #
+  # Instead we set it to a phony local path and process the results ourselves.
+  # In particular, $GOPATH[0]/bin will be used for `go install`, with
+  # cross-compiles adding an extra directory under that.
+  #
+  # Eventually, when we no longer rely on run-in-gopath.sh we may be able to
+  # simplify this some.
+  export GOPATH="${KUBE_GOPATH}"
+
+  # Keep caches local.
+  export GOCACHE="${KUBE_GOPATH}/cache/build"
+  export GOMODCACHE="${KUBE_GOPATH}/cache/mod"
+
+  # Make sure our own Go binaries are in PATH.
+  export PATH="${KUBE_GOPATH}/bin:${PATH}"
+
+  # Unset GOBIN in case it already exists in the current session.
+  # Cross-compiles will not work with it set.
+  unset GOBIN
+
+  # Explicitly turn on modules.
+  export GO111MODULE=on
 }
 
 # This will take binaries from $GOPATH/bin and copy them to the appropriate
@@ -714,14 +764,14 @@ kube::golang::build_some_binaries() {
     done
     if [[ "${#uncovered[@]}" != 0 ]]; then
       V=2 kube::log::info "Building ${uncovered[*]} without coverage..."
-      GO111MODULE=on go install "${build_args[@]}" "${uncovered[@]}"
+      go install "${build_args[@]}" "${uncovered[@]}"
     else
       V=2 kube::log::info "Nothing to build without coverage."
-     fi
-   else
+    fi
+  else
     V=2 kube::log::info "Coverage is disabled."
-    GO111MODULE=on go install "${build_args[@]}" "$@"
-   fi
+    go install "${build_args[@]}" "$@"
+  fi
 }
 
 # Args:
@@ -833,7 +883,7 @@ kube::golang::build_binaries() {
   # Create a sub-shell so that we don't pollute the outer environment
   (
     # Check for `go` binary and set ${GOPATH}.
-    kube::golang::setup_env
+    kube::golang::new::setup_env
     V=2 kube::log::info "Go version: $(GOFLAGS='' go version)"
 
     local host_platform
@@ -843,6 +893,8 @@ kube::golang::build_binaries() {
     # function calls.  They are effectively part of the calling API to
     # build_binaries_for_platform.
     local goflags goldflags goasmflags gogcflags gotags
+
+    goflags+=("-modcacherw") # since we keep GOMODCACHE in _output
 
     # This is $(pwd) because we use run-in-gopath to build.  Once that is
     # excised, this can become ${KUBE_ROOT}.

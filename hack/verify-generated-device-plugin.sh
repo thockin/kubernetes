@@ -29,7 +29,7 @@ DEVICE_PLUGIN_ALPHA="${KUBE_ROOT}/staging/src/k8s.io/kubelet/pkg/apis/deviceplug
 DEVICE_PLUGIN_V1BETA1="${KUBE_ROOT}/staging/src/k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1/"
 
 source "${KUBE_ROOT}/hack/lib/protoc.sh"
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 function cleanup {
 	rm -rf "${DEVICE_PLUGIN_ALPHA}/_tmp/"

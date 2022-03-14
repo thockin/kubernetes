@@ -29,7 +29,7 @@ KUBE_KMS_V2ALPHA1="${KUBE_ROOT}/staging/src/k8s.io/kms/apis/v2alpha1/"
 KUBE_KMS_V2="${KUBE_ROOT}/staging/src/k8s.io/apiserver/pkg/storage/value/encrypt/envelope/kmsv2/v2alpha1/"
 
 source "${KUBE_ROOT}/hack/lib/protoc.sh"
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 function cleanup {
 	rm -rf "${KUBE_KMS_V1BETA1}/_tmp/"

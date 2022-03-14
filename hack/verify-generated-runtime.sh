@@ -29,7 +29,7 @@ source "${KUBE_ROOT}/hack/lib/init.sh"
 
 runtime_versions=("v1alpha2" "v1")
 
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 function cleanup {
 	for v in "${runtime_versions[@]}"; do
