@@ -24,7 +24,7 @@ set -o pipefail
 KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "${KUBE_ROOT}/hack/lib/init.sh"
 
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 GO111MODULE=on GOPROXY=off go install k8s.io/kubernetes/pkg/generated/openapi/cmd/models-schema
 GO111MODULE=on GOPROXY=off go install k8s.io/code-generator/cmd/client-gen

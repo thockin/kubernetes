@@ -27,7 +27,7 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "${KUBE_ROOT}/hack/lib/init.sh"
 source "${KUBE_ROOT}/hack/lib/swagger.sh"
 
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 IFS=" " read -r -a GROUP_VERSIONS <<< "meta/v1 meta/v1beta1 ${KUBE_AVAILABLE_GROUP_VERSIONS}"
 

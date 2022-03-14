@@ -30,7 +30,7 @@ KUBELET_PLUGIN_REGISTRATION_V1ALPHA="${KUBE_ROOT}/staging/src/k8s.io/kubelet/pkg
 KUBELET_PLUGIN_REGISTRATION_V1BETA="${KUBE_ROOT}/staging/src/k8s.io/kubelet/pkg/apis/pluginregistration/v1beta1/"
 
 source "${KUBE_ROOT}/hack/lib/protoc.sh"
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 function cleanup {
 	rm -rf "${KUBELET_PLUGIN_REGISTRATION_V1ALPHA}/_tmp/"

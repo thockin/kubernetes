@@ -27,7 +27,7 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 POD_RESOURCES="${KUBE_ROOT}/staging/src/k8s.io/kubelet/pkg/apis/podresources/v1/"
 source "${KUBE_ROOT}/hack/lib/init.sh"
 
-kube::golang::setup_env
+kube::golang::old::setup_env
 
 function cleanup {
 	rm -rf "${POD_RESOURCES}/_tmp/"
