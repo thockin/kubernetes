@@ -524,6 +524,7 @@ kube::golang::old::setup_env() {
   kube::golang::old::create_gopath_tree
   export GOPATH="${KUBE_GOPATH}"
 
+  #FIXME: keep this?
   export GOCACHE="${KUBE_GOPATH}/cache"
 
   # Make sure our own Go binaries are in PATH.
