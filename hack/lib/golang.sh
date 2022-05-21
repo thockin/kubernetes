@@ -535,6 +535,7 @@ kube::golang::old::setup_env() {
   kube::golang::old::create_gopath_tree
   export GOPATH="${KUBE_GOPATH}"
 
+  #FIXME: keep this?
   #FIXME: thockin: remove this commit
   export GOCACHE="${KUBE_ROOT}/_hack_cache/build"
   export GOMODCACHE="${KUBE_ROOT}/_hack_cache/mod"
