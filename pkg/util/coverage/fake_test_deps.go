@@ -18,6 +18,8 @@ package coverage
 
 import (
 	"io"
+	"reflect"
+	"time"
 )
 
 // This is an implementation of testing.testDeps. It doesn't need to do anything, because
@@ -61,3 +63,27 @@ func (fakeTestDeps) WriteHeapProfile(io.Writer) error {
 func (fakeTestDeps) WriteProfileTo(string, io.Writer, int) error {
 	return nil
 }
+
+//nolint:unused // U1000 see comment above, we know it's unused normally.
+func (fakeTestDeps) CheckCorpus([]interface{}, []reflect.Type) error {
+	return nil
+}
+
+//nolint:unused // U1000 see comment above, we know it's unused normally.
+func (fakeTestDeps) SetPanicOnExit0(bool) {}
+
+//nolint:unused // U1000 see comment above, we know it's unused normally.
+func (fakeTestDeps) CoordinateFuzzing(time.Duration, int64, time.Duration, int64, int, []corpusEntry, []reflect.Type, string, string) error {
+	return nil
+}
+
+//nolint:unused // U1000 see comment above, we know it's unused normally.
+func (fakeTestDeps) RunFuzzWorker(func(corpusEntry) error) error {
+	return nil
+}
+
+//nolint:unused // U1000 see comment above, we know it's unused normally.
+func (fakeTestDeps) ResetCoverage() {}
+
+//nolint:unused // U1000 see comment above, we know it's unused normally.
+func (fakeTestDeps) SnapshotCoverage() {}
