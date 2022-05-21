@@ -462,21 +462,6 @@ kube::golang::set_platform_envs() {
   fi
 }
 
-# Create the GOPATH tree under $KUBE_OUTPUT
-#FIXME: remove this when kube::golang::old::setup_env() is removed
-kube::golang::old::create_gopath_tree() {
-  local go_pkg_dir="${KUBE_GOPATH}/src/${KUBE_GO_PACKAGE}"
-  local go_pkg_basedir
-  go_pkg_basedir=$(dirname "${go_pkg_dir}")
-
-  mkdir -p "${go_pkg_basedir}"
-
-  # TODO: This symlink should be relative.
-  if [[ ! -e "${go_pkg_dir}" || "$(readlink "${go_pkg_dir}")" != "${KUBE_ROOT}" ]]; then
-    ln -snf "${KUBE_ROOT}" "${go_pkg_dir}"
-  fi
-}
-
 # Ensure the go tool exists and is a viable version.
 kube::golang::verify_go_version() {
   if [[ -z "$(command -v go)" ]]; then
@@ -508,65 +493,8 @@ EOF
 # Outputs:
 #   env-var GOPATH points to our local output dir
 #   env-var GOBIN is unset (we want binaries in a predictable place)
-#   env-var GO15VENDOREXPERIMENT=1
-#   current directory is within GOPATH
-#FIXME: remove this when all callers are converted
-kube::golang::old::setup_env() {
-  kube::golang::verify_go_version
-
-  # Even in module mode, we need to set GOPATH for `go build` and `go install`
-  # to work.  We build various tools (usually via `go install`) from a lot of
-  # scripts.
-  #   * We can't set GOBIN because that does not work on cross-compiles.
-  #   * We could use `go build -o <something>`, but it's subtle when it comes
-  #     to cross-compiles and whether the <something> is a file or a directory,
-  #     and EVERY caller has to get it *just* right.
-  #   * We could leave GOPATH alone and let `go install` write binaries
-  #     wherever the user's GOPATH says (or doesn't say).
-  #
-  # Instead we set it to a phony local path and process the results ourselves.
-  # In particular, GOPATH[0]/bin will be used for `go install`, with
-  # cross-compiles adding an extra directory under that.
-  kube::golang::old::create_gopath_tree
-  export GOPATH="${KUBE_GOPATH}"
-
-  #FIXME: keep this?
-  #FIXME: thockin: remove this commit
-  export GOCACHE="${KUBE_ROOT}/_hack_cache/build"
-  export GOMODCACHE="${KUBE_ROOT}/_hack_cache/mod"
-
-  # Make sure our own Go binaries are in PATH.
-  export PATH="${KUBE_GOPATH}/bin:${PATH}"
-
-  # Change directories so that we are within the GOPATH.  Some tools get really
-  # upset if this is not true.  We use a whole fake GOPATH here to collect the
-  # resultant binaries.
-  local subdir
-  subdir=$(kube::realpath . | sed "s|${KUBE_ROOT}||")
-  cd "${KUBE_GOPATH}/src/${KUBE_GO_PACKAGE}/${subdir}" || return 1
-
-  # Set GOROOT so binaries that parse code can work properly.
-  GOROOT=$(go env GOROOT)
-  export GOROOT
-
-  # Unset GOBIN in case it already exists in the current session.
-  # Cross-compiles will not work with it set.
-  unset GOBIN
-
-  # This seems to matter to some tools
-  export GO15VENDOREXPERIMENT=1
-}
-
-# kube::golang::setup_env will check that the `go` commands is available in
-# ${PATH}. It will also check that the Go version is good enough for the
-# Kubernetes build.
-#
-# Outputs:
-#   env-var GOPATH points to our local output dir
-#   env-var GOBIN is unset (we want binaries in a predictable place)
 #   env-var PATH includes the local GOPATH
-#FIXME: rename this when all callers are converted
-kube::golang::new::setup_env() {
+kube::golang::setup_env() {
   kube::golang::verify_go_version
 
   # Even in module mode, we need to set GOPATH for `go build` and `go install`
@@ -870,7 +798,7 @@ kube::golang::build_binaries() {
   # Create a sub-shell so that we don't pollute the outer environment
   (
     # Check for `go` binary and set ${GOPATH}.
-    kube::golang::new::setup_env
+    kube::golang::setup_env
     V=2 kube::log::info "Go version: $(GOFLAGS='' go version)"
 
     local host_platform
