@@ -26,7 +26,7 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 source "${KUBE_ROOT}/hack/lib/init.sh"
 cd "${KUBE_ROOT}"
 
-kube::golang::old::setup_env
+kube::golang::new::setup_env
 
 DBG_CODEGEN="${DBG_CODEGEN:-0}"
 GENERATED_FILE_PREFIX="${GENERATED_FILE_PREFIX:-zz_generated.}"
@@ -186,14 +186,10 @@ function codegen::deepcopy() {
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: finding all +k8s:deepcopy-gen tags"
     fi
-    # FIXME: This tool needs inputs in the form:
-    # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
-    # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
     local tag_dirs=()
     kube::util::read-array tag_dirs < <( \
         grep -l -Z --color=never '+k8s:deepcopy-gen=' "${ALL_K8S_TAG_FILES[@]}" \
             | xargs -0 -n1 dirname \
-            | sed 's|staging/src|vendor|g' \
             | LC_ALL=C sort -u)
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: found ${#tag_dirs[@]} +k8s:deepcopy-gen tagged dirs"
@@ -201,7 +197,7 @@ function codegen::deepcopy() {
 
     local tag_pkgs=()
     for dir in "${tag_dirs[@]}"; do
-        tag_pkgs+=("${PRJ_SRC_PATH}/$dir")
+        tag_pkgs+=("./$dir")
     done
 
     kube::log::status "Generating deepcopy code for ${#tag_pkgs[@]} targets"
@@ -212,7 +208,7 @@ function codegen::deepcopy() {
         done
     fi
 
-    ./hack/run-in-gopath.sh "${gen_deepcopy_bin}" \
+    "${gen_deepcopy_bin}" \
         --v "${KUBE_VERBOSE}" \
         --logtostderr \
         -h "${BOILERPLATE_FILENAME}" \
