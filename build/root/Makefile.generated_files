@@ -44,7 +44,7 @@ GO2MAKE_BY_PKG ?=
 .PHONY: generated_files
 #FIXME: disable codegens and fix them one at a time in further commits
 #generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion gen_openapi
-generated_files:
+generated_files: gen_deepcopy
 
 #
 # Helper logic to calculate Go's dependency DAG ourselves.
@@ -248,7 +248,6 @@ $(PRERELEASE_LIFECYCLE_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-gene
 endif # DONOTRUN
 
 
-ifeq ($(DONOTRUN),1)
 # Deep-copy generation
 #
 # Any package that wants deep-copy functions generated must include a
@@ -296,7 +295,7 @@ gen_deepcopy: $(DEEPCOPY_GEN) $(META_DIR)/$(DEEPCOPY_GEN).todo
 	    fi;                                                            \
 	    N=$$(cat $(META_DIR)/$(DEEPCOPY_GEN).todo | wc -l);            \
 	    kube::log::status "Generating deepcopy code for $$N targets";  \
-	    ./hack/run-in-gopath.sh $(DEEPCOPY_GEN)                        \
+	    $(DEEPCOPY_GEN)                                                \
 	        --v $(KUBE_VERBOSE)                                        \
 	        --logtostderr                                              \
 	        -h $(BOILERPLATE_FILENAME)                                 \
@@ -329,7 +328,7 @@ $(DEEPCOPY_FILES): $(DEEPCOPY_GEN)
 	    ls -lft --full-time $@ || true;         \
 	    ls -lft --full-time $? || true;         \
 	fi
-	echo $(PRJ_SRC_PATH)/$(@D) >> $(META_DIR)/$(DEEPCOPY_GEN).todo
+	echo ./$(@D) >> $(META_DIR)/$(DEEPCOPY_GEN).todo
 
 # How to build the generator tool.  The deps for this are defined in
 # the $(GO_PKGDEPS_FILE), above.
@@ -344,7 +343,6 @@ $(DEEPCOPY_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/de
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/deepcopy-gen
 	touch $@
-endif # DONOTRUN
 
 
 ifeq ($(DONOTRUN),1)
