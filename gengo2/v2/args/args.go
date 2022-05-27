@@ -31,7 +31,6 @@ import (
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/namer"
 	"k8s.io/gengo/v2/parser"
-	"k8s.io/gengo/v2/types"
 
 	"github.com/spf13/pflag"
 )
@@ -150,24 +149,6 @@ func (g *GeneratorArgs) NewBuilder() (*parser.Builder, error) {
 		return nil, err
 	}
 	return b, nil
-}
-
-// InputIncludes returns true if the given package is a (sub) package of one of
-// the InputDirs.
-func (g *GeneratorArgs) InputIncludes(p *types.Package) bool {
-	for _, dir := range g.InputDirs {
-		d := dir
-		if strings.HasSuffix(d, "...") {
-			d = strings.TrimSuffix(d, "...")
-		}
-		if strings.HasPrefix(d, "./vendor/") {
-			d = strings.TrimPrefix(d, "./vendor/")
-		}
-		if strings.HasPrefix(p.Path, d) {
-			return true
-		}
-	}
-	return false
 }
 
 // Execute implements main().
