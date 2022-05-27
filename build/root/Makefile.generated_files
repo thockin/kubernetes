@@ -44,7 +44,7 @@ GO2MAKE_BY_PKG ?=
 .PHONY: generated_files
 #FIXME: disable codegens and fix them one at a time in further commits
 #generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion gen_openapi
-generated_files: gen_deepcopy
+generated_files: gen_deepcopy gen_defaulter
 
 #
 # Helper logic to calculate Go's dependency DAG ourselves.
@@ -344,8 +344,6 @@ $(DEEPCOPY_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/de
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/deepcopy-gen
 	touch $@
 
-
-ifeq ($(DONOTRUN),1)
 # Defaulter generation
 #
 # Any package that wants defaulter functions generated must include a
@@ -383,8 +381,6 @@ ifeq ($(DBG_MAKEFILE),1)
     $(warning ***** found $(shell echo $(DEFAULTER_DIRS) | wc -w) +k8s:defaulter-gen tagged dirs)
 endif
 DEFAULTER_FILES := $(addsuffix /$(DEFAULTER_FILENAME), $(DEFAULTER_DIRS))
-DEFAULTER_EXTRA_PEER_PKGS := \
-    $(addprefix $(PRJ_SRC_PATH)/, $(DEFAULTER_DIRS))
 
 # Reset the list of packages that need generation.
 $(shell mkdir -p $$(dirname $(META_DIR)/$(DEFAULTER_GEN)))
@@ -401,12 +397,11 @@ gen_defaulter: $(DEFAULTER_GEN) $(META_DIR)/$(DEFAULTER_GEN).todo
 	    fi;                                                             \
 	    N=$$(cat $(META_DIR)/$(DEFAULTER_GEN).todo | wc -l);            \
 	    kube::log::status "Generating defaulter code for $$N targets";  \
-	    ./hack/run-in-gopath.sh $(DEFAULTER_GEN)                        \
+	    $(DEFAULTER_GEN)                                                \
 	        --v $(KUBE_VERBOSE)                                         \
 	        --logtostderr                                               \
 	        -h $(BOILERPLATE_FILENAME)                                  \
 	        -i "$$pkgs"                                                 \
-	        --extra-peer-dirs $$(echo $(DEFAULTER_EXTRA_PEER_PKGS) | sed 's/ /,/g') \
 	        -O $(DEFAULTER_BASENAME)                                    \
 	        "$$@";                                                      \
 	fi
@@ -432,7 +427,7 @@ $(DEFAULTER_FILES): $(DEFAULTER_GEN)
 	    ls -lft --full-time $@ || true;          \
 	    ls -lft --full-time $? || true;          \
 	fi
-	echo $(PRJ_SRC_PATH)/$(@D) >> $(META_DIR)/$(DEFAULTER_GEN).todo
+	echo ./$(@D) >> $(META_DIR)/$(DEFAULTER_GEN).todo
 
 # How to build the generator tool.  The deps for this are defined in
 # the $(GO_PKGDEPS_FILE), above.
@@ -447,7 +442,6 @@ $(DEFAULTER_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/d
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/defaulter-gen
 	touch $@
-endif # DONOTRUN
 
 
 ifeq ($(DONOTRUN),1)
