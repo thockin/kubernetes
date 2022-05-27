@@ -137,13 +137,7 @@ func (g *GeneratorArgs) LoadGoBoilerplate() ([]byte, error) {
 // NewBuilder makes a new parser.Builder and populates it with the input
 // directories.
 func (g *GeneratorArgs) NewBuilder() (*parser.Builder, error) {
-	b := parser.New()
-
-	// flag for including *_test.go
-	b.IncludeTestFiles = g.IncludeTestFiles
-
-	// Ignore all auto-generated files.
-	b.AddBuildTags(g.GeneratedBuildTag)
+	b := parser.New(g.IncludeTestFiles, g.GeneratedBuildTag)
 
 	if err := b.AddDirs(g.InputDirs); err != nil {
 		return nil, err
@@ -165,9 +159,6 @@ func (g *GeneratorArgs) Execute(nameSystems namer.NameSystems, defaultSystem str
 	if err != nil {
 		return fmt.Errorf("Failed making a parser: %v", err)
 	}
-
-	// pass through the flag on whether to include *_test.go files
-	b.IncludeTestFiles = g.IncludeTestFiles
 
 	c, err := generator.NewContext(b, nameSystems, defaultSystem)
 	if err != nil {
