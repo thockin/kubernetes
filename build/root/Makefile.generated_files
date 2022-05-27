@@ -44,7 +44,7 @@ GO2MAKE_BY_PKG ?=
 .PHONY: generated_files
 #FIXME: disable codegens and fix them one at a time in further commits
 #generated_files: gen_prerelease_lifecycle gen_deepcopy gen_defaulter gen_conversion gen_openapi
-generated_files: gen_deepcopy gen_defaulter
+generated_files: gen_deepcopy gen_defaulter gen_conversion
 
 #
 # Helper logic to calculate Go's dependency DAG ourselves.
@@ -344,6 +344,7 @@ $(DEEPCOPY_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/de
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/deepcopy-gen
 	touch $@
 
+
 # Defaulter generation
 #
 # Any package that wants defaulter functions generated must include a
@@ -444,7 +445,6 @@ $(DEFAULTER_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/d
 	touch $@
 
 
-ifeq ($(DONOTRUN),1)
 # Conversion generation
 
 # Any package that wants conversion functions generated into it must
@@ -495,7 +495,7 @@ CONVERSION_EXTRA_PEER_PKGS := \
     k8s.io/kubernetes/pkg/apis/core \
     k8s.io/kubernetes/pkg/apis/core/v1 \
     k8s.io/api/core/v1
-CONVERSION_EXTRA_PKGS := $(addprefix $(PRJ_SRC_PATH)/, $(CONVERSION_DIRS))
+CONVERSION_EXTRA_PKGS := $(addprefix ./, $(CONVERSION_DIRS))
 
 # Reset the list of packages that need generation.
 $(shell mkdir -p $$(dirname $(META_DIR)/$(CONVERSION_GEN)))
@@ -503,6 +503,7 @@ $(shell rm -f $(META_DIR)/$(CONVERSION_GEN).todo)
 
 # This rule aggregates the set of files to generate and then generates them all
 # in a single run of the tool.
+# FIXME: if we process all of CONVERSION_DIRS is it actually faster to just regen everything?
 .PHONY: gen_conversion
 gen_conversion: $(CONVERSION_GEN) $(META_DIR)/$(CONVERSION_GEN).todo
 	if [[ -s $(META_DIR)/$(CONVERSION_GEN).todo ]]; then                 \
@@ -512,7 +513,7 @@ gen_conversion: $(CONVERSION_GEN) $(META_DIR)/$(CONVERSION_GEN).todo
 	    fi;                                                              \
 	    N=$$(cat $(META_DIR)/$(CONVERSION_GEN).todo | wc -l);            \
 	    kube::log::status "Generating conversion code for $$N targets";  \
-	    ./hack/run-in-gopath.sh $(CONVERSION_GEN)                        \
+	    $(CONVERSION_GEN)                                                \
 	        --extra-peer-dirs $$(echo $(CONVERSION_EXTRA_PEER_PKGS) | sed 's/ /,/g') \
 	        --extra-dirs $$(echo $(CONVERSION_EXTRA_PKGS) | sed 's/ /,/g') \
 	        --v $(KUBE_VERBOSE)                                          \
@@ -544,7 +545,7 @@ $(CONVERSION_FILES): $(CONVERSION_GEN)
 	    ls -lft --full-time $@ || true;           \
 	    ls -lft --full-time $? || true;           \
 	fi
-	echo $(PRJ_SRC_PATH)/$(@D) >> $(META_DIR)/$(CONVERSION_GEN).todo
+	echo ./$(@D) >> $(META_DIR)/$(CONVERSION_GEN).todo
 
 # How to build the generator tool.  The deps for this are defined in
 # the $(GO_PKGDEPS_FILE), above.
@@ -559,7 +560,6 @@ $(CONVERSION_GEN): $(call GO2MAKE_BY_PATH,staging/src/k8s.io/code-generator/cmd/
 	KUBE_BUILD_PLATFORMS="" \
 	    hack/make-rules/build.sh ./staging/src/k8s.io/code-generator/cmd/conversion-gen
 	touch $@
-endif # DONOTRUN
 
 
 ifeq ($(DONOTRUN),1)
