@@ -31,6 +31,7 @@ use (
 	./staging/src/k8s.io/sample-cli-plugin
 	./staging/src/k8s.io/sample-controller
 	./gengo2
+	./gengo2/v2
 )
 
 replace bazil.org/fuse => bazil.org/fuse v0.0.0-20160811212531-371fbbdaa898
@@ -662,6 +663,8 @@ replace k8s.io/cri-api v0.0.0 => ./staging/src/k8s.io/cri-api
 replace k8s.io/csi-translation-lib v0.0.0 => ./staging/src/k8s.io/csi-translation-lib
 
 replace k8s.io/gengo v0.0.0 => ./gengo2
+
+replace k8s.io/gengo/v2 v2.0.0 => ./gengo2/v2
 
 replace k8s.io/klog/v2 => k8s.io/klog/v2 v2.60.1
 
