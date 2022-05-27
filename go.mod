@@ -108,6 +108,7 @@ require (
 	k8s.io/cri-api v0.0.0
 	k8s.io/csi-translation-lib v0.0.0
 	k8s.io/gengo v0.0.0
+	k8s.io/gengo/v2 v2.0.0
 	k8s.io/klog/v2 v2.80.1
 	k8s.io/kms v0.0.0
 	k8s.io/kube-aggregator v0.0.0
@@ -534,6 +535,7 @@ replace (
 	k8s.io/cri-api => ./staging/src/k8s.io/cri-api
 	k8s.io/csi-translation-lib => ./staging/src/k8s.io/csi-translation-lib
 	k8s.io/gengo => ./gengo2
+	k8s.io/gengo/v2 => ./gengo2/v2
 	k8s.io/klog/v2 => k8s.io/klog/v2 v2.80.1
 	k8s.io/kms => ./staging/src/k8s.io/kms
 	k8s.io/kube-aggregator => ./staging/src/k8s.io/kube-aggregator

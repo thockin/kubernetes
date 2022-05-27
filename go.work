@@ -31,4 +31,5 @@ use (
 	./staging/src/k8s.io/sample-cli-plugin
 	./staging/src/k8s.io/sample-controller
 	./gengo2
+	./gengo2/v2
 )
