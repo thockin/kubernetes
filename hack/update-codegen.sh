@@ -446,15 +446,7 @@ function codegen::conversions() {
 
     local tag_pkgs=()
     for dir in "${tag_dirs[@]}"; do
-        # FIXME: This tool needs inputs in the form:
-        # 'k8s.io/foo/bar' rather than 'k8s.io/kubernetes/staging/src/k8s.io/foo/bar'
-        # or './staging/src/k8s.io/foo/bar'.
-        local p
-        p="$(echo "$dir" \
-            | sed 's|^|./|' \
-            | sed 's|^\./staging/src/||' \
-            | sed "s|^\.|${PRJ_SRC_PATH}|")"
-        tag_pkgs+=("$p")
+        tag_pkgs+=("./$dir")
     done
 
     local extra_peer_pkgs=(
@@ -473,13 +465,12 @@ function codegen::conversions() {
 
     git_find -z ':(glob)**'/"${output_base}.go" | xargs -0 rm -f
 
-    ./hack/run-in-gopath.sh "${gen_conversion_bin}" \
+    "${gen_conversion_bin}" \
         --v "${KUBE_VERBOSE}" \
         --logtostderr \
         -h "${BOILERPLATE_FILENAME}" \
         -O "${output_base}" \
         $(printf -- " --extra-peer-dirs %s" "${extra_peer_pkgs[@]}") \
-        $(printf -- " --extra-dirs %s" "${tag_pkgs[@]}") \
         $(printf -- " -i %s" "${tag_pkgs[@]}") \
         "$@"
 
