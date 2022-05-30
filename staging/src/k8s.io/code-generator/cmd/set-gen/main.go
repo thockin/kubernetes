@@ -28,8 +28,8 @@ import (
 	"os"
 
 	"k8s.io/code-generator/pkg/util"
-	"k8s.io/gengo/args"
-	"k8s.io/gengo/examples/set-gen/generators"
+	"k8s.io/gengo/v2/args"
+	"k8s.io/gengo/v2/examples/set-gen/generators"
 
 	"k8s.io/klog/v2"
 )

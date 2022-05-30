@@ -22,8 +22,8 @@ import (
 
 	"github.com/spf13/pflag"
 	"k8s.io/code-generator/pkg/util"
-	"k8s.io/gengo/args"
-	"k8s.io/gengo/examples/import-boss/generators"
+	"k8s.io/gengo/v2/args"
+	"k8s.io/gengo/v2/examples/import-boss/generators"
 
 	"k8s.io/klog/v2"
 )
