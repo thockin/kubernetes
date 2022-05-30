@@ -28,18 +28,20 @@ kube::golang::setup_env
 
 BOILERPLATE="staging/src/k8s.io/code-generator/hack/boilerplate.go.txt"
 
-hack/make-rules/build.sh k8s.io/kubernetes/pkg/generated/openapi/cmd/models-schema
-hack/make-rules/build.sh k8s.io/code-generator/cmd/client-gen
+hack/make-rules/build.sh \
+    k8s.io/code-generator/cmd/applyconfiguration-gen \
+    k8s.io/kubernetes/pkg/generated/openapi/cmd/models-schema \
+    k8s.io/code-generator/cmd/client-gen 
 #FIXME:
 #hack/make-rules/build.sh k8s.io/code-generator/cmd/lister-gen
 #hack/make-rules/build.sh k8s.io/code-generator/cmd/informer-gen
-#hack/make-rules/build.sh k8s.io/code-generator/cmd/applyconfiguration-gen
 
+applyconfigurationgen=$(kube::util::find-binary "applyconfiguration-gen")
 modelsschema=$(kube::util::find-binary "models-schema")
 clientgen=$(kube::util::find-binary "client-gen")
+#FIXME:
 #listergen=$(kube::util::find-binary "lister-gen")
 #informergen=$(kube::util::find-binary "informer-gen")
-#applyconfigurationgen=$(kube::util::find-binary "applyconfiguration-gen")
 
 IFS=" " read -r -a GROUP_VERSIONS <<< "${KUBE_AVAILABLE_GROUP_VERSIONS}"
 GV_DIRS=()
@@ -68,14 +70,14 @@ kube::util::read-array applyconfigurationgen_external_apis < <(
 applyconfigurationgen_external_apis+=("k8s.io/apimachinery/pkg/apis/meta/v1")
 applyconfigurationgen_external_apis_csv=$(IFS=,; echo "${applyconfigurationgen_external_apis[*]}")
 applyconfigurations_package="k8s.io/client-go/applyconfigurations"
-#${applyconfigurationgen} \
-#  --openapi-schema <(${modelsschema}) \
-#  --output-base "${KUBE_ROOT}/vendor" \
-#  --output-package "${applyconfigurations_package}" \
-#  --input-dirs "${applyconfigurationgen_external_apis_csv}" \
-#  --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
-#  "$@"
-false #FIXME
+${applyconfigurationgen} \
+  -v "${KUBE_VERBOSE}" \
+  --openapi-schema <(${modelsschema}) \
+  --output-base "${KUBE_ROOT}/staging/src" \
+  --output-package "${applyconfigurations_package}" \
+  --input-dirs "${applyconfigurationgen_external_apis_csv}" \
+  --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
+  "$@"
 
 # This can be called with one flag, --verify-only, so it works for both the
 # update- and verify- scripts.
@@ -89,6 +91,7 @@ ${clientgen} \
   --apply-configuration-package "${applyconfigurations_package}" \
   --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
   "$@"
+false #FIXME
 
 listergen_external_apis=()
 kube::util::read-array listergen_external_apis < <(
