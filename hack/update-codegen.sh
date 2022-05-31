@@ -91,7 +91,6 @@ ${clientgen} \
   --apply-configuration-package "${applyconfigurations_package}" \
   --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
   "$@"
-false #FIXME
 
 listergen_external_apis=()
 kube::util::read-array listergen_external_apis < <(
@@ -99,7 +98,14 @@ kube::util::read-array listergen_external_apis < <(
   find k8s.io/api -name types.go -print0 | xargs -0 -n1 dirname | sort
 )
 listergen_external_apis_csv=$(IFS=,; echo "${listergen_external_apis[*]}")
-${listergen} --output-base "${KUBE_ROOT}/vendor" --output-package "k8s.io/client-go/listers" --input-dirs "${listergen_external_apis_csv}" --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" "$@"
+${listergen} \
+  -v "${KUBE_VERBOSE}" \
+  --output-base "${KUBE_ROOT}/staging/src" \
+  --output-package "k8s.io/client-go/listers" \
+  --input-dirs "${listergen_external_apis_csv}" \
+  --go-header-file "${KUBE_ROOT}/hack/boilerplate/boilerplate.generatego.txt" \
+  "$@"
+false #FIXME
 
 informergen_external_apis=()
 # because client-gen doesn't do policy/v1alpha1, we have to skip it too
