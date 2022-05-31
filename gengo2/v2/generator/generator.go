@@ -185,6 +185,7 @@ type Context struct {
 	builder *parser.Builder
 
 	// If specified, trim the prefix from a package's path before writing files.
+	//FIXME: kill this
 	TrimPathPrefix string
 }
 

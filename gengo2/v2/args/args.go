@@ -87,6 +87,7 @@ type GeneratorArgs struct {
 	CustomArgs interface{}
 
 	// If specified, trim the prefix from OutputPackagePath before writing files.
+	//FIXME: remove this?  Clean up "OutputBase" etc to make sense.  Maybe "alt-gopath-root" ?
 	TrimPathPrefix string
 
 	// Whether to use default command line flags
