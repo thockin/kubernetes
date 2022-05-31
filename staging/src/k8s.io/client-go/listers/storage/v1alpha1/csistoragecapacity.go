@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "k8s.io/api/storage/v1alpha1"
+	apistoragev1alpha1 "k8s.io/api/storage/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type CSIStorageCapacityLister interface {
 	// List lists all CSIStorageCapacities in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.CSIStorageCapacity, err error)
+	List(selector labels.Selector) (ret []*apistoragev1alpha1.CSIStorageCapacity, err error)
 	// CSIStorageCapacities returns an object that can list and get CSIStorageCapacities.
 	CSIStorageCapacities(namespace string) CSIStorageCapacityNamespaceLister
 	CSIStorageCapacityListerExpansion
@@ -47,9 +47,9 @@ func NewCSIStorageCapacityLister(indexer cache.Indexer) CSIStorageCapacityLister
 }
 
 // List lists all CSIStorageCapacities in the indexer.
-func (s *cSIStorageCapacityLister) List(selector labels.Selector) (ret []*v1alpha1.CSIStorageCapacity, err error) {
+func (s *cSIStorageCapacityLister) List(selector labels.Selector) (ret []*apistoragev1alpha1.CSIStorageCapacity, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CSIStorageCapacity))
+		ret = append(ret, m.(*apistoragev1alpha1.CSIStorageCapacity))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *cSIStorageCapacityLister) CSIStorageCapacities(namespace string) CSISto
 type CSIStorageCapacityNamespaceLister interface {
 	// List lists all CSIStorageCapacities in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.CSIStorageCapacity, err error)
+	List(selector labels.Selector) (ret []*apistoragev1alpha1.CSIStorageCapacity, err error)
 	// Get retrieves the CSIStorageCapacity from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.CSIStorageCapacity, error)
+	Get(name string) (*apistoragev1alpha1.CSIStorageCapacity, error)
 	CSIStorageCapacityNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type cSIStorageCapacityNamespaceLister struct {
 }
 
 // List lists all CSIStorageCapacities in the indexer for a given namespace.
-func (s cSIStorageCapacityNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.CSIStorageCapacity, err error) {
+func (s cSIStorageCapacityNamespaceLister) List(selector labels.Selector) (ret []*apistoragev1alpha1.CSIStorageCapacity, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.CSIStorageCapacity))
+		ret = append(ret, m.(*apistoragev1alpha1.CSIStorageCapacity))
 	})
 	return ret, err
 }
 
 // Get retrieves the CSIStorageCapacity from the indexer for a given namespace and name.
-func (s cSIStorageCapacityNamespaceLister) Get(name string) (*v1alpha1.CSIStorageCapacity, error) {
+func (s cSIStorageCapacityNamespaceLister) Get(name string) (*apistoragev1alpha1.CSIStorageCapacity, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("csistoragecapacity"), name)
+		return nil, errors.NewNotFound(apistoragev1alpha1.Resource("csistoragecapacity"), name)
 	}
-	return obj.(*v1alpha1.CSIStorageCapacity), nil
+	return obj.(*apistoragev1alpha1.CSIStorageCapacity), nil
 }

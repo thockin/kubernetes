@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/storage/v1beta1"
+	apistoragev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type VolumeAttachmentLister interface {
 	// List lists all VolumeAttachments in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.VolumeAttachment, err error)
+	List(selector labels.Selector) (ret []*apistoragev1beta1.VolumeAttachment, err error)
 	// Get retrieves the VolumeAttachment from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.VolumeAttachment, error)
+	Get(name string) (*apistoragev1beta1.VolumeAttachment, error)
 	VolumeAttachmentListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewVolumeAttachmentLister(indexer cache.Indexer) VolumeAttachmentLister {
 }
 
 // List lists all VolumeAttachments in the indexer.
-func (s *volumeAttachmentLister) List(selector labels.Selector) (ret []*v1beta1.VolumeAttachment, err error) {
+func (s *volumeAttachmentLister) List(selector labels.Selector) (ret []*apistoragev1beta1.VolumeAttachment, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.VolumeAttachment))
+		ret = append(ret, m.(*apistoragev1beta1.VolumeAttachment))
 	})
 	return ret, err
 }
 
 // Get retrieves the VolumeAttachment from the index for a given name.
-func (s *volumeAttachmentLister) Get(name string) (*v1beta1.VolumeAttachment, error) {
+func (s *volumeAttachmentLister) Get(name string) (*apistoragev1beta1.VolumeAttachment, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("volumeattachment"), name)
+		return nil, errors.NewNotFound(apistoragev1beta1.Resource("volumeattachment"), name)
 	}
-	return obj.(*v1beta1.VolumeAttachment), nil
+	return obj.(*apistoragev1beta1.VolumeAttachment), nil
 }

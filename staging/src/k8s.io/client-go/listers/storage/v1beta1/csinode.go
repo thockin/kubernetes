@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/storage/v1beta1"
+	apistoragev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type CSINodeLister interface {
 	// List lists all CSINodes in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.CSINode, err error)
+	List(selector labels.Selector) (ret []*apistoragev1beta1.CSINode, err error)
 	// Get retrieves the CSINode from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.CSINode, error)
+	Get(name string) (*apistoragev1beta1.CSINode, error)
 	CSINodeListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewCSINodeLister(indexer cache.Indexer) CSINodeLister {
 }
 
 // List lists all CSINodes in the indexer.
-func (s *cSINodeLister) List(selector labels.Selector) (ret []*v1beta1.CSINode, err error) {
+func (s *cSINodeLister) List(selector labels.Selector) (ret []*apistoragev1beta1.CSINode, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.CSINode))
+		ret = append(ret, m.(*apistoragev1beta1.CSINode))
 	})
 	return ret, err
 }
 
 // Get retrieves the CSINode from the index for a given name.
-func (s *cSINodeLister) Get(name string) (*v1beta1.CSINode, error) {
+func (s *cSINodeLister) Get(name string) (*apistoragev1beta1.CSINode, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("csinode"), name)
+		return nil, errors.NewNotFound(apistoragev1beta1.Resource("csinode"), name)
 	}
-	return obj.(*v1beta1.CSINode), nil
+	return obj.(*apistoragev1beta1.CSINode), nil
 }

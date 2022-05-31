@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "k8s.io/api/imagepolicy/v1alpha1"
+	apiimagepolicyv1alpha1 "k8s.io/api/imagepolicy/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type ImageReviewLister interface {
 	// List lists all ImageReviews in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ImageReview, err error)
+	List(selector labels.Selector) (ret []*apiimagepolicyv1alpha1.ImageReview, err error)
 	// Get retrieves the ImageReview from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.ImageReview, error)
+	Get(name string) (*apiimagepolicyv1alpha1.ImageReview, error)
 	ImageReviewListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewImageReviewLister(indexer cache.Indexer) ImageReviewLister {
 }
 
 // List lists all ImageReviews in the indexer.
-func (s *imageReviewLister) List(selector labels.Selector) (ret []*v1alpha1.ImageReview, err error) {
+func (s *imageReviewLister) List(selector labels.Selector) (ret []*apiimagepolicyv1alpha1.ImageReview, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.ImageReview))
+		ret = append(ret, m.(*apiimagepolicyv1alpha1.ImageReview))
 	})
 	return ret, err
 }
 
 // Get retrieves the ImageReview from the index for a given name.
-func (s *imageReviewLister) Get(name string) (*v1alpha1.ImageReview, error) {
+func (s *imageReviewLister) Get(name string) (*apiimagepolicyv1alpha1.ImageReview, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("imagereview"), name)
+		return nil, errors.NewNotFound(apiimagepolicyv1alpha1.Resource("imagereview"), name)
 	}
-	return obj.(*v1alpha1.ImageReview), nil
+	return obj.(*apiimagepolicyv1alpha1.ImageReview), nil
 }

@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/storage/v1beta1"
+	apistoragev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type StorageClassLister interface {
 	// List lists all StorageClasses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.StorageClass, err error)
+	List(selector labels.Selector) (ret []*apistoragev1beta1.StorageClass, err error)
 	// Get retrieves the StorageClass from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.StorageClass, error)
+	Get(name string) (*apistoragev1beta1.StorageClass, error)
 	StorageClassListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewStorageClassLister(indexer cache.Indexer) StorageClassLister {
 }
 
 // List lists all StorageClasses in the indexer.
-func (s *storageClassLister) List(selector labels.Selector) (ret []*v1beta1.StorageClass, err error) {
+func (s *storageClassLister) List(selector labels.Selector) (ret []*apistoragev1beta1.StorageClass, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.StorageClass))
+		ret = append(ret, m.(*apistoragev1beta1.StorageClass))
 	})
 	return ret, err
 }
 
 // Get retrieves the StorageClass from the index for a given name.
-func (s *storageClassLister) Get(name string) (*v1beta1.StorageClass, error) {
+func (s *storageClassLister) Get(name string) (*apistoragev1beta1.StorageClass, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("storageclass"), name)
+		return nil, errors.NewNotFound(apistoragev1beta1.Resource("storageclass"), name)
 	}
-	return obj.(*v1beta1.StorageClass), nil
+	return obj.(*apistoragev1beta1.StorageClass), nil
 }

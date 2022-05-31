@@ -19,7 +19,7 @@ limitations under the License.
 package v1
 
 import (
-	v1 "k8s.io/api/core/v1"
+	apicorev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type PodLister interface {
 	// List lists all Pods in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.Pod, err error)
+	List(selector labels.Selector) (ret []*apicorev1.Pod, err error)
 	// Pods returns an object that can list and get Pods.
 	Pods(namespace string) PodNamespaceLister
 	PodListerExpansion
@@ -47,9 +47,9 @@ func NewPodLister(indexer cache.Indexer) PodLister {
 }
 
 // List lists all Pods in the indexer.
-func (s *podLister) List(selector labels.Selector) (ret []*v1.Pod, err error) {
+func (s *podLister) List(selector labels.Selector) (ret []*apicorev1.Pod, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.Pod))
+		ret = append(ret, m.(*apicorev1.Pod))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *podLister) Pods(namespace string) PodNamespaceLister {
 type PodNamespaceLister interface {
 	// List lists all Pods in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.Pod, err error)
+	List(selector labels.Selector) (ret []*apicorev1.Pod, err error)
 	// Get retrieves the Pod from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1.Pod, error)
+	Get(name string) (*apicorev1.Pod, error)
 	PodNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type podNamespaceLister struct {
 }
 
 // List lists all Pods in the indexer for a given namespace.
-func (s podNamespaceLister) List(selector labels.Selector) (ret []*v1.Pod, err error) {
+func (s podNamespaceLister) List(selector labels.Selector) (ret []*apicorev1.Pod, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.Pod))
+		ret = append(ret, m.(*apicorev1.Pod))
 	})
 	return ret, err
 }
 
 // Get retrieves the Pod from the indexer for a given namespace and name.
-func (s podNamespaceLister) Get(name string) (*v1.Pod, error) {
+func (s podNamespaceLister) Get(name string) (*apicorev1.Pod, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1.Resource("pod"), name)
+		return nil, errors.NewNotFound(apicorev1.Resource("pod"), name)
 	}
-	return obj.(*v1.Pod), nil
+	return obj.(*apicorev1.Pod), nil
 }

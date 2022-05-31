@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/node/v1beta1"
+	apinodev1beta1 "k8s.io/api/node/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type RuntimeClassLister interface {
 	// List lists all RuntimeClasses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.RuntimeClass, err error)
+	List(selector labels.Selector) (ret []*apinodev1beta1.RuntimeClass, err error)
 	// Get retrieves the RuntimeClass from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.RuntimeClass, error)
+	Get(name string) (*apinodev1beta1.RuntimeClass, error)
 	RuntimeClassListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewRuntimeClassLister(indexer cache.Indexer) RuntimeClassLister {
 }
 
 // List lists all RuntimeClasses in the indexer.
-func (s *runtimeClassLister) List(selector labels.Selector) (ret []*v1beta1.RuntimeClass, err error) {
+func (s *runtimeClassLister) List(selector labels.Selector) (ret []*apinodev1beta1.RuntimeClass, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.RuntimeClass))
+		ret = append(ret, m.(*apinodev1beta1.RuntimeClass))
 	})
 	return ret, err
 }
 
 // Get retrieves the RuntimeClass from the index for a given name.
-func (s *runtimeClassLister) Get(name string) (*v1beta1.RuntimeClass, error) {
+func (s *runtimeClassLister) Get(name string) (*apinodev1beta1.RuntimeClass, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("runtimeclass"), name)
+		return nil, errors.NewNotFound(apinodev1beta1.Resource("runtimeclass"), name)
 	}
-	return obj.(*v1beta1.RuntimeClass), nil
+	return obj.(*apinodev1beta1.RuntimeClass), nil
 }

@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "k8s.io/api/networking/v1alpha1"
+	apinetworkingv1alpha1 "k8s.io/api/networking/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type ClusterCIDRLister interface {
 	// List lists all ClusterCIDRs in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ClusterCIDR, err error)
+	List(selector labels.Selector) (ret []*apinetworkingv1alpha1.ClusterCIDR, err error)
 	// Get retrieves the ClusterCIDR from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.ClusterCIDR, error)
+	Get(name string) (*apinetworkingv1alpha1.ClusterCIDR, error)
 	ClusterCIDRListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewClusterCIDRLister(indexer cache.Indexer) ClusterCIDRLister {
 }
 
 // List lists all ClusterCIDRs in the indexer.
-func (s *clusterCIDRLister) List(selector labels.Selector) (ret []*v1alpha1.ClusterCIDR, err error) {
+func (s *clusterCIDRLister) List(selector labels.Selector) (ret []*apinetworkingv1alpha1.ClusterCIDR, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.ClusterCIDR))
+		ret = append(ret, m.(*apinetworkingv1alpha1.ClusterCIDR))
 	})
 	return ret, err
 }
 
 // Get retrieves the ClusterCIDR from the index for a given name.
-func (s *clusterCIDRLister) Get(name string) (*v1alpha1.ClusterCIDR, error) {
+func (s *clusterCIDRLister) Get(name string) (*apinetworkingv1alpha1.ClusterCIDR, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("clustercidr"), name)
+		return nil, errors.NewNotFound(apinetworkingv1alpha1.Resource("clustercidr"), name)
 	}
-	return obj.(*v1alpha1.ClusterCIDR), nil
+	return obj.(*apinetworkingv1alpha1.ClusterCIDR), nil
 }

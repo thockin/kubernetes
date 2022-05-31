@@ -19,7 +19,7 @@ limitations under the License.
 package v1
 
 import (
-	v1 "k8s.io/api/apps/v1"
+	apiappsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type ReplicaSetLister interface {
 	// List lists all ReplicaSets in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.ReplicaSet, err error)
+	List(selector labels.Selector) (ret []*apiappsv1.ReplicaSet, err error)
 	// ReplicaSets returns an object that can list and get ReplicaSets.
 	ReplicaSets(namespace string) ReplicaSetNamespaceLister
 	ReplicaSetListerExpansion
@@ -47,9 +47,9 @@ func NewReplicaSetLister(indexer cache.Indexer) ReplicaSetLister {
 }
 
 // List lists all ReplicaSets in the indexer.
-func (s *replicaSetLister) List(selector labels.Selector) (ret []*v1.ReplicaSet, err error) {
+func (s *replicaSetLister) List(selector labels.Selector) (ret []*apiappsv1.ReplicaSet, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.ReplicaSet))
+		ret = append(ret, m.(*apiappsv1.ReplicaSet))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *replicaSetLister) ReplicaSets(namespace string) ReplicaSetNamespaceList
 type ReplicaSetNamespaceLister interface {
 	// List lists all ReplicaSets in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.ReplicaSet, err error)
+	List(selector labels.Selector) (ret []*apiappsv1.ReplicaSet, err error)
 	// Get retrieves the ReplicaSet from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1.ReplicaSet, error)
+	Get(name string) (*apiappsv1.ReplicaSet, error)
 	ReplicaSetNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type replicaSetNamespaceLister struct {
 }
 
 // List lists all ReplicaSets in the indexer for a given namespace.
-func (s replicaSetNamespaceLister) List(selector labels.Selector) (ret []*v1.ReplicaSet, err error) {
+func (s replicaSetNamespaceLister) List(selector labels.Selector) (ret []*apiappsv1.ReplicaSet, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.ReplicaSet))
+		ret = append(ret, m.(*apiappsv1.ReplicaSet))
 	})
 	return ret, err
 }
 
 // Get retrieves the ReplicaSet from the indexer for a given namespace and name.
-func (s replicaSetNamespaceLister) Get(name string) (*v1.ReplicaSet, error) {
+func (s replicaSetNamespaceLister) Get(name string) (*apiappsv1.ReplicaSet, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1.Resource("replicaset"), name)
+		return nil, errors.NewNotFound(apiappsv1.Resource("replicaset"), name)
 	}
-	return obj.(*v1.ReplicaSet), nil
+	return obj.(*apiappsv1.ReplicaSet), nil
 }

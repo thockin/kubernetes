@@ -19,7 +19,7 @@ limitations under the License.
 package v1
 
 import (
-	v1 "k8s.io/api/core/v1"
+	apicorev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type ServiceAccountLister interface {
 	// List lists all ServiceAccounts in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.ServiceAccount, err error)
+	List(selector labels.Selector) (ret []*apicorev1.ServiceAccount, err error)
 	// ServiceAccounts returns an object that can list and get ServiceAccounts.
 	ServiceAccounts(namespace string) ServiceAccountNamespaceLister
 	ServiceAccountListerExpansion
@@ -47,9 +47,9 @@ func NewServiceAccountLister(indexer cache.Indexer) ServiceAccountLister {
 }
 
 // List lists all ServiceAccounts in the indexer.
-func (s *serviceAccountLister) List(selector labels.Selector) (ret []*v1.ServiceAccount, err error) {
+func (s *serviceAccountLister) List(selector labels.Selector) (ret []*apicorev1.ServiceAccount, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.ServiceAccount))
+		ret = append(ret, m.(*apicorev1.ServiceAccount))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *serviceAccountLister) ServiceAccounts(namespace string) ServiceAccountN
 type ServiceAccountNamespaceLister interface {
 	// List lists all ServiceAccounts in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.ServiceAccount, err error)
+	List(selector labels.Selector) (ret []*apicorev1.ServiceAccount, err error)
 	// Get retrieves the ServiceAccount from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1.ServiceAccount, error)
+	Get(name string) (*apicorev1.ServiceAccount, error)
 	ServiceAccountNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type serviceAccountNamespaceLister struct {
 }
 
 // List lists all ServiceAccounts in the indexer for a given namespace.
-func (s serviceAccountNamespaceLister) List(selector labels.Selector) (ret []*v1.ServiceAccount, err error) {
+func (s serviceAccountNamespaceLister) List(selector labels.Selector) (ret []*apicorev1.ServiceAccount, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.ServiceAccount))
+		ret = append(ret, m.(*apicorev1.ServiceAccount))
 	})
 	return ret, err
 }
 
 // Get retrieves the ServiceAccount from the indexer for a given namespace and name.
-func (s serviceAccountNamespaceLister) Get(name string) (*v1.ServiceAccount, error) {
+func (s serviceAccountNamespaceLister) Get(name string) (*apicorev1.ServiceAccount, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1.Resource("serviceaccount"), name)
+		return nil, errors.NewNotFound(apicorev1.Resource("serviceaccount"), name)
 	}
-	return obj.(*v1.ServiceAccount), nil
+	return obj.(*apicorev1.ServiceAccount), nil
 }

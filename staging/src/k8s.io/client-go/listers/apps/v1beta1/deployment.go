@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/apps/v1beta1"
+	apiappsv1beta1 "k8s.io/api/apps/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type DeploymentLister interface {
 	// List lists all Deployments in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.Deployment, err error)
+	List(selector labels.Selector) (ret []*apiappsv1beta1.Deployment, err error)
 	// Deployments returns an object that can list and get Deployments.
 	Deployments(namespace string) DeploymentNamespaceLister
 	DeploymentListerExpansion
@@ -47,9 +47,9 @@ func NewDeploymentLister(indexer cache.Indexer) DeploymentLister {
 }
 
 // List lists all Deployments in the indexer.
-func (s *deploymentLister) List(selector labels.Selector) (ret []*v1beta1.Deployment, err error) {
+func (s *deploymentLister) List(selector labels.Selector) (ret []*apiappsv1beta1.Deployment, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.Deployment))
+		ret = append(ret, m.(*apiappsv1beta1.Deployment))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *deploymentLister) Deployments(namespace string) DeploymentNamespaceList
 type DeploymentNamespaceLister interface {
 	// List lists all Deployments in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.Deployment, err error)
+	List(selector labels.Selector) (ret []*apiappsv1beta1.Deployment, err error)
 	// Get retrieves the Deployment from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.Deployment, error)
+	Get(name string) (*apiappsv1beta1.Deployment, error)
 	DeploymentNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type deploymentNamespaceLister struct {
 }
 
 // List lists all Deployments in the indexer for a given namespace.
-func (s deploymentNamespaceLister) List(selector labels.Selector) (ret []*v1beta1.Deployment, err error) {
+func (s deploymentNamespaceLister) List(selector labels.Selector) (ret []*apiappsv1beta1.Deployment, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.Deployment))
+		ret = append(ret, m.(*apiappsv1beta1.Deployment))
 	})
 	return ret, err
 }
 
 // Get retrieves the Deployment from the indexer for a given namespace and name.
-func (s deploymentNamespaceLister) Get(name string) (*v1beta1.Deployment, error) {
+func (s deploymentNamespaceLister) Get(name string) (*apiappsv1beta1.Deployment, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("deployment"), name)
+		return nil, errors.NewNotFound(apiappsv1beta1.Resource("deployment"), name)
 	}
-	return obj.(*v1beta1.Deployment), nil
+	return obj.(*apiappsv1beta1.Deployment), nil
 }

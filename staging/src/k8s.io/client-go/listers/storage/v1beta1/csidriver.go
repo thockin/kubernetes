@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/storage/v1beta1"
+	apistoragev1beta1 "k8s.io/api/storage/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type CSIDriverLister interface {
 	// List lists all CSIDrivers in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.CSIDriver, err error)
+	List(selector labels.Selector) (ret []*apistoragev1beta1.CSIDriver, err error)
 	// Get retrieves the CSIDriver from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.CSIDriver, error)
+	Get(name string) (*apistoragev1beta1.CSIDriver, error)
 	CSIDriverListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewCSIDriverLister(indexer cache.Indexer) CSIDriverLister {
 }
 
 // List lists all CSIDrivers in the indexer.
-func (s *cSIDriverLister) List(selector labels.Selector) (ret []*v1beta1.CSIDriver, err error) {
+func (s *cSIDriverLister) List(selector labels.Selector) (ret []*apistoragev1beta1.CSIDriver, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.CSIDriver))
+		ret = append(ret, m.(*apistoragev1beta1.CSIDriver))
 	})
 	return ret, err
 }
 
 // Get retrieves the CSIDriver from the index for a given name.
-func (s *cSIDriverLister) Get(name string) (*v1beta1.CSIDriver, error) {
+func (s *cSIDriverLister) Get(name string) (*apistoragev1beta1.CSIDriver, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("csidriver"), name)
+		return nil, errors.NewNotFound(apistoragev1beta1.Resource("csidriver"), name)
 	}
-	return obj.(*v1beta1.CSIDriver), nil
+	return obj.(*apistoragev1beta1.CSIDriver), nil
 }

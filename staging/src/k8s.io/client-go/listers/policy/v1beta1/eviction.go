@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/policy/v1beta1"
+	apipolicyv1beta1 "k8s.io/api/policy/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type EvictionLister interface {
 	// List lists all Evictions in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.Eviction, err error)
+	List(selector labels.Selector) (ret []*apipolicyv1beta1.Eviction, err error)
 	// Evictions returns an object that can list and get Evictions.
 	Evictions(namespace string) EvictionNamespaceLister
 	EvictionListerExpansion
@@ -47,9 +47,9 @@ func NewEvictionLister(indexer cache.Indexer) EvictionLister {
 }
 
 // List lists all Evictions in the indexer.
-func (s *evictionLister) List(selector labels.Selector) (ret []*v1beta1.Eviction, err error) {
+func (s *evictionLister) List(selector labels.Selector) (ret []*apipolicyv1beta1.Eviction, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.Eviction))
+		ret = append(ret, m.(*apipolicyv1beta1.Eviction))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *evictionLister) Evictions(namespace string) EvictionNamespaceLister {
 type EvictionNamespaceLister interface {
 	// List lists all Evictions in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.Eviction, err error)
+	List(selector labels.Selector) (ret []*apipolicyv1beta1.Eviction, err error)
 	// Get retrieves the Eviction from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.Eviction, error)
+	Get(name string) (*apipolicyv1beta1.Eviction, error)
 	EvictionNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type evictionNamespaceLister struct {
 }
 
 // List lists all Evictions in the indexer for a given namespace.
-func (s evictionNamespaceLister) List(selector labels.Selector) (ret []*v1beta1.Eviction, err error) {
+func (s evictionNamespaceLister) List(selector labels.Selector) (ret []*apipolicyv1beta1.Eviction, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.Eviction))
+		ret = append(ret, m.(*apipolicyv1beta1.Eviction))
 	})
 	return ret, err
 }
 
 // Get retrieves the Eviction from the indexer for a given namespace and name.
-func (s evictionNamespaceLister) Get(name string) (*v1beta1.Eviction, error) {
+func (s evictionNamespaceLister) Get(name string) (*apipolicyv1beta1.Eviction, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("eviction"), name)
+		return nil, errors.NewNotFound(apipolicyv1beta1.Resource("eviction"), name)
 	}
-	return obj.(*v1beta1.Eviction), nil
+	return obj.(*apipolicyv1beta1.Eviction), nil
 }

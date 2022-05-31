@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/discovery/v1beta1"
+	apidiscoveryv1beta1 "k8s.io/api/discovery/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type EndpointSliceLister interface {
 	// List lists all EndpointSlices in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.EndpointSlice, err error)
+	List(selector labels.Selector) (ret []*apidiscoveryv1beta1.EndpointSlice, err error)
 	// EndpointSlices returns an object that can list and get EndpointSlices.
 	EndpointSlices(namespace string) EndpointSliceNamespaceLister
 	EndpointSliceListerExpansion
@@ -47,9 +47,9 @@ func NewEndpointSliceLister(indexer cache.Indexer) EndpointSliceLister {
 }
 
 // List lists all EndpointSlices in the indexer.
-func (s *endpointSliceLister) List(selector labels.Selector) (ret []*v1beta1.EndpointSlice, err error) {
+func (s *endpointSliceLister) List(selector labels.Selector) (ret []*apidiscoveryv1beta1.EndpointSlice, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.EndpointSlice))
+		ret = append(ret, m.(*apidiscoveryv1beta1.EndpointSlice))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *endpointSliceLister) EndpointSlices(namespace string) EndpointSliceName
 type EndpointSliceNamespaceLister interface {
 	// List lists all EndpointSlices in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.EndpointSlice, err error)
+	List(selector labels.Selector) (ret []*apidiscoveryv1beta1.EndpointSlice, err error)
 	// Get retrieves the EndpointSlice from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.EndpointSlice, error)
+	Get(name string) (*apidiscoveryv1beta1.EndpointSlice, error)
 	EndpointSliceNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type endpointSliceNamespaceLister struct {
 }
 
 // List lists all EndpointSlices in the indexer for a given namespace.
-func (s endpointSliceNamespaceLister) List(selector labels.Selector) (ret []*v1beta1.EndpointSlice, err error) {
+func (s endpointSliceNamespaceLister) List(selector labels.Selector) (ret []*apidiscoveryv1beta1.EndpointSlice, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.EndpointSlice))
+		ret = append(ret, m.(*apidiscoveryv1beta1.EndpointSlice))
 	})
 	return ret, err
 }
 
 // Get retrieves the EndpointSlice from the indexer for a given namespace and name.
-func (s endpointSliceNamespaceLister) Get(name string) (*v1beta1.EndpointSlice, error) {
+func (s endpointSliceNamespaceLister) Get(name string) (*apidiscoveryv1beta1.EndpointSlice, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("endpointslice"), name)
+		return nil, errors.NewNotFound(apidiscoveryv1beta1.Resource("endpointslice"), name)
 	}
-	return obj.(*v1beta1.EndpointSlice), nil
+	return obj.(*apidiscoveryv1beta1.EndpointSlice), nil
 }

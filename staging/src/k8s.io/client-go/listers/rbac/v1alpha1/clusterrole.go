@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "k8s.io/api/rbac/v1alpha1"
+	apirbacv1alpha1 "k8s.io/api/rbac/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type ClusterRoleLister interface {
 	// List lists all ClusterRoles in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.ClusterRole, err error)
+	List(selector labels.Selector) (ret []*apirbacv1alpha1.ClusterRole, err error)
 	// Get retrieves the ClusterRole from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.ClusterRole, error)
+	Get(name string) (*apirbacv1alpha1.ClusterRole, error)
 	ClusterRoleListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewClusterRoleLister(indexer cache.Indexer) ClusterRoleLister {
 }
 
 // List lists all ClusterRoles in the indexer.
-func (s *clusterRoleLister) List(selector labels.Selector) (ret []*v1alpha1.ClusterRole, err error) {
+func (s *clusterRoleLister) List(selector labels.Selector) (ret []*apirbacv1alpha1.ClusterRole, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.ClusterRole))
+		ret = append(ret, m.(*apirbacv1alpha1.ClusterRole))
 	})
 	return ret, err
 }
 
 // Get retrieves the ClusterRole from the index for a given name.
-func (s *clusterRoleLister) Get(name string) (*v1alpha1.ClusterRole, error) {
+func (s *clusterRoleLister) Get(name string) (*apirbacv1alpha1.ClusterRole, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("clusterrole"), name)
+		return nil, errors.NewNotFound(apirbacv1alpha1.Resource("clusterrole"), name)
 	}
-	return obj.(*v1alpha1.ClusterRole), nil
+	return obj.(*apirbacv1alpha1.ClusterRole), nil
 }

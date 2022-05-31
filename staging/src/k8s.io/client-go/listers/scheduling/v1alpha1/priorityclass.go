@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "k8s.io/api/scheduling/v1alpha1"
+	apischedulingv1alpha1 "k8s.io/api/scheduling/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type PriorityClassLister interface {
 	// List lists all PriorityClasses in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.PriorityClass, err error)
+	List(selector labels.Selector) (ret []*apischedulingv1alpha1.PriorityClass, err error)
 	// Get retrieves the PriorityClass from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.PriorityClass, error)
+	Get(name string) (*apischedulingv1alpha1.PriorityClass, error)
 	PriorityClassListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewPriorityClassLister(indexer cache.Indexer) PriorityClassLister {
 }
 
 // List lists all PriorityClasses in the indexer.
-func (s *priorityClassLister) List(selector labels.Selector) (ret []*v1alpha1.PriorityClass, err error) {
+func (s *priorityClassLister) List(selector labels.Selector) (ret []*apischedulingv1alpha1.PriorityClass, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.PriorityClass))
+		ret = append(ret, m.(*apischedulingv1alpha1.PriorityClass))
 	})
 	return ret, err
 }
 
 // Get retrieves the PriorityClass from the index for a given name.
-func (s *priorityClassLister) Get(name string) (*v1alpha1.PriorityClass, error) {
+func (s *priorityClassLister) Get(name string) (*apischedulingv1alpha1.PriorityClass, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("priorityclass"), name)
+		return nil, errors.NewNotFound(apischedulingv1alpha1.Resource("priorityclass"), name)
 	}
-	return obj.(*v1alpha1.PriorityClass), nil
+	return obj.(*apischedulingv1alpha1.PriorityClass), nil
 }

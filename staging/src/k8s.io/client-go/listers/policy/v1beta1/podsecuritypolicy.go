@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/policy/v1beta1"
+	apipolicyv1beta1 "k8s.io/api/policy/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type PodSecurityPolicyLister interface {
 	// List lists all PodSecurityPolicies in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.PodSecurityPolicy, err error)
+	List(selector labels.Selector) (ret []*apipolicyv1beta1.PodSecurityPolicy, err error)
 	// Get retrieves the PodSecurityPolicy from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.PodSecurityPolicy, error)
+	Get(name string) (*apipolicyv1beta1.PodSecurityPolicy, error)
 	PodSecurityPolicyListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewPodSecurityPolicyLister(indexer cache.Indexer) PodSecurityPolicyLister {
 }
 
 // List lists all PodSecurityPolicies in the indexer.
-func (s *podSecurityPolicyLister) List(selector labels.Selector) (ret []*v1beta1.PodSecurityPolicy, err error) {
+func (s *podSecurityPolicyLister) List(selector labels.Selector) (ret []*apipolicyv1beta1.PodSecurityPolicy, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.PodSecurityPolicy))
+		ret = append(ret, m.(*apipolicyv1beta1.PodSecurityPolicy))
 	})
 	return ret, err
 }
 
 // Get retrieves the PodSecurityPolicy from the index for a given name.
-func (s *podSecurityPolicyLister) Get(name string) (*v1beta1.PodSecurityPolicy, error) {
+func (s *podSecurityPolicyLister) Get(name string) (*apipolicyv1beta1.PodSecurityPolicy, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("podsecuritypolicy"), name)
+		return nil, errors.NewNotFound(apipolicyv1beta1.Resource("podsecuritypolicy"), name)
 	}
-	return obj.(*v1beta1.PodSecurityPolicy), nil
+	return obj.(*apipolicyv1beta1.PodSecurityPolicy), nil
 }

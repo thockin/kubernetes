@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+	apiflowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,10 +30,10 @@ import (
 type FlowSchemaLister interface {
 	// List lists all FlowSchemas in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.FlowSchema, err error)
+	List(selector labels.Selector) (ret []*apiflowcontrolv1alpha1.FlowSchema, err error)
 	// Get retrieves the FlowSchema from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.FlowSchema, error)
+	Get(name string) (*apiflowcontrolv1alpha1.FlowSchema, error)
 	FlowSchemaListerExpansion
 }
 
@@ -48,21 +48,21 @@ func NewFlowSchemaLister(indexer cache.Indexer) FlowSchemaLister {
 }
 
 // List lists all FlowSchemas in the indexer.
-func (s *flowSchemaLister) List(selector labels.Selector) (ret []*v1alpha1.FlowSchema, err error) {
+func (s *flowSchemaLister) List(selector labels.Selector) (ret []*apiflowcontrolv1alpha1.FlowSchema, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.FlowSchema))
+		ret = append(ret, m.(*apiflowcontrolv1alpha1.FlowSchema))
 	})
 	return ret, err
 }
 
 // Get retrieves the FlowSchema from the index for a given name.
-func (s *flowSchemaLister) Get(name string) (*v1alpha1.FlowSchema, error) {
+func (s *flowSchemaLister) Get(name string) (*apiflowcontrolv1alpha1.FlowSchema, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("flowschema"), name)
+		return nil, errors.NewNotFound(apiflowcontrolv1alpha1.Resource("flowschema"), name)
 	}
-	return obj.(*v1alpha1.FlowSchema), nil
+	return obj.(*apiflowcontrolv1alpha1.FlowSchema), nil
 }

@@ -19,7 +19,7 @@ limitations under the License.
 package v1
 
 import (
-	v1 "k8s.io/api/events/v1"
+	apieventsv1 "k8s.io/api/events/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type EventLister interface {
 	// List lists all Events in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.Event, err error)
+	List(selector labels.Selector) (ret []*apieventsv1.Event, err error)
 	// Events returns an object that can list and get Events.
 	Events(namespace string) EventNamespaceLister
 	EventListerExpansion
@@ -47,9 +47,9 @@ func NewEventLister(indexer cache.Indexer) EventLister {
 }
 
 // List lists all Events in the indexer.
-func (s *eventLister) List(selector labels.Selector) (ret []*v1.Event, err error) {
+func (s *eventLister) List(selector labels.Selector) (ret []*apieventsv1.Event, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.Event))
+		ret = append(ret, m.(*apieventsv1.Event))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *eventLister) Events(namespace string) EventNamespaceLister {
 type EventNamespaceLister interface {
 	// List lists all Events in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.Event, err error)
+	List(selector labels.Selector) (ret []*apieventsv1.Event, err error)
 	// Get retrieves the Event from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1.Event, error)
+	Get(name string) (*apieventsv1.Event, error)
 	EventNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type eventNamespaceLister struct {
 }
 
 // List lists all Events in the indexer for a given namespace.
-func (s eventNamespaceLister) List(selector labels.Selector) (ret []*v1.Event, err error) {
+func (s eventNamespaceLister) List(selector labels.Selector) (ret []*apieventsv1.Event, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.Event))
+		ret = append(ret, m.(*apieventsv1.Event))
 	})
 	return ret, err
 }
 
 // Get retrieves the Event from the indexer for a given namespace and name.
-func (s eventNamespaceLister) Get(name string) (*v1.Event, error) {
+func (s eventNamespaceLister) Get(name string) (*apieventsv1.Event, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1.Resource("event"), name)
+		return nil, errors.NewNotFound(apieventsv1.Resource("event"), name)
 	}
-	return obj.(*v1.Event), nil
+	return obj.(*apieventsv1.Event), nil
 }

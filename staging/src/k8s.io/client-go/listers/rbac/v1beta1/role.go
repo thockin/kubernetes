@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "k8s.io/api/rbac/v1beta1"
+	apirbacv1beta1 "k8s.io/api/rbac/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
@@ -30,7 +30,7 @@ import (
 type RoleLister interface {
 	// List lists all Roles in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.Role, err error)
+	List(selector labels.Selector) (ret []*apirbacv1beta1.Role, err error)
 	// Roles returns an object that can list and get Roles.
 	Roles(namespace string) RoleNamespaceLister
 	RoleListerExpansion
@@ -47,9 +47,9 @@ func NewRoleLister(indexer cache.Indexer) RoleLister {
 }
 
 // List lists all Roles in the indexer.
-func (s *roleLister) List(selector labels.Selector) (ret []*v1beta1.Role, err error) {
+func (s *roleLister) List(selector labels.Selector) (ret []*apirbacv1beta1.Role, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.Role))
+		ret = append(ret, m.(*apirbacv1beta1.Role))
 	})
 	return ret, err
 }
@@ -64,10 +64,10 @@ func (s *roleLister) Roles(namespace string) RoleNamespaceLister {
 type RoleNamespaceLister interface {
 	// List lists all Roles in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1beta1.Role, err error)
+	List(selector labels.Selector) (ret []*apirbacv1beta1.Role, err error)
 	// Get retrieves the Role from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1beta1.Role, error)
+	Get(name string) (*apirbacv1beta1.Role, error)
 	RoleNamespaceListerExpansion
 }
 
@@ -79,21 +79,21 @@ type roleNamespaceLister struct {
 }
 
 // List lists all Roles in the indexer for a given namespace.
-func (s roleNamespaceLister) List(selector labels.Selector) (ret []*v1beta1.Role, err error) {
+func (s roleNamespaceLister) List(selector labels.Selector) (ret []*apirbacv1beta1.Role, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1beta1.Role))
+		ret = append(ret, m.(*apirbacv1beta1.Role))
 	})
 	return ret, err
 }
 
 // Get retrieves the Role from the indexer for a given namespace and name.
-func (s roleNamespaceLister) Get(name string) (*v1beta1.Role, error) {
+func (s roleNamespaceLister) Get(name string) (*apirbacv1beta1.Role, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1beta1.Resource("role"), name)
+		return nil, errors.NewNotFound(apirbacv1beta1.Resource("role"), name)
 	}
-	return obj.(*v1beta1.Role), nil
+	return obj.(*apirbacv1beta1.Role), nil
 }
