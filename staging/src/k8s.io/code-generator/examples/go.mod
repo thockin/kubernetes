@@ -17,4 +17,4 @@ replace (
 	k8s.io/client-go => ../../client-go
 )
 
-replace sigs.k8s.io/json => github.com/liggitt/json v0.0.0-20211020163728-48258682683b
+replace sigs.k8s.io/json => sigs.k8s.io/json v0.0.0-20211208200746-9f7c6b3444d2
