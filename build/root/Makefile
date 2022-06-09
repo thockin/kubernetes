@@ -21,7 +21,6 @@ else
     MAKEFLAGS += -s
 endif
 
-
 # Old-skool build tools.
 #
 # Commonly used targets (see each target for more information):
@@ -71,6 +70,8 @@ ifneq ($(shell pwd),$(shell pwd -P))
     $(error Aborting)
 endif
 
+include build/root/Makefile.generate-gocache
+
 define ALL_HELP_INFO
 # Build code.
 #
@@ -100,7 +101,7 @@ ifeq ($(PRINT_HELP),y)
 all:
 	echo "$$ALL_HELP_INFO"
 else
-all:
+all: gen_go_mod_cache # TODO: how do we want to ensure that this gets called? Via Makefile or in build.sh?
 	hack/make-rules/build.sh $(WHAT)
 endif
 

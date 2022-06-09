@@ -519,6 +519,14 @@ kube::golang::setup_env() {
   #export GOMODCACHE="${KUBE_GOPATH}/cache/mod"
   export GOMODCACHE="${KUBE_ROOT}/_hack_cache/mod"
 
+  # We build Kubernetes exclusively from local sources. generate-go-cache.sh
+  # populates GOMODCACHE, so here we disable downloading source.
+  #
+  # Invoking Go during normal development (go build, go test, etc.) will use
+  # workspace mode, ignore vendor and instead continue to depend on downloading
+  # modules.
+  export GOPROXY=off
+
   # Make sure our own Go binaries are in PATH.
   export PATH="${KUBE_GOPATH}/bin:${PATH}"
 

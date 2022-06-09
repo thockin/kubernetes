@@ -28,6 +28,9 @@ source "${KUBE_ROOT}/hack/lib/init.sh"
 export GO111MODULE=on
 # Explicitly set GOFLAGS to ignore vendor, since GOFLAGS=-mod=vendor breaks dependency resolution while rebuilding vendor
 export GOFLAGS=-mod=mod
+# Explicitly disable workspace mode because several operations ("go mod vendor")
+# and options ("-mod=mod") are not supported in that mode.
+export GOWORK=off
 # Ensure sort order doesn't depend on locale
 export LANG=C
 export LC_ALL=C
@@ -190,8 +193,27 @@ function add_generated_comments() {
   go mod edit -fmt
 }
 
+# TODO: move this into phase 8 once this script works again. Right now it
+# fails because of:
+# +++ [0609 10:20:53] go.mod: update staging references
+# go: k8s.io/gengo/v2@v2.0.0: reading k8s.io/gengo/go.mod at revision v2.0.0: unknown revision v2.0.0
 
-# Phase 1: ensure go.mod files for staging modules and main module
+
+# Copy go.mod files into vendor for generate-go-cache.sh.
+go list -m -json all | jq -r '"\(.Path) \(.GoMod)"' | while read -r module modfile; do
+    if [[ "$modfile" =~ "${KUBE_ROOT}/staging/src/" ]]; then
+        # Module files from staging do not need to be replicated under vendor.
+        continue
+    fi
+
+    to="${KUBE_ROOT}/vendor/${module}"
+    mkdir -p "${to}"
+    cp "$modfile" "${to}/go.mod"
+done
+
+exit 0
+
+# Phase 1: ensure go.mod files for staging modules (needed only for new modules).
 
 for repo in $(kube::util::list_staging_repos); do
   pushd "staging/src/k8s.io/${repo}" >/dev/null 2>&1
@@ -203,13 +225,6 @@ for repo in $(kube::util::list_staging_repos); do
     fi
   popd >/dev/null 2>&1
 done
-
-if [[ ! -f go.mod ]]; then
-  kube::log::status "go.mod: initialize k8s.io/kubernetes"
-  go mod init "k8s.io/kubernetes"
-  rm -f Godeps/Godeps.json # remove after initializing
-fi
-
 
 # Phase 2: ensure staging repo require/replace directives
 

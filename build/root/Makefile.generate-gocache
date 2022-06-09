@@ -1,0 +1,46 @@
+# Copyright 2022 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# The local module cache must be recreated whenever anything in "vendor"
+# changes. The dependencies include all directories, so adding or removing
+# anything under vendor will also trigger an update because the time stamp of
+# the parent directory gets bumped when doing that.
+#
+# TODO: sync this with hack/lib/golang.sh or import it and echo?
+# $(shell import hack/lib/golang.sh && echo $${GOMODCACHE})
+MOD_CACHE_DIR := _hack_cache/mod
+MOD_VENDORDEPS_FILE := vendor-deps.mk
+
+# Any target that needs to invoke Go must depend on this target.
+# Only shell commands are required.
+.PHONY: gen_go_mod_cache
+gen_go_mod_cache: $(MOD_CACHE_DIR)/.stamp
+
+# Include the Go cache dependencies file. This will cause the rule of
+# the same name to be considered and if it is updated, make will restart and
+# reload the updated deps.
+include $(OUT_DIR)/$(MOD_VENDORDEPS_FILE)
+
+$(MOD_CACHE_DIR)/.stamp:
+	hack/generate-go-cache.sh
+	touch "$@"
+
+$(OUT_DIR)/$(MOD_VENDORDEPS_FILE):
+	mkdir -p "$(@D)"
+	( echo -n "$(MOD_CACHE_DIR)/.stamp: "; find vendor | LC_ALL=C sort | sed -e 's;$$; \\;') >"$@.tmp"
+	if [ -f "$@" ] && diff "$@" "$@.tmp" >/dev/null; then \
+		rm "$@.tmp"; \
+	else \
+		mv "$@.tmp" "$@"; \
+	fi
