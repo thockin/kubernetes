@@ -19,48 +19,48 @@ limitations under the License.
 package informers
 
 import (
-	reflect "reflect"
-	sync "sync"
-	time "time"
+	"reflect"
+	"sync"
+	"time"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	admissionregistration "k8s.io/client-go/informers/admissionregistration"
-	apiserverinternal "k8s.io/client-go/informers/apiserverinternal"
-	apps "k8s.io/client-go/informers/apps"
-	autoscaling "k8s.io/client-go/informers/autoscaling"
-	batch "k8s.io/client-go/informers/batch"
-	certificates "k8s.io/client-go/informers/certificates"
-	coordination "k8s.io/client-go/informers/coordination"
-	core "k8s.io/client-go/informers/core"
-	discovery "k8s.io/client-go/informers/discovery"
-	events "k8s.io/client-go/informers/events"
-	extensions "k8s.io/client-go/informers/extensions"
-	flowcontrol "k8s.io/client-go/informers/flowcontrol"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	networking "k8s.io/client-go/informers/networking"
-	node "k8s.io/client-go/informers/node"
-	policy "k8s.io/client-go/informers/policy"
-	rbac "k8s.io/client-go/informers/rbac"
-	scheduling "k8s.io/client-go/informers/scheduling"
-	storage "k8s.io/client-go/informers/storage"
-	kubernetes "k8s.io/client-go/kubernetes"
-	cache "k8s.io/client-go/tools/cache"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	clientgoinformersadmissionregistration "k8s.io/client-go/informers/admissionregistration"
+	clientgoinformersapiserverinternal "k8s.io/client-go/informers/apiserverinternal"
+	clientgoinformersapps "k8s.io/client-go/informers/apps"
+	clientgoinformersautoscaling "k8s.io/client-go/informers/autoscaling"
+	clientgoinformersbatch "k8s.io/client-go/informers/batch"
+	clientgoinformerscertificates "k8s.io/client-go/informers/certificates"
+	clientgoinformerscoordination "k8s.io/client-go/informers/coordination"
+	clientgoinformerscore "k8s.io/client-go/informers/core"
+	clientgoinformersdiscovery "k8s.io/client-go/informers/discovery"
+	clientgoinformersevents "k8s.io/client-go/informers/events"
+	clientgoinformersextensions "k8s.io/client-go/informers/extensions"
+	clientgoinformersflowcontrol "k8s.io/client-go/informers/flowcontrol"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgoinformersnetworking "k8s.io/client-go/informers/networking"
+	clientgoinformersnode "k8s.io/client-go/informers/node"
+	clientgoinformerspolicy "k8s.io/client-go/informers/policy"
+	clientgoinformersrbac "k8s.io/client-go/informers/rbac"
+	clientgoinformersscheduling "k8s.io/client-go/informers/scheduling"
+	clientgoinformersstorage "k8s.io/client-go/informers/storage"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
 type SharedInformerOption func(*sharedInformerFactory) *sharedInformerFactory
 
 type sharedInformerFactory struct {
-	client           kubernetes.Interface
+	client           clientgokubernetes.Interface
 	namespace        string
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	lock             sync.Mutex
 	defaultResync    time.Duration
 	customResync     map[reflect.Type]time.Duration
 
-	informers map[reflect.Type]cache.SharedIndexInformer
+	informers map[reflect.Type]clientgotoolscache.SharedIndexInformer
 	// startedInformers is used for tracking which informers have been started.
 	// This allows Start() to be called multiple times safely.
 	startedInformers map[reflect.Type]bool
@@ -72,7 +72,7 @@ type sharedInformerFactory struct {
 }
 
 // WithCustomResyncConfig sets a custom resync period for the specified informer types.
-func WithCustomResyncConfig(resyncConfig map[v1.Object]time.Duration) SharedInformerOption {
+func WithCustomResyncConfig(resyncConfig map[apismetav1.Object]time.Duration) SharedInformerOption {
 	return func(factory *sharedInformerFactory) *sharedInformerFactory {
 		for k, v := range resyncConfig {
 			factory.customResync[reflect.TypeOf(k)] = v
@@ -98,7 +98,7 @@ func WithNamespace(namespace string) SharedInformerOption {
 }
 
 // NewSharedInformerFactory constructs a new instance of sharedInformerFactory for all namespaces.
-func NewSharedInformerFactory(client kubernetes.Interface, defaultResync time.Duration) SharedInformerFactory {
+func NewSharedInformerFactory(client clientgokubernetes.Interface, defaultResync time.Duration) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync)
 }
 
@@ -106,17 +106,17 @@ func NewSharedInformerFactory(client kubernetes.Interface, defaultResync time.Du
 // Listers obtained via this SharedInformerFactory will be subject to the same filters
 // as specified here.
 // Deprecated: Please use NewSharedInformerFactoryWithOptions instead
-func NewFilteredSharedInformerFactory(client kubernetes.Interface, defaultResync time.Duration, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) SharedInformerFactory {
+func NewFilteredSharedInformerFactory(client clientgokubernetes.Interface, defaultResync time.Duration, namespace string, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) SharedInformerFactory {
 	return NewSharedInformerFactoryWithOptions(client, defaultResync, WithNamespace(namespace), WithTweakListOptions(tweakListOptions))
 }
 
 // NewSharedInformerFactoryWithOptions constructs a new instance of a SharedInformerFactory with additional options.
-func NewSharedInformerFactoryWithOptions(client kubernetes.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
+func NewSharedInformerFactoryWithOptions(client clientgokubernetes.Interface, defaultResync time.Duration, options ...SharedInformerOption) SharedInformerFactory {
 	factory := &sharedInformerFactory{
 		client:           client,
 		namespace:        v1.NamespaceAll,
 		defaultResync:    defaultResync,
-		informers:        make(map[reflect.Type]cache.SharedIndexInformer),
+		informers:        make(map[reflect.Type]clientgotoolscache.SharedIndexInformer),
 		startedInformers: make(map[reflect.Type]bool),
 		customResync:     make(map[reflect.Type]time.Duration),
 	}
@@ -185,7 +185,7 @@ func (f *sharedInformerFactory) WaitForCacheSync(stopCh <-chan struct{}) map[ref
 
 // InternalInformerFor returns the SharedIndexInformer for obj using an internal
 // client.
-func (f *sharedInformerFactory) InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer {
+func (f *sharedInformerFactory) InformerFor(obj apimachinerypkgruntime.Object, newFunc clientgoinformersinternalinterfaces.NewInformerFunc) clientgotoolscache.SharedIndexInformer {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
@@ -231,7 +231,7 @@ func (f *sharedInformerFactory) InformerFor(obj runtime.Object, newFunc internal
 //	anotherGenericInformer := factory.ForResource(resource)
 //	factory.Start(ctx.Done())
 type SharedInformerFactory interface {
-	internalinterfaces.SharedInformerFactory
+	clientgoinformersinternalinterfaces.SharedInformerFactory
 
 	// Start initializes all requested informers. They are handled in goroutines
 	// which run until the stop channel gets closed.
@@ -254,100 +254,100 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	// ForResource gives generic access to a shared informer of the matching type.
-	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
+	ForResource(resource pkgruntimeschema.GroupVersionResource) (GenericInformer, error)
 
 	// InternalInformerFor returns the SharedIndexInformer for obj using an internal
 	// client.
-	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
+	InformerFor(obj apimachinerypkgruntime.Object, newFunc clientgoinformersinternalinterfaces.NewInformerFunc) clientgotoolscache.SharedIndexInformer
 
-	Admissionregistration() admissionregistration.Interface
-	Internal() apiserverinternal.Interface
-	Apps() apps.Interface
-	Autoscaling() autoscaling.Interface
-	Batch() batch.Interface
-	Certificates() certificates.Interface
-	Coordination() coordination.Interface
-	Core() core.Interface
-	Discovery() discovery.Interface
-	Events() events.Interface
-	Extensions() extensions.Interface
-	Flowcontrol() flowcontrol.Interface
-	Networking() networking.Interface
-	Node() node.Interface
-	Policy() policy.Interface
-	Rbac() rbac.Interface
-	Scheduling() scheduling.Interface
-	Storage() storage.Interface
+	Admissionregistration() clientgoinformersadmissionregistration.Interface
+	Internal() clientgoinformersapiserverinternal.Interface
+	Apps() clientgoinformersapps.Interface
+	Autoscaling() clientgoinformersautoscaling.Interface
+	Batch() clientgoinformersbatch.Interface
+	Certificates() clientgoinformerscertificates.Interface
+	Coordination() clientgoinformerscoordination.Interface
+	Core() clientgoinformerscore.Interface
+	Discovery() clientgoinformersdiscovery.Interface
+	Events() clientgoinformersevents.Interface
+	Extensions() clientgoinformersextensions.Interface
+	Flowcontrol() clientgoinformersflowcontrol.Interface
+	Networking() clientgoinformersnetworking.Interface
+	Node() clientgoinformersnode.Interface
+	Policy() clientgoinformerspolicy.Interface
+	Rbac() clientgoinformersrbac.Interface
+	Scheduling() clientgoinformersscheduling.Interface
+	Storage() clientgoinformersstorage.Interface
 }
 
-func (f *sharedInformerFactory) Admissionregistration() admissionregistration.Interface {
-	return admissionregistration.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Admissionregistration() clientgoinformersadmissionregistration.Interface {
+	return clientgoinformersadmissionregistration.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Internal() apiserverinternal.Interface {
-	return apiserverinternal.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Internal() clientgoinformersapiserverinternal.Interface {
+	return clientgoinformersapiserverinternal.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Apps() apps.Interface {
-	return apps.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Apps() clientgoinformersapps.Interface {
+	return clientgoinformersapps.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Autoscaling() autoscaling.Interface {
-	return autoscaling.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Autoscaling() clientgoinformersautoscaling.Interface {
+	return clientgoinformersautoscaling.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Batch() batch.Interface {
-	return batch.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Batch() clientgoinformersbatch.Interface {
+	return clientgoinformersbatch.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Certificates() certificates.Interface {
-	return certificates.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Certificates() clientgoinformerscertificates.Interface {
+	return clientgoinformerscertificates.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Coordination() coordination.Interface {
-	return coordination.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Coordination() clientgoinformerscoordination.Interface {
+	return clientgoinformerscoordination.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Core() core.Interface {
-	return core.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Core() clientgoinformerscore.Interface {
+	return clientgoinformerscore.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Discovery() discovery.Interface {
-	return discovery.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Discovery() clientgoinformersdiscovery.Interface {
+	return clientgoinformersdiscovery.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Events() events.Interface {
-	return events.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Events() clientgoinformersevents.Interface {
+	return clientgoinformersevents.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Extensions() extensions.Interface {
-	return extensions.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Extensions() clientgoinformersextensions.Interface {
+	return clientgoinformersextensions.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Flowcontrol() flowcontrol.Interface {
-	return flowcontrol.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Flowcontrol() clientgoinformersflowcontrol.Interface {
+	return clientgoinformersflowcontrol.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Networking() networking.Interface {
-	return networking.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Networking() clientgoinformersnetworking.Interface {
+	return clientgoinformersnetworking.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Node() node.Interface {
-	return node.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Node() clientgoinformersnode.Interface {
+	return clientgoinformersnode.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Policy() policy.Interface {
-	return policy.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Policy() clientgoinformerspolicy.Interface {
+	return clientgoinformerspolicy.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Rbac() rbac.Interface {
-	return rbac.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Rbac() clientgoinformersrbac.Interface {
+	return clientgoinformersrbac.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Scheduling() scheduling.Interface {
-	return scheduling.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Scheduling() clientgoinformersscheduling.Interface {
+	return clientgoinformersscheduling.New(f, f.namespace, f.tweakListOptions)
 }
 
-func (f *sharedInformerFactory) Storage() storage.Interface {
-	return storage.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Storage() clientgoinformersstorage.Interface {
+	return clientgoinformersstorage.New(f, f.namespace, f.tweakListOptions)
 }

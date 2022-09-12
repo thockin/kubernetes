@@ -20,70 +20,70 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/admissionregistration/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apiadmissionregistrationv1 "k8s.io/api/admissionregistration/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersadmissionregistrationv1 "k8s.io/client-go/listers/admissionregistration/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // ValidatingWebhookConfigurationInformer provides access to a shared informer and lister for
 // ValidatingWebhookConfigurations.
 type ValidatingWebhookConfigurationInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.ValidatingWebhookConfigurationLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersadmissionregistrationv1.ValidatingWebhookConfigurationLister
 }
 
 type validatingWebhookConfigurationInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewValidatingWebhookConfigurationInformer constructs a new informer for ValidatingWebhookConfiguration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewValidatingWebhookConfigurationInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewValidatingWebhookConfigurationInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredValidatingWebhookConfigurationInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredValidatingWebhookConfigurationInformer constructs a new informer for ValidatingWebhookConfiguration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredValidatingWebhookConfigurationInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredValidatingWebhookConfigurationInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.AdmissionregistrationV1().ValidatingWebhookConfigurations().List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.AdmissionregistrationV1().ValidatingWebhookConfigurations().Watch(context.TODO(), options)
 			},
 		},
-		&admissionregistrationv1.ValidatingWebhookConfiguration{},
+		&apiadmissionregistrationv1.ValidatingWebhookConfiguration{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *validatingWebhookConfigurationInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredValidatingWebhookConfigurationInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *validatingWebhookConfigurationInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredValidatingWebhookConfigurationInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *validatingWebhookConfigurationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&admissionregistrationv1.ValidatingWebhookConfiguration{}, f.defaultInformer)
+func (f *validatingWebhookConfigurationInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apiadmissionregistrationv1.ValidatingWebhookConfiguration{}, f.defaultInformer)
 }
 
-func (f *validatingWebhookConfigurationInformer) Lister() v1.ValidatingWebhookConfigurationLister {
-	return v1.NewValidatingWebhookConfigurationLister(f.Informer().GetIndexer())
+func (f *validatingWebhookConfigurationInformer) Lister() listersadmissionregistrationv1.ValidatingWebhookConfigurationLister {
+	return listersadmissionregistrationv1.NewValidatingWebhookConfigurationLister(f.Informer().GetIndexer())
 }

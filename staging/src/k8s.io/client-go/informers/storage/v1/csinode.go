@@ -20,70 +20,70 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	storagev1 "k8s.io/api/storage/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/storage/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apistoragev1 "k8s.io/api/storage/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersstoragev1 "k8s.io/client-go/listers/storage/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // CSINodeInformer provides access to a shared informer and lister for
 // CSINodes.
 type CSINodeInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.CSINodeLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersstoragev1.CSINodeLister
 }
 
 type cSINodeInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewCSINodeInformer constructs a new informer for CSINode type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewCSINodeInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewCSINodeInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredCSINodeInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredCSINodeInformer constructs a new informer for CSINode type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredCSINodeInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredCSINodeInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.StorageV1().CSINodes().List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.StorageV1().CSINodes().Watch(context.TODO(), options)
 			},
 		},
-		&storagev1.CSINode{},
+		&apistoragev1.CSINode{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *cSINodeInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredCSINodeInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *cSINodeInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredCSINodeInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *cSINodeInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&storagev1.CSINode{}, f.defaultInformer)
+func (f *cSINodeInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apistoragev1.CSINode{}, f.defaultInformer)
 }
 
-func (f *cSINodeInformer) Lister() v1.CSINodeLister {
-	return v1.NewCSINodeLister(f.Informer().GetIndexer())
+func (f *cSINodeInformer) Lister() listersstoragev1.CSINodeLister {
+	return listersstoragev1.NewCSINodeLister(f.Informer().GetIndexer())
 }

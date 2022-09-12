@@ -20,70 +20,70 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/core/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apicorev1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listerscorev1 "k8s.io/client-go/listers/core/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // PersistentVolumeInformer provides access to a shared informer and lister for
 // PersistentVolumes.
 type PersistentVolumeInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.PersistentVolumeLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listerscorev1.PersistentVolumeLister
 }
 
 type persistentVolumeInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewPersistentVolumeInformer constructs a new informer for PersistentVolume type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPersistentVolumeInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewPersistentVolumeInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredPersistentVolumeInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredPersistentVolumeInformer constructs a new informer for PersistentVolume type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPersistentVolumeInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredPersistentVolumeInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.CoreV1().PersistentVolumes().List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.CoreV1().PersistentVolumes().Watch(context.TODO(), options)
 			},
 		},
-		&corev1.PersistentVolume{},
+		&apicorev1.PersistentVolume{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *persistentVolumeInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPersistentVolumeInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *persistentVolumeInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredPersistentVolumeInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *persistentVolumeInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1.PersistentVolume{}, f.defaultInformer)
+func (f *persistentVolumeInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apicorev1.PersistentVolume{}, f.defaultInformer)
 }
 
-func (f *persistentVolumeInformer) Lister() v1.PersistentVolumeLister {
-	return v1.NewPersistentVolumeLister(f.Informer().GetIndexer())
+func (f *persistentVolumeInformer) Lister() listerscorev1.PersistentVolumeLister {
+	return listerscorev1.NewPersistentVolumeLister(f.Informer().GetIndexer())
 }

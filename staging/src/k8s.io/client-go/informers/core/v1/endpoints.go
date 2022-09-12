@@ -20,71 +20,71 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/core/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apicorev1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listerscorev1 "k8s.io/client-go/listers/core/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // EndpointsInformer provides access to a shared informer and lister for
 // Endpoints.
 type EndpointsInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.EndpointsLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listerscorev1.EndpointsLister
 }
 
 type endpointsInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewEndpointsInformer constructs a new informer for Endpoints type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewEndpointsInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewEndpointsInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredEndpointsInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredEndpointsInformer constructs a new informer for Endpoints type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredEndpointsInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredEndpointsInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.CoreV1().Endpoints(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.CoreV1().Endpoints(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corev1.Endpoints{},
+		&apicorev1.Endpoints{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *endpointsInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredEndpointsInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *endpointsInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredEndpointsInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *endpointsInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corev1.Endpoints{}, f.defaultInformer)
+func (f *endpointsInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apicorev1.Endpoints{}, f.defaultInformer)
 }
 
-func (f *endpointsInformer) Lister() v1.EndpointsLister {
-	return v1.NewEndpointsLister(f.Informer().GetIndexer())
+func (f *endpointsInformer) Lister() listerscorev1.EndpointsLister {
+	return listerscorev1.NewEndpointsLister(f.Informer().GetIndexer())
 }

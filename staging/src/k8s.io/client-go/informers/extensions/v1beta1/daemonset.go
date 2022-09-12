@@ -20,71 +20,71 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/extensions/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apiextensionsv1beta1 "k8s.io/api/extensions/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersextensionsv1beta1 "k8s.io/client-go/listers/extensions/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // DaemonSetInformer provides access to a shared informer and lister for
 // DaemonSets.
 type DaemonSetInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.DaemonSetLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersextensionsv1beta1.DaemonSetLister
 }
 
 type daemonSetInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewDaemonSetInformer constructs a new informer for DaemonSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewDaemonSetInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewDaemonSetInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredDaemonSetInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredDaemonSetInformer constructs a new informer for DaemonSet type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredDaemonSetInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredDaemonSetInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.ExtensionsV1beta1().DaemonSets(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.ExtensionsV1beta1().DaemonSets(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&extensionsv1beta1.DaemonSet{},
+		&apiextensionsv1beta1.DaemonSet{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *daemonSetInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredDaemonSetInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *daemonSetInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredDaemonSetInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *daemonSetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&extensionsv1beta1.DaemonSet{}, f.defaultInformer)
+func (f *daemonSetInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apiextensionsv1beta1.DaemonSet{}, f.defaultInformer)
 }
 
-func (f *daemonSetInformer) Lister() v1beta1.DaemonSetLister {
-	return v1beta1.NewDaemonSetLister(f.Informer().GetIndexer())
+func (f *daemonSetInformer) Lister() listersextensionsv1beta1.DaemonSetLister {
+	return listersextensionsv1beta1.NewDaemonSetLister(f.Informer().GetIndexer())
 }

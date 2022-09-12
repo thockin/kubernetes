@@ -19,36 +19,36 @@ limitations under the License.
 package admissionregistration
 
 import (
-	v1 "k8s.io/client-go/informers/admissionregistration/v1"
-	v1beta1 "k8s.io/client-go/informers/admissionregistration/v1beta1"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	informersadmissionregistrationv1 "k8s.io/client-go/informers/admissionregistration/v1"
+	informersadmissionregistrationv1beta1 "k8s.io/client-go/informers/admissionregistration/v1beta1"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.
 type Interface interface {
 	// V1 provides access to shared informers for resources in V1.
-	V1() v1.Interface
+	V1() informersadmissionregistrationv1.Interface
 	// V1beta1 provides access to shared informers for resources in V1beta1.
-	V1beta1() v1beta1.Interface
+	V1beta1() informersadmissionregistrationv1beta1.Interface
 }
 
 type group struct {
-	factory          internalinterfaces.SharedInformerFactory
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
 	namespace        string
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // New returns a new Interface.
-func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
+func New(f clientgoinformersinternalinterfaces.SharedInformerFactory, namespace string, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) Interface {
 	return &group{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// V1 returns a new v1.Interface.
-func (g *group) V1() v1.Interface {
-	return v1.New(g.factory, g.namespace, g.tweakListOptions)
+// V1 returns a new informersadmissionregistrationv1.Interface.
+func (g *group) V1() informersadmissionregistrationv1.Interface {
+	return informersadmissionregistrationv1.New(g.factory, g.namespace, g.tweakListOptions)
 }
 
-// V1beta1 returns a new v1beta1.Interface.
-func (g *group) V1beta1() v1beta1.Interface {
-	return v1beta1.New(g.factory, g.namespace, g.tweakListOptions)
+// V1beta1 returns a new informersadmissionregistrationv1beta1.Interface.
+func (g *group) V1beta1() informersadmissionregistrationv1beta1.Interface {
+	return informersadmissionregistrationv1beta1.New(g.factory, g.namespace, g.tweakListOptions)
 }

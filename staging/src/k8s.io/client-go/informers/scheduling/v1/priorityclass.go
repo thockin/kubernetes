@@ -20,70 +20,70 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	schedulingv1 "k8s.io/api/scheduling/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/scheduling/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apischedulingv1 "k8s.io/api/scheduling/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersschedulingv1 "k8s.io/client-go/listers/scheduling/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // PriorityClassInformer provides access to a shared informer and lister for
 // PriorityClasses.
 type PriorityClassInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.PriorityClassLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersschedulingv1.PriorityClassLister
 }
 
 type priorityClassInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewPriorityClassInformer constructs a new informer for PriorityClass type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPriorityClassInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewPriorityClassInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredPriorityClassInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredPriorityClassInformer constructs a new informer for PriorityClass type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPriorityClassInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredPriorityClassInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.SchedulingV1().PriorityClasses().List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.SchedulingV1().PriorityClasses().Watch(context.TODO(), options)
 			},
 		},
-		&schedulingv1.PriorityClass{},
+		&apischedulingv1.PriorityClass{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *priorityClassInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPriorityClassInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *priorityClassInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredPriorityClassInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *priorityClassInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&schedulingv1.PriorityClass{}, f.defaultInformer)
+func (f *priorityClassInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apischedulingv1.PriorityClass{}, f.defaultInformer)
 }
 
-func (f *priorityClassInformer) Lister() v1.PriorityClassLister {
-	return v1.NewPriorityClassLister(f.Informer().GetIndexer())
+func (f *priorityClassInformer) Lister() listersschedulingv1.PriorityClassLister {
+	return listersschedulingv1.NewPriorityClassLister(f.Informer().GetIndexer())
 }

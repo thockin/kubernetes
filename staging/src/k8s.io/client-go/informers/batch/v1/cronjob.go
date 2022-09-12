@@ -20,71 +20,71 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	batchv1 "k8s.io/api/batch/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/batch/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apibatchv1 "k8s.io/api/batch/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersbatchv1 "k8s.io/client-go/listers/batch/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // CronJobInformer provides access to a shared informer and lister for
 // CronJobs.
 type CronJobInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.CronJobLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersbatchv1.CronJobLister
 }
 
 type cronJobInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewCronJobInformer constructs a new informer for CronJob type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewCronJobInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewCronJobInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredCronJobInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredCronJobInformer constructs a new informer for CronJob type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredCronJobInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredCronJobInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.BatchV1().CronJobs(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.BatchV1().CronJobs(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&batchv1.CronJob{},
+		&apibatchv1.CronJob{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *cronJobInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredCronJobInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *cronJobInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredCronJobInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *cronJobInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&batchv1.CronJob{}, f.defaultInformer)
+func (f *cronJobInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apibatchv1.CronJob{}, f.defaultInformer)
 }
 
-func (f *cronJobInformer) Lister() v1.CronJobLister {
-	return v1.NewCronJobLister(f.Informer().GetIndexer())
+func (f *cronJobInformer) Lister() listersbatchv1.CronJobLister {
+	return listersbatchv1.NewCronJobLister(f.Informer().GetIndexer())
 }

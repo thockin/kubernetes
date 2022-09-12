@@ -20,70 +20,70 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	policyv1beta1 "k8s.io/api/policy/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/policy/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apipolicyv1beta1 "k8s.io/api/policy/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listerspolicyv1beta1 "k8s.io/client-go/listers/policy/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // PodSecurityPolicyInformer provides access to a shared informer and lister for
 // PodSecurityPolicies.
 type PodSecurityPolicyInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.PodSecurityPolicyLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listerspolicyv1beta1.PodSecurityPolicyLister
 }
 
 type podSecurityPolicyInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewPodSecurityPolicyInformer constructs a new informer for PodSecurityPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPodSecurityPolicyInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewPodSecurityPolicyInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredPodSecurityPolicyInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredPodSecurityPolicyInformer constructs a new informer for PodSecurityPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPodSecurityPolicyInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredPodSecurityPolicyInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.PolicyV1beta1().PodSecurityPolicies().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.PolicyV1beta1().PodSecurityPolicies().Watch(context.TODO(), options)
 			},
 		},
-		&policyv1beta1.PodSecurityPolicy{},
+		&apipolicyv1beta1.PodSecurityPolicy{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *podSecurityPolicyInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPodSecurityPolicyInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *podSecurityPolicyInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredPodSecurityPolicyInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *podSecurityPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&policyv1beta1.PodSecurityPolicy{}, f.defaultInformer)
+func (f *podSecurityPolicyInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apipolicyv1beta1.PodSecurityPolicy{}, f.defaultInformer)
 }
 
-func (f *podSecurityPolicyInformer) Lister() v1beta1.PodSecurityPolicyLister {
-	return v1beta1.NewPodSecurityPolicyLister(f.Informer().GetIndexer())
+func (f *podSecurityPolicyInformer) Lister() listerspolicyv1beta1.PodSecurityPolicyLister {
+	return listerspolicyv1beta1.NewPodSecurityPolicyLister(f.Informer().GetIndexer())
 }

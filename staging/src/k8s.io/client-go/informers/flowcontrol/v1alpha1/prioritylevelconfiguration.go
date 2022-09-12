@@ -20,70 +20,70 @@ package v1alpha1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	flowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1alpha1 "k8s.io/client-go/listers/flowcontrol/v1alpha1"
-	cache "k8s.io/client-go/tools/cache"
+	apiflowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersflowcontrolv1alpha1 "k8s.io/client-go/listers/flowcontrol/v1alpha1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // PriorityLevelConfigurationInformer provides access to a shared informer and lister for
 // PriorityLevelConfigurations.
 type PriorityLevelConfigurationInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.PriorityLevelConfigurationLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersflowcontrolv1alpha1.PriorityLevelConfigurationLister
 }
 
 type priorityLevelConfigurationInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewPriorityLevelConfigurationInformer constructs a new informer for PriorityLevelConfiguration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPriorityLevelConfigurationInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewPriorityLevelConfigurationInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredPriorityLevelConfigurationInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredPriorityLevelConfigurationInformer constructs a new informer for PriorityLevelConfiguration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPriorityLevelConfigurationInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredPriorityLevelConfigurationInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.FlowcontrolV1alpha1().PriorityLevelConfigurations().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.FlowcontrolV1alpha1().PriorityLevelConfigurations().Watch(context.TODO(), options)
 			},
 		},
-		&flowcontrolv1alpha1.PriorityLevelConfiguration{},
+		&apiflowcontrolv1alpha1.PriorityLevelConfiguration{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *priorityLevelConfigurationInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPriorityLevelConfigurationInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *priorityLevelConfigurationInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredPriorityLevelConfigurationInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *priorityLevelConfigurationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&flowcontrolv1alpha1.PriorityLevelConfiguration{}, f.defaultInformer)
+func (f *priorityLevelConfigurationInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apiflowcontrolv1alpha1.PriorityLevelConfiguration{}, f.defaultInformer)
 }
 
-func (f *priorityLevelConfigurationInformer) Lister() v1alpha1.PriorityLevelConfigurationLister {
-	return v1alpha1.NewPriorityLevelConfigurationLister(f.Informer().GetIndexer())
+func (f *priorityLevelConfigurationInformer) Lister() listersflowcontrolv1alpha1.PriorityLevelConfigurationLister {
+	return listersflowcontrolv1alpha1.NewPriorityLevelConfigurationLister(f.Informer().GetIndexer())
 }

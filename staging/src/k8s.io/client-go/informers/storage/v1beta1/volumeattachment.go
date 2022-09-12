@@ -20,70 +20,70 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	storagev1beta1 "k8s.io/api/storage/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/storage/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apistoragev1beta1 "k8s.io/api/storage/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersstoragev1beta1 "k8s.io/client-go/listers/storage/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // VolumeAttachmentInformer provides access to a shared informer and lister for
 // VolumeAttachments.
 type VolumeAttachmentInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.VolumeAttachmentLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersstoragev1beta1.VolumeAttachmentLister
 }
 
 type volumeAttachmentInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewVolumeAttachmentInformer constructs a new informer for VolumeAttachment type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewVolumeAttachmentInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewVolumeAttachmentInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredVolumeAttachmentInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredVolumeAttachmentInformer constructs a new informer for VolumeAttachment type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredVolumeAttachmentInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredVolumeAttachmentInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.StorageV1beta1().VolumeAttachments().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.StorageV1beta1().VolumeAttachments().Watch(context.TODO(), options)
 			},
 		},
-		&storagev1beta1.VolumeAttachment{},
+		&apistoragev1beta1.VolumeAttachment{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *volumeAttachmentInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredVolumeAttachmentInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *volumeAttachmentInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredVolumeAttachmentInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *volumeAttachmentInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&storagev1beta1.VolumeAttachment{}, f.defaultInformer)
+func (f *volumeAttachmentInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apistoragev1beta1.VolumeAttachment{}, f.defaultInformer)
 }
 
-func (f *volumeAttachmentInformer) Lister() v1beta1.VolumeAttachmentLister {
-	return v1beta1.NewVolumeAttachmentLister(f.Informer().GetIndexer())
+func (f *volumeAttachmentInformer) Lister() listersstoragev1beta1.VolumeAttachmentLister {
+	return listersstoragev1beta1.NewVolumeAttachmentLister(f.Informer().GetIndexer())
 }

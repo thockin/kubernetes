@@ -19,7 +19,7 @@ limitations under the License.
 package v1beta1
 
 import (
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
 )
 
 // Interface provides access to all the informers in this group version.
@@ -29,13 +29,13 @@ type Interface interface {
 }
 
 type version struct {
-	factory          internalinterfaces.SharedInformerFactory
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
 	namespace        string
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // New returns a new Interface.
-func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
+func New(f clientgoinformersinternalinterfaces.SharedInformerFactory, namespace string, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 

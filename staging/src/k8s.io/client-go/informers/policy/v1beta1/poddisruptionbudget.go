@@ -20,71 +20,71 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	policyv1beta1 "k8s.io/api/policy/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/policy/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apipolicyv1beta1 "k8s.io/api/policy/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listerspolicyv1beta1 "k8s.io/client-go/listers/policy/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // PodDisruptionBudgetInformer provides access to a shared informer and lister for
 // PodDisruptionBudgets.
 type PodDisruptionBudgetInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.PodDisruptionBudgetLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listerspolicyv1beta1.PodDisruptionBudgetLister
 }
 
 type podDisruptionBudgetInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewPodDisruptionBudgetInformer constructs a new informer for PodDisruptionBudget type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewPodDisruptionBudgetInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewPodDisruptionBudgetInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredPodDisruptionBudgetInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredPodDisruptionBudgetInformer constructs a new informer for PodDisruptionBudget type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredPodDisruptionBudgetInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredPodDisruptionBudgetInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.PolicyV1beta1().PodDisruptionBudgets(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.PolicyV1beta1().PodDisruptionBudgets(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&policyv1beta1.PodDisruptionBudget{},
+		&apipolicyv1beta1.PodDisruptionBudget{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *podDisruptionBudgetInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredPodDisruptionBudgetInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *podDisruptionBudgetInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredPodDisruptionBudgetInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *podDisruptionBudgetInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&policyv1beta1.PodDisruptionBudget{}, f.defaultInformer)
+func (f *podDisruptionBudgetInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apipolicyv1beta1.PodDisruptionBudget{}, f.defaultInformer)
 }
 
-func (f *podDisruptionBudgetInformer) Lister() v1beta1.PodDisruptionBudgetLister {
-	return v1beta1.NewPodDisruptionBudgetLister(f.Informer().GetIndexer())
+func (f *podDisruptionBudgetInformer) Lister() listerspolicyv1beta1.PodDisruptionBudgetLister {
+	return listerspolicyv1beta1.NewPodDisruptionBudgetLister(f.Informer().GetIndexer())
 }

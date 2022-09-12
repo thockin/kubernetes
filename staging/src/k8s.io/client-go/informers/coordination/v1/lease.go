@@ -20,71 +20,71 @@ package v1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	coordinationv1 "k8s.io/api/coordination/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/listers/coordination/v1"
-	cache "k8s.io/client-go/tools/cache"
+	apicoordinationv1 "k8s.io/api/coordination/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listerscoordinationv1 "k8s.io/client-go/listers/coordination/v1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // LeaseInformer provides access to a shared informer and lister for
 // Leases.
 type LeaseInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1.LeaseLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listerscoordinationv1.LeaseLister
 }
 
 type leaseInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewLeaseInformer constructs a new informer for Lease type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewLeaseInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewLeaseInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredLeaseInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredLeaseInformer constructs a new informer for Lease type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredLeaseInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+func NewFilteredLeaseInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.CoordinationV1().Leases(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.CoordinationV1().Leases(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&coordinationv1.Lease{},
+		&apicoordinationv1.Lease{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *leaseInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredLeaseInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *leaseInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredLeaseInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *leaseInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&coordinationv1.Lease{}, f.defaultInformer)
+func (f *leaseInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apicoordinationv1.Lease{}, f.defaultInformer)
 }
 
-func (f *leaseInformer) Lister() v1.LeaseLister {
-	return v1.NewLeaseLister(f.Informer().GetIndexer())
+func (f *leaseInformer) Lister() listerscoordinationv1.LeaseLister {
+	return listerscoordinationv1.NewLeaseLister(f.Informer().GetIndexer())
 }

@@ -20,71 +20,71 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	eventsv1beta1 "k8s.io/api/events/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/events/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apieventsv1beta1 "k8s.io/api/events/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listerseventsv1beta1 "k8s.io/client-go/listers/events/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // EventInformer provides access to a shared informer and lister for
 // Events.
 type EventInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.EventLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listerseventsv1beta1.EventLister
 }
 
 type eventInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewEventInformer constructs a new informer for Event type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewEventInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewEventInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredEventInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredEventInformer constructs a new informer for Event type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredEventInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredEventInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.EventsV1beta1().Events(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.EventsV1beta1().Events(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&eventsv1beta1.Event{},
+		&apieventsv1beta1.Event{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *eventInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredEventInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *eventInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredEventInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *eventInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&eventsv1beta1.Event{}, f.defaultInformer)
+func (f *eventInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apieventsv1beta1.Event{}, f.defaultInformer)
 }
 
-func (f *eventInformer) Lister() v1beta1.EventLister {
-	return v1beta1.NewEventLister(f.Informer().GetIndexer())
+func (f *eventInformer) Lister() listerseventsv1beta1.EventLister {
+	return listerseventsv1beta1.NewEventLister(f.Informer().GetIndexer())
 }

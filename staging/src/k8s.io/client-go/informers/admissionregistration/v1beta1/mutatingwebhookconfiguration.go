@@ -20,70 +20,70 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/admissionregistration/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apiadmissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersadmissionregistrationv1beta1 "k8s.io/client-go/listers/admissionregistration/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // MutatingWebhookConfigurationInformer provides access to a shared informer and lister for
 // MutatingWebhookConfigurations.
 type MutatingWebhookConfigurationInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.MutatingWebhookConfigurationLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersadmissionregistrationv1beta1.MutatingWebhookConfigurationLister
 }
 
 type mutatingWebhookConfigurationInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewMutatingWebhookConfigurationInformer constructs a new informer for MutatingWebhookConfiguration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewMutatingWebhookConfigurationInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewMutatingWebhookConfigurationInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredMutatingWebhookConfigurationInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredMutatingWebhookConfigurationInformer constructs a new informer for MutatingWebhookConfiguration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredMutatingWebhookConfigurationInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredMutatingWebhookConfigurationInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.AdmissionregistrationV1beta1().MutatingWebhookConfigurations().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.AdmissionregistrationV1beta1().MutatingWebhookConfigurations().Watch(context.TODO(), options)
 			},
 		},
-		&admissionregistrationv1beta1.MutatingWebhookConfiguration{},
+		&apiadmissionregistrationv1beta1.MutatingWebhookConfiguration{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *mutatingWebhookConfigurationInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredMutatingWebhookConfigurationInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *mutatingWebhookConfigurationInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredMutatingWebhookConfigurationInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *mutatingWebhookConfigurationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&admissionregistrationv1beta1.MutatingWebhookConfiguration{}, f.defaultInformer)
+func (f *mutatingWebhookConfigurationInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apiadmissionregistrationv1beta1.MutatingWebhookConfiguration{}, f.defaultInformer)
 }
 
-func (f *mutatingWebhookConfigurationInformer) Lister() v1beta1.MutatingWebhookConfigurationLister {
-	return v1beta1.NewMutatingWebhookConfigurationLister(f.Informer().GetIndexer())
+func (f *mutatingWebhookConfigurationInformer) Lister() listersadmissionregistrationv1beta1.MutatingWebhookConfigurationLister {
+	return listersadmissionregistrationv1beta1.NewMutatingWebhookConfigurationLister(f.Informer().GetIndexer())
 }

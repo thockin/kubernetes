@@ -20,70 +20,70 @@ package v1alpha1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	apiserverinternalv1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1alpha1 "k8s.io/client-go/listers/apiserverinternal/v1alpha1"
-	cache "k8s.io/client-go/tools/cache"
+	apiapiserverinternalv1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersapiserverinternalv1alpha1 "k8s.io/client-go/listers/apiserverinternal/v1alpha1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // StorageVersionInformer provides access to a shared informer and lister for
 // StorageVersions.
 type StorageVersionInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.StorageVersionLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersapiserverinternalv1alpha1.StorageVersionLister
 }
 
 type storageVersionInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewStorageVersionInformer constructs a new informer for StorageVersion type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewStorageVersionInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewStorageVersionInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredStorageVersionInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredStorageVersionInformer constructs a new informer for StorageVersion type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredStorageVersionInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredStorageVersionInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.InternalV1alpha1().StorageVersions().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.InternalV1alpha1().StorageVersions().Watch(context.TODO(), options)
 			},
 		},
-		&apiserverinternalv1alpha1.StorageVersion{},
+		&apiapiserverinternalv1alpha1.StorageVersion{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *storageVersionInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredStorageVersionInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *storageVersionInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredStorageVersionInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *storageVersionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiserverinternalv1alpha1.StorageVersion{}, f.defaultInformer)
+func (f *storageVersionInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apiapiserverinternalv1alpha1.StorageVersion{}, f.defaultInformer)
 }
 
-func (f *storageVersionInformer) Lister() v1alpha1.StorageVersionLister {
-	return v1alpha1.NewStorageVersionLister(f.Informer().GetIndexer())
+func (f *storageVersionInformer) Lister() listersapiserverinternalv1alpha1.StorageVersionLister {
+	return listersapiserverinternalv1alpha1.NewStorageVersionLister(f.Informer().GetIndexer())
 }

@@ -20,71 +20,71 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	networkingv1beta1 "k8s.io/api/networking/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/networking/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apinetworkingv1beta1 "k8s.io/api/networking/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersnetworkingv1beta1 "k8s.io/client-go/listers/networking/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // IngressInformer provides access to a shared informer and lister for
 // Ingresses.
 type IngressInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.IngressLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersnetworkingv1beta1.IngressLister
 }
 
 type ingressInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
 // NewIngressInformer constructs a new informer for Ingress type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewIngressInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewIngressInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredIngressInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredIngressInformer constructs a new informer for Ingress type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredIngressInformer(client kubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredIngressInformer(client clientgokubernetes.Interface, namespace string, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.NetworkingV1beta1().Ingresses(namespace).List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.NetworkingV1beta1().Ingresses(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&networkingv1beta1.Ingress{},
+		&apinetworkingv1beta1.Ingress{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *ingressInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredIngressInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *ingressInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredIngressInformer(client, f.namespace, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *ingressInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&networkingv1beta1.Ingress{}, f.defaultInformer)
+func (f *ingressInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apinetworkingv1beta1.Ingress{}, f.defaultInformer)
 }
 
-func (f *ingressInformer) Lister() v1beta1.IngressLister {
-	return v1beta1.NewIngressLister(f.Informer().GetIndexer())
+func (f *ingressInformer) Lister() listersnetworkingv1beta1.IngressLister {
+	return listersnetworkingv1beta1.NewIngressLister(f.Informer().GetIndexer())
 }

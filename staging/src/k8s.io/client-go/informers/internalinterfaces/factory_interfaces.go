@@ -19,22 +19,22 @@ limitations under the License.
 package internalinterfaces
 
 import (
-	time "time"
+	"time"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	kubernetes "k8s.io/client-go/kubernetes"
-	cache "k8s.io/client-go/tools/cache"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
-// NewInformerFunc takes kubernetes.Interface and time.Duration to return a SharedIndexInformer.
-type NewInformerFunc func(kubernetes.Interface, time.Duration) cache.SharedIndexInformer
+// NewInformerFunc takes clientgokubernetes.Interface and time.Duration to return a SharedIndexInformer.
+type NewInformerFunc func(clientgokubernetes.Interface, time.Duration) cache.SharedIndexInformer
 
 // SharedInformerFactory a small interface to allow for adding an informer without an import cycle
 type SharedInformerFactory interface {
 	Start(stopCh <-chan struct{})
-	InformerFor(obj runtime.Object, newFunc NewInformerFunc) cache.SharedIndexInformer
+	InformerFor(obj apimachinerypkgruntime.Object, newFunc NewInformerFunc) clientgotoolscache.SharedIndexInformer
 }
 
-// TweakListOptionsFunc is a function that transforms a v1.ListOptions.
-type TweakListOptionsFunc func(*v1.ListOptions)
+// TweakListOptionsFunc is a function that transforms a apismetav1.ListOptions.
+type TweakListOptionsFunc func(*apismetav1.ListOptions)

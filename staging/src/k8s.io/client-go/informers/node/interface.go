@@ -19,44 +19,44 @@ limitations under the License.
 package node
 
 import (
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	v1 "k8s.io/client-go/informers/node/v1"
-	v1alpha1 "k8s.io/client-go/informers/node/v1alpha1"
-	v1beta1 "k8s.io/client-go/informers/node/v1beta1"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	informersnodev1 "k8s.io/client-go/informers/node/v1"
+	informersnodev1alpha1 "k8s.io/client-go/informers/node/v1alpha1"
+	informersnodev1beta1 "k8s.io/client-go/informers/node/v1beta1"
 )
 
 // Interface provides access to each of this group's versions.
 type Interface interface {
 	// V1 provides access to shared informers for resources in V1.
-	V1() v1.Interface
+	V1() informersnodev1.Interface
 	// V1alpha1 provides access to shared informers for resources in V1alpha1.
-	V1alpha1() v1alpha1.Interface
+	V1alpha1() informersnodev1alpha1.Interface
 	// V1beta1 provides access to shared informers for resources in V1beta1.
-	V1beta1() v1beta1.Interface
+	V1beta1() informersnodev1beta1.Interface
 }
 
 type group struct {
-	factory          internalinterfaces.SharedInformerFactory
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
 	namespace        string
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // New returns a new Interface.
-func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
+func New(f clientgoinformersinternalinterfaces.SharedInformerFactory, namespace string, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) Interface {
 	return &group{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// V1 returns a new v1.Interface.
-func (g *group) V1() v1.Interface {
-	return v1.New(g.factory, g.namespace, g.tweakListOptions)
+// V1 returns a new informersnodev1.Interface.
+func (g *group) V1() informersnodev1.Interface {
+	return informersnodev1.New(g.factory, g.namespace, g.tweakListOptions)
 }
 
-// V1alpha1 returns a new v1alpha1.Interface.
-func (g *group) V1alpha1() v1alpha1.Interface {
-	return v1alpha1.New(g.factory, g.namespace, g.tweakListOptions)
+// V1alpha1 returns a new informersnodev1alpha1.Interface.
+func (g *group) V1alpha1() informersnodev1alpha1.Interface {
+	return informersnodev1alpha1.New(g.factory, g.namespace, g.tweakListOptions)
 }
 
-// V1beta1 returns a new v1beta1.Interface.
-func (g *group) V1beta1() v1beta1.Interface {
-	return v1beta1.New(g.factory, g.namespace, g.tweakListOptions)
+// V1beta1 returns a new informersnodev1beta1.Interface.
+func (g *group) V1beta1() informersnodev1beta1.Interface {
+	return informersnodev1beta1.New(g.factory, g.namespace, g.tweakListOptions)
 }

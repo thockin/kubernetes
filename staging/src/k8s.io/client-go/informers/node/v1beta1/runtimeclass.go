@@ -20,70 +20,70 @@ package v1beta1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	nodev1beta1 "k8s.io/api/node/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1beta1 "k8s.io/client-go/listers/node/v1beta1"
-	cache "k8s.io/client-go/tools/cache"
+	apinodev1beta1 "k8s.io/api/node/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersnodev1beta1 "k8s.io/client-go/listers/node/v1beta1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // RuntimeClassInformer provides access to a shared informer and lister for
 // RuntimeClasses.
 type RuntimeClassInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1beta1.RuntimeClassLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersnodev1beta1.RuntimeClassLister
 }
 
 type runtimeClassInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewRuntimeClassInformer constructs a new informer for RuntimeClass type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewRuntimeClassInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewRuntimeClassInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredRuntimeClassInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredRuntimeClassInformer constructs a new informer for RuntimeClass type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredRuntimeClassInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredRuntimeClassInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.NodeV1beta1().RuntimeClasses().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.NodeV1beta1().RuntimeClasses().Watch(context.TODO(), options)
 			},
 		},
-		&nodev1beta1.RuntimeClass{},
+		&apinodev1beta1.RuntimeClass{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *runtimeClassInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredRuntimeClassInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *runtimeClassInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredRuntimeClassInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *runtimeClassInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&nodev1beta1.RuntimeClass{}, f.defaultInformer)
+func (f *runtimeClassInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apinodev1beta1.RuntimeClass{}, f.defaultInformer)
 }
 
-func (f *runtimeClassInformer) Lister() v1beta1.RuntimeClassLister {
-	return v1beta1.NewRuntimeClassLister(f.Informer().GetIndexer())
+func (f *runtimeClassInformer) Lister() listersnodev1beta1.RuntimeClassLister {
+	return listersnodev1beta1.NewRuntimeClassLister(f.Informer().GetIndexer())
 }

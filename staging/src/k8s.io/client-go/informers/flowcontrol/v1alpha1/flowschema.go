@@ -20,70 +20,70 @@ package v1alpha1
 
 import (
 	"context"
-	time "time"
+	"time"
 
-	flowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
-	watch "k8s.io/apimachinery/pkg/watch"
-	internalinterfaces "k8s.io/client-go/informers/internalinterfaces"
-	kubernetes "k8s.io/client-go/kubernetes"
-	v1alpha1 "k8s.io/client-go/listers/flowcontrol/v1alpha1"
-	cache "k8s.io/client-go/tools/cache"
+	apiflowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	clientgoinformersinternalinterfaces "k8s.io/client-go/informers/internalinterfaces"
+	clientgokubernetes "k8s.io/client-go/kubernetes"
+	listersflowcontrolv1alpha1 "k8s.io/client-go/listers/flowcontrol/v1alpha1"
+	clientgotoolscache "k8s.io/client-go/tools/cache"
 )
 
 // FlowSchemaInformer provides access to a shared informer and lister for
 // FlowSchemas.
 type FlowSchemaInformer interface {
-	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.FlowSchemaLister
+	Informer() clientgotoolscache.SharedIndexInformer
+	Lister() listersflowcontrolv1alpha1.FlowSchemaLister
 }
 
 type flowSchemaInformer struct {
-	factory          internalinterfaces.SharedInformerFactory
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	factory          clientgoinformersinternalinterfaces.SharedInformerFactory
+	tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc
 }
 
 // NewFlowSchemaInformer constructs a new informer for FlowSchema type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFlowSchemaInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewFlowSchemaInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers) clientgotoolscache.SharedIndexInformer {
 	return NewFilteredFlowSchemaInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredFlowSchemaInformer constructs a new informer for FlowSchema type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredFlowSchemaInformer(client kubernetes.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
-			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
+func NewFilteredFlowSchemaInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration, indexers clientgotoolscache.Indexers, tweakListOptions clientgoinformersinternalinterfaces.TweakListOptionsFunc) clientgotoolscache.SharedIndexInformer {
+	return clientgotoolscache.NewSharedIndexInformer(
+		&clientgotoolscache.ListWatch{
+			ListFunc: func(options apismetav1.ListOptions) (apimachinerypkgruntime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.FlowcontrolV1alpha1().FlowSchemas().List(context.TODO(), options)
 			},
-			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
+			WatchFunc: func(options apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
 				return client.FlowcontrolV1alpha1().FlowSchemas().Watch(context.TODO(), options)
 			},
 		},
-		&flowcontrolv1alpha1.FlowSchema{},
+		&apiflowcontrolv1alpha1.FlowSchema{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *flowSchemaInformer) defaultInformer(client kubernetes.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredFlowSchemaInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *flowSchemaInformer) defaultInformer(client clientgokubernetes.Interface, resyncPeriod time.Duration) clientgotoolscache.SharedIndexInformer {
+	return NewFilteredFlowSchemaInformer(client, resyncPeriod, clientgotoolscache.Indexers{clientgotoolscache.NamespaceIndex: clientgotoolscache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *flowSchemaInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&flowcontrolv1alpha1.FlowSchema{}, f.defaultInformer)
+func (f *flowSchemaInformer) Informer() clientgotoolscache.SharedIndexInformer {
+	return f.factory.InformerFor(&apiflowcontrolv1alpha1.FlowSchema{}, f.defaultInformer)
 }
 
-func (f *flowSchemaInformer) Lister() v1alpha1.FlowSchemaLister {
-	return v1alpha1.NewFlowSchemaLister(f.Informer().GetIndexer())
+func (f *flowSchemaInformer) Lister() listersflowcontrolv1alpha1.FlowSchemaLister {
+	return listersflowcontrolv1alpha1.NewFlowSchemaLister(f.Informer().GetIndexer())
 }
