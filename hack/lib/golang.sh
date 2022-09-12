@@ -601,8 +601,11 @@ kube::golang::new::setup_env() {
   export GOPATH="${KUBE_GOPATH}"
 
   # Keep caches local.
-  export GOCACHE="${KUBE_GOPATH}/cache/build"
-  export GOMODCACHE="${KUBE_GOPATH}/cache/mod"
+  #FIXME: thockin: remove this commit
+  #export GOCACHE="${KUBE_GOPATH}/cache/build"
+  export GOCACHE="${KUBE_ROOT}/_hack_cache/build"
+  #export GOMODCACHE="${KUBE_GOPATH}/cache/mod"
+  export GOMODCACHE="${KUBE_ROOT}/_hack_cache/mod"
 
   # Make sure our own Go binaries are in PATH.
   export PATH="${KUBE_GOPATH}/bin:${PATH}"
