@@ -520,7 +520,9 @@ kube::golang::setup_env() {
   kube::golang::create_gopath_tree
   export GOPATH="${KUBE_GOPATH}"
 
-  export GOCACHE="${KUBE_GOPATH}/cache"
+  #FIXME: thockin: remove this commit
+  export GOCACHE="${KUBE_ROOT}/_hack_cache/build"
+  export GOMODCACHE="${KUBE_ROOT}/_hack_cache/mod"
 
   # Make sure our own Go binaries are in PATH.
   export PATH="${KUBE_GOPATH}/bin:${PATH}"
