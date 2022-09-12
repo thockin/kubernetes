@@ -32,19 +32,19 @@ SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
   "example:v1 example2:v1 example3.io:v1" \
   --output-base "$(dirname "${BASH_SOURCE[0]}")/../../.." \
   --go-header-file "${SCRIPT_ROOT}/hack/boilerplate.go.txt"
-"${SCRIPT_ROOT}/generate-groups.sh" all \
+echo "${SCRIPT_ROOT}/generate-groups.sh" all \
   k8s.io/code-generator/examples/crd \
   k8s.io/code-generator/examples/crd/apis \
   "example:v1 example2:v1" \
   --output-base "$(dirname "${BASH_SOURCE[0]}")/../../.." \
   --go-header-file "${SCRIPT_ROOT}/hack/boilerplate.go.txt"
-"${SCRIPT_ROOT}/generate-groups.sh" all \
+echo "${SCRIPT_ROOT}/generate-groups.sh" all \
   k8s.io/code-generator/examples/MixedCase \
   k8s.io/code-generator/examples/MixedCase/apis \
   "example:v1" \
   --output-base "$(dirname "${BASH_SOURCE[0]}")/../../.." \
   --go-header-file "${SCRIPT_ROOT}/hack/boilerplate.go.txt"
-"${SCRIPT_ROOT}/generate-groups.sh" all \
+echo "${SCRIPT_ROOT}/generate-groups.sh" all \
   k8s.io/code-generator/examples/HyphenGroup \
   k8s.io/code-generator/examples/HyphenGroup/apis \
   "example:v1" \

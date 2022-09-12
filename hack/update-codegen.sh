@@ -741,6 +741,7 @@ function codegen::informers() {
 function codegen::subprojects() {
     # Call generation on sub-projects.
     # TODO(thockin): make these take a list of codegens and flags
+    #FIXME: broken
     local subs=(
         staging/src/k8s.io/code-generator/hack/update-codegen.sh
         staging/src/k8s.io/kube-aggregator/hack/update-codegen.sh

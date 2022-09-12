@@ -23,7 +23,7 @@ set -o pipefail
 
 if [ "$#" -lt 5 ] || [ "${1}" == "--help" ]; then
   cat <<EOF
-Usage: $(basename "$0") <generators> <output-package> <internal-apis-package> <extensiona-apis-package> <groups-versions> ...
+Usage: $(basename "$0") <generators> <output-package> <internal-apis-package> <extension-apis-package> <groups-versions> ...
 
   <generators>        the generators comma separated to run (deepcopy,defaulter,conversion,client,lister,informer,openapi) or "all".
   <output-package>    the output package name (e.g. github.com/example/project/pkg/generated).
@@ -34,8 +34,16 @@ Usage: $(basename "$0") <generators> <output-package> <internal-apis-package> <e
   ...                 arbitrary flags passed to all generator binaries.
 
 Examples:
-  $(basename "$0") all                           github.com/example/project/pkg/client github.com/example/project/pkg/apis github.com/example/project/pkg/apis "foo:v1 bar:v1alpha1,v1beta1"
-  $(basename "$0") deepcopy,defaulter,conversion github.com/example/project/pkg/client github.com/example/project/pkg/apis github.com/example/project/apis     "foo:v1 bar:v1alpha1,v1beta1"
+  $(basename "$0") all \\
+      github.com/example/project/pkg/client \\
+      github.com/example/project/pkg/apis \\
+      github.com/example/project/apis \\
+      "foo:v1 bar:v1alpha1,v1beta1"
+  $(basename "$0") deepcopy,defaulter,conversion \\
+      github.com/example/project/pkg/client \\
+      github.com/example/project/pkg/apis \\
+      github.com/example/project/apis \\
+      "foo:v1 bar:v1alpha1,v1beta1"
 EOF
   exit 0
 fi
@@ -47,14 +55,23 @@ EXT_APIS_PKG="$4"
 GROUPS_WITH_VERSIONS="$5"
 shift 5
 
+echo "Generating for ${OUTPUT_PKG} (internal)"
+
 (
   # To support running this script from anywhere, first cd into this directory,
   # and then install with forced module mode on and fully qualified name.
+  bins=(
+      defaulter-gen
+      conversion-gen
+      client-gen
+      lister-gen
+      informer-gen
+      deepcopy-gen
+      openapi-gen
+  )
   cd "$(dirname "${0}")"
-  GO111MODULE=on go install k8s.io/code-generator/cmd/{defaulter-gen,conversion-gen,client-gen,lister-gen,informer-gen,deepcopy-gen,openapi-gen}
+  GO111MODULE=on go install $(printf -- "k8s.io/code-generator/cmd/%s " "${bins[@]}")
 )
-
-function codegen::join() { local IFS="$1"; shift; echo "$*"; }
 
 # enumerate group versions
 ALL_FQ_APIS=() # e.g. k8s.io/kubernetes/pkg/apis/apps k8s.io/api/apps/v1
@@ -75,24 +92,28 @@ for GVs in ${GROUPS_WITH_VERSIONS}; do
   done
 done
 
+#FIXME: don't assume GOPATH?
 if [ "${GENS}" = "all" ] || grep -qw "deepcopy" <<<"${GENS}"; then
   echo "Generating deepcopy funcs"
   "${GOPATH}/bin/deepcopy-gen" \
-      --input-dirs "$(codegen::join , "${ALL_FQ_APIS[@]}")" -O zz_generated.deepcopy \
+      -O zz_generated.deepcopy \
+      $(printf -- "--input-dirs %s " "${ALL_FQ_APIS[@]}") \
       "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "defaulter" <<<"${GENS}"; then
   echo "Generating defaulters"
-  "${GOPATH}/bin/defaulter-gen"  \
-      --input-dirs "$(codegen::join , "${EXT_FQ_APIS[@]}")" -O zz_generated.defaults \
+  "${GOPATH}/bin/defaulter-gen" \
+      -O zz_generated.defaults \
+      $(printf -- "--input-dirs %s " "${EXT_FQ_APIS[@]}") \
       "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "conversion" <<<"${GENS}"; then
   echo "Generating conversions"
   "${GOPATH}/bin/conversion-gen" \
-      --input-dirs "$(codegen::join , "${ALL_FQ_APIS[@]}")" -O zz_generated.conversion \
+      -O zz_generated.conversion \
+      $(printf -- "--input-dirs %s " "${ALL_FQ_APIS[@]}") \
       "$@"
 fi
 
@@ -103,44 +124,56 @@ if [ "${GENS}" = "all" ] || grep -qw "client" <<<"${GENS}"; then
     "${GOPATH}/bin/client-gen" \
         --clientset-name "${CLIENTSET_NAME_INTERNAL:-internalversion}" \
         --input-base "" \
-        --input "$(codegen::join , "${APIS[@]}")" \
         --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}" \
+        $(printf -- "--input %s " "${APIS[@]}") \
         "$@"
   fi
   "${GOPATH}/bin/client-gen" \
       --clientset-name "${CLIENTSET_NAME_VERSIONED:-versioned}" \
       --input-base "" \
-      --input "$(codegen::join , "${EXT_FQ_APIS[@]}")" \
       --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}" \
+      $(printf -- "--input %s " "${EXT_FQ_APIS[@]}") \
       "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "lister" <<<"${GENS}"; then
   echo "Generating listers for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/listers"
   "${GOPATH}/bin/lister-gen" \
-      --input-dirs "$(codegen::join , "${ALL_FQ_APIS[@]}")" \
       --output-package "${OUTPUT_PKG}/listers" \
+      $(printf -- "--input-dirs %s " "${ALL_FQ_APIS[@]}") \
       "$@"
 fi
 
 if [ "${GENS}" = "all" ] || grep -qw "informer" <<<"${GENS}"; then
   echo "Generating informers for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/informers"
   "${GOPATH}/bin/informer-gen" \
-      --input-dirs "$(codegen::join , "${ALL_FQ_APIS[@]}")" \
       --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}/${CLIENTSET_NAME_VERSIONED:-versioned}" \
       --internal-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME:-clientset}/${CLIENTSET_NAME_INTERNAL:-internalversion}" \
       --listers-package "${OUTPUT_PKG}/listers" \
       --output-package "${OUTPUT_PKG}/informers" \
+      $(printf -- "--input-dirs %s " "${ALL_FQ_APIS[@]}") \
       "$@"
 fi
 
+#FIXME: broken
 if [ "${GENS}" = "all" ] || grep -qw "openapi" <<<"${GENS}"; then
   echo "Generating OpenAPI definitions for ${GROUPS_WITH_VERSIONS} at ${OUTPUT_PKG}/openapi"
   declare -a OPENAPI_EXTRA_PACKAGES
-  "${GOPATH}/bin/openapi-gen" \
-      --input-dirs "$(codegen::join , "${EXT_FQ_APIS[@]}" "${OPENAPI_EXTRA_PACKAGES[@]+"${OPENAPI_EXTRA_PACKAGES[@]}"}")" \
-      --input-dirs "k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/apimachinery/pkg/version" \
+  echo "${GOPATH}/bin/openapi-gen" \
       --output-package "${OUTPUT_PKG}/openapi" \
       -O zz_generated.openapi \
+      $(printf -- "--input-dirs %s " "${EXT_FQ_APIS[@]}" "${OPENAPI_EXTRA_PACKAGES[@]}") \
+      --input-dirs k8s.io/apimachinery/pkg/apis/meta/v1 \
+      --input-dirs k8s.io/apimachinery/pkg/runtime \
+      --input-dirs k8s.io/apimachinery/pkg/version \
       "$@"
 fi
+# Writing openapi output to ./...
+# Not respecting output base?
+#Wrote: ./k8s.io/code-generator/examples/apiserver/openapi/zz_generated.openapi.go
+# Flags
+#--output-package k8s.io/code-generator/examples/apiserver/openapi 
+#--output-base staging/src/k8s.io/code-generator/hack/../../.. 
+# Debug:
+# /home/thockin/go/bin/openapi-gen --output-package k8s.io/code-generator/examples/apiserver/openapi -O zz_generated.openapi --input-dirs k8s.io/code-generator/examples/apiserver/apis/example/v1 --input-dirs k8s.io/code-generator/examples/apiserver/apis/example2/v1 --input-dirs k8s.io/code-generator/examples/apiserver/apis/example3.io/v1 --input-dirs k8s.io/apimachinery/pkg/apis/meta/v1 --input-dirs k8s.io/apimachinery/pkg/runtime --input-dirs k8s.io/apimachinery/pkg/version --output-base staging/src/k8s.io/code-generator/hack/../../.. --go-header-file staging/src/k8s.io/code-generator/hack/../hack/boilerplate.go.txt
+
