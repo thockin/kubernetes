@@ -20,10 +20,11 @@ package v1
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 	"time"
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 	v1 "k8s.io/api/flowcontrol/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -31,6 +32,23 @@ import (
 	flowcontrolv1 "k8s.io/client-go/applyconfigurations/flowcontrol/v1"
 	scheme "k8s.io/client-go/kubernetes/scheme"
 	rest "k8s.io/client-go/rest"
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
+	watch "k8s.io/apimachinery/pkg/watch"
+	flowcontrolv1alpha1 "k8s.io/client-go/applyconfigurations/flowcontrol/v1alpha1"
+	scheme "k8s.io/client-go/kubernetes/scheme"
+	rest "k8s.io/client-go/rest"
+=======
+	apiflowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsflowcontrolv1alpha1 "k8s.io/client-go/applyconfigurations/flowcontrol/v1alpha1"
+	clientgokubernetesscheme "k8s.io/client-go/kubernetes/scheme"
+	clientgorest "k8s.io/client-go/rest"
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 )
 
 // FlowSchemasGetter has a method to return a FlowSchemaInterface.
@@ -41,6 +59,7 @@ type FlowSchemasGetter interface {
 
 // FlowSchemaInterface has methods to work with FlowSchema resources.
 type FlowSchemaInterface interface {
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 	Create(ctx context.Context, flowSchema *v1.FlowSchema, opts metav1.CreateOptions) (*v1.FlowSchema, error)
 	Update(ctx context.Context, flowSchema *v1.FlowSchema, opts metav1.UpdateOptions) (*v1.FlowSchema, error)
 	UpdateStatus(ctx context.Context, flowSchema *v1.FlowSchema, opts metav1.UpdateOptions) (*v1.FlowSchema, error)
@@ -52,12 +71,37 @@ type FlowSchemaInterface interface {
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.FlowSchema, err error)
 	Apply(ctx context.Context, flowSchema *flowcontrolv1.FlowSchemaApplyConfiguration, opts metav1.ApplyOptions) (result *v1.FlowSchema, err error)
 	ApplyStatus(ctx context.Context, flowSchema *flowcontrolv1.FlowSchemaApplyConfiguration, opts metav1.ApplyOptions) (result *v1.FlowSchema, err error)
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+	Create(ctx context.Context, flowSchema *v1alpha1.FlowSchema, opts v1.CreateOptions) (*v1alpha1.FlowSchema, error)
+	Update(ctx context.Context, flowSchema *v1alpha1.FlowSchema, opts v1.UpdateOptions) (*v1alpha1.FlowSchema, error)
+	UpdateStatus(ctx context.Context, flowSchema *v1alpha1.FlowSchema, opts v1.UpdateOptions) (*v1alpha1.FlowSchema, error)
+	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.FlowSchema, error)
+	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.FlowSchemaList, error)
+	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error)
+	Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.FlowSchema, err error)
+	ApplyStatus(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.FlowSchema, err error)
+=======
+	Create(ctx context.Context, flowSchema *apiflowcontrolv1alpha1.FlowSchema, opts apismetav1.CreateOptions) (*apiflowcontrolv1alpha1.FlowSchema, error)
+	Update(ctx context.Context, flowSchema *apiflowcontrolv1alpha1.FlowSchema, opts apismetav1.UpdateOptions) (*apiflowcontrolv1alpha1.FlowSchema, error)
+	UpdateStatus(ctx context.Context, flowSchema *apiflowcontrolv1alpha1.FlowSchema, opts apismetav1.UpdateOptions) (*apiflowcontrolv1alpha1.FlowSchema, error)
+	Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error
+	Get(ctx context.Context, name string, opts apismetav1.GetOptions) (*apiflowcontrolv1alpha1.FlowSchema, error)
+	List(ctx context.Context, opts apismetav1.ListOptions) (*apiflowcontrolv1alpha1.FlowSchemaList, error)
+	Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error)
+	Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apiflowcontrolv1alpha1.FlowSchema, err error)
+	Apply(ctx context.Context, flowSchema *applyconfigurationsflowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error)
+	ApplyStatus(ctx context.Context, flowSchema *applyconfigurationsflowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error)
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	FlowSchemaExpansion
 }
 
 // flowSchemas implements FlowSchemaInterface
 type flowSchemas struct {
-	client rest.Interface
+	client clientgorest.Interface
 }
 
 // newFlowSchemas returns a FlowSchemas
@@ -68,35 +112,63 @@ func newFlowSchemas(c *FlowcontrolV1Client) *flowSchemas {
 }
 
 // Get takes name of the flowSchema, and returns the corresponding flowSchema object, and an error if there is any.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.FlowSchema, err error) {
 	result = &v1.FlowSchema{}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.FlowSchema, err error) {
+	result = &v1alpha1.FlowSchema{}
+=======
+func (c *flowSchemas) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	err = c.client.Get().
 		Resource("flowschemas").
 		Name(name).
-		VersionedParams(&options, scheme.ParameterCodec).
+		VersionedParams(&options, clientgokubernetesscheme.ParameterCodec).
 		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of FlowSchemas that match those selectors.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) List(ctx context.Context, opts metav1.ListOptions) (result *v1.FlowSchemaList, err error) {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.FlowSchemaList, err error) {
+=======
+func (c *flowSchemas) List(ctx context.Context, opts apismetav1.ListOptions) (result *apiflowcontrolv1alpha1.FlowSchemaList, err error) {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 	result = &v1.FlowSchemaList{}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+	result = &v1alpha1.FlowSchemaList{}
+=======
+	result = &apiflowcontrolv1alpha1.FlowSchemaList{}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	err = c.client.Get().
 		Resource("flowschemas").
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, clientgokubernetesscheme.ParameterCodec).
 		Timeout(timeout).
 		Do(ctx).
 		Into(result)
 	return
 }
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 // Watch returns a watch.Interface that watches the requested flowSchemas.
 func (c *flowSchemas) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+// Watch returns a watch.Interface that watches the requested flowSchemas.
+func (c *flowSchemas) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+=======
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested flowSchemas.
+func (c *flowSchemas) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -104,17 +176,25 @@ func (c *flowSchemas) Watch(ctx context.Context, opts metav1.ListOptions) (watch
 	opts.Watch = true
 	return c.client.Get().
 		Resource("flowschemas").
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, clientgokubernetesscheme.ParameterCodec).
 		Timeout(timeout).
 		Watch(ctx)
 }
 
 // Create takes the representation of a flowSchema and creates it.  Returns the server's representation of the flowSchema, and an error, if there is any.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) Create(ctx context.Context, flowSchema *v1.FlowSchema, opts metav1.CreateOptions) (result *v1.FlowSchema, err error) {
 	result = &v1.FlowSchema{}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) Create(ctx context.Context, flowSchema *v1alpha1.FlowSchema, opts v1.CreateOptions) (result *v1alpha1.FlowSchema, err error) {
+	result = &v1alpha1.FlowSchema{}
+=======
+func (c *flowSchemas) Create(ctx context.Context, flowSchema *apiflowcontrolv1alpha1.FlowSchema, opts apismetav1.CreateOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	err = c.client.Post().
 		Resource("flowschemas").
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, clientgokubernetesscheme.ParameterCodec).
 		Body(flowSchema).
 		Do(ctx).
 		Into(result)
@@ -122,12 +202,20 @@ func (c *flowSchemas) Create(ctx context.Context, flowSchema *v1.FlowSchema, opt
 }
 
 // Update takes the representation of a flowSchema and updates it. Returns the server's representation of the flowSchema, and an error, if there is any.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) Update(ctx context.Context, flowSchema *v1.FlowSchema, opts metav1.UpdateOptions) (result *v1.FlowSchema, err error) {
 	result = &v1.FlowSchema{}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) Update(ctx context.Context, flowSchema *v1alpha1.FlowSchema, opts v1.UpdateOptions) (result *v1alpha1.FlowSchema, err error) {
+	result = &v1alpha1.FlowSchema{}
+=======
+func (c *flowSchemas) Update(ctx context.Context, flowSchema *apiflowcontrolv1alpha1.FlowSchema, opts apismetav1.UpdateOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	err = c.client.Put().
 		Resource("flowschemas").
 		Name(flowSchema.Name).
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, clientgokubernetesscheme.ParameterCodec).
 		Body(flowSchema).
 		Do(ctx).
 		Into(result)
@@ -136,13 +224,21 @@ func (c *flowSchemas) Update(ctx context.Context, flowSchema *v1.FlowSchema, opt
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) UpdateStatus(ctx context.Context, flowSchema *v1.FlowSchema, opts metav1.UpdateOptions) (result *v1.FlowSchema, err error) {
 	result = &v1.FlowSchema{}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) UpdateStatus(ctx context.Context, flowSchema *v1alpha1.FlowSchema, opts v1.UpdateOptions) (result *v1alpha1.FlowSchema, err error) {
+	result = &v1alpha1.FlowSchema{}
+=======
+func (c *flowSchemas) UpdateStatus(ctx context.Context, flowSchema *apiflowcontrolv1alpha1.FlowSchema, opts apismetav1.UpdateOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	err = c.client.Put().
 		Resource("flowschemas").
 		Name(flowSchema.Name).
 		SubResource("status").
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, clientgokubernetesscheme.ParameterCodec).
 		Body(flowSchema).
 		Do(ctx).
 		Into(result)
@@ -150,7 +246,13 @@ func (c *flowSchemas) UpdateStatus(ctx context.Context, flowSchema *v1.FlowSchem
 }
 
 // Delete takes name of the flowSchema and deletes it. Returns an error if one occurs.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+=======
+func (c *flowSchemas) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	return c.client.Delete().
 		Resource("flowschemas").
 		Name(name).
@@ -160,14 +262,20 @@ func (c *flowSchemas) Delete(ctx context.Context, name string, opts metav1.Delet
 }
 
 // DeleteCollection deletes a collection of objects.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+=======
+func (c *flowSchemas) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	var timeout time.Duration
 	if listOpts.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Resource("flowschemas").
-		VersionedParams(&listOpts, scheme.ParameterCodec).
+		VersionedParams(&listOpts, clientgokubernetesscheme.ParameterCodec).
 		Timeout(timeout).
 		Body(&opts).
 		Do(ctx).
@@ -175,13 +283,21 @@ func (c *flowSchemas) DeleteCollection(ctx context.Context, opts metav1.DeleteOp
 }
 
 // Patch applies the patch and returns the patched flowSchema.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.FlowSchema, err error) {
 	result = &v1.FlowSchema{}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FlowSchema, err error) {
+	result = &v1alpha1.FlowSchema{}
+=======
+func (c *flowSchemas) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	err = c.client.Patch(pt).
 		Resource("flowschemas").
 		Name(name).
 		SubResource(subresources...).
-		VersionedParams(&opts, scheme.ParameterCodec).
+		VersionedParams(&opts, clientgokubernetesscheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)
@@ -189,7 +305,13 @@ func (c *flowSchemas) Patch(ctx context.Context, name string, pt types.PatchType
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied flowSchema.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1.FlowSchemaApplyConfiguration, opts metav1.ApplyOptions) (result *v1.FlowSchema, err error) {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.FlowSchema, err error) {
+=======
+func (c *flowSchemas) Apply(ctx context.Context, flowSchema *applyconfigurationsflowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	if flowSchema == nil {
 		return nil, fmt.Errorf("flowSchema provided to Apply must not be nil")
 	}
@@ -202,11 +324,19 @@ func (c *flowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1.FlowS
 	if name == nil {
 		return nil, fmt.Errorf("flowSchema.Name must be provided to Apply")
 	}
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 	result = &v1.FlowSchema{}
 	err = c.client.Patch(types.ApplyPatchType).
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+	result = &v1alpha1.FlowSchema{}
+	err = c.client.Patch(types.ApplyPatchType).
+=======
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+	err = c.client.Patch(apimachinerypkgtypes.ApplyPatchType).
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 		Resource("flowschemas").
 		Name(*name).
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		VersionedParams(&patchOpts, clientgokubernetesscheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)
@@ -215,7 +345,13 @@ func (c *flowSchemas) Apply(ctx context.Context, flowSchema *flowcontrolv1.FlowS
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 func (c *flowSchemas) ApplyStatus(ctx context.Context, flowSchema *flowcontrolv1.FlowSchemaApplyConfiguration, opts metav1.ApplyOptions) (result *v1.FlowSchema, err error) {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+func (c *flowSchemas) ApplyStatus(ctx context.Context, flowSchema *flowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.FlowSchema, err error) {
+=======
+func (c *flowSchemas) ApplyStatus(ctx context.Context, flowSchema *applyconfigurationsflowcontrolv1alpha1.FlowSchemaApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiflowcontrolv1alpha1.FlowSchema, err error) {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 	if flowSchema == nil {
 		return nil, fmt.Errorf("flowSchema provided to Apply must not be nil")
 	}
@@ -230,12 +366,20 @@ func (c *flowSchemas) ApplyStatus(ctx context.Context, flowSchema *flowcontrolv1
 		return nil, fmt.Errorf("flowSchema.Name must be provided to Apply")
 	}
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowschema.go
 	result = &v1.FlowSchema{}
 	err = c.client.Patch(types.ApplyPatchType).
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
+	result = &v1alpha1.FlowSchema{}
+	err = c.client.Patch(types.ApplyPatchType).
+=======
+	result = &apiflowcontrolv1alpha1.FlowSchema{}
+	err = c.client.Patch(apimachinerypkgtypes.ApplyPatchType).
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowschema.go
 		Resource("flowschemas").
 		Name(*name).
 		SubResource("status").
-		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		VersionedParams(&patchOpts, clientgokubernetesscheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)
