@@ -19,13 +19,31 @@ limitations under the License.
 package fake
 
 import (
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/fake/fake_flowcontrol_client.go
 	v1 "k8s.io/client-go/kubernetes/typed/flowcontrol/v1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake/fake_flowcontrol_client.go
+	v1alpha1 "k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1"
+	rest "k8s.io/client-go/rest"
+	testing "k8s.io/client-go/testing"
+=======
+	v1alpha1 "k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1"
+	clientgorest "k8s.io/client-go/rest"
+	clientgotesting "k8s.io/client-go/testing"
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake/fake_flowcontrol_client.go
 )
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/fake/fake_flowcontrol_client.go
 type FakeFlowcontrolV1 struct {
 	*testing.Fake
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake/fake_flowcontrol_client.go
+type FakeFlowcontrolV1alpha1 struct {
+	*testing.Fake
+=======
+type FakeFlowcontrolV1alpha1 struct {
+	*clientgotesting.Fake
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake/fake_flowcontrol_client.go
 }
 
 func (c *FakeFlowcontrolV1) FlowSchemas() v1.FlowSchemaInterface {
@@ -38,7 +56,15 @@ func (c *FakeFlowcontrolV1) PriorityLevelConfigurations() v1.PriorityLevelConfig
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/fake/fake_flowcontrol_client.go
 func (c *FakeFlowcontrolV1) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake/fake_flowcontrol_client.go
+func (c *FakeFlowcontrolV1alpha1) RESTClient() rest.Interface {
+	var ret *rest.RESTClient
+=======
+func (c *FakeFlowcontrolV1alpha1) RESTClient() clientgorest.Interface {
+	var ret *clientgorest.RESTClient
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake/fake_flowcontrol_client.go
 	return ret
 }

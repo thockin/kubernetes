@@ -21,20 +21,44 @@ package v1
 import (
 	"net/http"
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 	v1 "k8s.io/api/flowcontrol/v1"
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+=======
+	apiflowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	"k8s.io/client-go/kubernetes/scheme"
-	rest "k8s.io/client-go/rest"
+	clientgorest "k8s.io/client-go/rest"
 )
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 type FlowcontrolV1Interface interface {
 	RESTClient() rest.Interface
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+type FlowcontrolV1alpha1Interface interface {
+	RESTClient() rest.Interface
+=======
+type FlowcontrolV1alpha1Interface interface {
+	RESTClient() clientgorest.Interface
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	FlowSchemasGetter
 	PriorityLevelConfigurationsGetter
 }
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 // FlowcontrolV1Client is used to interact with features provided by the flowcontrol.apiserver.k8s.io group.
 type FlowcontrolV1Client struct {
 	restClient rest.Interface
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+// FlowcontrolV1alpha1Client is used to interact with features provided by the flowcontrol.apiserver.k8s.io group.
+type FlowcontrolV1alpha1Client struct {
+	restClient rest.Interface
+=======
+// FlowcontrolV1alpha1Client is used to interact with features provided by the flowcontrol.apiserver.k8s.io group.
+type FlowcontrolV1alpha1Client struct {
+	restClient clientgorest.Interface
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 }
 
 func (c *FlowcontrolV1Client) FlowSchemas() FlowSchemaInterface {
@@ -48,12 +72,18 @@ func (c *FlowcontrolV1Client) PriorityLevelConfigurations() PriorityLevelConfigu
 // NewForConfig creates a new FlowcontrolV1Client for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 func NewForConfig(c *rest.Config) (*FlowcontrolV1Client, error) {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+func NewForConfig(c *rest.Config) (*FlowcontrolV1alpha1Client, error) {
+=======
+func NewForConfig(c *clientgorest.Config) (*FlowcontrolV1alpha1Client, error) {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	httpClient, err := rest.HTTPClientFor(&config)
+	httpClient, err := clientgorest.HTTPClientFor(&config)
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +92,18 @@ func NewForConfig(c *rest.Config) (*FlowcontrolV1Client, error) {
 
 // NewForConfigAndClient creates a new FlowcontrolV1Client for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 func NewForConfigAndClient(c *rest.Config, h *http.Client) (*FlowcontrolV1Client, error) {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*FlowcontrolV1alpha1Client, error) {
+=======
+func NewForConfigAndClient(c *clientgorest.Config, h *http.Client) (*FlowcontrolV1alpha1Client, error) {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := rest.RESTClientForConfigAndClient(&config, h)
+	client, err := clientgorest.RESTClientForConfigAndClient(&config, h)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +112,13 @@ func NewForConfigAndClient(c *rest.Config, h *http.Client) (*FlowcontrolV1Client
 
 // NewForConfigOrDie creates a new FlowcontrolV1Client for the given config and
 // panics if there is an error in the config.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 func NewForConfigOrDie(c *rest.Config) *FlowcontrolV1Client {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+func NewForConfigOrDie(c *rest.Config) *FlowcontrolV1alpha1Client {
+=======
+func NewForConfigOrDie(c *clientgorest.Config) *FlowcontrolV1alpha1Client {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -84,19 +126,37 @@ func NewForConfigOrDie(c *rest.Config) *FlowcontrolV1Client {
 	return client
 }
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 // New creates a new FlowcontrolV1Client for the given RESTClient.
 func New(c rest.Interface) *FlowcontrolV1Client {
 	return &FlowcontrolV1Client{c}
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+// New creates a new FlowcontrolV1alpha1Client for the given RESTClient.
+func New(c rest.Interface) *FlowcontrolV1alpha1Client {
+	return &FlowcontrolV1alpha1Client{c}
+=======
+// New creates a new FlowcontrolV1alpha1Client for the given RESTClient.
+func New(c clientgorest.Interface) *FlowcontrolV1alpha1Client {
+	return &FlowcontrolV1alpha1Client{c}
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 }
 
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 func setConfigDefaults(config *rest.Config) error {
 	gv := v1.SchemeGroupVersion
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+func setConfigDefaults(config *rest.Config) error {
+	gv := v1alpha1.SchemeGroupVersion
+=======
+func setConfigDefaults(config *clientgorest.Config) error {
+	gv := apiflowcontrolv1alpha1.SchemeGroupVersion
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	config.GroupVersion = &gv
 	config.APIPath = "/apis"
 	config.NegotiatedSerializer = scheme.Codecs.WithoutConversion()
 
 	if config.UserAgent == "" {
-		config.UserAgent = rest.DefaultKubernetesUserAgent()
+		config.UserAgent = clientgorest.DefaultKubernetesUserAgent()
 	}
 
 	return nil
@@ -104,7 +164,13 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
+<<<<<<< HEAD:staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1/flowcontrol_client.go
 func (c *FlowcontrolV1Client) RESTClient() rest.Interface {
+||||||| parent of e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
+func (c *FlowcontrolV1alpha1Client) RESTClient() rest.Interface {
+=======
+func (c *FlowcontrolV1alpha1Client) RESTClient() clientgorest.Interface {
+>>>>>>> e9771bdbaa6 (codegen client-gen (BROKEN)):staging/src/k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/flowcontrol_client.go
 	if c == nil {
 		return nil
 	}
