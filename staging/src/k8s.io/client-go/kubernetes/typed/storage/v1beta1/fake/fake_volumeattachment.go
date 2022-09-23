@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	v1beta1 "k8s.io/api/storage/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	storagev1beta1 "k8s.io/client-go/applyconfigurations/storage/v1beta1"
-	testing "k8s.io/client-go/testing"
+	apistoragev1beta1 "k8s.io/api/storage/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsstoragev1beta1 "k8s.io/client-go/applyconfigurations/storage/v1beta1"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeVolumeAttachments implements VolumeAttachmentInterface
@@ -38,34 +38,34 @@ type FakeVolumeAttachments struct {
 	Fake *FakeStorageV1beta1
 }
 
-var volumeattachmentsResource = schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1beta1", Resource: "volumeattachments"}
+var volumeattachmentsResource = pkgruntimeschema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1beta1", Resource: "volumeattachments"}
 
-var volumeattachmentsKind = schema.GroupVersionKind{Group: "storage.k8s.io", Version: "v1beta1", Kind: "VolumeAttachment"}
+var volumeattachmentsKind = pkgruntimeschema.GroupVersionKind{Group: "storage.k8s.io", Version: "v1beta1", Kind: "VolumeAttachment"}
 
 // Get takes name of the volumeAttachment, and returns the corresponding volumeAttachment object, and an error if there is any.
-func (c *FakeVolumeAttachments) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apistoragev1beta1.VolumeAttachment, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(volumeattachmentsResource, name), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootGetAction(volumeattachmentsResource, name), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }
 
 // List takes label and field selectors, and returns the list of VolumeAttachments that match those selectors.
-func (c *FakeVolumeAttachments) List(ctx context.Context, opts v1.ListOptions) (result *v1beta1.VolumeAttachmentList, err error) {
+func (c *FakeVolumeAttachments) List(ctx context.Context, opts apismetav1.ListOptions) (result *apistoragev1beta1.VolumeAttachmentList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(volumeattachmentsResource, volumeattachmentsKind, opts), &v1beta1.VolumeAttachmentList{})
+		Invokes(clientgotesting.NewRootListAction(volumeattachmentsResource, volumeattachmentsKind, opts), &apistoragev1beta1.VolumeAttachmentList{})
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &v1beta1.VolumeAttachmentList{ListMeta: obj.(*v1beta1.VolumeAttachmentList).ListMeta}
-	for _, item := range obj.(*v1beta1.VolumeAttachmentList).Items {
+	list := &apistoragev1beta1.VolumeAttachmentList{ListMeta: obj.(*apistoragev1beta1.VolumeAttachmentList).ListMeta}
+	for _, item := range obj.(*apistoragev1beta1.VolumeAttachmentList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -73,70 +73,70 @@ func (c *FakeVolumeAttachments) List(ctx context.Context, opts v1.ListOptions) (
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested volumeAttachments.
-func (c *FakeVolumeAttachments) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested volumeAttachments.
+func (c *FakeVolumeAttachments) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(volumeattachmentsResource, opts))
+		InvokesWatch(clientgotesting.NewRootWatchAction(volumeattachmentsResource, opts))
 }
 
 // Create takes the representation of a volumeAttachment and creates it.  Returns the server's representation of the volumeAttachment, and an error, if there is any.
-func (c *FakeVolumeAttachments) Create(ctx context.Context, volumeAttachment *v1beta1.VolumeAttachment, opts v1.CreateOptions) (result *v1beta1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Create(ctx context.Context, volumeAttachment *apistoragev1beta1.VolumeAttachment, opts apismetav1.CreateOptions) (result *apistoragev1beta1.VolumeAttachment, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(volumeattachmentsResource, volumeAttachment), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootCreateAction(volumeattachmentsResource, volumeAttachment), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }
 
 // Update takes the representation of a volumeAttachment and updates it. Returns the server's representation of the volumeAttachment, and an error, if there is any.
-func (c *FakeVolumeAttachments) Update(ctx context.Context, volumeAttachment *v1beta1.VolumeAttachment, opts v1.UpdateOptions) (result *v1beta1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Update(ctx context.Context, volumeAttachment *apistoragev1beta1.VolumeAttachment, opts apismetav1.UpdateOptions) (result *apistoragev1beta1.VolumeAttachment, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(volumeattachmentsResource, volumeAttachment), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootUpdateAction(volumeattachmentsResource, volumeAttachment), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeVolumeAttachments) UpdateStatus(ctx context.Context, volumeAttachment *v1beta1.VolumeAttachment, opts v1.UpdateOptions) (*v1beta1.VolumeAttachment, error) {
+func (c *FakeVolumeAttachments) UpdateStatus(ctx context.Context, volumeAttachment *apistoragev1beta1.VolumeAttachment, opts apismetav1.UpdateOptions) (*apistoragev1beta1.VolumeAttachment, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(volumeattachmentsResource, "status", volumeAttachment), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootUpdateSubresourceAction(volumeattachmentsResource, "status", volumeAttachment), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }
 
 // Delete takes name of the volumeAttachment and deletes it. Returns an error if one occurs.
-func (c *FakeVolumeAttachments) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeVolumeAttachments) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(volumeattachmentsResource, name, opts), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootDeleteActionWithOptions(volumeattachmentsResource, name, opts), &apistoragev1beta1.VolumeAttachment{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeVolumeAttachments) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(volumeattachmentsResource, listOpts)
+func (c *FakeVolumeAttachments) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewRootDeleteCollectionAction(volumeattachmentsResource, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1beta1.VolumeAttachmentList{})
+	_, err := c.Fake.Invokes(action, &apistoragev1beta1.VolumeAttachmentList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched volumeAttachment.
-func (c *FakeVolumeAttachments) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apistoragev1beta1.VolumeAttachment, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(volumeattachmentsResource, name, pt, data, subresources...), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(volumeattachmentsResource, name, pt, data, subresources...), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied volumeAttachment.
-func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *storagev1beta1.VolumeAttachmentApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *applyconfigurationsstoragev1beta1.VolumeAttachmentApplyConfiguration, opts apismetav1.ApplyOptions) (result *apistoragev1beta1.VolumeAttachment, err error) {
 	if volumeAttachment == nil {
 		return nil, fmt.Errorf("volumeAttachment provided to Apply must not be nil")
 	}
@@ -149,16 +149,16 @@ func (c *FakeVolumeAttachments) Apply(ctx context.Context, volumeAttachment *sto
 		return nil, fmt.Errorf("volumeAttachment.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(volumeattachmentsResource, *name, types.ApplyPatchType, data), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(volumeattachmentsResource, *name, apimachinerypkgtypes.ApplyPatchType, data), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeVolumeAttachments) ApplyStatus(ctx context.Context, volumeAttachment *storagev1beta1.VolumeAttachmentApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.VolumeAttachment, err error) {
+func (c *FakeVolumeAttachments) ApplyStatus(ctx context.Context, volumeAttachment *applyconfigurationsstoragev1beta1.VolumeAttachmentApplyConfiguration, opts apismetav1.ApplyOptions) (result *apistoragev1beta1.VolumeAttachment, err error) {
 	if volumeAttachment == nil {
 		return nil, fmt.Errorf("volumeAttachment provided to Apply must not be nil")
 	}
@@ -171,9 +171,9 @@ func (c *FakeVolumeAttachments) ApplyStatus(ctx context.Context, volumeAttachmen
 		return nil, fmt.Errorf("volumeAttachment.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(volumeattachmentsResource, *name, types.ApplyPatchType, data, "status"), &v1beta1.VolumeAttachment{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(volumeattachmentsResource, *name, apimachinerypkgtypes.ApplyPatchType, data, "status"), &apistoragev1beta1.VolumeAttachment{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.VolumeAttachment), err
+	return obj.(*apistoragev1beta1.VolumeAttachment), err
 }

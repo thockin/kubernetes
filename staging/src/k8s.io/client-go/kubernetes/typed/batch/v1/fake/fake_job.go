@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	batchv1 "k8s.io/api/batch/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apibatchv1 "k8s.io/api/batch/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationsbatchv1 "k8s.io/client-go/applyconfigurations/batch/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeJobs implements JobInterface
@@ -39,36 +39,36 @@ type FakeJobs struct {
 	ns   string
 }
 
-var jobsResource = schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}
+var jobsResource = pkgruntimeschema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}
 
-var jobsKind = schema.GroupVersionKind{Group: "batch", Version: "v1", Kind: "Job"}
+var jobsKind = pkgruntimeschema.GroupVersionKind{Group: "batch", Version: "v1", Kind: "Job"}
 
 // Get takes name of the job, and returns the corresponding job object, and an error if there is any.
-func (c *FakeJobs) Get(ctx context.Context, name string, options v1.GetOptions) (result *batchv1.Job, err error) {
+func (c *FakeJobs) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apibatchv1.Job, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(jobsResource, c.ns, name), &batchv1.Job{})
+		Invokes(clientgotesting.NewGetAction(jobsResource, c.ns, name), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }
 
 // List takes label and field selectors, and returns the list of Jobs that match those selectors.
-func (c *FakeJobs) List(ctx context.Context, opts v1.ListOptions) (result *batchv1.JobList, err error) {
+func (c *FakeJobs) List(ctx context.Context, opts apismetav1.ListOptions) (result *apibatchv1.JobList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(jobsResource, jobsKind, c.ns, opts), &batchv1.JobList{})
+		Invokes(clientgotesting.NewListAction(jobsResource, jobsKind, c.ns, opts), &apibatchv1.JobList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &batchv1.JobList{ListMeta: obj.(*batchv1.JobList).ListMeta}
-	for _, item := range obj.(*batchv1.JobList).Items {
+	list := &apibatchv1.JobList{ListMeta: obj.(*apibatchv1.JobList).ListMeta}
+	for _, item := range obj.(*apibatchv1.JobList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,76 +76,76 @@ func (c *FakeJobs) List(ctx context.Context, opts v1.ListOptions) (result *batch
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested jobs.
-func (c *FakeJobs) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested jobs.
+func (c *FakeJobs) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(jobsResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(jobsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a job and creates it.  Returns the server's representation of the job, and an error, if there is any.
-func (c *FakeJobs) Create(ctx context.Context, job *batchv1.Job, opts v1.CreateOptions) (result *batchv1.Job, err error) {
+func (c *FakeJobs) Create(ctx context.Context, job *apibatchv1.Job, opts apismetav1.CreateOptions) (result *apibatchv1.Job, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(jobsResource, c.ns, job), &batchv1.Job{})
+		Invokes(clientgotesting.NewCreateAction(jobsResource, c.ns, job), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }
 
 // Update takes the representation of a job and updates it. Returns the server's representation of the job, and an error, if there is any.
-func (c *FakeJobs) Update(ctx context.Context, job *batchv1.Job, opts v1.UpdateOptions) (result *batchv1.Job, err error) {
+func (c *FakeJobs) Update(ctx context.Context, job *apibatchv1.Job, opts apismetav1.UpdateOptions) (result *apibatchv1.Job, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(jobsResource, c.ns, job), &batchv1.Job{})
+		Invokes(clientgotesting.NewUpdateAction(jobsResource, c.ns, job), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeJobs) UpdateStatus(ctx context.Context, job *batchv1.Job, opts v1.UpdateOptions) (*batchv1.Job, error) {
+func (c *FakeJobs) UpdateStatus(ctx context.Context, job *apibatchv1.Job, opts apismetav1.UpdateOptions) (*apibatchv1.Job, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(jobsResource, "status", c.ns, job), &batchv1.Job{})
+		Invokes(clientgotesting.NewUpdateSubresourceAction(jobsResource, "status", c.ns, job), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }
 
 // Delete takes name of the job and deletes it. Returns an error if one occurs.
-func (c *FakeJobs) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeJobs) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(jobsResource, c.ns, name, opts), &batchv1.Job{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(jobsResource, c.ns, name, opts), &apibatchv1.Job{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeJobs) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(jobsResource, c.ns, listOpts)
+func (c *FakeJobs) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(jobsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &batchv1.JobList{})
+	_, err := c.Fake.Invokes(action, &apibatchv1.JobList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched job.
-func (c *FakeJobs) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *batchv1.Job, err error) {
+func (c *FakeJobs) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apibatchv1.Job, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(jobsResource, c.ns, name, pt, data, subresources...), &batchv1.Job{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(jobsResource, c.ns, name, pt, data, subresources...), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied job.
-func (c *FakeJobs) Apply(ctx context.Context, job *applyconfigurationsbatchv1.JobApplyConfiguration, opts v1.ApplyOptions) (result *batchv1.Job, err error) {
+func (c *FakeJobs) Apply(ctx context.Context, job *applyconfigurationsbatchv1.JobApplyConfiguration, opts apismetav1.ApplyOptions) (result *apibatchv1.Job, err error) {
 	if job == nil {
 		return nil, fmt.Errorf("job provided to Apply must not be nil")
 	}
@@ -158,17 +158,17 @@ func (c *FakeJobs) Apply(ctx context.Context, job *applyconfigurationsbatchv1.Jo
 		return nil, fmt.Errorf("job.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(jobsResource, c.ns, *name, types.ApplyPatchType, data), &batchv1.Job{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(jobsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeJobs) ApplyStatus(ctx context.Context, job *applyconfigurationsbatchv1.JobApplyConfiguration, opts v1.ApplyOptions) (result *batchv1.Job, err error) {
+func (c *FakeJobs) ApplyStatus(ctx context.Context, job *applyconfigurationsbatchv1.JobApplyConfiguration, opts apismetav1.ApplyOptions) (result *apibatchv1.Job, err error) {
 	if job == nil {
 		return nil, fmt.Errorf("job provided to Apply must not be nil")
 	}
@@ -181,10 +181,10 @@ func (c *FakeJobs) ApplyStatus(ctx context.Context, job *applyconfigurationsbatc
 		return nil, fmt.Errorf("job.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(jobsResource, c.ns, *name, types.ApplyPatchType, data, "status"), &batchv1.Job{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(jobsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data, "status"), &apibatchv1.Job{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*batchv1.Job), err
+	return obj.(*apibatchv1.Job), err
 }

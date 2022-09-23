@@ -650,6 +650,7 @@ function codegen::clients() {
     fi
 
     "${clientgen}" \
+        --v "${KUBE_VERBOSE}" \
         --go-header-file "${BOILERPLATE_FILENAME}" \
         --output-base "${KUBE_ROOT}/staging/src" \
         --output-package="k8s.io/client-go" \

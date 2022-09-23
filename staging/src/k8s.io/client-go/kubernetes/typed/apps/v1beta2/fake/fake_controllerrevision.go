@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	v1beta2 "k8s.io/api/apps/v1beta2"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	appsv1beta2 "k8s.io/client-go/applyconfigurations/apps/v1beta2"
-	testing "k8s.io/client-go/testing"
+	apiappsv1beta2 "k8s.io/api/apps/v1beta2"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsappsv1beta2 "k8s.io/client-go/applyconfigurations/apps/v1beta2"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeControllerRevisions implements ControllerRevisionInterface
@@ -39,36 +39,36 @@ type FakeControllerRevisions struct {
 	ns   string
 }
 
-var controllerrevisionsResource = schema.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "controllerrevisions"}
+var controllerrevisionsResource = pkgruntimeschema.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "controllerrevisions"}
 
-var controllerrevisionsKind = schema.GroupVersionKind{Group: "apps", Version: "v1beta2", Kind: "ControllerRevision"}
+var controllerrevisionsKind = pkgruntimeschema.GroupVersionKind{Group: "apps", Version: "v1beta2", Kind: "ControllerRevision"}
 
 // Get takes name of the controllerRevision, and returns the corresponding controllerRevision object, and an error if there is any.
-func (c *FakeControllerRevisions) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta2.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apiappsv1beta2.ControllerRevision, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(controllerrevisionsResource, c.ns, name), &v1beta2.ControllerRevision{})
+		Invokes(clientgotesting.NewGetAction(controllerrevisionsResource, c.ns, name), &apiappsv1beta2.ControllerRevision{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta2.ControllerRevision), err
+	return obj.(*apiappsv1beta2.ControllerRevision), err
 }
 
 // List takes label and field selectors, and returns the list of ControllerRevisions that match those selectors.
-func (c *FakeControllerRevisions) List(ctx context.Context, opts v1.ListOptions) (result *v1beta2.ControllerRevisionList, err error) {
+func (c *FakeControllerRevisions) List(ctx context.Context, opts apismetav1.ListOptions) (result *apiappsv1beta2.ControllerRevisionList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(controllerrevisionsResource, controllerrevisionsKind, c.ns, opts), &v1beta2.ControllerRevisionList{})
+		Invokes(clientgotesting.NewListAction(controllerrevisionsResource, controllerrevisionsKind, c.ns, opts), &apiappsv1beta2.ControllerRevisionList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &v1beta2.ControllerRevisionList{ListMeta: obj.(*v1beta2.ControllerRevisionList).ListMeta}
-	for _, item := range obj.(*v1beta2.ControllerRevisionList).Items {
+	list := &apiappsv1beta2.ControllerRevisionList{ListMeta: obj.(*apiappsv1beta2.ControllerRevisionList).ListMeta}
+	for _, item := range obj.(*apiappsv1beta2.ControllerRevisionList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,64 +76,64 @@ func (c *FakeControllerRevisions) List(ctx context.Context, opts v1.ListOptions)
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested controllerRevisions.
-func (c *FakeControllerRevisions) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested controllerRevisions.
+func (c *FakeControllerRevisions) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(controllerrevisionsResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(controllerrevisionsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a controllerRevision and creates it.  Returns the server's representation of the controllerRevision, and an error, if there is any.
-func (c *FakeControllerRevisions) Create(ctx context.Context, controllerRevision *v1beta2.ControllerRevision, opts v1.CreateOptions) (result *v1beta2.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Create(ctx context.Context, controllerRevision *apiappsv1beta2.ControllerRevision, opts apismetav1.CreateOptions) (result *apiappsv1beta2.ControllerRevision, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(controllerrevisionsResource, c.ns, controllerRevision), &v1beta2.ControllerRevision{})
+		Invokes(clientgotesting.NewCreateAction(controllerrevisionsResource, c.ns, controllerRevision), &apiappsv1beta2.ControllerRevision{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta2.ControllerRevision), err
+	return obj.(*apiappsv1beta2.ControllerRevision), err
 }
 
 // Update takes the representation of a controllerRevision and updates it. Returns the server's representation of the controllerRevision, and an error, if there is any.
-func (c *FakeControllerRevisions) Update(ctx context.Context, controllerRevision *v1beta2.ControllerRevision, opts v1.UpdateOptions) (result *v1beta2.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Update(ctx context.Context, controllerRevision *apiappsv1beta2.ControllerRevision, opts apismetav1.UpdateOptions) (result *apiappsv1beta2.ControllerRevision, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(controllerrevisionsResource, c.ns, controllerRevision), &v1beta2.ControllerRevision{})
+		Invokes(clientgotesting.NewUpdateAction(controllerrevisionsResource, c.ns, controllerRevision), &apiappsv1beta2.ControllerRevision{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta2.ControllerRevision), err
+	return obj.(*apiappsv1beta2.ControllerRevision), err
 }
 
 // Delete takes name of the controllerRevision and deletes it. Returns an error if one occurs.
-func (c *FakeControllerRevisions) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeControllerRevisions) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(controllerrevisionsResource, c.ns, name, opts), &v1beta2.ControllerRevision{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(controllerrevisionsResource, c.ns, name, opts), &apiappsv1beta2.ControllerRevision{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeControllerRevisions) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(controllerrevisionsResource, c.ns, listOpts)
+func (c *FakeControllerRevisions) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(controllerrevisionsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1beta2.ControllerRevisionList{})
+	_, err := c.Fake.Invokes(action, &apiappsv1beta2.ControllerRevisionList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched controllerRevision.
-func (c *FakeControllerRevisions) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta2.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apiappsv1beta2.ControllerRevision, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(controllerrevisionsResource, c.ns, name, pt, data, subresources...), &v1beta2.ControllerRevision{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(controllerrevisionsResource, c.ns, name, pt, data, subresources...), &apiappsv1beta2.ControllerRevision{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta2.ControllerRevision), err
+	return obj.(*apiappsv1beta2.ControllerRevision), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied controllerRevision.
-func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision *appsv1beta2.ControllerRevisionApplyConfiguration, opts v1.ApplyOptions) (result *v1beta2.ControllerRevision, err error) {
+func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision *applyconfigurationsappsv1beta2.ControllerRevisionApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiappsv1beta2.ControllerRevision, err error) {
 	if controllerRevision == nil {
 		return nil, fmt.Errorf("controllerRevision provided to Apply must not be nil")
 	}
@@ -146,10 +146,10 @@ func (c *FakeControllerRevisions) Apply(ctx context.Context, controllerRevision 
 		return nil, fmt.Errorf("controllerRevision.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(controllerrevisionsResource, c.ns, *name, types.ApplyPatchType, data), &v1beta2.ControllerRevision{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(controllerrevisionsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apiappsv1beta2.ControllerRevision{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta2.ControllerRevision), err
+	return obj.(*apiappsv1beta2.ControllerRevision), err
 }

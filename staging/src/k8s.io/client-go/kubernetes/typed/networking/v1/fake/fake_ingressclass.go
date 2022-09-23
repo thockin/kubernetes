@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	networkingv1 "k8s.io/api/networking/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apinetworkingv1 "k8s.io/api/networking/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationsnetworkingv1 "k8s.io/client-go/applyconfigurations/networking/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeIngressClasses implements IngressClassInterface
@@ -38,34 +38,34 @@ type FakeIngressClasses struct {
 	Fake *FakeNetworkingV1
 }
 
-var ingressclassesResource = schema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingressclasses"}
+var ingressclassesResource = pkgruntimeschema.GroupVersionResource{Group: "networking.k8s.io", Version: "v1", Resource: "ingressclasses"}
 
-var ingressclassesKind = schema.GroupVersionKind{Group: "networking.k8s.io", Version: "v1", Kind: "IngressClass"}
+var ingressclassesKind = pkgruntimeschema.GroupVersionKind{Group: "networking.k8s.io", Version: "v1", Kind: "IngressClass"}
 
 // Get takes name of the ingressClass, and returns the corresponding ingressClass object, and an error if there is any.
-func (c *FakeIngressClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apinetworkingv1.IngressClass, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(ingressclassesResource, name), &networkingv1.IngressClass{})
+		Invokes(clientgotesting.NewRootGetAction(ingressclassesResource, name), &apinetworkingv1.IngressClass{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*networkingv1.IngressClass), err
+	return obj.(*apinetworkingv1.IngressClass), err
 }
 
 // List takes label and field selectors, and returns the list of IngressClasses that match those selectors.
-func (c *FakeIngressClasses) List(ctx context.Context, opts v1.ListOptions) (result *networkingv1.IngressClassList, err error) {
+func (c *FakeIngressClasses) List(ctx context.Context, opts apismetav1.ListOptions) (result *apinetworkingv1.IngressClassList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(ingressclassesResource, ingressclassesKind, opts), &networkingv1.IngressClassList{})
+		Invokes(clientgotesting.NewRootListAction(ingressclassesResource, ingressclassesKind, opts), &apinetworkingv1.IngressClassList{})
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &networkingv1.IngressClassList{ListMeta: obj.(*networkingv1.IngressClassList).ListMeta}
-	for _, item := range obj.(*networkingv1.IngressClassList).Items {
+	list := &apinetworkingv1.IngressClassList{ListMeta: obj.(*apinetworkingv1.IngressClassList).ListMeta}
+	for _, item := range obj.(*apinetworkingv1.IngressClassList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -73,59 +73,59 @@ func (c *FakeIngressClasses) List(ctx context.Context, opts v1.ListOptions) (res
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested ingressClasses.
-func (c *FakeIngressClasses) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested ingressClasses.
+func (c *FakeIngressClasses) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(ingressclassesResource, opts))
+		InvokesWatch(clientgotesting.NewRootWatchAction(ingressclassesResource, opts))
 }
 
 // Create takes the representation of a ingressClass and creates it.  Returns the server's representation of the ingressClass, and an error, if there is any.
-func (c *FakeIngressClasses) Create(ctx context.Context, ingressClass *networkingv1.IngressClass, opts v1.CreateOptions) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Create(ctx context.Context, ingressClass *apinetworkingv1.IngressClass, opts apismetav1.CreateOptions) (result *apinetworkingv1.IngressClass, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(ingressclassesResource, ingressClass), &networkingv1.IngressClass{})
+		Invokes(clientgotesting.NewRootCreateAction(ingressclassesResource, ingressClass), &apinetworkingv1.IngressClass{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*networkingv1.IngressClass), err
+	return obj.(*apinetworkingv1.IngressClass), err
 }
 
 // Update takes the representation of a ingressClass and updates it. Returns the server's representation of the ingressClass, and an error, if there is any.
-func (c *FakeIngressClasses) Update(ctx context.Context, ingressClass *networkingv1.IngressClass, opts v1.UpdateOptions) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Update(ctx context.Context, ingressClass *apinetworkingv1.IngressClass, opts apismetav1.UpdateOptions) (result *apinetworkingv1.IngressClass, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(ingressclassesResource, ingressClass), &networkingv1.IngressClass{})
+		Invokes(clientgotesting.NewRootUpdateAction(ingressclassesResource, ingressClass), &apinetworkingv1.IngressClass{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*networkingv1.IngressClass), err
+	return obj.(*apinetworkingv1.IngressClass), err
 }
 
 // Delete takes name of the ingressClass and deletes it. Returns an error if one occurs.
-func (c *FakeIngressClasses) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeIngressClasses) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(ingressclassesResource, name, opts), &networkingv1.IngressClass{})
+		Invokes(clientgotesting.NewRootDeleteActionWithOptions(ingressclassesResource, name, opts), &apinetworkingv1.IngressClass{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeIngressClasses) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(ingressclassesResource, listOpts)
+func (c *FakeIngressClasses) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewRootDeleteCollectionAction(ingressclassesResource, listOpts)
 
-	_, err := c.Fake.Invokes(action, &networkingv1.IngressClassList{})
+	_, err := c.Fake.Invokes(action, &apinetworkingv1.IngressClassList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched ingressClass.
-func (c *FakeIngressClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apinetworkingv1.IngressClass, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(ingressclassesResource, name, pt, data, subresources...), &networkingv1.IngressClass{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(ingressclassesResource, name, pt, data, subresources...), &apinetworkingv1.IngressClass{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*networkingv1.IngressClass), err
+	return obj.(*apinetworkingv1.IngressClass), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied ingressClass.
-func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass *applyconfigurationsnetworkingv1.IngressClassApplyConfiguration, opts v1.ApplyOptions) (result *networkingv1.IngressClass, err error) {
+func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass *applyconfigurationsnetworkingv1.IngressClassApplyConfiguration, opts apismetav1.ApplyOptions) (result *apinetworkingv1.IngressClass, err error) {
 	if ingressClass == nil {
 		return nil, fmt.Errorf("ingressClass provided to Apply must not be nil")
 	}
@@ -138,9 +138,9 @@ func (c *FakeIngressClasses) Apply(ctx context.Context, ingressClass *applyconfi
 		return nil, fmt.Errorf("ingressClass.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(ingressclassesResource, *name, types.ApplyPatchType, data), &networkingv1.IngressClass{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(ingressclassesResource, *name, apimachinerypkgtypes.ApplyPatchType, data), &apinetworkingv1.IngressClass{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*networkingv1.IngressClass), err
+	return obj.(*apinetworkingv1.IngressClass), err
 }

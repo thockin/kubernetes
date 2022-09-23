@@ -29,11 +29,10 @@ import (
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
 	codegennamer "k8s.io/code-generator/pkg/namer"
 	genutil "k8s.io/code-generator/pkg/util"
-	"k8s.io/gengo/args"
-	"k8s.io/gengo/generator"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/types"
-
+	"k8s.io/gengo/v2/args"
+	"k8s.io/gengo/v2/generator"
+	"k8s.io/gengo/v2/namer"
+	"k8s.io/gengo/v2/types"
 	"k8s.io/klog/v2"
 )
 
@@ -131,12 +130,11 @@ func DefaultNameSystem() string {
 func packageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, clientsetPackage string, groupPackageName string, groupGoName string, apiPath string, srcTreePath string, inputPackage string, applyBuilderPackage string, boilerplate []byte) generator.Package {
 	groupVersionClientPackage := filepath.Join(clientsetPackage, "typed", strings.ToLower(groupPackageName), strings.ToLower(gv.Version.NonEmpty()))
 	return &generator.DefaultPackage{
-		PackageName: strings.ToLower(gv.Version.NonEmpty()),
-		PackagePath: groupVersionClientPackage,
-		HeaderText:  boilerplate,
-		PackageDocumentation: []byte(
-			`// This package has the automatically generated typed clients.
-`),
+		PackageName:          strings.ToLower(gv.Version.NonEmpty()),
+		PackagePath:          groupVersionClientPackage,
+		HeaderText:           boilerplate,
+		Source:               filepath.Join(srcTreePath, groupVersionClientPackage),
+		PackageDocumentation: []byte("// This package has the automatically generated typed clients.\n"),
 		// GeneratorFunc returns a list of generators. Each generator makes a
 		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
@@ -195,14 +193,13 @@ func packageForGroup(gv clientgentypes.GroupVersion, typeList []*types.Type, cli
 	}
 }
 
-func packageForClientset(customArgs *clientgenargs.CustomArgs, clientsetPackage string, groupGoNames map[clientgentypes.GroupVersion]string, boilerplate []byte) generator.Package {
+func packageForClientset(customArgs *clientgenargs.CustomArgs, clientsetPackage string, srcTreePath string, groupGoNames map[clientgentypes.GroupVersion]string, boilerplate []byte) generator.Package {
 	return &generator.DefaultPackage{
-		PackageName: customArgs.ClientsetName,
-		PackagePath: clientsetPackage,
-		HeaderText:  boilerplate,
-		PackageDocumentation: []byte(
-			`// This package has the automatically generated clientset.
-`),
+		PackageName:          customArgs.ClientsetName,
+		PackagePath:          clientsetPackage,
+		HeaderText:           boilerplate,
+		Source:               filepath.Join(srcTreePath, clientsetPackage),
+		PackageDocumentation: []byte("// This package has the automatically generated clientset.\n"),
 		// GeneratorFunc returns a list of generators. Each generator generates a
 		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
@@ -242,12 +239,11 @@ NextGroup:
 	}
 
 	return &generator.DefaultPackage{
-		PackageName: "scheme",
-		PackagePath: schemePackage,
-		HeaderText:  boilerplate,
-		PackageDocumentation: []byte(
-			`// This package contains the scheme of the automatically generated clientset.
-`),
+		PackageName:          "scheme",
+		PackagePath:          schemePackage,
+		HeaderText:           boilerplate,
+		Source:               filepath.Join(srcTreePath, schemePackage),
+		PackageDocumentation: []byte("// This package contains the scheme of the automatically generated clientset.\n"),
 		// GeneratorFunc returns a list of generators. Each generator generates a
 		// single file.
 		GeneratorFunc: func(c *generator.Context) (generators []generator.Generator) {
@@ -342,7 +338,6 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			groupGoNames[gv] = namer.IC(override[0])
 		}
 
-		// Package are indexed with the vendor prefix stripped
 		for n, t := range p.Types {
 			// filter out types which are not included in user specified overrides.
 			typesOverride, ok := includedTypesOverrides[gv]
@@ -374,10 +369,10 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 	var packageList []generator.Package
 	clientsetPackage := filepath.Join(arguments.OutputPackagePath, customArgs.ClientsetName)
 
-	packageList = append(packageList, packageForClientset(customArgs, clientsetPackage, groupGoNames, boilerplate))
+	packageList = append(packageList, packageForClientset(customArgs, clientsetPackage, arguments.OutputBase, groupGoNames, boilerplate))
 	packageList = append(packageList, packageForScheme(customArgs, clientsetPackage, arguments.OutputBase, groupGoNames, boilerplate))
 	if customArgs.FakeClient {
-		packageList = append(packageList, fake.PackageForClientset(customArgs, clientsetPackage, groupGoNames, boilerplate))
+		packageList = append(packageList, fake.PackageForClientset(customArgs, clientsetPackage, arguments.OutputBase, groupGoNames, boilerplate))
 	}
 
 	// If --clientset-only=true, we don't regenerate the individual typed clients.
@@ -394,7 +389,7 @@ func Packages(context *generator.Context, arguments *args.GeneratorArgs) generat
 			inputPath := gvPackages[gv]
 			packageList = append(packageList, packageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], customArgs.ClientsetAPIPath, arguments.OutputBase, inputPath, customArgs.ApplyConfigurationPackage, boilerplate))
 			if customArgs.FakeClient {
-				packageList = append(packageList, fake.PackageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], inputPath, customArgs.ApplyConfigurationPackage, boilerplate))
+				packageList = append(packageList, fake.PackageForGroup(gv, orderer.OrderTypes(types), clientsetPackage, group.PackageName, groupGoNames[gv], arguments.OutputBase, inputPath, customArgs.ApplyConfigurationPackage, boilerplate))
 			}
 		}
 	}

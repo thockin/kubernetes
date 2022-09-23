@@ -23,9 +23,9 @@ import (
 	"strings"
 
 	clientgentypes "k8s.io/code-generator/cmd/client-gen/types"
-	"k8s.io/gengo/generator"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/types"
+	"k8s.io/gengo/v2/generator"
+	"k8s.io/gengo/v2/namer"
+	"k8s.io/gengo/v2/types"
 )
 
 // genClientset generates a package for a clientset.
@@ -91,6 +91,8 @@ func (g *genClientset) GenerateType(c *generator.Context, t *types.Type, w io.Wr
 		sw.Do(clientsetInterfaceImplTemplate, g)
 	}
 	sw.Do(getDiscoveryTemplate, m)
+	g.imports.AddImport("fmt")
+	g.imports.AddImport("net/http")
 	sw.Do(newClientsetForConfigTemplate, m)
 	sw.Do(newClientsetForConfigAndClientTemplate, m)
 	sw.Do(newClientsetForConfigOrDieTemplate, m)

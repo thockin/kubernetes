@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apicorev1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeResourceQuotas implements ResourceQuotaInterface
@@ -39,36 +39,36 @@ type FakeResourceQuotas struct {
 	ns   string
 }
 
-var resourcequotasResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "resourcequotas"}
+var resourcequotasResource = pkgruntimeschema.GroupVersionResource{Group: "", Version: "v1", Resource: "resourcequotas"}
 
-var resourcequotasKind = schema.GroupVersionKind{Group: "", Version: "v1", Kind: "ResourceQuota"}
+var resourcequotasKind = pkgruntimeschema.GroupVersionKind{Group: "", Version: "v1", Kind: "ResourceQuota"}
 
 // Get takes name of the resourceQuota, and returns the corresponding resourceQuota object, and an error if there is any.
-func (c *FakeResourceQuotas) Get(ctx context.Context, name string, options v1.GetOptions) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apicorev1.ResourceQuota, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(resourcequotasResource, c.ns, name), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewGetAction(resourcequotasResource, c.ns, name), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }
 
 // List takes label and field selectors, and returns the list of ResourceQuotas that match those selectors.
-func (c *FakeResourceQuotas) List(ctx context.Context, opts v1.ListOptions) (result *corev1.ResourceQuotaList, err error) {
+func (c *FakeResourceQuotas) List(ctx context.Context, opts apismetav1.ListOptions) (result *apicorev1.ResourceQuotaList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(resourcequotasResource, resourcequotasKind, c.ns, opts), &corev1.ResourceQuotaList{})
+		Invokes(clientgotesting.NewListAction(resourcequotasResource, resourcequotasKind, c.ns, opts), &apicorev1.ResourceQuotaList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &corev1.ResourceQuotaList{ListMeta: obj.(*corev1.ResourceQuotaList).ListMeta}
-	for _, item := range obj.(*corev1.ResourceQuotaList).Items {
+	list := &apicorev1.ResourceQuotaList{ListMeta: obj.(*apicorev1.ResourceQuotaList).ListMeta}
+	for _, item := range obj.(*apicorev1.ResourceQuotaList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,76 +76,76 @@ func (c *FakeResourceQuotas) List(ctx context.Context, opts v1.ListOptions) (res
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested resourceQuotas.
-func (c *FakeResourceQuotas) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested resourceQuotas.
+func (c *FakeResourceQuotas) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(resourcequotasResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(resourcequotasResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a resourceQuota and creates it.  Returns the server's representation of the resourceQuota, and an error, if there is any.
-func (c *FakeResourceQuotas) Create(ctx context.Context, resourceQuota *corev1.ResourceQuota, opts v1.CreateOptions) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Create(ctx context.Context, resourceQuota *apicorev1.ResourceQuota, opts apismetav1.CreateOptions) (result *apicorev1.ResourceQuota, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(resourcequotasResource, c.ns, resourceQuota), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewCreateAction(resourcequotasResource, c.ns, resourceQuota), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }
 
 // Update takes the representation of a resourceQuota and updates it. Returns the server's representation of the resourceQuota, and an error, if there is any.
-func (c *FakeResourceQuotas) Update(ctx context.Context, resourceQuota *corev1.ResourceQuota, opts v1.UpdateOptions) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Update(ctx context.Context, resourceQuota *apicorev1.ResourceQuota, opts apismetav1.UpdateOptions) (result *apicorev1.ResourceQuota, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(resourcequotasResource, c.ns, resourceQuota), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewUpdateAction(resourcequotasResource, c.ns, resourceQuota), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeResourceQuotas) UpdateStatus(ctx context.Context, resourceQuota *corev1.ResourceQuota, opts v1.UpdateOptions) (*corev1.ResourceQuota, error) {
+func (c *FakeResourceQuotas) UpdateStatus(ctx context.Context, resourceQuota *apicorev1.ResourceQuota, opts apismetav1.UpdateOptions) (*apicorev1.ResourceQuota, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(resourcequotasResource, "status", c.ns, resourceQuota), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewUpdateSubresourceAction(resourcequotasResource, "status", c.ns, resourceQuota), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }
 
 // Delete takes name of the resourceQuota and deletes it. Returns an error if one occurs.
-func (c *FakeResourceQuotas) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeResourceQuotas) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(resourcequotasResource, c.ns, name, opts), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(resourcequotasResource, c.ns, name, opts), &apicorev1.ResourceQuota{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeResourceQuotas) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(resourcequotasResource, c.ns, listOpts)
+func (c *FakeResourceQuotas) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(resourcequotasResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &corev1.ResourceQuotaList{})
+	_, err := c.Fake.Invokes(action, &apicorev1.ResourceQuotaList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched resourceQuota.
-func (c *FakeResourceQuotas) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apicorev1.ResourceQuota, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(resourcequotasResource, c.ns, name, pt, data, subresources...), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(resourcequotasResource, c.ns, name, pt, data, subresources...), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied resourceQuota.
-func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *applyconfigurationscorev1.ResourceQuotaApplyConfiguration, opts v1.ApplyOptions) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *applyconfigurationscorev1.ResourceQuotaApplyConfiguration, opts apismetav1.ApplyOptions) (result *apicorev1.ResourceQuota, err error) {
 	if resourceQuota == nil {
 		return nil, fmt.Errorf("resourceQuota provided to Apply must not be nil")
 	}
@@ -158,17 +158,17 @@ func (c *FakeResourceQuotas) Apply(ctx context.Context, resourceQuota *applyconf
 		return nil, fmt.Errorf("resourceQuota.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(resourcequotasResource, c.ns, *name, types.ApplyPatchType, data), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(resourcequotasResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeResourceQuotas) ApplyStatus(ctx context.Context, resourceQuota *applyconfigurationscorev1.ResourceQuotaApplyConfiguration, opts v1.ApplyOptions) (result *corev1.ResourceQuota, err error) {
+func (c *FakeResourceQuotas) ApplyStatus(ctx context.Context, resourceQuota *applyconfigurationscorev1.ResourceQuotaApplyConfiguration, opts apismetav1.ApplyOptions) (result *apicorev1.ResourceQuota, err error) {
 	if resourceQuota == nil {
 		return nil, fmt.Errorf("resourceQuota provided to Apply must not be nil")
 	}
@@ -181,10 +181,10 @@ func (c *FakeResourceQuotas) ApplyStatus(ctx context.Context, resourceQuota *app
 		return nil, fmt.Errorf("resourceQuota.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(resourcequotasResource, c.ns, *name, types.ApplyPatchType, data, "status"), &corev1.ResourceQuota{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(resourcequotasResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data, "status"), &apicorev1.ResourceQuota{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ResourceQuota), err
+	return obj.(*apicorev1.ResourceQuota), err
 }

@@ -21,10 +21,10 @@ package fake
 import (
 	"context"
 
-	v1beta1 "k8s.io/api/authorization/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	testing "k8s.io/client-go/testing"
+	apiauthorizationv1beta1 "k8s.io/api/authorization/v1beta1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeSubjectAccessReviews implements SubjectAccessReviewInterface
@@ -32,16 +32,16 @@ type FakeSubjectAccessReviews struct {
 	Fake *FakeAuthorizationV1beta1
 }
 
-var subjectaccessreviewsResource = schema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1beta1", Resource: "subjectaccessreviews"}
+var subjectaccessreviewsResource = pkgruntimeschema.GroupVersionResource{Group: "authorization.k8s.io", Version: "v1beta1", Resource: "subjectaccessreviews"}
 
-var subjectaccessreviewsKind = schema.GroupVersionKind{Group: "authorization.k8s.io", Version: "v1beta1", Kind: "SubjectAccessReview"}
+var subjectaccessreviewsKind = pkgruntimeschema.GroupVersionKind{Group: "authorization.k8s.io", Version: "v1beta1", Kind: "SubjectAccessReview"}
 
 // Create takes the representation of a subjectAccessReview and creates it.  Returns the server's representation of the subjectAccessReview, and an error, if there is any.
-func (c *FakeSubjectAccessReviews) Create(ctx context.Context, subjectAccessReview *v1beta1.SubjectAccessReview, opts v1.CreateOptions) (result *v1beta1.SubjectAccessReview, err error) {
+func (c *FakeSubjectAccessReviews) Create(ctx context.Context, subjectAccessReview *apiauthorizationv1beta1.SubjectAccessReview, opts apismetav1.CreateOptions) (result *apiauthorizationv1beta1.SubjectAccessReview, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(subjectaccessreviewsResource, subjectAccessReview), &v1beta1.SubjectAccessReview{})
+		Invokes(clientgotesting.NewRootCreateAction(subjectaccessreviewsResource, subjectAccessReview), &apiauthorizationv1beta1.SubjectAccessReview{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1beta1.SubjectAccessReview), err
+	return obj.(*apiauthorizationv1beta1.SubjectAccessReview), err
 }

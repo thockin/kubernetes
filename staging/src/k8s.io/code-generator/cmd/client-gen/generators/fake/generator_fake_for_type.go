@@ -22,9 +22,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"k8s.io/gengo/generator"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/types"
+	"k8s.io/gengo/v2/generator"
+	"k8s.io/gengo/v2/namer"
+	"k8s.io/gengo/v2/types"
 
 	"k8s.io/code-generator/cmd/client-gen/generators/util"
 	"k8s.io/code-generator/cmd/client-gen/path"
@@ -188,9 +188,11 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 	sw.Do(kind, m)
 
 	if tags.HasVerb("get") {
+		g.imports.AddImport("context")
 		sw.Do(getTemplate, m)
 	}
 	if tags.HasVerb("list") {
+		g.imports.AddImport("context")
 		if hasObjectMeta(t) {
 			sw.Do(listUsingOptionsTemplate, m)
 		} else {
@@ -198,31 +200,42 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 		}
 	}
 	if tags.HasVerb("watch") {
+		g.imports.AddImport("context")
 		sw.Do(watchTemplate, m)
 	}
 
 	if tags.HasVerb("create") {
+		g.imports.AddImport("context")
 		sw.Do(createTemplate, m)
 	}
 	if tags.HasVerb("update") {
+		g.imports.AddImport("context")
 		sw.Do(updateTemplate, m)
 	}
 	if tags.HasVerb("updateStatus") && genStatus(t) {
+		g.imports.AddImport("context")
 		sw.Do(updateStatusTemplate, m)
 	}
 	if tags.HasVerb("delete") {
+		g.imports.AddImport("context")
 		sw.Do(deleteTemplate, m)
 	}
 	if tags.HasVerb("deleteCollection") {
+		g.imports.AddImport("context")
 		sw.Do(deleteCollectionTemplate, m)
 	}
 	if tags.HasVerb("patch") {
+		g.imports.AddImport("context")
 		sw.Do(patchTemplate, m)
 	}
 	if tags.HasVerb("apply") && generateApply {
+		g.imports.AddImport("fmt")
+		g.imports.AddImport("context")
 		sw.Do(applyTemplate, m)
 	}
 	if tags.HasVerb("applyStatus") && generateApply && genStatus(t) {
+		g.imports.AddImport("fmt")
+		g.imports.AddImport("context")
 		sw.Do(applyStatusTemplate, m)
 	}
 	_, typeGVString := util.ParsePathGroupVersion(g.inputPackage)
@@ -260,6 +273,7 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 		}
 
 		if e.HasVerb("get") {
+			g.imports.AddImport("context")
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, getSubresourceTemplate), m)
 			} else {
@@ -268,16 +282,18 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 		}
 
 		if e.HasVerb("list") {
-
+			g.imports.AddImport("context")
 			sw.Do(adjustTemplate(e.VerbName, e.VerbType, listTemplate), m)
 		}
 
 		// TODO: Figure out schemantic for watching a sub-resource.
 		if e.HasVerb("watch") {
+			g.imports.AddImport("context")
 			sw.Do(adjustTemplate(e.VerbName, e.VerbType, watchTemplate), m)
 		}
 
 		if e.HasVerb("create") {
+			g.imports.AddImport("context")
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, createSubresourceTemplate), m)
 			} else {
@@ -286,6 +302,7 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 		}
 
 		if e.HasVerb("update") {
+			g.imports.AddImport("context")
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, updateSubresourceTemplate), m)
 			} else {
@@ -296,17 +313,21 @@ func (g *genFakeForType) GenerateType(c *generator.Context, t *types.Type, w io.
 		// TODO: Figure out schemantic for deleting a sub-resource (what arguments
 		// are passed, does it need two names? etc.
 		if e.HasVerb("delete") {
+			g.imports.AddImport("context")
 			sw.Do(adjustTemplate(e.VerbName, e.VerbType, deleteTemplate), m)
 		}
 
 		if e.HasVerb("patch") {
+			g.imports.AddImport("context")
 			sw.Do(adjustTemplate(e.VerbName, e.VerbType, patchTemplate), m)
 		}
 
 		if e.HasVerb("apply") && generateApply {
+			g.imports.AddImport("context")
 			if e.IsSubresource() {
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, applySubresourceTemplate), m)
 			} else {
+				g.imports.AddImport("fmt")
 				sw.Do(adjustTemplate(e.VerbName, e.VerbType, applyTemplate), m)
 			}
 		}

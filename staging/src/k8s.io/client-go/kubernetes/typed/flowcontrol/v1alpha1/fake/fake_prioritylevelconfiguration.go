@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	flowcontrolv1alpha1 "k8s.io/client-go/applyconfigurations/flowcontrol/v1alpha1"
-	testing "k8s.io/client-go/testing"
+	apiflowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsflowcontrolv1alpha1 "k8s.io/client-go/applyconfigurations/flowcontrol/v1alpha1"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakePriorityLevelConfigurations implements PriorityLevelConfigurationInterface
@@ -38,34 +38,34 @@ type FakePriorityLevelConfigurations struct {
 	Fake *FakeFlowcontrolV1alpha1
 }
 
-var prioritylevelconfigurationsResource = schema.GroupVersionResource{Group: "flowcontrol.apiserver.k8s.io", Version: "v1alpha1", Resource: "prioritylevelconfigurations"}
+var prioritylevelconfigurationsResource = pkgruntimeschema.GroupVersionResource{Group: "flowcontrol.apiserver.k8s.io", Version: "v1alpha1", Resource: "prioritylevelconfigurations"}
 
-var prioritylevelconfigurationsKind = schema.GroupVersionKind{Group: "flowcontrol.apiserver.k8s.io", Version: "v1alpha1", Kind: "PriorityLevelConfiguration"}
+var prioritylevelconfigurationsKind = pkgruntimeschema.GroupVersionKind{Group: "flowcontrol.apiserver.k8s.io", Version: "v1alpha1", Kind: "PriorityLevelConfiguration"}
 
 // Get takes name of the priorityLevelConfiguration, and returns the corresponding priorityLevelConfiguration object, and an error if there is any.
-func (c *FakePriorityLevelConfigurations) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apiflowcontrolv1alpha1.PriorityLevelConfiguration, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(prioritylevelconfigurationsResource, name), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootGetAction(prioritylevelconfigurationsResource, name), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }
 
 // List takes label and field selectors, and returns the list of PriorityLevelConfigurations that match those selectors.
-func (c *FakePriorityLevelConfigurations) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.PriorityLevelConfigurationList, err error) {
+func (c *FakePriorityLevelConfigurations) List(ctx context.Context, opts apismetav1.ListOptions) (result *apiflowcontrolv1alpha1.PriorityLevelConfigurationList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(prioritylevelconfigurationsResource, prioritylevelconfigurationsKind, opts), &v1alpha1.PriorityLevelConfigurationList{})
+		Invokes(clientgotesting.NewRootListAction(prioritylevelconfigurationsResource, prioritylevelconfigurationsKind, opts), &apiflowcontrolv1alpha1.PriorityLevelConfigurationList{})
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &v1alpha1.PriorityLevelConfigurationList{ListMeta: obj.(*v1alpha1.PriorityLevelConfigurationList).ListMeta}
-	for _, item := range obj.(*v1alpha1.PriorityLevelConfigurationList).Items {
+	list := &apiflowcontrolv1alpha1.PriorityLevelConfigurationList{ListMeta: obj.(*apiflowcontrolv1alpha1.PriorityLevelConfigurationList).ListMeta}
+	for _, item := range obj.(*apiflowcontrolv1alpha1.PriorityLevelConfigurationList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -73,70 +73,70 @@ func (c *FakePriorityLevelConfigurations) List(ctx context.Context, opts v1.List
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested priorityLevelConfigurations.
-func (c *FakePriorityLevelConfigurations) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested priorityLevelConfigurations.
+func (c *FakePriorityLevelConfigurations) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewRootWatchAction(prioritylevelconfigurationsResource, opts))
+		InvokesWatch(clientgotesting.NewRootWatchAction(prioritylevelconfigurationsResource, opts))
 }
 
 // Create takes the representation of a priorityLevelConfiguration and creates it.  Returns the server's representation of the priorityLevelConfiguration, and an error, if there is any.
-func (c *FakePriorityLevelConfigurations) Create(ctx context.Context, priorityLevelConfiguration *v1alpha1.PriorityLevelConfiguration, opts v1.CreateOptions) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) Create(ctx context.Context, priorityLevelConfiguration *apiflowcontrolv1alpha1.PriorityLevelConfiguration, opts apismetav1.CreateOptions) (result *apiflowcontrolv1alpha1.PriorityLevelConfiguration, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(prioritylevelconfigurationsResource, priorityLevelConfiguration), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootCreateAction(prioritylevelconfigurationsResource, priorityLevelConfiguration), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }
 
 // Update takes the representation of a priorityLevelConfiguration and updates it. Returns the server's representation of the priorityLevelConfiguration, and an error, if there is any.
-func (c *FakePriorityLevelConfigurations) Update(ctx context.Context, priorityLevelConfiguration *v1alpha1.PriorityLevelConfiguration, opts v1.UpdateOptions) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) Update(ctx context.Context, priorityLevelConfiguration *apiflowcontrolv1alpha1.PriorityLevelConfiguration, opts apismetav1.UpdateOptions) (result *apiflowcontrolv1alpha1.PriorityLevelConfiguration, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(prioritylevelconfigurationsResource, priorityLevelConfiguration), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootUpdateAction(prioritylevelconfigurationsResource, priorityLevelConfiguration), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakePriorityLevelConfigurations) UpdateStatus(ctx context.Context, priorityLevelConfiguration *v1alpha1.PriorityLevelConfiguration, opts v1.UpdateOptions) (*v1alpha1.PriorityLevelConfiguration, error) {
+func (c *FakePriorityLevelConfigurations) UpdateStatus(ctx context.Context, priorityLevelConfiguration *apiflowcontrolv1alpha1.PriorityLevelConfiguration, opts apismetav1.UpdateOptions) (*apiflowcontrolv1alpha1.PriorityLevelConfiguration, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(prioritylevelconfigurationsResource, "status", priorityLevelConfiguration), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootUpdateSubresourceAction(prioritylevelconfigurationsResource, "status", priorityLevelConfiguration), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }
 
 // Delete takes name of the priorityLevelConfiguration and deletes it. Returns an error if one occurs.
-func (c *FakePriorityLevelConfigurations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakePriorityLevelConfigurations) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(prioritylevelconfigurationsResource, name, opts), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootDeleteActionWithOptions(prioritylevelconfigurationsResource, name, opts), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakePriorityLevelConfigurations) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(prioritylevelconfigurationsResource, listOpts)
+func (c *FakePriorityLevelConfigurations) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewRootDeleteCollectionAction(prioritylevelconfigurationsResource, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.PriorityLevelConfigurationList{})
+	_, err := c.Fake.Invokes(action, &apiflowcontrolv1alpha1.PriorityLevelConfigurationList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched priorityLevelConfiguration.
-func (c *FakePriorityLevelConfigurations) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apiflowcontrolv1alpha1.PriorityLevelConfiguration, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(prioritylevelconfigurationsResource, name, pt, data, subresources...), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(prioritylevelconfigurationsResource, name, pt, data, subresources...), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied priorityLevelConfiguration.
-func (c *FakePriorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) Apply(ctx context.Context, priorityLevelConfiguration *applyconfigurationsflowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiflowcontrolv1alpha1.PriorityLevelConfiguration, err error) {
 	if priorityLevelConfiguration == nil {
 		return nil, fmt.Errorf("priorityLevelConfiguration provided to Apply must not be nil")
 	}
@@ -149,16 +149,16 @@ func (c *FakePriorityLevelConfigurations) Apply(ctx context.Context, priorityLev
 		return nil, fmt.Errorf("priorityLevelConfiguration.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(prioritylevelconfigurationsResource, *name, types.ApplyPatchType, data), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(prioritylevelconfigurationsResource, *name, apimachinerypkgtypes.ApplyPatchType, data), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakePriorityLevelConfigurations) ApplyStatus(ctx context.Context, priorityLevelConfiguration *flowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.PriorityLevelConfiguration, err error) {
+func (c *FakePriorityLevelConfigurations) ApplyStatus(ctx context.Context, priorityLevelConfiguration *applyconfigurationsflowcontrolv1alpha1.PriorityLevelConfigurationApplyConfiguration, opts apismetav1.ApplyOptions) (result *apiflowcontrolv1alpha1.PriorityLevelConfiguration, err error) {
 	if priorityLevelConfiguration == nil {
 		return nil, fmt.Errorf("priorityLevelConfiguration provided to Apply must not be nil")
 	}
@@ -171,9 +171,9 @@ func (c *FakePriorityLevelConfigurations) ApplyStatus(ctx context.Context, prior
 		return nil, fmt.Errorf("priorityLevelConfiguration.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(prioritylevelconfigurationsResource, *name, types.ApplyPatchType, data, "status"), &v1alpha1.PriorityLevelConfiguration{})
+		Invokes(clientgotesting.NewRootPatchSubresourceAction(prioritylevelconfigurationsResource, *name, apimachinerypkgtypes.ApplyPatchType, data, "status"), &apiflowcontrolv1alpha1.PriorityLevelConfiguration{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.PriorityLevelConfiguration), err
+	return obj.(*apiflowcontrolv1alpha1.PriorityLevelConfiguration), err
 }

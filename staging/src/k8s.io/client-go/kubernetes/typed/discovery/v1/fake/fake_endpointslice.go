@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	discoveryv1 "k8s.io/api/discovery/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apidiscoveryv1 "k8s.io/api/discovery/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationsdiscoveryv1 "k8s.io/client-go/applyconfigurations/discovery/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeEndpointSlices implements EndpointSliceInterface
@@ -39,36 +39,36 @@ type FakeEndpointSlices struct {
 	ns   string
 }
 
-var endpointslicesResource = schema.GroupVersionResource{Group: "discovery.k8s.io", Version: "v1", Resource: "endpointslices"}
+var endpointslicesResource = pkgruntimeschema.GroupVersionResource{Group: "discovery.k8s.io", Version: "v1", Resource: "endpointslices"}
 
-var endpointslicesKind = schema.GroupVersionKind{Group: "discovery.k8s.io", Version: "v1", Kind: "EndpointSlice"}
+var endpointslicesKind = pkgruntimeschema.GroupVersionKind{Group: "discovery.k8s.io", Version: "v1", Kind: "EndpointSlice"}
 
 // Get takes name of the endpointSlice, and returns the corresponding endpointSlice object, and an error if there is any.
-func (c *FakeEndpointSlices) Get(ctx context.Context, name string, options v1.GetOptions) (result *discoveryv1.EndpointSlice, err error) {
+func (c *FakeEndpointSlices) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apidiscoveryv1.EndpointSlice, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(endpointslicesResource, c.ns, name), &discoveryv1.EndpointSlice{})
+		Invokes(clientgotesting.NewGetAction(endpointslicesResource, c.ns, name), &apidiscoveryv1.EndpointSlice{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*discoveryv1.EndpointSlice), err
+	return obj.(*apidiscoveryv1.EndpointSlice), err
 }
 
 // List takes label and field selectors, and returns the list of EndpointSlices that match those selectors.
-func (c *FakeEndpointSlices) List(ctx context.Context, opts v1.ListOptions) (result *discoveryv1.EndpointSliceList, err error) {
+func (c *FakeEndpointSlices) List(ctx context.Context, opts apismetav1.ListOptions) (result *apidiscoveryv1.EndpointSliceList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(endpointslicesResource, endpointslicesKind, c.ns, opts), &discoveryv1.EndpointSliceList{})
+		Invokes(clientgotesting.NewListAction(endpointslicesResource, endpointslicesKind, c.ns, opts), &apidiscoveryv1.EndpointSliceList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &discoveryv1.EndpointSliceList{ListMeta: obj.(*discoveryv1.EndpointSliceList).ListMeta}
-	for _, item := range obj.(*discoveryv1.EndpointSliceList).Items {
+	list := &apidiscoveryv1.EndpointSliceList{ListMeta: obj.(*apidiscoveryv1.EndpointSliceList).ListMeta}
+	for _, item := range obj.(*apidiscoveryv1.EndpointSliceList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,64 +76,64 @@ func (c *FakeEndpointSlices) List(ctx context.Context, opts v1.ListOptions) (res
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested endpointSlices.
-func (c *FakeEndpointSlices) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested endpointSlices.
+func (c *FakeEndpointSlices) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(endpointslicesResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(endpointslicesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a endpointSlice and creates it.  Returns the server's representation of the endpointSlice, and an error, if there is any.
-func (c *FakeEndpointSlices) Create(ctx context.Context, endpointSlice *discoveryv1.EndpointSlice, opts v1.CreateOptions) (result *discoveryv1.EndpointSlice, err error) {
+func (c *FakeEndpointSlices) Create(ctx context.Context, endpointSlice *apidiscoveryv1.EndpointSlice, opts apismetav1.CreateOptions) (result *apidiscoveryv1.EndpointSlice, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(endpointslicesResource, c.ns, endpointSlice), &discoveryv1.EndpointSlice{})
+		Invokes(clientgotesting.NewCreateAction(endpointslicesResource, c.ns, endpointSlice), &apidiscoveryv1.EndpointSlice{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*discoveryv1.EndpointSlice), err
+	return obj.(*apidiscoveryv1.EndpointSlice), err
 }
 
 // Update takes the representation of a endpointSlice and updates it. Returns the server's representation of the endpointSlice, and an error, if there is any.
-func (c *FakeEndpointSlices) Update(ctx context.Context, endpointSlice *discoveryv1.EndpointSlice, opts v1.UpdateOptions) (result *discoveryv1.EndpointSlice, err error) {
+func (c *FakeEndpointSlices) Update(ctx context.Context, endpointSlice *apidiscoveryv1.EndpointSlice, opts apismetav1.UpdateOptions) (result *apidiscoveryv1.EndpointSlice, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(endpointslicesResource, c.ns, endpointSlice), &discoveryv1.EndpointSlice{})
+		Invokes(clientgotesting.NewUpdateAction(endpointslicesResource, c.ns, endpointSlice), &apidiscoveryv1.EndpointSlice{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*discoveryv1.EndpointSlice), err
+	return obj.(*apidiscoveryv1.EndpointSlice), err
 }
 
 // Delete takes name of the endpointSlice and deletes it. Returns an error if one occurs.
-func (c *FakeEndpointSlices) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeEndpointSlices) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(endpointslicesResource, c.ns, name, opts), &discoveryv1.EndpointSlice{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(endpointslicesResource, c.ns, name, opts), &apidiscoveryv1.EndpointSlice{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeEndpointSlices) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(endpointslicesResource, c.ns, listOpts)
+func (c *FakeEndpointSlices) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(endpointslicesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &discoveryv1.EndpointSliceList{})
+	_, err := c.Fake.Invokes(action, &apidiscoveryv1.EndpointSliceList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched endpointSlice.
-func (c *FakeEndpointSlices) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *discoveryv1.EndpointSlice, err error) {
+func (c *FakeEndpointSlices) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apidiscoveryv1.EndpointSlice, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(endpointslicesResource, c.ns, name, pt, data, subresources...), &discoveryv1.EndpointSlice{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(endpointslicesResource, c.ns, name, pt, data, subresources...), &apidiscoveryv1.EndpointSlice{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*discoveryv1.EndpointSlice), err
+	return obj.(*apidiscoveryv1.EndpointSlice), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied endpointSlice.
-func (c *FakeEndpointSlices) Apply(ctx context.Context, endpointSlice *applyconfigurationsdiscoveryv1.EndpointSliceApplyConfiguration, opts v1.ApplyOptions) (result *discoveryv1.EndpointSlice, err error) {
+func (c *FakeEndpointSlices) Apply(ctx context.Context, endpointSlice *applyconfigurationsdiscoveryv1.EndpointSliceApplyConfiguration, opts apismetav1.ApplyOptions) (result *apidiscoveryv1.EndpointSlice, err error) {
 	if endpointSlice == nil {
 		return nil, fmt.Errorf("endpointSlice provided to Apply must not be nil")
 	}
@@ -146,10 +146,10 @@ func (c *FakeEndpointSlices) Apply(ctx context.Context, endpointSlice *applyconf
 		return nil, fmt.Errorf("endpointSlice.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(endpointslicesResource, c.ns, *name, types.ApplyPatchType, data), &discoveryv1.EndpointSlice{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(endpointslicesResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apidiscoveryv1.EndpointSlice{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*discoveryv1.EndpointSlice), err
+	return obj.(*apidiscoveryv1.EndpointSlice), err
 }

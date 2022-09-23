@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apicorev1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeConfigMaps implements ConfigMapInterface
@@ -39,36 +39,36 @@ type FakeConfigMaps struct {
 	ns   string
 }
 
-var configmapsResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "configmaps"}
+var configmapsResource = pkgruntimeschema.GroupVersionResource{Group: "", Version: "v1", Resource: "configmaps"}
 
-var configmapsKind = schema.GroupVersionKind{Group: "", Version: "v1", Kind: "ConfigMap"}
+var configmapsKind = pkgruntimeschema.GroupVersionKind{Group: "", Version: "v1", Kind: "ConfigMap"}
 
 // Get takes name of the configMap, and returns the corresponding configMap object, and an error if there is any.
-func (c *FakeConfigMaps) Get(ctx context.Context, name string, options v1.GetOptions) (result *corev1.ConfigMap, err error) {
+func (c *FakeConfigMaps) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apicorev1.ConfigMap, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(configmapsResource, c.ns, name), &corev1.ConfigMap{})
+		Invokes(clientgotesting.NewGetAction(configmapsResource, c.ns, name), &apicorev1.ConfigMap{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ConfigMap), err
+	return obj.(*apicorev1.ConfigMap), err
 }
 
 // List takes label and field selectors, and returns the list of ConfigMaps that match those selectors.
-func (c *FakeConfigMaps) List(ctx context.Context, opts v1.ListOptions) (result *corev1.ConfigMapList, err error) {
+func (c *FakeConfigMaps) List(ctx context.Context, opts apismetav1.ListOptions) (result *apicorev1.ConfigMapList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(configmapsResource, configmapsKind, c.ns, opts), &corev1.ConfigMapList{})
+		Invokes(clientgotesting.NewListAction(configmapsResource, configmapsKind, c.ns, opts), &apicorev1.ConfigMapList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &corev1.ConfigMapList{ListMeta: obj.(*corev1.ConfigMapList).ListMeta}
-	for _, item := range obj.(*corev1.ConfigMapList).Items {
+	list := &apicorev1.ConfigMapList{ListMeta: obj.(*apicorev1.ConfigMapList).ListMeta}
+	for _, item := range obj.(*apicorev1.ConfigMapList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,64 +76,64 @@ func (c *FakeConfigMaps) List(ctx context.Context, opts v1.ListOptions) (result 
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested configMaps.
-func (c *FakeConfigMaps) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested configMaps.
+func (c *FakeConfigMaps) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(configmapsResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(configmapsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a configMap and creates it.  Returns the server's representation of the configMap, and an error, if there is any.
-func (c *FakeConfigMaps) Create(ctx context.Context, configMap *corev1.ConfigMap, opts v1.CreateOptions) (result *corev1.ConfigMap, err error) {
+func (c *FakeConfigMaps) Create(ctx context.Context, configMap *apicorev1.ConfigMap, opts apismetav1.CreateOptions) (result *apicorev1.ConfigMap, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(configmapsResource, c.ns, configMap), &corev1.ConfigMap{})
+		Invokes(clientgotesting.NewCreateAction(configmapsResource, c.ns, configMap), &apicorev1.ConfigMap{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ConfigMap), err
+	return obj.(*apicorev1.ConfigMap), err
 }
 
 // Update takes the representation of a configMap and updates it. Returns the server's representation of the configMap, and an error, if there is any.
-func (c *FakeConfigMaps) Update(ctx context.Context, configMap *corev1.ConfigMap, opts v1.UpdateOptions) (result *corev1.ConfigMap, err error) {
+func (c *FakeConfigMaps) Update(ctx context.Context, configMap *apicorev1.ConfigMap, opts apismetav1.UpdateOptions) (result *apicorev1.ConfigMap, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(configmapsResource, c.ns, configMap), &corev1.ConfigMap{})
+		Invokes(clientgotesting.NewUpdateAction(configmapsResource, c.ns, configMap), &apicorev1.ConfigMap{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ConfigMap), err
+	return obj.(*apicorev1.ConfigMap), err
 }
 
 // Delete takes name of the configMap and deletes it. Returns an error if one occurs.
-func (c *FakeConfigMaps) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeConfigMaps) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(configmapsResource, c.ns, name, opts), &corev1.ConfigMap{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(configmapsResource, c.ns, name, opts), &apicorev1.ConfigMap{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeConfigMaps) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(configmapsResource, c.ns, listOpts)
+func (c *FakeConfigMaps) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(configmapsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &corev1.ConfigMapList{})
+	_, err := c.Fake.Invokes(action, &apicorev1.ConfigMapList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched configMap.
-func (c *FakeConfigMaps) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.ConfigMap, err error) {
+func (c *FakeConfigMaps) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apicorev1.ConfigMap, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(configmapsResource, c.ns, name, pt, data, subresources...), &corev1.ConfigMap{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(configmapsResource, c.ns, name, pt, data, subresources...), &apicorev1.ConfigMap{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ConfigMap), err
+	return obj.(*apicorev1.ConfigMap), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied configMap.
-func (c *FakeConfigMaps) Apply(ctx context.Context, configMap *applyconfigurationscorev1.ConfigMapApplyConfiguration, opts v1.ApplyOptions) (result *corev1.ConfigMap, err error) {
+func (c *FakeConfigMaps) Apply(ctx context.Context, configMap *applyconfigurationscorev1.ConfigMapApplyConfiguration, opts apismetav1.ApplyOptions) (result *apicorev1.ConfigMap, err error) {
 	if configMap == nil {
 		return nil, fmt.Errorf("configMap provided to Apply must not be nil")
 	}
@@ -146,10 +146,10 @@ func (c *FakeConfigMaps) Apply(ctx context.Context, configMap *applyconfiguratio
 		return nil, fmt.Errorf("configMap.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(configmapsResource, c.ns, *name, types.ApplyPatchType, data), &corev1.ConfigMap{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(configmapsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apicorev1.ConfigMap{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.ConfigMap), err
+	return obj.(*apicorev1.ConfigMap), err
 }

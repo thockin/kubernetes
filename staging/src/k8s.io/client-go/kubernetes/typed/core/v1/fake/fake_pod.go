@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apicorev1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakePods implements PodInterface
@@ -39,36 +39,36 @@ type FakePods struct {
 	ns   string
 }
 
-var podsResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"}
+var podsResource = pkgruntimeschema.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"}
 
-var podsKind = schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Pod"}
+var podsKind = pkgruntimeschema.GroupVersionKind{Group: "", Version: "v1", Kind: "Pod"}
 
 // Get takes name of the pod, and returns the corresponding pod object, and an error if there is any.
-func (c *FakePods) Get(ctx context.Context, name string, options v1.GetOptions) (result *corev1.Pod, err error) {
+func (c *FakePods) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apicorev1.Pod, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(podsResource, c.ns, name), &corev1.Pod{})
+		Invokes(clientgotesting.NewGetAction(podsResource, c.ns, name), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // List takes label and field selectors, and returns the list of Pods that match those selectors.
-func (c *FakePods) List(ctx context.Context, opts v1.ListOptions) (result *corev1.PodList, err error) {
+func (c *FakePods) List(ctx context.Context, opts apismetav1.ListOptions) (result *apicorev1.PodList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(podsResource, podsKind, c.ns, opts), &corev1.PodList{})
+		Invokes(clientgotesting.NewListAction(podsResource, podsKind, c.ns, opts), &apicorev1.PodList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &corev1.PodList{ListMeta: obj.(*corev1.PodList).ListMeta}
-	for _, item := range obj.(*corev1.PodList).Items {
+	list := &apicorev1.PodList{ListMeta: obj.(*apicorev1.PodList).ListMeta}
+	for _, item := range obj.(*apicorev1.PodList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,76 +76,76 @@ func (c *FakePods) List(ctx context.Context, opts v1.ListOptions) (result *corev
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested pods.
-func (c *FakePods) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested pods.
+func (c *FakePods) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(podsResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(podsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a pod and creates it.  Returns the server's representation of the pod, and an error, if there is any.
-func (c *FakePods) Create(ctx context.Context, pod *corev1.Pod, opts v1.CreateOptions) (result *corev1.Pod, err error) {
+func (c *FakePods) Create(ctx context.Context, pod *apicorev1.Pod, opts apismetav1.CreateOptions) (result *apicorev1.Pod, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(podsResource, c.ns, pod), &corev1.Pod{})
+		Invokes(clientgotesting.NewCreateAction(podsResource, c.ns, pod), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // Update takes the representation of a pod and updates it. Returns the server's representation of the pod, and an error, if there is any.
-func (c *FakePods) Update(ctx context.Context, pod *corev1.Pod, opts v1.UpdateOptions) (result *corev1.Pod, err error) {
+func (c *FakePods) Update(ctx context.Context, pod *apicorev1.Pod, opts apismetav1.UpdateOptions) (result *apicorev1.Pod, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(podsResource, c.ns, pod), &corev1.Pod{})
+		Invokes(clientgotesting.NewUpdateAction(podsResource, c.ns, pod), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakePods) UpdateStatus(ctx context.Context, pod *corev1.Pod, opts v1.UpdateOptions) (*corev1.Pod, error) {
+func (c *FakePods) UpdateStatus(ctx context.Context, pod *apicorev1.Pod, opts apismetav1.UpdateOptions) (*apicorev1.Pod, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(podsResource, "status", c.ns, pod), &corev1.Pod{})
+		Invokes(clientgotesting.NewUpdateSubresourceAction(podsResource, "status", c.ns, pod), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // Delete takes name of the pod and deletes it. Returns an error if one occurs.
-func (c *FakePods) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakePods) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(podsResource, c.ns, name, opts), &corev1.Pod{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(podsResource, c.ns, name, opts), &apicorev1.Pod{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakePods) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(podsResource, c.ns, listOpts)
+func (c *FakePods) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(podsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &corev1.PodList{})
+	_, err := c.Fake.Invokes(action, &apicorev1.PodList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched pod.
-func (c *FakePods) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.Pod, err error) {
+func (c *FakePods) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apicorev1.Pod, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(podsResource, c.ns, name, pt, data, subresources...), &corev1.Pod{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(podsResource, c.ns, name, pt, data, subresources...), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied pod.
-func (c *FakePods) Apply(ctx context.Context, pod *applyconfigurationscorev1.PodApplyConfiguration, opts v1.ApplyOptions) (result *corev1.Pod, err error) {
+func (c *FakePods) Apply(ctx context.Context, pod *applyconfigurationscorev1.PodApplyConfiguration, opts apismetav1.ApplyOptions) (result *apicorev1.Pod, err error) {
 	if pod == nil {
 		return nil, fmt.Errorf("pod provided to Apply must not be nil")
 	}
@@ -158,17 +158,17 @@ func (c *FakePods) Apply(ctx context.Context, pod *applyconfigurationscorev1.Pod
 		return nil, fmt.Errorf("pod.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(podsResource, c.ns, *name, types.ApplyPatchType, data), &corev1.Pod{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(podsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakePods) ApplyStatus(ctx context.Context, pod *applyconfigurationscorev1.PodApplyConfiguration, opts v1.ApplyOptions) (result *corev1.Pod, err error) {
+func (c *FakePods) ApplyStatus(ctx context.Context, pod *applyconfigurationscorev1.PodApplyConfiguration, opts apismetav1.ApplyOptions) (result *apicorev1.Pod, err error) {
 	if pod == nil {
 		return nil, fmt.Errorf("pod provided to Apply must not be nil")
 	}
@@ -181,21 +181,21 @@ func (c *FakePods) ApplyStatus(ctx context.Context, pod *applyconfigurationscore
 		return nil, fmt.Errorf("pod.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(podsResource, c.ns, *name, types.ApplyPatchType, data, "status"), &corev1.Pod{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(podsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data, "status"), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }
 
 // UpdateEphemeralContainers takes the representation of a pod and updates it. Returns the server's representation of the pod, and an error, if there is any.
-func (c *FakePods) UpdateEphemeralContainers(ctx context.Context, podName string, pod *corev1.Pod, opts v1.UpdateOptions) (result *corev1.Pod, err error) {
+func (c *FakePods) UpdateEphemeralContainers(ctx context.Context, podName string, pod *apicorev1.Pod, opts apismetav1.UpdateOptions) (result *apicorev1.Pod, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(podsResource, "ephemeralcontainers", c.ns, pod), &corev1.Pod{})
+		Invokes(clientgotesting.NewUpdateSubresourceAction(podsResource, "ephemeralcontainers", c.ns, pod), &apicorev1.Pod{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.Pod), err
+	return obj.(*apicorev1.Pod), err
 }

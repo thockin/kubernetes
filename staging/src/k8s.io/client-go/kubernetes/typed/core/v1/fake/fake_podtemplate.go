@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apicorev1 "k8s.io/api/core/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationscorev1 "k8s.io/client-go/applyconfigurations/core/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakePodTemplates implements PodTemplateInterface
@@ -39,36 +39,36 @@ type FakePodTemplates struct {
 	ns   string
 }
 
-var podtemplatesResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "podtemplates"}
+var podtemplatesResource = pkgruntimeschema.GroupVersionResource{Group: "", Version: "v1", Resource: "podtemplates"}
 
-var podtemplatesKind = schema.GroupVersionKind{Group: "", Version: "v1", Kind: "PodTemplate"}
+var podtemplatesKind = pkgruntimeschema.GroupVersionKind{Group: "", Version: "v1", Kind: "PodTemplate"}
 
 // Get takes name of the podTemplate, and returns the corresponding podTemplate object, and an error if there is any.
-func (c *FakePodTemplates) Get(ctx context.Context, name string, options v1.GetOptions) (result *corev1.PodTemplate, err error) {
+func (c *FakePodTemplates) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apicorev1.PodTemplate, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(podtemplatesResource, c.ns, name), &corev1.PodTemplate{})
+		Invokes(clientgotesting.NewGetAction(podtemplatesResource, c.ns, name), &apicorev1.PodTemplate{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.PodTemplate), err
+	return obj.(*apicorev1.PodTemplate), err
 }
 
 // List takes label and field selectors, and returns the list of PodTemplates that match those selectors.
-func (c *FakePodTemplates) List(ctx context.Context, opts v1.ListOptions) (result *corev1.PodTemplateList, err error) {
+func (c *FakePodTemplates) List(ctx context.Context, opts apismetav1.ListOptions) (result *apicorev1.PodTemplateList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(podtemplatesResource, podtemplatesKind, c.ns, opts), &corev1.PodTemplateList{})
+		Invokes(clientgotesting.NewListAction(podtemplatesResource, podtemplatesKind, c.ns, opts), &apicorev1.PodTemplateList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &corev1.PodTemplateList{ListMeta: obj.(*corev1.PodTemplateList).ListMeta}
-	for _, item := range obj.(*corev1.PodTemplateList).Items {
+	list := &apicorev1.PodTemplateList{ListMeta: obj.(*apicorev1.PodTemplateList).ListMeta}
+	for _, item := range obj.(*apicorev1.PodTemplateList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,64 +76,64 @@ func (c *FakePodTemplates) List(ctx context.Context, opts v1.ListOptions) (resul
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested podTemplates.
-func (c *FakePodTemplates) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested podTemplates.
+func (c *FakePodTemplates) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(podtemplatesResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(podtemplatesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a podTemplate and creates it.  Returns the server's representation of the podTemplate, and an error, if there is any.
-func (c *FakePodTemplates) Create(ctx context.Context, podTemplate *corev1.PodTemplate, opts v1.CreateOptions) (result *corev1.PodTemplate, err error) {
+func (c *FakePodTemplates) Create(ctx context.Context, podTemplate *apicorev1.PodTemplate, opts apismetav1.CreateOptions) (result *apicorev1.PodTemplate, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(podtemplatesResource, c.ns, podTemplate), &corev1.PodTemplate{})
+		Invokes(clientgotesting.NewCreateAction(podtemplatesResource, c.ns, podTemplate), &apicorev1.PodTemplate{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.PodTemplate), err
+	return obj.(*apicorev1.PodTemplate), err
 }
 
 // Update takes the representation of a podTemplate and updates it. Returns the server's representation of the podTemplate, and an error, if there is any.
-func (c *FakePodTemplates) Update(ctx context.Context, podTemplate *corev1.PodTemplate, opts v1.UpdateOptions) (result *corev1.PodTemplate, err error) {
+func (c *FakePodTemplates) Update(ctx context.Context, podTemplate *apicorev1.PodTemplate, opts apismetav1.UpdateOptions) (result *apicorev1.PodTemplate, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(podtemplatesResource, c.ns, podTemplate), &corev1.PodTemplate{})
+		Invokes(clientgotesting.NewUpdateAction(podtemplatesResource, c.ns, podTemplate), &apicorev1.PodTemplate{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.PodTemplate), err
+	return obj.(*apicorev1.PodTemplate), err
 }
 
 // Delete takes name of the podTemplate and deletes it. Returns an error if one occurs.
-func (c *FakePodTemplates) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakePodTemplates) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(podtemplatesResource, c.ns, name, opts), &corev1.PodTemplate{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(podtemplatesResource, c.ns, name, opts), &apicorev1.PodTemplate{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakePodTemplates) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(podtemplatesResource, c.ns, listOpts)
+func (c *FakePodTemplates) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(podtemplatesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &corev1.PodTemplateList{})
+	_, err := c.Fake.Invokes(action, &apicorev1.PodTemplateList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched podTemplate.
-func (c *FakePodTemplates) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *corev1.PodTemplate, err error) {
+func (c *FakePodTemplates) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apicorev1.PodTemplate, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(podtemplatesResource, c.ns, name, pt, data, subresources...), &corev1.PodTemplate{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(podtemplatesResource, c.ns, name, pt, data, subresources...), &apicorev1.PodTemplate{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.PodTemplate), err
+	return obj.(*apicorev1.PodTemplate), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podTemplate.
-func (c *FakePodTemplates) Apply(ctx context.Context, podTemplate *applyconfigurationscorev1.PodTemplateApplyConfiguration, opts v1.ApplyOptions) (result *corev1.PodTemplate, err error) {
+func (c *FakePodTemplates) Apply(ctx context.Context, podTemplate *applyconfigurationscorev1.PodTemplateApplyConfiguration, opts apismetav1.ApplyOptions) (result *apicorev1.PodTemplate, err error) {
 	if podTemplate == nil {
 		return nil, fmt.Errorf("podTemplate provided to Apply must not be nil")
 	}
@@ -146,10 +146,10 @@ func (c *FakePodTemplates) Apply(ctx context.Context, podTemplate *applyconfigur
 		return nil, fmt.Errorf("podTemplate.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(podtemplatesResource, c.ns, *name, types.ApplyPatchType, data), &corev1.PodTemplate{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(podtemplatesResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apicorev1.PodTemplate{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*corev1.PodTemplate), err
+	return obj.(*apicorev1.PodTemplate), err
 }

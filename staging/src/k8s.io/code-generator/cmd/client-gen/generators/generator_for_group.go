@@ -20,9 +20,9 @@ import (
 	"io"
 	"path/filepath"
 
-	"k8s.io/gengo/generator"
-	"k8s.io/gengo/namer"
-	"k8s.io/gengo/types"
+	"k8s.io/gengo/v2/generator"
+	"k8s.io/gengo/v2/namer"
+	"k8s.io/gengo/v2/types"
 
 	"k8s.io/code-generator/cmd/client-gen/generators/util"
 	"k8s.io/code-generator/cmd/client-gen/path"
@@ -124,6 +124,7 @@ func (g *genGroup) GenerateType(c *generator.Context, t *types.Type, w io.Writer
 			sw.Do(getterImplNamespaced, wrapper)
 		}
 	}
+	g.imports.AddImport("net/http")
 	sw.Do(newClientForConfigTemplate, m)
 	sw.Do(newClientForConfigAndClientTemplate, m)
 	sw.Do(newClientForConfigOrDieTemplate, m)

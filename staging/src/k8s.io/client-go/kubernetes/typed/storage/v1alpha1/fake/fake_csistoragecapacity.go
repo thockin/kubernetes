@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	v1alpha1 "k8s.io/api/storage/v1alpha1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
-	storagev1alpha1 "k8s.io/client-go/applyconfigurations/storage/v1alpha1"
-	testing "k8s.io/client-go/testing"
+	apistoragev1alpha1 "k8s.io/api/storage/v1alpha1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
+	applyconfigurationsstoragev1alpha1 "k8s.io/client-go/applyconfigurations/storage/v1alpha1"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeCSIStorageCapacities implements CSIStorageCapacityInterface
@@ -39,36 +39,36 @@ type FakeCSIStorageCapacities struct {
 	ns   string
 }
 
-var csistoragecapacitiesResource = schema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1alpha1", Resource: "csistoragecapacities"}
+var csistoragecapacitiesResource = pkgruntimeschema.GroupVersionResource{Group: "storage.k8s.io", Version: "v1alpha1", Resource: "csistoragecapacities"}
 
-var csistoragecapacitiesKind = schema.GroupVersionKind{Group: "storage.k8s.io", Version: "v1alpha1", Kind: "CSIStorageCapacity"}
+var csistoragecapacitiesKind = pkgruntimeschema.GroupVersionKind{Group: "storage.k8s.io", Version: "v1alpha1", Kind: "CSIStorageCapacity"}
 
 // Get takes name of the cSIStorageCapacity, and returns the corresponding cSIStorageCapacity object, and an error if there is any.
-func (c *FakeCSIStorageCapacities) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.CSIStorageCapacity, err error) {
+func (c *FakeCSIStorageCapacities) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apistoragev1alpha1.CSIStorageCapacity, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(csistoragecapacitiesResource, c.ns, name), &v1alpha1.CSIStorageCapacity{})
+		Invokes(clientgotesting.NewGetAction(csistoragecapacitiesResource, c.ns, name), &apistoragev1alpha1.CSIStorageCapacity{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CSIStorageCapacity), err
+	return obj.(*apistoragev1alpha1.CSIStorageCapacity), err
 }
 
 // List takes label and field selectors, and returns the list of CSIStorageCapacities that match those selectors.
-func (c *FakeCSIStorageCapacities) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.CSIStorageCapacityList, err error) {
+func (c *FakeCSIStorageCapacities) List(ctx context.Context, opts apismetav1.ListOptions) (result *apistoragev1alpha1.CSIStorageCapacityList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(csistoragecapacitiesResource, csistoragecapacitiesKind, c.ns, opts), &v1alpha1.CSIStorageCapacityList{})
+		Invokes(clientgotesting.NewListAction(csistoragecapacitiesResource, csistoragecapacitiesKind, c.ns, opts), &apistoragev1alpha1.CSIStorageCapacityList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &v1alpha1.CSIStorageCapacityList{ListMeta: obj.(*v1alpha1.CSIStorageCapacityList).ListMeta}
-	for _, item := range obj.(*v1alpha1.CSIStorageCapacityList).Items {
+	list := &apistoragev1alpha1.CSIStorageCapacityList{ListMeta: obj.(*apistoragev1alpha1.CSIStorageCapacityList).ListMeta}
+	for _, item := range obj.(*apistoragev1alpha1.CSIStorageCapacityList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,64 +76,64 @@ func (c *FakeCSIStorageCapacities) List(ctx context.Context, opts v1.ListOptions
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested cSIStorageCapacities.
-func (c *FakeCSIStorageCapacities) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested cSIStorageCapacities.
+func (c *FakeCSIStorageCapacities) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(csistoragecapacitiesResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(csistoragecapacitiesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a cSIStorageCapacity and creates it.  Returns the server's representation of the cSIStorageCapacity, and an error, if there is any.
-func (c *FakeCSIStorageCapacities) Create(ctx context.Context, cSIStorageCapacity *v1alpha1.CSIStorageCapacity, opts v1.CreateOptions) (result *v1alpha1.CSIStorageCapacity, err error) {
+func (c *FakeCSIStorageCapacities) Create(ctx context.Context, cSIStorageCapacity *apistoragev1alpha1.CSIStorageCapacity, opts apismetav1.CreateOptions) (result *apistoragev1alpha1.CSIStorageCapacity, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(csistoragecapacitiesResource, c.ns, cSIStorageCapacity), &v1alpha1.CSIStorageCapacity{})
+		Invokes(clientgotesting.NewCreateAction(csistoragecapacitiesResource, c.ns, cSIStorageCapacity), &apistoragev1alpha1.CSIStorageCapacity{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CSIStorageCapacity), err
+	return obj.(*apistoragev1alpha1.CSIStorageCapacity), err
 }
 
 // Update takes the representation of a cSIStorageCapacity and updates it. Returns the server's representation of the cSIStorageCapacity, and an error, if there is any.
-func (c *FakeCSIStorageCapacities) Update(ctx context.Context, cSIStorageCapacity *v1alpha1.CSIStorageCapacity, opts v1.UpdateOptions) (result *v1alpha1.CSIStorageCapacity, err error) {
+func (c *FakeCSIStorageCapacities) Update(ctx context.Context, cSIStorageCapacity *apistoragev1alpha1.CSIStorageCapacity, opts apismetav1.UpdateOptions) (result *apistoragev1alpha1.CSIStorageCapacity, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(csistoragecapacitiesResource, c.ns, cSIStorageCapacity), &v1alpha1.CSIStorageCapacity{})
+		Invokes(clientgotesting.NewUpdateAction(csistoragecapacitiesResource, c.ns, cSIStorageCapacity), &apistoragev1alpha1.CSIStorageCapacity{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CSIStorageCapacity), err
+	return obj.(*apistoragev1alpha1.CSIStorageCapacity), err
 }
 
 // Delete takes name of the cSIStorageCapacity and deletes it. Returns an error if one occurs.
-func (c *FakeCSIStorageCapacities) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeCSIStorageCapacities) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(csistoragecapacitiesResource, c.ns, name, opts), &v1alpha1.CSIStorageCapacity{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(csistoragecapacitiesResource, c.ns, name, opts), &apistoragev1alpha1.CSIStorageCapacity{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeCSIStorageCapacities) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(csistoragecapacitiesResource, c.ns, listOpts)
+func (c *FakeCSIStorageCapacities) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(csistoragecapacitiesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.CSIStorageCapacityList{})
+	_, err := c.Fake.Invokes(action, &apistoragev1alpha1.CSIStorageCapacityList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched cSIStorageCapacity.
-func (c *FakeCSIStorageCapacities) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.CSIStorageCapacity, err error) {
+func (c *FakeCSIStorageCapacities) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apistoragev1alpha1.CSIStorageCapacity, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(csistoragecapacitiesResource, c.ns, name, pt, data, subresources...), &v1alpha1.CSIStorageCapacity{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(csistoragecapacitiesResource, c.ns, name, pt, data, subresources...), &apistoragev1alpha1.CSIStorageCapacity{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CSIStorageCapacity), err
+	return obj.(*apistoragev1alpha1.CSIStorageCapacity), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied cSIStorageCapacity.
-func (c *FakeCSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity *storagev1alpha1.CSIStorageCapacityApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha1.CSIStorageCapacity, err error) {
+func (c *FakeCSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity *applyconfigurationsstoragev1alpha1.CSIStorageCapacityApplyConfiguration, opts apismetav1.ApplyOptions) (result *apistoragev1alpha1.CSIStorageCapacity, err error) {
 	if cSIStorageCapacity == nil {
 		return nil, fmt.Errorf("cSIStorageCapacity provided to Apply must not be nil")
 	}
@@ -146,10 +146,10 @@ func (c *FakeCSIStorageCapacities) Apply(ctx context.Context, cSIStorageCapacity
 		return nil, fmt.Errorf("cSIStorageCapacity.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(csistoragecapacitiesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha1.CSIStorageCapacity{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(csistoragecapacitiesResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apistoragev1alpha1.CSIStorageCapacity{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.CSIStorageCapacity), err
+	return obj.(*apistoragev1alpha1.CSIStorageCapacity), err
 }

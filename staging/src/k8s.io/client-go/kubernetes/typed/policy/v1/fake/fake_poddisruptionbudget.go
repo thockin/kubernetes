@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	policyv1 "k8s.io/api/policy/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apipolicyv1 "k8s.io/api/policy/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationspolicyv1 "k8s.io/client-go/applyconfigurations/policy/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakePodDisruptionBudgets implements PodDisruptionBudgetInterface
@@ -39,36 +39,36 @@ type FakePodDisruptionBudgets struct {
 	ns   string
 }
 
-var poddisruptionbudgetsResource = schema.GroupVersionResource{Group: "policy", Version: "v1", Resource: "poddisruptionbudgets"}
+var poddisruptionbudgetsResource = pkgruntimeschema.GroupVersionResource{Group: "policy", Version: "v1", Resource: "poddisruptionbudgets"}
 
-var poddisruptionbudgetsKind = schema.GroupVersionKind{Group: "policy", Version: "v1", Kind: "PodDisruptionBudget"}
+var poddisruptionbudgetsKind = pkgruntimeschema.GroupVersionKind{Group: "policy", Version: "v1", Kind: "PodDisruptionBudget"}
 
 // Get takes name of the podDisruptionBudget, and returns the corresponding podDisruptionBudget object, and an error if there is any.
-func (c *FakePodDisruptionBudgets) Get(ctx context.Context, name string, options v1.GetOptions) (result *policyv1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apipolicyv1.PodDisruptionBudget, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(poddisruptionbudgetsResource, c.ns, name), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewGetAction(poddisruptionbudgetsResource, c.ns, name), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }
 
 // List takes label and field selectors, and returns the list of PodDisruptionBudgets that match those selectors.
-func (c *FakePodDisruptionBudgets) List(ctx context.Context, opts v1.ListOptions) (result *policyv1.PodDisruptionBudgetList, err error) {
+func (c *FakePodDisruptionBudgets) List(ctx context.Context, opts apismetav1.ListOptions) (result *apipolicyv1.PodDisruptionBudgetList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(poddisruptionbudgetsResource, poddisruptionbudgetsKind, c.ns, opts), &policyv1.PodDisruptionBudgetList{})
+		Invokes(clientgotesting.NewListAction(poddisruptionbudgetsResource, poddisruptionbudgetsKind, c.ns, opts), &apipolicyv1.PodDisruptionBudgetList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &policyv1.PodDisruptionBudgetList{ListMeta: obj.(*policyv1.PodDisruptionBudgetList).ListMeta}
-	for _, item := range obj.(*policyv1.PodDisruptionBudgetList).Items {
+	list := &apipolicyv1.PodDisruptionBudgetList{ListMeta: obj.(*apipolicyv1.PodDisruptionBudgetList).ListMeta}
+	for _, item := range obj.(*apipolicyv1.PodDisruptionBudgetList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,76 +76,76 @@ func (c *FakePodDisruptionBudgets) List(ctx context.Context, opts v1.ListOptions
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested podDisruptionBudgets.
-func (c *FakePodDisruptionBudgets) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested podDisruptionBudgets.
+func (c *FakePodDisruptionBudgets) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(poddisruptionbudgetsResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(poddisruptionbudgetsResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a podDisruptionBudget and creates it.  Returns the server's representation of the podDisruptionBudget, and an error, if there is any.
-func (c *FakePodDisruptionBudgets) Create(ctx context.Context, podDisruptionBudget *policyv1.PodDisruptionBudget, opts v1.CreateOptions) (result *policyv1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) Create(ctx context.Context, podDisruptionBudget *apipolicyv1.PodDisruptionBudget, opts apismetav1.CreateOptions) (result *apipolicyv1.PodDisruptionBudget, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(poddisruptionbudgetsResource, c.ns, podDisruptionBudget), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewCreateAction(poddisruptionbudgetsResource, c.ns, podDisruptionBudget), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }
 
 // Update takes the representation of a podDisruptionBudget and updates it. Returns the server's representation of the podDisruptionBudget, and an error, if there is any.
-func (c *FakePodDisruptionBudgets) Update(ctx context.Context, podDisruptionBudget *policyv1.PodDisruptionBudget, opts v1.UpdateOptions) (result *policyv1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) Update(ctx context.Context, podDisruptionBudget *apipolicyv1.PodDisruptionBudget, opts apismetav1.UpdateOptions) (result *apipolicyv1.PodDisruptionBudget, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(poddisruptionbudgetsResource, c.ns, podDisruptionBudget), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewUpdateAction(poddisruptionbudgetsResource, c.ns, podDisruptionBudget), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakePodDisruptionBudgets) UpdateStatus(ctx context.Context, podDisruptionBudget *policyv1.PodDisruptionBudget, opts v1.UpdateOptions) (*policyv1.PodDisruptionBudget, error) {
+func (c *FakePodDisruptionBudgets) UpdateStatus(ctx context.Context, podDisruptionBudget *apipolicyv1.PodDisruptionBudget, opts apismetav1.UpdateOptions) (*apipolicyv1.PodDisruptionBudget, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(poddisruptionbudgetsResource, "status", c.ns, podDisruptionBudget), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewUpdateSubresourceAction(poddisruptionbudgetsResource, "status", c.ns, podDisruptionBudget), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }
 
 // Delete takes name of the podDisruptionBudget and deletes it. Returns an error if one occurs.
-func (c *FakePodDisruptionBudgets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakePodDisruptionBudgets) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(poddisruptionbudgetsResource, c.ns, name, opts), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(poddisruptionbudgetsResource, c.ns, name, opts), &apipolicyv1.PodDisruptionBudget{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakePodDisruptionBudgets) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(poddisruptionbudgetsResource, c.ns, listOpts)
+func (c *FakePodDisruptionBudgets) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(poddisruptionbudgetsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &policyv1.PodDisruptionBudgetList{})
+	_, err := c.Fake.Invokes(action, &apipolicyv1.PodDisruptionBudgetList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched podDisruptionBudget.
-func (c *FakePodDisruptionBudgets) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *policyv1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apipolicyv1.PodDisruptionBudget, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(poddisruptionbudgetsResource, c.ns, name, pt, data, subresources...), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(poddisruptionbudgetsResource, c.ns, name, pt, data, subresources...), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied podDisruptionBudget.
-func (c *FakePodDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget *applyconfigurationspolicyv1.PodDisruptionBudgetApplyConfiguration, opts v1.ApplyOptions) (result *policyv1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudget *applyconfigurationspolicyv1.PodDisruptionBudgetApplyConfiguration, opts apismetav1.ApplyOptions) (result *apipolicyv1.PodDisruptionBudget, err error) {
 	if podDisruptionBudget == nil {
 		return nil, fmt.Errorf("podDisruptionBudget provided to Apply must not be nil")
 	}
@@ -158,17 +158,17 @@ func (c *FakePodDisruptionBudgets) Apply(ctx context.Context, podDisruptionBudge
 		return nil, fmt.Errorf("podDisruptionBudget.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(poddisruptionbudgetsResource, c.ns, *name, types.ApplyPatchType, data), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(poddisruptionbudgetsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakePodDisruptionBudgets) ApplyStatus(ctx context.Context, podDisruptionBudget *applyconfigurationspolicyv1.PodDisruptionBudgetApplyConfiguration, opts v1.ApplyOptions) (result *policyv1.PodDisruptionBudget, err error) {
+func (c *FakePodDisruptionBudgets) ApplyStatus(ctx context.Context, podDisruptionBudget *applyconfigurationspolicyv1.PodDisruptionBudgetApplyConfiguration, opts apismetav1.ApplyOptions) (result *apipolicyv1.PodDisruptionBudget, err error) {
 	if podDisruptionBudget == nil {
 		return nil, fmt.Errorf("podDisruptionBudget provided to Apply must not be nil")
 	}
@@ -181,10 +181,10 @@ func (c *FakePodDisruptionBudgets) ApplyStatus(ctx context.Context, podDisruptio
 		return nil, fmt.Errorf("podDisruptionBudget.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(poddisruptionbudgetsResource, c.ns, *name, types.ApplyPatchType, data, "status"), &policyv1.PodDisruptionBudget{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(poddisruptionbudgetsResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data, "status"), &apipolicyv1.PodDisruptionBudget{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*policyv1.PodDisruptionBudget), err
+	return obj.(*apipolicyv1.PodDisruptionBudget), err
 }

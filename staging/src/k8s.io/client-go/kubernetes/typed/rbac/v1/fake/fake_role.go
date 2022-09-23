@@ -20,17 +20,17 @@ package fake
 
 import (
 	"context"
-	json "encoding/json"
+	"encoding/json"
 	"fmt"
 
-	rbacv1 "k8s.io/api/rbac/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
-	types "k8s.io/apimachinery/pkg/types"
-	watch "k8s.io/apimachinery/pkg/watch"
+	apirbacv1 "k8s.io/api/rbac/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkglabels "k8s.io/apimachinery/pkg/labels"
+	pkgruntimeschema "k8s.io/apimachinery/pkg/runtime/schema"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	apimachinerypkgwatch "k8s.io/apimachinery/pkg/watch"
 	applyconfigurationsrbacv1 "k8s.io/client-go/applyconfigurations/rbac/v1"
-	testing "k8s.io/client-go/testing"
+	clientgotesting "k8s.io/client-go/testing"
 )
 
 // FakeRoles implements RoleInterface
@@ -39,36 +39,36 @@ type FakeRoles struct {
 	ns   string
 }
 
-var rolesResource = schema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "roles"}
+var rolesResource = pkgruntimeschema.GroupVersionResource{Group: "rbac.authorization.k8s.io", Version: "v1", Resource: "roles"}
 
-var rolesKind = schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "Role"}
+var rolesKind = pkgruntimeschema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "Role"}
 
 // Get takes name of the role, and returns the corresponding role object, and an error if there is any.
-func (c *FakeRoles) Get(ctx context.Context, name string, options v1.GetOptions) (result *rbacv1.Role, err error) {
+func (c *FakeRoles) Get(ctx context.Context, name string, options apismetav1.GetOptions) (result *apirbacv1.Role, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(rolesResource, c.ns, name), &rbacv1.Role{})
+		Invokes(clientgotesting.NewGetAction(rolesResource, c.ns, name), &apirbacv1.Role{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*rbacv1.Role), err
+	return obj.(*apirbacv1.Role), err
 }
 
 // List takes label and field selectors, and returns the list of Roles that match those selectors.
-func (c *FakeRoles) List(ctx context.Context, opts v1.ListOptions) (result *rbacv1.RoleList, err error) {
+func (c *FakeRoles) List(ctx context.Context, opts apismetav1.ListOptions) (result *apirbacv1.RoleList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(rolesResource, rolesKind, c.ns, opts), &rbacv1.RoleList{})
+		Invokes(clientgotesting.NewListAction(rolesResource, rolesKind, c.ns, opts), &apirbacv1.RoleList{})
 
 	if obj == nil {
 		return nil, err
 	}
 
-	label, _, _ := testing.ExtractFromListOptions(opts)
+	label, _, _ := clientgotesting.ExtractFromListOptions(opts)
 	if label == nil {
-		label = labels.Everything()
+		label = apimachinerypkglabels.Everything()
 	}
-	list := &rbacv1.RoleList{ListMeta: obj.(*rbacv1.RoleList).ListMeta}
-	for _, item := range obj.(*rbacv1.RoleList).Items {
+	list := &apirbacv1.RoleList{ListMeta: obj.(*apirbacv1.RoleList).ListMeta}
+	for _, item := range obj.(*apirbacv1.RoleList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -76,64 +76,64 @@ func (c *FakeRoles) List(ctx context.Context, opts v1.ListOptions) (result *rbac
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested roles.
-func (c *FakeRoles) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a apimachinerypkgwatch.Interface that watches the requested roles.
+func (c *FakeRoles) Watch(ctx context.Context, opts apismetav1.ListOptions) (apimachinerypkgwatch.Interface, error) {
 	return c.Fake.
-		InvokesWatch(testing.NewWatchAction(rolesResource, c.ns, opts))
+		InvokesWatch(clientgotesting.NewWatchAction(rolesResource, c.ns, opts))
 
 }
 
 // Create takes the representation of a role and creates it.  Returns the server's representation of the role, and an error, if there is any.
-func (c *FakeRoles) Create(ctx context.Context, role *rbacv1.Role, opts v1.CreateOptions) (result *rbacv1.Role, err error) {
+func (c *FakeRoles) Create(ctx context.Context, role *apirbacv1.Role, opts apismetav1.CreateOptions) (result *apirbacv1.Role, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(rolesResource, c.ns, role), &rbacv1.Role{})
+		Invokes(clientgotesting.NewCreateAction(rolesResource, c.ns, role), &apirbacv1.Role{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*rbacv1.Role), err
+	return obj.(*apirbacv1.Role), err
 }
 
 // Update takes the representation of a role and updates it. Returns the server's representation of the role, and an error, if there is any.
-func (c *FakeRoles) Update(ctx context.Context, role *rbacv1.Role, opts v1.UpdateOptions) (result *rbacv1.Role, err error) {
+func (c *FakeRoles) Update(ctx context.Context, role *apirbacv1.Role, opts apismetav1.UpdateOptions) (result *apirbacv1.Role, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(rolesResource, c.ns, role), &rbacv1.Role{})
+		Invokes(clientgotesting.NewUpdateAction(rolesResource, c.ns, role), &apirbacv1.Role{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*rbacv1.Role), err
+	return obj.(*apirbacv1.Role), err
 }
 
 // Delete takes name of the role and deletes it. Returns an error if one occurs.
-func (c *FakeRoles) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (c *FakeRoles) Delete(ctx context.Context, name string, opts apismetav1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(rolesResource, c.ns, name, opts), &rbacv1.Role{})
+		Invokes(clientgotesting.NewDeleteActionWithOptions(rolesResource, c.ns, name, opts), &apirbacv1.Role{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeRoles) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	action := testing.NewDeleteCollectionAction(rolesResource, c.ns, listOpts)
+func (c *FakeRoles) DeleteCollection(ctx context.Context, opts apismetav1.DeleteOptions, listOpts apismetav1.ListOptions) error {
+	action := clientgotesting.NewDeleteCollectionAction(rolesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &rbacv1.RoleList{})
+	_, err := c.Fake.Invokes(action, &apirbacv1.RoleList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched role.
-func (c *FakeRoles) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *rbacv1.Role, err error) {
+func (c *FakeRoles) Patch(ctx context.Context, name string, pt apimachinerypkgtypes.PatchType, data []byte, opts apismetav1.PatchOptions, subresources ...string) (result *apirbacv1.Role, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(rolesResource, c.ns, name, pt, data, subresources...), &rbacv1.Role{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(rolesResource, c.ns, name, pt, data, subresources...), &apirbacv1.Role{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*rbacv1.Role), err
+	return obj.(*apirbacv1.Role), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied role.
-func (c *FakeRoles) Apply(ctx context.Context, role *applyconfigurationsrbacv1.RoleApplyConfiguration, opts v1.ApplyOptions) (result *rbacv1.Role, err error) {
+func (c *FakeRoles) Apply(ctx context.Context, role *applyconfigurationsrbacv1.RoleApplyConfiguration, opts apismetav1.ApplyOptions) (result *apirbacv1.Role, err error) {
 	if role == nil {
 		return nil, fmt.Errorf("role provided to Apply must not be nil")
 	}
@@ -146,10 +146,10 @@ func (c *FakeRoles) Apply(ctx context.Context, role *applyconfigurationsrbacv1.R
 		return nil, fmt.Errorf("role.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(rolesResource, c.ns, *name, types.ApplyPatchType, data), &rbacv1.Role{})
+		Invokes(clientgotesting.NewPatchSubresourceAction(rolesResource, c.ns, *name, apimachinerypkgtypes.ApplyPatchType, data), &apirbacv1.Role{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*rbacv1.Role), err
+	return obj.(*apirbacv1.Role), err
 }
