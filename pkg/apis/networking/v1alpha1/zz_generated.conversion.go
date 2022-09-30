@@ -24,12 +24,12 @@ package v1alpha1
 import (
 	"unsafe"
 
-	"k8s.io/api/core/v1"
-	"k8s.io/api/networking/v1alpha1"
-	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/kubernetes/pkg/apis/core"
-	"k8s.io/kubernetes/pkg/apis/networking"
+	apicorev1 "k8s.io/api/core/v1"
+	apinetworkingv1alpha1 "k8s.io/api/networking/v1alpha1"
+	apimachinerypkgconversion "k8s.io/apimachinery/pkg/conversion"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	pkgapiscore "k8s.io/kubernetes/pkg/apis/core"
+	pkgapisnetworking "k8s.io/kubernetes/pkg/apis/networking"
 )
 
 func init() {
@@ -38,41 +38,41 @@ func init() {
 
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ClusterCIDR)(nil), (*networking.ClusterCIDR)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(a.(*v1alpha1.ClusterCIDR), b.(*networking.ClusterCIDR), scope)
+func RegisterConversions(s *apimachinerypkgruntime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*apinetworkingv1alpha1.ClusterCIDR)(nil), (*pkgapisnetworking.ClusterCIDR)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(a.(*apinetworkingv1alpha1.ClusterCIDR), b.(*pkgapisnetworking.ClusterCIDR), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*networking.ClusterCIDR)(nil), (*v1alpha1.ClusterCIDR)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(a.(*networking.ClusterCIDR), b.(*v1alpha1.ClusterCIDR), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisnetworking.ClusterCIDR)(nil), (*apinetworkingv1alpha1.ClusterCIDR)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(a.(*pkgapisnetworking.ClusterCIDR), b.(*apinetworkingv1alpha1.ClusterCIDR), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ClusterCIDRList)(nil), (*networking.ClusterCIDRList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(a.(*v1alpha1.ClusterCIDRList), b.(*networking.ClusterCIDRList), scope)
+	if err := s.AddGeneratedConversionFunc((*apinetworkingv1alpha1.ClusterCIDRList)(nil), (*pkgapisnetworking.ClusterCIDRList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(a.(*apinetworkingv1alpha1.ClusterCIDRList), b.(*pkgapisnetworking.ClusterCIDRList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*networking.ClusterCIDRList)(nil), (*v1alpha1.ClusterCIDRList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(a.(*networking.ClusterCIDRList), b.(*v1alpha1.ClusterCIDRList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisnetworking.ClusterCIDRList)(nil), (*apinetworkingv1alpha1.ClusterCIDRList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(a.(*pkgapisnetworking.ClusterCIDRList), b.(*apinetworkingv1alpha1.ClusterCIDRList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1alpha1.ClusterCIDRSpec)(nil), (*networking.ClusterCIDRSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(a.(*v1alpha1.ClusterCIDRSpec), b.(*networking.ClusterCIDRSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apinetworkingv1alpha1.ClusterCIDRSpec)(nil), (*pkgapisnetworking.ClusterCIDRSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(a.(*apinetworkingv1alpha1.ClusterCIDRSpec), b.(*pkgapisnetworking.ClusterCIDRSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*networking.ClusterCIDRSpec)(nil), (*v1alpha1.ClusterCIDRSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(a.(*networking.ClusterCIDRSpec), b.(*v1alpha1.ClusterCIDRSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisnetworking.ClusterCIDRSpec)(nil), (*apinetworkingv1alpha1.ClusterCIDRSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(a.(*pkgapisnetworking.ClusterCIDRSpec), b.(*apinetworkingv1alpha1.ClusterCIDRSpec), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(in *v1alpha1.ClusterCIDR, out *networking.ClusterCIDR, s conversion.Scope) error {
+func autoConvert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(in *apinetworkingv1alpha1.ClusterCIDR, out *pkgapisnetworking.ClusterCIDR, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -81,11 +81,11 @@ func autoConvert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(in *v1alpha1.Clu
 }
 
 // Convert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR is an autogenerated conversion function.
-func Convert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(in *v1alpha1.ClusterCIDR, out *networking.ClusterCIDR, s conversion.Scope) error {
+func Convert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(in *apinetworkingv1alpha1.ClusterCIDR, out *pkgapisnetworking.ClusterCIDR, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_ClusterCIDR_To_networking_ClusterCIDR(in, out, s)
 }
 
-func autoConvert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(in *networking.ClusterCIDR, out *v1alpha1.ClusterCIDR, s conversion.Scope) error {
+func autoConvert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(in *pkgapisnetworking.ClusterCIDR, out *apinetworkingv1alpha1.ClusterCIDR, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -94,34 +94,34 @@ func autoConvert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(in *networking.C
 }
 
 // Convert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR is an autogenerated conversion function.
-func Convert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(in *networking.ClusterCIDR, out *v1alpha1.ClusterCIDR, s conversion.Scope) error {
+func Convert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(in *pkgapisnetworking.ClusterCIDR, out *apinetworkingv1alpha1.ClusterCIDR, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_networking_ClusterCIDR_To_v1alpha1_ClusterCIDR(in, out, s)
 }
 
-func autoConvert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(in *v1alpha1.ClusterCIDRList, out *networking.ClusterCIDRList, s conversion.Scope) error {
+func autoConvert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(in *apinetworkingv1alpha1.ClusterCIDRList, out *pkgapisnetworking.ClusterCIDRList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]networking.ClusterCIDR)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapisnetworking.ClusterCIDR)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList is an autogenerated conversion function.
-func Convert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(in *v1alpha1.ClusterCIDRList, out *networking.ClusterCIDRList, s conversion.Scope) error {
+func Convert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(in *apinetworkingv1alpha1.ClusterCIDRList, out *pkgapisnetworking.ClusterCIDRList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_ClusterCIDRList_To_networking_ClusterCIDRList(in, out, s)
 }
 
-func autoConvert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(in *networking.ClusterCIDRList, out *v1alpha1.ClusterCIDRList, s conversion.Scope) error {
+func autoConvert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(in *pkgapisnetworking.ClusterCIDRList, out *apinetworkingv1alpha1.ClusterCIDRList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1alpha1.ClusterCIDR)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apinetworkingv1alpha1.ClusterCIDR)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList is an autogenerated conversion function.
-func Convert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(in *networking.ClusterCIDRList, out *v1alpha1.ClusterCIDRList, s conversion.Scope) error {
+func Convert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(in *pkgapisnetworking.ClusterCIDRList, out *apinetworkingv1alpha1.ClusterCIDRList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_networking_ClusterCIDRList_To_v1alpha1_ClusterCIDRList(in, out, s)
 }
 
-func autoConvert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(in *v1alpha1.ClusterCIDRSpec, out *networking.ClusterCIDRSpec, s conversion.Scope) error {
-	out.NodeSelector = (*core.NodeSelector)(unsafe.Pointer(in.NodeSelector))
+func autoConvert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(in *apinetworkingv1alpha1.ClusterCIDRSpec, out *pkgapisnetworking.ClusterCIDRSpec, s apimachinerypkgconversion.Scope) error {
+	out.NodeSelector = (*pkgapiscore.NodeSelector)(unsafe.Pointer(in.NodeSelector))
 	out.PerNodeHostBits = in.PerNodeHostBits
 	out.IPv4 = in.IPv4
 	out.IPv6 = in.IPv6
@@ -129,12 +129,12 @@ func autoConvert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(in *v1al
 }
 
 // Convert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec is an autogenerated conversion function.
-func Convert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(in *v1alpha1.ClusterCIDRSpec, out *networking.ClusterCIDRSpec, s conversion.Scope) error {
+func Convert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(in *apinetworkingv1alpha1.ClusterCIDRSpec, out *pkgapisnetworking.ClusterCIDRSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_ClusterCIDRSpec_To_networking_ClusterCIDRSpec(in, out, s)
 }
 
-func autoConvert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(in *networking.ClusterCIDRSpec, out *v1alpha1.ClusterCIDRSpec, s conversion.Scope) error {
-	out.NodeSelector = (*v1.NodeSelector)(unsafe.Pointer(in.NodeSelector))
+func autoConvert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(in *pkgapisnetworking.ClusterCIDRSpec, out *apinetworkingv1alpha1.ClusterCIDRSpec, s apimachinerypkgconversion.Scope) error {
+	out.NodeSelector = (*apicorev1.NodeSelector)(unsafe.Pointer(in.NodeSelector))
 	out.PerNodeHostBits = in.PerNodeHostBits
 	out.IPv4 = in.IPv4
 	out.IPv6 = in.IPv6
@@ -142,6 +142,6 @@ func autoConvert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(in *netw
 }
 
 // Convert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec is an autogenerated conversion function.
-func Convert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(in *networking.ClusterCIDRSpec, out *v1alpha1.ClusterCIDRSpec, s conversion.Scope) error {
+func Convert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(in *pkgapisnetworking.ClusterCIDRSpec, out *apinetworkingv1alpha1.ClusterCIDRSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_networking_ClusterCIDRSpec_To_v1alpha1_ClusterCIDRSpec(in, out, s)
 }

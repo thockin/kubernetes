@@ -24,11 +24,11 @@ package v1
 import (
 	"unsafe"
 
-	"k8s.io/api/admissionregistration/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/kubernetes/pkg/apis/admissionregistration"
+	apiadmissionregistrationv1 "k8s.io/api/admissionregistration/v1"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgconversion "k8s.io/apimachinery/pkg/conversion"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	pkgapisadmissionregistration "k8s.io/kubernetes/pkg/apis/admissionregistration"
 )
 
 func init() {
@@ -37,159 +37,159 @@ func init() {
 
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1.MutatingWebhook)(nil), (*admissionregistration.MutatingWebhook)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(a.(*v1.MutatingWebhook), b.(*admissionregistration.MutatingWebhook), scope)
+func RegisterConversions(s *apimachinerypkgruntime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.MutatingWebhook)(nil), (*pkgapisadmissionregistration.MutatingWebhook)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(a.(*apiadmissionregistrationv1.MutatingWebhook), b.(*pkgapisadmissionregistration.MutatingWebhook), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.MutatingWebhook)(nil), (*v1.MutatingWebhook)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(a.(*admissionregistration.MutatingWebhook), b.(*v1.MutatingWebhook), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.MutatingWebhook)(nil), (*apiadmissionregistrationv1.MutatingWebhook)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(a.(*pkgapisadmissionregistration.MutatingWebhook), b.(*apiadmissionregistrationv1.MutatingWebhook), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.MutatingWebhookConfiguration)(nil), (*admissionregistration.MutatingWebhookConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(a.(*v1.MutatingWebhookConfiguration), b.(*admissionregistration.MutatingWebhookConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.MutatingWebhookConfiguration)(nil), (*pkgapisadmissionregistration.MutatingWebhookConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(a.(*apiadmissionregistrationv1.MutatingWebhookConfiguration), b.(*pkgapisadmissionregistration.MutatingWebhookConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.MutatingWebhookConfiguration)(nil), (*v1.MutatingWebhookConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(a.(*admissionregistration.MutatingWebhookConfiguration), b.(*v1.MutatingWebhookConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.MutatingWebhookConfiguration)(nil), (*apiadmissionregistrationv1.MutatingWebhookConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(a.(*pkgapisadmissionregistration.MutatingWebhookConfiguration), b.(*apiadmissionregistrationv1.MutatingWebhookConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.MutatingWebhookConfigurationList)(nil), (*admissionregistration.MutatingWebhookConfigurationList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(a.(*v1.MutatingWebhookConfigurationList), b.(*admissionregistration.MutatingWebhookConfigurationList), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.MutatingWebhookConfigurationList)(nil), (*pkgapisadmissionregistration.MutatingWebhookConfigurationList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(a.(*apiadmissionregistrationv1.MutatingWebhookConfigurationList), b.(*pkgapisadmissionregistration.MutatingWebhookConfigurationList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.MutatingWebhookConfigurationList)(nil), (*v1.MutatingWebhookConfigurationList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(a.(*admissionregistration.MutatingWebhookConfigurationList), b.(*v1.MutatingWebhookConfigurationList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.MutatingWebhookConfigurationList)(nil), (*apiadmissionregistrationv1.MutatingWebhookConfigurationList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(a.(*pkgapisadmissionregistration.MutatingWebhookConfigurationList), b.(*apiadmissionregistrationv1.MutatingWebhookConfigurationList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Rule)(nil), (*admissionregistration.Rule)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Rule_To_admissionregistration_Rule(a.(*v1.Rule), b.(*admissionregistration.Rule), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.Rule)(nil), (*pkgapisadmissionregistration.Rule)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Rule_To_admissionregistration_Rule(a.(*apiadmissionregistrationv1.Rule), b.(*pkgapisadmissionregistration.Rule), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.Rule)(nil), (*v1.Rule)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_Rule_To_v1_Rule(a.(*admissionregistration.Rule), b.(*v1.Rule), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.Rule)(nil), (*apiadmissionregistrationv1.Rule)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_Rule_To_v1_Rule(a.(*pkgapisadmissionregistration.Rule), b.(*apiadmissionregistrationv1.Rule), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RuleWithOperations)(nil), (*admissionregistration.RuleWithOperations)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(a.(*v1.RuleWithOperations), b.(*admissionregistration.RuleWithOperations), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.RuleWithOperations)(nil), (*pkgapisadmissionregistration.RuleWithOperations)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(a.(*apiadmissionregistrationv1.RuleWithOperations), b.(*pkgapisadmissionregistration.RuleWithOperations), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.RuleWithOperations)(nil), (*v1.RuleWithOperations)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(a.(*admissionregistration.RuleWithOperations), b.(*v1.RuleWithOperations), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.RuleWithOperations)(nil), (*apiadmissionregistrationv1.RuleWithOperations)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(a.(*pkgapisadmissionregistration.RuleWithOperations), b.(*apiadmissionregistrationv1.RuleWithOperations), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceReference)(nil), (*admissionregistration.ServiceReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceReference_To_admissionregistration_ServiceReference(a.(*v1.ServiceReference), b.(*admissionregistration.ServiceReference), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.ServiceReference)(nil), (*pkgapisadmissionregistration.ServiceReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceReference_To_admissionregistration_ServiceReference(a.(*apiadmissionregistrationv1.ServiceReference), b.(*pkgapisadmissionregistration.ServiceReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.ServiceReference)(nil), (*v1.ServiceReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_ServiceReference_To_v1_ServiceReference(a.(*admissionregistration.ServiceReference), b.(*v1.ServiceReference), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.ServiceReference)(nil), (*apiadmissionregistrationv1.ServiceReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_ServiceReference_To_v1_ServiceReference(a.(*pkgapisadmissionregistration.ServiceReference), b.(*apiadmissionregistrationv1.ServiceReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ValidatingWebhook)(nil), (*admissionregistration.ValidatingWebhook)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(a.(*v1.ValidatingWebhook), b.(*admissionregistration.ValidatingWebhook), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.ValidatingWebhook)(nil), (*pkgapisadmissionregistration.ValidatingWebhook)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(a.(*apiadmissionregistrationv1.ValidatingWebhook), b.(*pkgapisadmissionregistration.ValidatingWebhook), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.ValidatingWebhook)(nil), (*v1.ValidatingWebhook)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(a.(*admissionregistration.ValidatingWebhook), b.(*v1.ValidatingWebhook), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.ValidatingWebhook)(nil), (*apiadmissionregistrationv1.ValidatingWebhook)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(a.(*pkgapisadmissionregistration.ValidatingWebhook), b.(*apiadmissionregistrationv1.ValidatingWebhook), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ValidatingWebhookConfiguration)(nil), (*admissionregistration.ValidatingWebhookConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(a.(*v1.ValidatingWebhookConfiguration), b.(*admissionregistration.ValidatingWebhookConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.ValidatingWebhookConfiguration)(nil), (*pkgapisadmissionregistration.ValidatingWebhookConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(a.(*apiadmissionregistrationv1.ValidatingWebhookConfiguration), b.(*pkgapisadmissionregistration.ValidatingWebhookConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.ValidatingWebhookConfiguration)(nil), (*v1.ValidatingWebhookConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(a.(*admissionregistration.ValidatingWebhookConfiguration), b.(*v1.ValidatingWebhookConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.ValidatingWebhookConfiguration)(nil), (*apiadmissionregistrationv1.ValidatingWebhookConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(a.(*pkgapisadmissionregistration.ValidatingWebhookConfiguration), b.(*apiadmissionregistrationv1.ValidatingWebhookConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ValidatingWebhookConfigurationList)(nil), (*admissionregistration.ValidatingWebhookConfigurationList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(a.(*v1.ValidatingWebhookConfigurationList), b.(*admissionregistration.ValidatingWebhookConfigurationList), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.ValidatingWebhookConfigurationList)(nil), (*pkgapisadmissionregistration.ValidatingWebhookConfigurationList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(a.(*apiadmissionregistrationv1.ValidatingWebhookConfigurationList), b.(*pkgapisadmissionregistration.ValidatingWebhookConfigurationList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.ValidatingWebhookConfigurationList)(nil), (*v1.ValidatingWebhookConfigurationList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(a.(*admissionregistration.ValidatingWebhookConfigurationList), b.(*v1.ValidatingWebhookConfigurationList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.ValidatingWebhookConfigurationList)(nil), (*apiadmissionregistrationv1.ValidatingWebhookConfigurationList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(a.(*pkgapisadmissionregistration.ValidatingWebhookConfigurationList), b.(*apiadmissionregistrationv1.ValidatingWebhookConfigurationList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.WebhookClientConfig)(nil), (*admissionregistration.WebhookClientConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(a.(*v1.WebhookClientConfig), b.(*admissionregistration.WebhookClientConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*apiadmissionregistrationv1.WebhookClientConfig)(nil), (*pkgapisadmissionregistration.WebhookClientConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(a.(*apiadmissionregistrationv1.WebhookClientConfig), b.(*pkgapisadmissionregistration.WebhookClientConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*admissionregistration.WebhookClientConfig)(nil), (*v1.WebhookClientConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(a.(*admissionregistration.WebhookClientConfig), b.(*v1.WebhookClientConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisadmissionregistration.WebhookClientConfig)(nil), (*apiadmissionregistrationv1.WebhookClientConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(a.(*pkgapisadmissionregistration.WebhookClientConfig), b.(*apiadmissionregistrationv1.WebhookClientConfig), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(in *v1.MutatingWebhook, out *admissionregistration.MutatingWebhook, s conversion.Scope) error {
+func autoConvert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(in *apiadmissionregistrationv1.MutatingWebhook, out *pkgapisadmissionregistration.MutatingWebhook, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(&in.ClientConfig, &out.ClientConfig, s); err != nil {
 		return err
 	}
-	out.Rules = *(*[]admissionregistration.RuleWithOperations)(unsafe.Pointer(&in.Rules))
-	out.FailurePolicy = (*admissionregistration.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
-	out.MatchPolicy = (*admissionregistration.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
-	out.NamespaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
-	out.ObjectSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.SideEffects = (*admissionregistration.SideEffectClass)(unsafe.Pointer(in.SideEffects))
+	out.Rules = *(*[]pkgapisadmissionregistration.RuleWithOperations)(unsafe.Pointer(&in.Rules))
+	out.FailurePolicy = (*pkgapisadmissionregistration.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
+	out.MatchPolicy = (*pkgapisadmissionregistration.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
+	out.NamespaceSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
+	out.ObjectSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
+	out.SideEffects = (*pkgapisadmissionregistration.SideEffectClass)(unsafe.Pointer(in.SideEffects))
 	out.TimeoutSeconds = (*int32)(unsafe.Pointer(in.TimeoutSeconds))
 	out.AdmissionReviewVersions = *(*[]string)(unsafe.Pointer(&in.AdmissionReviewVersions))
-	out.ReinvocationPolicy = (*admissionregistration.ReinvocationPolicyType)(unsafe.Pointer(in.ReinvocationPolicy))
+	out.ReinvocationPolicy = (*pkgapisadmissionregistration.ReinvocationPolicyType)(unsafe.Pointer(in.ReinvocationPolicy))
 	return nil
 }
 
 // Convert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook is an autogenerated conversion function.
-func Convert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(in *v1.MutatingWebhook, out *admissionregistration.MutatingWebhook, s conversion.Scope) error {
+func Convert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(in *apiadmissionregistrationv1.MutatingWebhook, out *pkgapisadmissionregistration.MutatingWebhook, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(in, out, s)
 }
 
-func autoConvert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(in *admissionregistration.MutatingWebhook, out *v1.MutatingWebhook, s conversion.Scope) error {
+func autoConvert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(in *pkgapisadmissionregistration.MutatingWebhook, out *apiadmissionregistrationv1.MutatingWebhook, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(&in.ClientConfig, &out.ClientConfig, s); err != nil {
 		return err
 	}
-	out.Rules = *(*[]v1.RuleWithOperations)(unsafe.Pointer(&in.Rules))
-	out.FailurePolicy = (*v1.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
-	out.MatchPolicy = (*v1.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
-	out.NamespaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
-	out.ObjectSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.SideEffects = (*v1.SideEffectClass)(unsafe.Pointer(in.SideEffects))
+	out.Rules = *(*[]apiadmissionregistrationv1.RuleWithOperations)(unsafe.Pointer(&in.Rules))
+	out.FailurePolicy = (*apiadmissionregistrationv1.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
+	out.MatchPolicy = (*apiadmissionregistrationv1.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
+	out.NamespaceSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
+	out.ObjectSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
+	out.SideEffects = (*apiadmissionregistrationv1.SideEffectClass)(unsafe.Pointer(in.SideEffects))
 	out.TimeoutSeconds = (*int32)(unsafe.Pointer(in.TimeoutSeconds))
 	out.AdmissionReviewVersions = *(*[]string)(unsafe.Pointer(&in.AdmissionReviewVersions))
-	out.ReinvocationPolicy = (*v1.ReinvocationPolicyType)(unsafe.Pointer(in.ReinvocationPolicy))
+	out.ReinvocationPolicy = (*apiadmissionregistrationv1.ReinvocationPolicyType)(unsafe.Pointer(in.ReinvocationPolicy))
 	return nil
 }
 
 // Convert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook is an autogenerated conversion function.
-func Convert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(in *admissionregistration.MutatingWebhook, out *v1.MutatingWebhook, s conversion.Scope) error {
+func Convert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(in *pkgapisadmissionregistration.MutatingWebhook, out *apiadmissionregistrationv1.MutatingWebhook, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(in, out, s)
 }
 
-func autoConvert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(in *v1.MutatingWebhookConfiguration, out *admissionregistration.MutatingWebhookConfiguration, s conversion.Scope) error {
+func autoConvert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(in *apiadmissionregistrationv1.MutatingWebhookConfiguration, out *pkgapisadmissionregistration.MutatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Webhooks != nil {
 		in, out := &in.Webhooks, &out.Webhooks
-		*out = make([]admissionregistration.MutatingWebhook, len(*in))
+		*out = make([]pkgapisadmissionregistration.MutatingWebhook, len(*in))
 		for i := range *in {
 			if err := Convert_v1_MutatingWebhook_To_admissionregistration_MutatingWebhook(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -202,15 +202,15 @@ func autoConvert_v1_MutatingWebhookConfiguration_To_admissionregistration_Mutati
 }
 
 // Convert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration is an autogenerated conversion function.
-func Convert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(in *v1.MutatingWebhookConfiguration, out *admissionregistration.MutatingWebhookConfiguration, s conversion.Scope) error {
+func Convert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(in *apiadmissionregistrationv1.MutatingWebhookConfiguration, out *pkgapisadmissionregistration.MutatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(in, out, s)
 }
 
-func autoConvert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(in *admissionregistration.MutatingWebhookConfiguration, out *v1.MutatingWebhookConfiguration, s conversion.Scope) error {
+func autoConvert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(in *pkgapisadmissionregistration.MutatingWebhookConfiguration, out *apiadmissionregistrationv1.MutatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Webhooks != nil {
 		in, out := &in.Webhooks, &out.Webhooks
-		*out = make([]v1.MutatingWebhook, len(*in))
+		*out = make([]apiadmissionregistrationv1.MutatingWebhook, len(*in))
 		for i := range *in {
 			if err := Convert_admissionregistration_MutatingWebhook_To_v1_MutatingWebhook(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -223,15 +223,15 @@ func autoConvert_admissionregistration_MutatingWebhookConfiguration_To_v1_Mutati
 }
 
 // Convert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration is an autogenerated conversion function.
-func Convert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(in *admissionregistration.MutatingWebhookConfiguration, out *v1.MutatingWebhookConfiguration, s conversion.Scope) error {
+func Convert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(in *pkgapisadmissionregistration.MutatingWebhookConfiguration, out *apiadmissionregistrationv1.MutatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(in, out, s)
 }
 
-func autoConvert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(in *v1.MutatingWebhookConfigurationList, out *admissionregistration.MutatingWebhookConfigurationList, s conversion.Scope) error {
+func autoConvert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(in *apiadmissionregistrationv1.MutatingWebhookConfigurationList, out *pkgapisadmissionregistration.MutatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]admissionregistration.MutatingWebhookConfiguration, len(*in))
+		*out = make([]pkgapisadmissionregistration.MutatingWebhookConfiguration, len(*in))
 		for i := range *in {
 			if err := Convert_v1_MutatingWebhookConfiguration_To_admissionregistration_MutatingWebhookConfiguration(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -244,15 +244,15 @@ func autoConvert_v1_MutatingWebhookConfigurationList_To_admissionregistration_Mu
 }
 
 // Convert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList is an autogenerated conversion function.
-func Convert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(in *v1.MutatingWebhookConfigurationList, out *admissionregistration.MutatingWebhookConfigurationList, s conversion.Scope) error {
+func Convert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(in *apiadmissionregistrationv1.MutatingWebhookConfigurationList, out *pkgapisadmissionregistration.MutatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_MutatingWebhookConfigurationList_To_admissionregistration_MutatingWebhookConfigurationList(in, out, s)
 }
 
-func autoConvert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(in *admissionregistration.MutatingWebhookConfigurationList, out *v1.MutatingWebhookConfigurationList, s conversion.Scope) error {
+func autoConvert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(in *pkgapisadmissionregistration.MutatingWebhookConfigurationList, out *apiadmissionregistrationv1.MutatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.MutatingWebhookConfiguration, len(*in))
+		*out = make([]apiadmissionregistrationv1.MutatingWebhookConfiguration, len(*in))
 		for i := range *in {
 			if err := Convert_admissionregistration_MutatingWebhookConfiguration_To_v1_MutatingWebhookConfiguration(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -265,38 +265,38 @@ func autoConvert_admissionregistration_MutatingWebhookConfigurationList_To_v1_Mu
 }
 
 // Convert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList is an autogenerated conversion function.
-func Convert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(in *admissionregistration.MutatingWebhookConfigurationList, out *v1.MutatingWebhookConfigurationList, s conversion.Scope) error {
+func Convert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(in *pkgapisadmissionregistration.MutatingWebhookConfigurationList, out *apiadmissionregistrationv1.MutatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_MutatingWebhookConfigurationList_To_v1_MutatingWebhookConfigurationList(in, out, s)
 }
 
-func autoConvert_v1_Rule_To_admissionregistration_Rule(in *v1.Rule, out *admissionregistration.Rule, s conversion.Scope) error {
+func autoConvert_v1_Rule_To_admissionregistration_Rule(in *apiadmissionregistrationv1.Rule, out *pkgapisadmissionregistration.Rule, s apimachinerypkgconversion.Scope) error {
 	out.APIGroups = *(*[]string)(unsafe.Pointer(&in.APIGroups))
 	out.APIVersions = *(*[]string)(unsafe.Pointer(&in.APIVersions))
 	out.Resources = *(*[]string)(unsafe.Pointer(&in.Resources))
-	out.Scope = (*admissionregistration.ScopeType)(unsafe.Pointer(in.Scope))
+	out.Scope = (*pkgapisadmissionregistration.ScopeType)(unsafe.Pointer(in.Scope))
 	return nil
 }
 
 // Convert_v1_Rule_To_admissionregistration_Rule is an autogenerated conversion function.
-func Convert_v1_Rule_To_admissionregistration_Rule(in *v1.Rule, out *admissionregistration.Rule, s conversion.Scope) error {
+func Convert_v1_Rule_To_admissionregistration_Rule(in *apiadmissionregistrationv1.Rule, out *pkgapisadmissionregistration.Rule, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Rule_To_admissionregistration_Rule(in, out, s)
 }
 
-func autoConvert_admissionregistration_Rule_To_v1_Rule(in *admissionregistration.Rule, out *v1.Rule, s conversion.Scope) error {
+func autoConvert_admissionregistration_Rule_To_v1_Rule(in *pkgapisadmissionregistration.Rule, out *apiadmissionregistrationv1.Rule, s apimachinerypkgconversion.Scope) error {
 	out.APIGroups = *(*[]string)(unsafe.Pointer(&in.APIGroups))
 	out.APIVersions = *(*[]string)(unsafe.Pointer(&in.APIVersions))
 	out.Resources = *(*[]string)(unsafe.Pointer(&in.Resources))
-	out.Scope = (*v1.ScopeType)(unsafe.Pointer(in.Scope))
+	out.Scope = (*apiadmissionregistrationv1.ScopeType)(unsafe.Pointer(in.Scope))
 	return nil
 }
 
 // Convert_admissionregistration_Rule_To_v1_Rule is an autogenerated conversion function.
-func Convert_admissionregistration_Rule_To_v1_Rule(in *admissionregistration.Rule, out *v1.Rule, s conversion.Scope) error {
+func Convert_admissionregistration_Rule_To_v1_Rule(in *pkgapisadmissionregistration.Rule, out *apiadmissionregistrationv1.Rule, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_Rule_To_v1_Rule(in, out, s)
 }
 
-func autoConvert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(in *v1.RuleWithOperations, out *admissionregistration.RuleWithOperations, s conversion.Scope) error {
-	out.Operations = *(*[]admissionregistration.OperationType)(unsafe.Pointer(&in.Operations))
+func autoConvert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(in *apiadmissionregistrationv1.RuleWithOperations, out *pkgapisadmissionregistration.RuleWithOperations, s apimachinerypkgconversion.Scope) error {
+	out.Operations = *(*[]pkgapisadmissionregistration.OperationType)(unsafe.Pointer(&in.Operations))
 	if err := Convert_v1_Rule_To_admissionregistration_Rule(&in.Rule, &out.Rule, s); err != nil {
 		return err
 	}
@@ -304,12 +304,12 @@ func autoConvert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperatio
 }
 
 // Convert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations is an autogenerated conversion function.
-func Convert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(in *v1.RuleWithOperations, out *admissionregistration.RuleWithOperations, s conversion.Scope) error {
+func Convert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(in *apiadmissionregistrationv1.RuleWithOperations, out *pkgapisadmissionregistration.RuleWithOperations, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_RuleWithOperations_To_admissionregistration_RuleWithOperations(in, out, s)
 }
 
-func autoConvert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(in *admissionregistration.RuleWithOperations, out *v1.RuleWithOperations, s conversion.Scope) error {
-	out.Operations = *(*[]v1.OperationType)(unsafe.Pointer(&in.Operations))
+func autoConvert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(in *pkgapisadmissionregistration.RuleWithOperations, out *apiadmissionregistrationv1.RuleWithOperations, s apimachinerypkgconversion.Scope) error {
+	out.Operations = *(*[]apiadmissionregistrationv1.OperationType)(unsafe.Pointer(&in.Operations))
 	if err := Convert_admissionregistration_Rule_To_v1_Rule(&in.Rule, &out.Rule, s); err != nil {
 		return err
 	}
@@ -317,87 +317,87 @@ func autoConvert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperatio
 }
 
 // Convert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations is an autogenerated conversion function.
-func Convert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(in *admissionregistration.RuleWithOperations, out *v1.RuleWithOperations, s conversion.Scope) error {
+func Convert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(in *pkgapisadmissionregistration.RuleWithOperations, out *apiadmissionregistrationv1.RuleWithOperations, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_RuleWithOperations_To_v1_RuleWithOperations(in, out, s)
 }
 
-func autoConvert_v1_ServiceReference_To_admissionregistration_ServiceReference(in *v1.ServiceReference, out *admissionregistration.ServiceReference, s conversion.Scope) error {
+func autoConvert_v1_ServiceReference_To_admissionregistration_ServiceReference(in *apiadmissionregistrationv1.ServiceReference, out *pkgapisadmissionregistration.ServiceReference, s apimachinerypkgconversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Name = in.Name
 	out.Path = (*string)(unsafe.Pointer(in.Path))
-	if err := metav1.Convert_Pointer_int32_To_int32(&in.Port, &out.Port, s); err != nil {
+	if err := apismetav1.Convert_Pointer_int32_To_int32(&in.Port, &out.Port, s); err != nil {
 		return err
 	}
 	return nil
 }
 
 // Convert_v1_ServiceReference_To_admissionregistration_ServiceReference is an autogenerated conversion function.
-func Convert_v1_ServiceReference_To_admissionregistration_ServiceReference(in *v1.ServiceReference, out *admissionregistration.ServiceReference, s conversion.Scope) error {
+func Convert_v1_ServiceReference_To_admissionregistration_ServiceReference(in *apiadmissionregistrationv1.ServiceReference, out *pkgapisadmissionregistration.ServiceReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceReference_To_admissionregistration_ServiceReference(in, out, s)
 }
 
-func autoConvert_admissionregistration_ServiceReference_To_v1_ServiceReference(in *admissionregistration.ServiceReference, out *v1.ServiceReference, s conversion.Scope) error {
+func autoConvert_admissionregistration_ServiceReference_To_v1_ServiceReference(in *pkgapisadmissionregistration.ServiceReference, out *apiadmissionregistrationv1.ServiceReference, s apimachinerypkgconversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Name = in.Name
 	out.Path = (*string)(unsafe.Pointer(in.Path))
-	if err := metav1.Convert_int32_To_Pointer_int32(&in.Port, &out.Port, s); err != nil {
+	if err := apismetav1.Convert_int32_To_Pointer_int32(&in.Port, &out.Port, s); err != nil {
 		return err
 	}
 	return nil
 }
 
 // Convert_admissionregistration_ServiceReference_To_v1_ServiceReference is an autogenerated conversion function.
-func Convert_admissionregistration_ServiceReference_To_v1_ServiceReference(in *admissionregistration.ServiceReference, out *v1.ServiceReference, s conversion.Scope) error {
+func Convert_admissionregistration_ServiceReference_To_v1_ServiceReference(in *pkgapisadmissionregistration.ServiceReference, out *apiadmissionregistrationv1.ServiceReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_ServiceReference_To_v1_ServiceReference(in, out, s)
 }
 
-func autoConvert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(in *v1.ValidatingWebhook, out *admissionregistration.ValidatingWebhook, s conversion.Scope) error {
+func autoConvert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(in *apiadmissionregistrationv1.ValidatingWebhook, out *pkgapisadmissionregistration.ValidatingWebhook, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(&in.ClientConfig, &out.ClientConfig, s); err != nil {
 		return err
 	}
-	out.Rules = *(*[]admissionregistration.RuleWithOperations)(unsafe.Pointer(&in.Rules))
-	out.FailurePolicy = (*admissionregistration.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
-	out.MatchPolicy = (*admissionregistration.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
-	out.NamespaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
-	out.ObjectSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.SideEffects = (*admissionregistration.SideEffectClass)(unsafe.Pointer(in.SideEffects))
+	out.Rules = *(*[]pkgapisadmissionregistration.RuleWithOperations)(unsafe.Pointer(&in.Rules))
+	out.FailurePolicy = (*pkgapisadmissionregistration.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
+	out.MatchPolicy = (*pkgapisadmissionregistration.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
+	out.NamespaceSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
+	out.ObjectSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
+	out.SideEffects = (*pkgapisadmissionregistration.SideEffectClass)(unsafe.Pointer(in.SideEffects))
 	out.TimeoutSeconds = (*int32)(unsafe.Pointer(in.TimeoutSeconds))
 	out.AdmissionReviewVersions = *(*[]string)(unsafe.Pointer(&in.AdmissionReviewVersions))
 	return nil
 }
 
 // Convert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook is an autogenerated conversion function.
-func Convert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(in *v1.ValidatingWebhook, out *admissionregistration.ValidatingWebhook, s conversion.Scope) error {
+func Convert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(in *apiadmissionregistrationv1.ValidatingWebhook, out *pkgapisadmissionregistration.ValidatingWebhook, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(in, out, s)
 }
 
-func autoConvert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(in *admissionregistration.ValidatingWebhook, out *v1.ValidatingWebhook, s conversion.Scope) error {
+func autoConvert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(in *pkgapisadmissionregistration.ValidatingWebhook, out *apiadmissionregistrationv1.ValidatingWebhook, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(&in.ClientConfig, &out.ClientConfig, s); err != nil {
 		return err
 	}
-	out.Rules = *(*[]v1.RuleWithOperations)(unsafe.Pointer(&in.Rules))
-	out.FailurePolicy = (*v1.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
-	out.MatchPolicy = (*v1.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
-	out.NamespaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
-	out.ObjectSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.SideEffects = (*v1.SideEffectClass)(unsafe.Pointer(in.SideEffects))
+	out.Rules = *(*[]apiadmissionregistrationv1.RuleWithOperations)(unsafe.Pointer(&in.Rules))
+	out.FailurePolicy = (*apiadmissionregistrationv1.FailurePolicyType)(unsafe.Pointer(in.FailurePolicy))
+	out.MatchPolicy = (*apiadmissionregistrationv1.MatchPolicyType)(unsafe.Pointer(in.MatchPolicy))
+	out.NamespaceSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
+	out.ObjectSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.ObjectSelector))
+	out.SideEffects = (*apiadmissionregistrationv1.SideEffectClass)(unsafe.Pointer(in.SideEffects))
 	out.TimeoutSeconds = (*int32)(unsafe.Pointer(in.TimeoutSeconds))
 	out.AdmissionReviewVersions = *(*[]string)(unsafe.Pointer(&in.AdmissionReviewVersions))
 	return nil
 }
 
 // Convert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook is an autogenerated conversion function.
-func Convert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(in *admissionregistration.ValidatingWebhook, out *v1.ValidatingWebhook, s conversion.Scope) error {
+func Convert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(in *pkgapisadmissionregistration.ValidatingWebhook, out *apiadmissionregistrationv1.ValidatingWebhook, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(in, out, s)
 }
 
-func autoConvert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(in *v1.ValidatingWebhookConfiguration, out *admissionregistration.ValidatingWebhookConfiguration, s conversion.Scope) error {
+func autoConvert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(in *apiadmissionregistrationv1.ValidatingWebhookConfiguration, out *pkgapisadmissionregistration.ValidatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Webhooks != nil {
 		in, out := &in.Webhooks, &out.Webhooks
-		*out = make([]admissionregistration.ValidatingWebhook, len(*in))
+		*out = make([]pkgapisadmissionregistration.ValidatingWebhook, len(*in))
 		for i := range *in {
 			if err := Convert_v1_ValidatingWebhook_To_admissionregistration_ValidatingWebhook(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -410,15 +410,15 @@ func autoConvert_v1_ValidatingWebhookConfiguration_To_admissionregistration_Vali
 }
 
 // Convert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration is an autogenerated conversion function.
-func Convert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(in *v1.ValidatingWebhookConfiguration, out *admissionregistration.ValidatingWebhookConfiguration, s conversion.Scope) error {
+func Convert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(in *apiadmissionregistrationv1.ValidatingWebhookConfiguration, out *pkgapisadmissionregistration.ValidatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(in, out, s)
 }
 
-func autoConvert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(in *admissionregistration.ValidatingWebhookConfiguration, out *v1.ValidatingWebhookConfiguration, s conversion.Scope) error {
+func autoConvert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(in *pkgapisadmissionregistration.ValidatingWebhookConfiguration, out *apiadmissionregistrationv1.ValidatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if in.Webhooks != nil {
 		in, out := &in.Webhooks, &out.Webhooks
-		*out = make([]v1.ValidatingWebhook, len(*in))
+		*out = make([]apiadmissionregistrationv1.ValidatingWebhook, len(*in))
 		for i := range *in {
 			if err := Convert_admissionregistration_ValidatingWebhook_To_v1_ValidatingWebhook(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -431,15 +431,15 @@ func autoConvert_admissionregistration_ValidatingWebhookConfiguration_To_v1_Vali
 }
 
 // Convert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration is an autogenerated conversion function.
-func Convert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(in *admissionregistration.ValidatingWebhookConfiguration, out *v1.ValidatingWebhookConfiguration, s conversion.Scope) error {
+func Convert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(in *pkgapisadmissionregistration.ValidatingWebhookConfiguration, out *apiadmissionregistrationv1.ValidatingWebhookConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(in, out, s)
 }
 
-func autoConvert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(in *v1.ValidatingWebhookConfigurationList, out *admissionregistration.ValidatingWebhookConfigurationList, s conversion.Scope) error {
+func autoConvert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(in *apiadmissionregistrationv1.ValidatingWebhookConfigurationList, out *pkgapisadmissionregistration.ValidatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]admissionregistration.ValidatingWebhookConfiguration, len(*in))
+		*out = make([]pkgapisadmissionregistration.ValidatingWebhookConfiguration, len(*in))
 		for i := range *in {
 			if err := Convert_v1_ValidatingWebhookConfiguration_To_admissionregistration_ValidatingWebhookConfiguration(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -452,15 +452,15 @@ func autoConvert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_
 }
 
 // Convert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList is an autogenerated conversion function.
-func Convert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(in *v1.ValidatingWebhookConfigurationList, out *admissionregistration.ValidatingWebhookConfigurationList, s conversion.Scope) error {
+func Convert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(in *apiadmissionregistrationv1.ValidatingWebhookConfigurationList, out *pkgapisadmissionregistration.ValidatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ValidatingWebhookConfigurationList_To_admissionregistration_ValidatingWebhookConfigurationList(in, out, s)
 }
 
-func autoConvert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(in *admissionregistration.ValidatingWebhookConfigurationList, out *v1.ValidatingWebhookConfigurationList, s conversion.Scope) error {
+func autoConvert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(in *pkgapisadmissionregistration.ValidatingWebhookConfigurationList, out *apiadmissionregistrationv1.ValidatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.ValidatingWebhookConfiguration, len(*in))
+		*out = make([]apiadmissionregistrationv1.ValidatingWebhookConfiguration, len(*in))
 		for i := range *in {
 			if err := Convert_admissionregistration_ValidatingWebhookConfiguration_To_v1_ValidatingWebhookConfiguration(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -473,15 +473,15 @@ func autoConvert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_
 }
 
 // Convert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList is an autogenerated conversion function.
-func Convert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(in *admissionregistration.ValidatingWebhookConfigurationList, out *v1.ValidatingWebhookConfigurationList, s conversion.Scope) error {
+func Convert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(in *pkgapisadmissionregistration.ValidatingWebhookConfigurationList, out *apiadmissionregistrationv1.ValidatingWebhookConfigurationList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_ValidatingWebhookConfigurationList_To_v1_ValidatingWebhookConfigurationList(in, out, s)
 }
 
-func autoConvert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(in *v1.WebhookClientConfig, out *admissionregistration.WebhookClientConfig, s conversion.Scope) error {
+func autoConvert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(in *apiadmissionregistrationv1.WebhookClientConfig, out *pkgapisadmissionregistration.WebhookClientConfig, s apimachinerypkgconversion.Scope) error {
 	out.URL = (*string)(unsafe.Pointer(in.URL))
 	if in.Service != nil {
 		in, out := &in.Service, &out.Service
-		*out = new(admissionregistration.ServiceReference)
+		*out = new(pkgapisadmissionregistration.ServiceReference)
 		if err := Convert_v1_ServiceReference_To_admissionregistration_ServiceReference(*in, *out, s); err != nil {
 			return err
 		}
@@ -493,15 +493,15 @@ func autoConvert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientCo
 }
 
 // Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig is an autogenerated conversion function.
-func Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(in *v1.WebhookClientConfig, out *admissionregistration.WebhookClientConfig, s conversion.Scope) error {
+func Convert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(in *apiadmissionregistrationv1.WebhookClientConfig, out *pkgapisadmissionregistration.WebhookClientConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_WebhookClientConfig_To_admissionregistration_WebhookClientConfig(in, out, s)
 }
 
-func autoConvert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(in *admissionregistration.WebhookClientConfig, out *v1.WebhookClientConfig, s conversion.Scope) error {
+func autoConvert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(in *pkgapisadmissionregistration.WebhookClientConfig, out *apiadmissionregistrationv1.WebhookClientConfig, s apimachinerypkgconversion.Scope) error {
 	out.URL = (*string)(unsafe.Pointer(in.URL))
 	if in.Service != nil {
 		in, out := &in.Service, &out.Service
-		*out = new(v1.ServiceReference)
+		*out = new(apiadmissionregistrationv1.ServiceReference)
 		if err := Convert_admissionregistration_ServiceReference_To_v1_ServiceReference(*in, *out, s); err != nil {
 			return err
 		}
@@ -513,6 +513,6 @@ func autoConvert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientCo
 }
 
 // Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig is an autogenerated conversion function.
-func Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(in *admissionregistration.WebhookClientConfig, out *v1.WebhookClientConfig, s conversion.Scope) error {
+func Convert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(in *pkgapisadmissionregistration.WebhookClientConfig, out *apiadmissionregistrationv1.WebhookClientConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_admissionregistration_WebhookClientConfig_To_v1_WebhookClientConfig(in, out, s)
 }

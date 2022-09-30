@@ -25,14 +25,14 @@ import (
 	"net/url"
 	"unsafe"
 
-	"k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/kubernetes/pkg/apis/apps"
-	"k8s.io/kubernetes/pkg/apis/core"
+	apicorev1 "k8s.io/api/core/v1"
+	pkgapiresource "k8s.io/apimachinery/pkg/api/resource"
+	apismetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apimachinerypkgconversion "k8s.io/apimachinery/pkg/conversion"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	apimachinerypkgtypes "k8s.io/apimachinery/pkg/types"
+	pkgapisapps "k8s.io/kubernetes/pkg/apis/apps"
+	pkgapiscore "k8s.io/kubernetes/pkg/apis/core"
 )
 
 func init() {
@@ -41,2181 +41,2181 @@ func init() {
 
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*v1.AWSElasticBlockStoreVolumeSource)(nil), (*core.AWSElasticBlockStoreVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(a.(*v1.AWSElasticBlockStoreVolumeSource), b.(*core.AWSElasticBlockStoreVolumeSource), scope)
+func RegisterConversions(s *apimachinerypkgruntime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*apicorev1.AWSElasticBlockStoreVolumeSource)(nil), (*pkgapiscore.AWSElasticBlockStoreVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(a.(*apicorev1.AWSElasticBlockStoreVolumeSource), b.(*pkgapiscore.AWSElasticBlockStoreVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.AWSElasticBlockStoreVolumeSource)(nil), (*v1.AWSElasticBlockStoreVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(a.(*core.AWSElasticBlockStoreVolumeSource), b.(*v1.AWSElasticBlockStoreVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.AWSElasticBlockStoreVolumeSource)(nil), (*apicorev1.AWSElasticBlockStoreVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(a.(*pkgapiscore.AWSElasticBlockStoreVolumeSource), b.(*apicorev1.AWSElasticBlockStoreVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Affinity)(nil), (*core.Affinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Affinity_To_core_Affinity(a.(*v1.Affinity), b.(*core.Affinity), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Affinity)(nil), (*pkgapiscore.Affinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Affinity_To_core_Affinity(a.(*apicorev1.Affinity), b.(*pkgapiscore.Affinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Affinity)(nil), (*v1.Affinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Affinity_To_v1_Affinity(a.(*core.Affinity), b.(*v1.Affinity), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Affinity)(nil), (*apicorev1.Affinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Affinity_To_v1_Affinity(a.(*pkgapiscore.Affinity), b.(*apicorev1.Affinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.AttachedVolume)(nil), (*core.AttachedVolume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_AttachedVolume_To_core_AttachedVolume(a.(*v1.AttachedVolume), b.(*core.AttachedVolume), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.AttachedVolume)(nil), (*pkgapiscore.AttachedVolume)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_AttachedVolume_To_core_AttachedVolume(a.(*apicorev1.AttachedVolume), b.(*pkgapiscore.AttachedVolume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.AttachedVolume)(nil), (*v1.AttachedVolume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_AttachedVolume_To_v1_AttachedVolume(a.(*core.AttachedVolume), b.(*v1.AttachedVolume), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.AttachedVolume)(nil), (*apicorev1.AttachedVolume)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_AttachedVolume_To_v1_AttachedVolume(a.(*pkgapiscore.AttachedVolume), b.(*apicorev1.AttachedVolume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.AvoidPods)(nil), (*core.AvoidPods)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_AvoidPods_To_core_AvoidPods(a.(*v1.AvoidPods), b.(*core.AvoidPods), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.AvoidPods)(nil), (*pkgapiscore.AvoidPods)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_AvoidPods_To_core_AvoidPods(a.(*apicorev1.AvoidPods), b.(*pkgapiscore.AvoidPods), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.AvoidPods)(nil), (*v1.AvoidPods)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_AvoidPods_To_v1_AvoidPods(a.(*core.AvoidPods), b.(*v1.AvoidPods), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.AvoidPods)(nil), (*apicorev1.AvoidPods)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_AvoidPods_To_v1_AvoidPods(a.(*pkgapiscore.AvoidPods), b.(*apicorev1.AvoidPods), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.AzureDiskVolumeSource)(nil), (*core.AzureDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(a.(*v1.AzureDiskVolumeSource), b.(*core.AzureDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.AzureDiskVolumeSource)(nil), (*pkgapiscore.AzureDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(a.(*apicorev1.AzureDiskVolumeSource), b.(*pkgapiscore.AzureDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.AzureDiskVolumeSource)(nil), (*v1.AzureDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(a.(*core.AzureDiskVolumeSource), b.(*v1.AzureDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.AzureDiskVolumeSource)(nil), (*apicorev1.AzureDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(a.(*pkgapiscore.AzureDiskVolumeSource), b.(*apicorev1.AzureDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.AzureFilePersistentVolumeSource)(nil), (*core.AzureFilePersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(a.(*v1.AzureFilePersistentVolumeSource), b.(*core.AzureFilePersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.AzureFilePersistentVolumeSource)(nil), (*pkgapiscore.AzureFilePersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(a.(*apicorev1.AzureFilePersistentVolumeSource), b.(*pkgapiscore.AzureFilePersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.AzureFilePersistentVolumeSource)(nil), (*v1.AzureFilePersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(a.(*core.AzureFilePersistentVolumeSource), b.(*v1.AzureFilePersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.AzureFilePersistentVolumeSource)(nil), (*apicorev1.AzureFilePersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(a.(*pkgapiscore.AzureFilePersistentVolumeSource), b.(*apicorev1.AzureFilePersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.AzureFileVolumeSource)(nil), (*core.AzureFileVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(a.(*v1.AzureFileVolumeSource), b.(*core.AzureFileVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.AzureFileVolumeSource)(nil), (*pkgapiscore.AzureFileVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(a.(*apicorev1.AzureFileVolumeSource), b.(*pkgapiscore.AzureFileVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.AzureFileVolumeSource)(nil), (*v1.AzureFileVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(a.(*core.AzureFileVolumeSource), b.(*v1.AzureFileVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.AzureFileVolumeSource)(nil), (*apicorev1.AzureFileVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(a.(*pkgapiscore.AzureFileVolumeSource), b.(*apicorev1.AzureFileVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Binding)(nil), (*core.Binding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Binding_To_core_Binding(a.(*v1.Binding), b.(*core.Binding), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Binding)(nil), (*pkgapiscore.Binding)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Binding_To_core_Binding(a.(*apicorev1.Binding), b.(*pkgapiscore.Binding), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Binding)(nil), (*v1.Binding)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Binding_To_v1_Binding(a.(*core.Binding), b.(*v1.Binding), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Binding)(nil), (*apicorev1.Binding)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Binding_To_v1_Binding(a.(*pkgapiscore.Binding), b.(*apicorev1.Binding), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CSIPersistentVolumeSource)(nil), (*core.CSIPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(a.(*v1.CSIPersistentVolumeSource), b.(*core.CSIPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.CSIPersistentVolumeSource)(nil), (*pkgapiscore.CSIPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(a.(*apicorev1.CSIPersistentVolumeSource), b.(*pkgapiscore.CSIPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.CSIPersistentVolumeSource)(nil), (*v1.CSIPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(a.(*core.CSIPersistentVolumeSource), b.(*v1.CSIPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.CSIPersistentVolumeSource)(nil), (*apicorev1.CSIPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(a.(*pkgapiscore.CSIPersistentVolumeSource), b.(*apicorev1.CSIPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CSIVolumeSource)(nil), (*core.CSIVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CSIVolumeSource_To_core_CSIVolumeSource(a.(*v1.CSIVolumeSource), b.(*core.CSIVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.CSIVolumeSource)(nil), (*pkgapiscore.CSIVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_CSIVolumeSource_To_core_CSIVolumeSource(a.(*apicorev1.CSIVolumeSource), b.(*pkgapiscore.CSIVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.CSIVolumeSource)(nil), (*v1.CSIVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_CSIVolumeSource_To_v1_CSIVolumeSource(a.(*core.CSIVolumeSource), b.(*v1.CSIVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.CSIVolumeSource)(nil), (*apicorev1.CSIVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_CSIVolumeSource_To_v1_CSIVolumeSource(a.(*pkgapiscore.CSIVolumeSource), b.(*apicorev1.CSIVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Capabilities)(nil), (*core.Capabilities)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Capabilities_To_core_Capabilities(a.(*v1.Capabilities), b.(*core.Capabilities), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Capabilities)(nil), (*pkgapiscore.Capabilities)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Capabilities_To_core_Capabilities(a.(*apicorev1.Capabilities), b.(*pkgapiscore.Capabilities), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Capabilities)(nil), (*v1.Capabilities)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Capabilities_To_v1_Capabilities(a.(*core.Capabilities), b.(*v1.Capabilities), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Capabilities)(nil), (*apicorev1.Capabilities)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Capabilities_To_v1_Capabilities(a.(*pkgapiscore.Capabilities), b.(*apicorev1.Capabilities), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CephFSPersistentVolumeSource)(nil), (*core.CephFSPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(a.(*v1.CephFSPersistentVolumeSource), b.(*core.CephFSPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.CephFSPersistentVolumeSource)(nil), (*pkgapiscore.CephFSPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(a.(*apicorev1.CephFSPersistentVolumeSource), b.(*pkgapiscore.CephFSPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.CephFSPersistentVolumeSource)(nil), (*v1.CephFSPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(a.(*core.CephFSPersistentVolumeSource), b.(*v1.CephFSPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.CephFSPersistentVolumeSource)(nil), (*apicorev1.CephFSPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(a.(*pkgapiscore.CephFSPersistentVolumeSource), b.(*apicorev1.CephFSPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CephFSVolumeSource)(nil), (*core.CephFSVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(a.(*v1.CephFSVolumeSource), b.(*core.CephFSVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.CephFSVolumeSource)(nil), (*pkgapiscore.CephFSVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(a.(*apicorev1.CephFSVolumeSource), b.(*pkgapiscore.CephFSVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.CephFSVolumeSource)(nil), (*v1.CephFSVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(a.(*core.CephFSVolumeSource), b.(*v1.CephFSVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.CephFSVolumeSource)(nil), (*apicorev1.CephFSVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(a.(*pkgapiscore.CephFSVolumeSource), b.(*apicorev1.CephFSVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CinderPersistentVolumeSource)(nil), (*core.CinderPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(a.(*v1.CinderPersistentVolumeSource), b.(*core.CinderPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.CinderPersistentVolumeSource)(nil), (*pkgapiscore.CinderPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(a.(*apicorev1.CinderPersistentVolumeSource), b.(*pkgapiscore.CinderPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.CinderPersistentVolumeSource)(nil), (*v1.CinderPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(a.(*core.CinderPersistentVolumeSource), b.(*v1.CinderPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.CinderPersistentVolumeSource)(nil), (*apicorev1.CinderPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(a.(*pkgapiscore.CinderPersistentVolumeSource), b.(*apicorev1.CinderPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.CinderVolumeSource)(nil), (*core.CinderVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_CinderVolumeSource_To_core_CinderVolumeSource(a.(*v1.CinderVolumeSource), b.(*core.CinderVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.CinderVolumeSource)(nil), (*pkgapiscore.CinderVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_CinderVolumeSource_To_core_CinderVolumeSource(a.(*apicorev1.CinderVolumeSource), b.(*pkgapiscore.CinderVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.CinderVolumeSource)(nil), (*v1.CinderVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_CinderVolumeSource_To_v1_CinderVolumeSource(a.(*core.CinderVolumeSource), b.(*v1.CinderVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.CinderVolumeSource)(nil), (*apicorev1.CinderVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_CinderVolumeSource_To_v1_CinderVolumeSource(a.(*pkgapiscore.CinderVolumeSource), b.(*apicorev1.CinderVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ClientIPConfig)(nil), (*core.ClientIPConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ClientIPConfig_To_core_ClientIPConfig(a.(*v1.ClientIPConfig), b.(*core.ClientIPConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ClientIPConfig)(nil), (*pkgapiscore.ClientIPConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ClientIPConfig_To_core_ClientIPConfig(a.(*apicorev1.ClientIPConfig), b.(*pkgapiscore.ClientIPConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ClientIPConfig)(nil), (*v1.ClientIPConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ClientIPConfig_To_v1_ClientIPConfig(a.(*core.ClientIPConfig), b.(*v1.ClientIPConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ClientIPConfig)(nil), (*apicorev1.ClientIPConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ClientIPConfig_To_v1_ClientIPConfig(a.(*pkgapiscore.ClientIPConfig), b.(*apicorev1.ClientIPConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ComponentCondition)(nil), (*core.ComponentCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ComponentCondition_To_core_ComponentCondition(a.(*v1.ComponentCondition), b.(*core.ComponentCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ComponentCondition)(nil), (*pkgapiscore.ComponentCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ComponentCondition_To_core_ComponentCondition(a.(*apicorev1.ComponentCondition), b.(*pkgapiscore.ComponentCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ComponentCondition)(nil), (*v1.ComponentCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ComponentCondition_To_v1_ComponentCondition(a.(*core.ComponentCondition), b.(*v1.ComponentCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ComponentCondition)(nil), (*apicorev1.ComponentCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ComponentCondition_To_v1_ComponentCondition(a.(*pkgapiscore.ComponentCondition), b.(*apicorev1.ComponentCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ComponentStatus)(nil), (*core.ComponentStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ComponentStatus_To_core_ComponentStatus(a.(*v1.ComponentStatus), b.(*core.ComponentStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ComponentStatus)(nil), (*pkgapiscore.ComponentStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ComponentStatus_To_core_ComponentStatus(a.(*apicorev1.ComponentStatus), b.(*pkgapiscore.ComponentStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ComponentStatus)(nil), (*v1.ComponentStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ComponentStatus_To_v1_ComponentStatus(a.(*core.ComponentStatus), b.(*v1.ComponentStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ComponentStatus)(nil), (*apicorev1.ComponentStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ComponentStatus_To_v1_ComponentStatus(a.(*pkgapiscore.ComponentStatus), b.(*apicorev1.ComponentStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ComponentStatusList)(nil), (*core.ComponentStatusList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ComponentStatusList_To_core_ComponentStatusList(a.(*v1.ComponentStatusList), b.(*core.ComponentStatusList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ComponentStatusList)(nil), (*pkgapiscore.ComponentStatusList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ComponentStatusList_To_core_ComponentStatusList(a.(*apicorev1.ComponentStatusList), b.(*pkgapiscore.ComponentStatusList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ComponentStatusList)(nil), (*v1.ComponentStatusList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ComponentStatusList_To_v1_ComponentStatusList(a.(*core.ComponentStatusList), b.(*v1.ComponentStatusList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ComponentStatusList)(nil), (*apicorev1.ComponentStatusList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ComponentStatusList_To_v1_ComponentStatusList(a.(*pkgapiscore.ComponentStatusList), b.(*apicorev1.ComponentStatusList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMap)(nil), (*core.ConfigMap)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMap_To_core_ConfigMap(a.(*v1.ConfigMap), b.(*core.ConfigMap), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMap)(nil), (*pkgapiscore.ConfigMap)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMap_To_core_ConfigMap(a.(*apicorev1.ConfigMap), b.(*pkgapiscore.ConfigMap), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMap)(nil), (*v1.ConfigMap)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMap_To_v1_ConfigMap(a.(*core.ConfigMap), b.(*v1.ConfigMap), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMap)(nil), (*apicorev1.ConfigMap)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMap_To_v1_ConfigMap(a.(*pkgapiscore.ConfigMap), b.(*apicorev1.ConfigMap), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMapEnvSource)(nil), (*core.ConfigMapEnvSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(a.(*v1.ConfigMapEnvSource), b.(*core.ConfigMapEnvSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMapEnvSource)(nil), (*pkgapiscore.ConfigMapEnvSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(a.(*apicorev1.ConfigMapEnvSource), b.(*pkgapiscore.ConfigMapEnvSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMapEnvSource)(nil), (*v1.ConfigMapEnvSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(a.(*core.ConfigMapEnvSource), b.(*v1.ConfigMapEnvSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMapEnvSource)(nil), (*apicorev1.ConfigMapEnvSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(a.(*pkgapiscore.ConfigMapEnvSource), b.(*apicorev1.ConfigMapEnvSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMapKeySelector)(nil), (*core.ConfigMapKeySelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(a.(*v1.ConfigMapKeySelector), b.(*core.ConfigMapKeySelector), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMapKeySelector)(nil), (*pkgapiscore.ConfigMapKeySelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(a.(*apicorev1.ConfigMapKeySelector), b.(*pkgapiscore.ConfigMapKeySelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMapKeySelector)(nil), (*v1.ConfigMapKeySelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(a.(*core.ConfigMapKeySelector), b.(*v1.ConfigMapKeySelector), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMapKeySelector)(nil), (*apicorev1.ConfigMapKeySelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(a.(*pkgapiscore.ConfigMapKeySelector), b.(*apicorev1.ConfigMapKeySelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMapList)(nil), (*core.ConfigMapList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMapList_To_core_ConfigMapList(a.(*v1.ConfigMapList), b.(*core.ConfigMapList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMapList)(nil), (*pkgapiscore.ConfigMapList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMapList_To_core_ConfigMapList(a.(*apicorev1.ConfigMapList), b.(*pkgapiscore.ConfigMapList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMapList)(nil), (*v1.ConfigMapList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMapList_To_v1_ConfigMapList(a.(*core.ConfigMapList), b.(*v1.ConfigMapList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMapList)(nil), (*apicorev1.ConfigMapList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMapList_To_v1_ConfigMapList(a.(*pkgapiscore.ConfigMapList), b.(*apicorev1.ConfigMapList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMapNodeConfigSource)(nil), (*core.ConfigMapNodeConfigSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(a.(*v1.ConfigMapNodeConfigSource), b.(*core.ConfigMapNodeConfigSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMapNodeConfigSource)(nil), (*pkgapiscore.ConfigMapNodeConfigSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(a.(*apicorev1.ConfigMapNodeConfigSource), b.(*pkgapiscore.ConfigMapNodeConfigSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMapNodeConfigSource)(nil), (*v1.ConfigMapNodeConfigSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(a.(*core.ConfigMapNodeConfigSource), b.(*v1.ConfigMapNodeConfigSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMapNodeConfigSource)(nil), (*apicorev1.ConfigMapNodeConfigSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(a.(*pkgapiscore.ConfigMapNodeConfigSource), b.(*apicorev1.ConfigMapNodeConfigSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMapProjection)(nil), (*core.ConfigMapProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMapProjection_To_core_ConfigMapProjection(a.(*v1.ConfigMapProjection), b.(*core.ConfigMapProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMapProjection)(nil), (*pkgapiscore.ConfigMapProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMapProjection_To_core_ConfigMapProjection(a.(*apicorev1.ConfigMapProjection), b.(*pkgapiscore.ConfigMapProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMapProjection)(nil), (*v1.ConfigMapProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMapProjection_To_v1_ConfigMapProjection(a.(*core.ConfigMapProjection), b.(*v1.ConfigMapProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMapProjection)(nil), (*apicorev1.ConfigMapProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMapProjection_To_v1_ConfigMapProjection(a.(*pkgapiscore.ConfigMapProjection), b.(*apicorev1.ConfigMapProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ConfigMapVolumeSource)(nil), (*core.ConfigMapVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(a.(*v1.ConfigMapVolumeSource), b.(*core.ConfigMapVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ConfigMapVolumeSource)(nil), (*pkgapiscore.ConfigMapVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(a.(*apicorev1.ConfigMapVolumeSource), b.(*pkgapiscore.ConfigMapVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ConfigMapVolumeSource)(nil), (*v1.ConfigMapVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(a.(*core.ConfigMapVolumeSource), b.(*v1.ConfigMapVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ConfigMapVolumeSource)(nil), (*apicorev1.ConfigMapVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(a.(*pkgapiscore.ConfigMapVolumeSource), b.(*apicorev1.ConfigMapVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Container)(nil), (*core.Container)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Container_To_core_Container(a.(*v1.Container), b.(*core.Container), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Container)(nil), (*pkgapiscore.Container)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Container_To_core_Container(a.(*apicorev1.Container), b.(*pkgapiscore.Container), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Container)(nil), (*v1.Container)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Container_To_v1_Container(a.(*core.Container), b.(*v1.Container), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Container)(nil), (*apicorev1.Container)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Container_To_v1_Container(a.(*pkgapiscore.Container), b.(*apicorev1.Container), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerImage)(nil), (*core.ContainerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerImage_To_core_ContainerImage(a.(*v1.ContainerImage), b.(*core.ContainerImage), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerImage)(nil), (*pkgapiscore.ContainerImage)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerImage_To_core_ContainerImage(a.(*apicorev1.ContainerImage), b.(*pkgapiscore.ContainerImage), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerImage)(nil), (*v1.ContainerImage)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerImage_To_v1_ContainerImage(a.(*core.ContainerImage), b.(*v1.ContainerImage), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerImage)(nil), (*apicorev1.ContainerImage)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerImage_To_v1_ContainerImage(a.(*pkgapiscore.ContainerImage), b.(*apicorev1.ContainerImage), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerPort)(nil), (*core.ContainerPort)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerPort_To_core_ContainerPort(a.(*v1.ContainerPort), b.(*core.ContainerPort), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerPort)(nil), (*pkgapiscore.ContainerPort)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerPort_To_core_ContainerPort(a.(*apicorev1.ContainerPort), b.(*pkgapiscore.ContainerPort), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerPort)(nil), (*v1.ContainerPort)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerPort_To_v1_ContainerPort(a.(*core.ContainerPort), b.(*v1.ContainerPort), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerPort)(nil), (*apicorev1.ContainerPort)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerPort_To_v1_ContainerPort(a.(*pkgapiscore.ContainerPort), b.(*apicorev1.ContainerPort), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerState)(nil), (*core.ContainerState)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerState_To_core_ContainerState(a.(*v1.ContainerState), b.(*core.ContainerState), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerState)(nil), (*pkgapiscore.ContainerState)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerState_To_core_ContainerState(a.(*apicorev1.ContainerState), b.(*pkgapiscore.ContainerState), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerState)(nil), (*v1.ContainerState)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerState_To_v1_ContainerState(a.(*core.ContainerState), b.(*v1.ContainerState), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerState)(nil), (*apicorev1.ContainerState)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerState_To_v1_ContainerState(a.(*pkgapiscore.ContainerState), b.(*apicorev1.ContainerState), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerStateRunning)(nil), (*core.ContainerStateRunning)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerStateRunning_To_core_ContainerStateRunning(a.(*v1.ContainerStateRunning), b.(*core.ContainerStateRunning), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerStateRunning)(nil), (*pkgapiscore.ContainerStateRunning)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerStateRunning_To_core_ContainerStateRunning(a.(*apicorev1.ContainerStateRunning), b.(*pkgapiscore.ContainerStateRunning), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerStateRunning)(nil), (*v1.ContainerStateRunning)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerStateRunning_To_v1_ContainerStateRunning(a.(*core.ContainerStateRunning), b.(*v1.ContainerStateRunning), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerStateRunning)(nil), (*apicorev1.ContainerStateRunning)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerStateRunning_To_v1_ContainerStateRunning(a.(*pkgapiscore.ContainerStateRunning), b.(*apicorev1.ContainerStateRunning), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerStateTerminated)(nil), (*core.ContainerStateTerminated)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(a.(*v1.ContainerStateTerminated), b.(*core.ContainerStateTerminated), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerStateTerminated)(nil), (*pkgapiscore.ContainerStateTerminated)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(a.(*apicorev1.ContainerStateTerminated), b.(*pkgapiscore.ContainerStateTerminated), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerStateTerminated)(nil), (*v1.ContainerStateTerminated)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(a.(*core.ContainerStateTerminated), b.(*v1.ContainerStateTerminated), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerStateTerminated)(nil), (*apicorev1.ContainerStateTerminated)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(a.(*pkgapiscore.ContainerStateTerminated), b.(*apicorev1.ContainerStateTerminated), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerStateWaiting)(nil), (*core.ContainerStateWaiting)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(a.(*v1.ContainerStateWaiting), b.(*core.ContainerStateWaiting), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerStateWaiting)(nil), (*pkgapiscore.ContainerStateWaiting)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(a.(*apicorev1.ContainerStateWaiting), b.(*pkgapiscore.ContainerStateWaiting), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerStateWaiting)(nil), (*v1.ContainerStateWaiting)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(a.(*core.ContainerStateWaiting), b.(*v1.ContainerStateWaiting), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerStateWaiting)(nil), (*apicorev1.ContainerStateWaiting)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(a.(*pkgapiscore.ContainerStateWaiting), b.(*apicorev1.ContainerStateWaiting), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ContainerStatus)(nil), (*core.ContainerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ContainerStatus_To_core_ContainerStatus(a.(*v1.ContainerStatus), b.(*core.ContainerStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ContainerStatus)(nil), (*pkgapiscore.ContainerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ContainerStatus_To_core_ContainerStatus(a.(*apicorev1.ContainerStatus), b.(*pkgapiscore.ContainerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ContainerStatus)(nil), (*v1.ContainerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ContainerStatus_To_v1_ContainerStatus(a.(*core.ContainerStatus), b.(*v1.ContainerStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ContainerStatus)(nil), (*apicorev1.ContainerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ContainerStatus_To_v1_ContainerStatus(a.(*pkgapiscore.ContainerStatus), b.(*apicorev1.ContainerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.DaemonEndpoint)(nil), (*core.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_DaemonEndpoint_To_core_DaemonEndpoint(a.(*v1.DaemonEndpoint), b.(*core.DaemonEndpoint), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.DaemonEndpoint)(nil), (*pkgapiscore.DaemonEndpoint)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_DaemonEndpoint_To_core_DaemonEndpoint(a.(*apicorev1.DaemonEndpoint), b.(*pkgapiscore.DaemonEndpoint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.DaemonEndpoint)(nil), (*v1.DaemonEndpoint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_DaemonEndpoint_To_v1_DaemonEndpoint(a.(*core.DaemonEndpoint), b.(*v1.DaemonEndpoint), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.DaemonEndpoint)(nil), (*apicorev1.DaemonEndpoint)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_DaemonEndpoint_To_v1_DaemonEndpoint(a.(*pkgapiscore.DaemonEndpoint), b.(*apicorev1.DaemonEndpoint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.DownwardAPIProjection)(nil), (*core.DownwardAPIProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(a.(*v1.DownwardAPIProjection), b.(*core.DownwardAPIProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.DownwardAPIProjection)(nil), (*pkgapiscore.DownwardAPIProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(a.(*apicorev1.DownwardAPIProjection), b.(*pkgapiscore.DownwardAPIProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.DownwardAPIProjection)(nil), (*v1.DownwardAPIProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(a.(*core.DownwardAPIProjection), b.(*v1.DownwardAPIProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.DownwardAPIProjection)(nil), (*apicorev1.DownwardAPIProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(a.(*pkgapiscore.DownwardAPIProjection), b.(*apicorev1.DownwardAPIProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.DownwardAPIVolumeFile)(nil), (*core.DownwardAPIVolumeFile)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(a.(*v1.DownwardAPIVolumeFile), b.(*core.DownwardAPIVolumeFile), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.DownwardAPIVolumeFile)(nil), (*pkgapiscore.DownwardAPIVolumeFile)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(a.(*apicorev1.DownwardAPIVolumeFile), b.(*pkgapiscore.DownwardAPIVolumeFile), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.DownwardAPIVolumeFile)(nil), (*v1.DownwardAPIVolumeFile)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(a.(*core.DownwardAPIVolumeFile), b.(*v1.DownwardAPIVolumeFile), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.DownwardAPIVolumeFile)(nil), (*apicorev1.DownwardAPIVolumeFile)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(a.(*pkgapiscore.DownwardAPIVolumeFile), b.(*apicorev1.DownwardAPIVolumeFile), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.DownwardAPIVolumeSource)(nil), (*core.DownwardAPIVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(a.(*v1.DownwardAPIVolumeSource), b.(*core.DownwardAPIVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.DownwardAPIVolumeSource)(nil), (*pkgapiscore.DownwardAPIVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(a.(*apicorev1.DownwardAPIVolumeSource), b.(*pkgapiscore.DownwardAPIVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.DownwardAPIVolumeSource)(nil), (*v1.DownwardAPIVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(a.(*core.DownwardAPIVolumeSource), b.(*v1.DownwardAPIVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.DownwardAPIVolumeSource)(nil), (*apicorev1.DownwardAPIVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(a.(*pkgapiscore.DownwardAPIVolumeSource), b.(*apicorev1.DownwardAPIVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EmptyDirVolumeSource)(nil), (*core.EmptyDirVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(a.(*v1.EmptyDirVolumeSource), b.(*core.EmptyDirVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EmptyDirVolumeSource)(nil), (*pkgapiscore.EmptyDirVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(a.(*apicorev1.EmptyDirVolumeSource), b.(*pkgapiscore.EmptyDirVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EmptyDirVolumeSource)(nil), (*v1.EmptyDirVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(a.(*core.EmptyDirVolumeSource), b.(*v1.EmptyDirVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EmptyDirVolumeSource)(nil), (*apicorev1.EmptyDirVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(a.(*pkgapiscore.EmptyDirVolumeSource), b.(*apicorev1.EmptyDirVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EndpointAddress)(nil), (*core.EndpointAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EndpointAddress_To_core_EndpointAddress(a.(*v1.EndpointAddress), b.(*core.EndpointAddress), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EndpointAddress)(nil), (*pkgapiscore.EndpointAddress)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EndpointAddress_To_core_EndpointAddress(a.(*apicorev1.EndpointAddress), b.(*pkgapiscore.EndpointAddress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EndpointAddress)(nil), (*v1.EndpointAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EndpointAddress_To_v1_EndpointAddress(a.(*core.EndpointAddress), b.(*v1.EndpointAddress), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EndpointAddress)(nil), (*apicorev1.EndpointAddress)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EndpointAddress_To_v1_EndpointAddress(a.(*pkgapiscore.EndpointAddress), b.(*apicorev1.EndpointAddress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EndpointPort)(nil), (*core.EndpointPort)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EndpointPort_To_core_EndpointPort(a.(*v1.EndpointPort), b.(*core.EndpointPort), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EndpointPort)(nil), (*pkgapiscore.EndpointPort)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EndpointPort_To_core_EndpointPort(a.(*apicorev1.EndpointPort), b.(*pkgapiscore.EndpointPort), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EndpointPort)(nil), (*v1.EndpointPort)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EndpointPort_To_v1_EndpointPort(a.(*core.EndpointPort), b.(*v1.EndpointPort), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EndpointPort)(nil), (*apicorev1.EndpointPort)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EndpointPort_To_v1_EndpointPort(a.(*pkgapiscore.EndpointPort), b.(*apicorev1.EndpointPort), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EndpointSubset)(nil), (*core.EndpointSubset)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EndpointSubset_To_core_EndpointSubset(a.(*v1.EndpointSubset), b.(*core.EndpointSubset), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EndpointSubset)(nil), (*pkgapiscore.EndpointSubset)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EndpointSubset_To_core_EndpointSubset(a.(*apicorev1.EndpointSubset), b.(*pkgapiscore.EndpointSubset), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EndpointSubset)(nil), (*v1.EndpointSubset)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EndpointSubset_To_v1_EndpointSubset(a.(*core.EndpointSubset), b.(*v1.EndpointSubset), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EndpointSubset)(nil), (*apicorev1.EndpointSubset)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EndpointSubset_To_v1_EndpointSubset(a.(*pkgapiscore.EndpointSubset), b.(*apicorev1.EndpointSubset), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Endpoints)(nil), (*core.Endpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Endpoints_To_core_Endpoints(a.(*v1.Endpoints), b.(*core.Endpoints), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Endpoints)(nil), (*pkgapiscore.Endpoints)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Endpoints_To_core_Endpoints(a.(*apicorev1.Endpoints), b.(*pkgapiscore.Endpoints), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Endpoints)(nil), (*v1.Endpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Endpoints_To_v1_Endpoints(a.(*core.Endpoints), b.(*v1.Endpoints), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Endpoints)(nil), (*apicorev1.Endpoints)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Endpoints_To_v1_Endpoints(a.(*pkgapiscore.Endpoints), b.(*apicorev1.Endpoints), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EndpointsList)(nil), (*core.EndpointsList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EndpointsList_To_core_EndpointsList(a.(*v1.EndpointsList), b.(*core.EndpointsList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EndpointsList)(nil), (*pkgapiscore.EndpointsList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EndpointsList_To_core_EndpointsList(a.(*apicorev1.EndpointsList), b.(*pkgapiscore.EndpointsList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EndpointsList)(nil), (*v1.EndpointsList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EndpointsList_To_v1_EndpointsList(a.(*core.EndpointsList), b.(*v1.EndpointsList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EndpointsList)(nil), (*apicorev1.EndpointsList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EndpointsList_To_v1_EndpointsList(a.(*pkgapiscore.EndpointsList), b.(*apicorev1.EndpointsList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EnvFromSource)(nil), (*core.EnvFromSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EnvFromSource_To_core_EnvFromSource(a.(*v1.EnvFromSource), b.(*core.EnvFromSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EnvFromSource)(nil), (*pkgapiscore.EnvFromSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EnvFromSource_To_core_EnvFromSource(a.(*apicorev1.EnvFromSource), b.(*pkgapiscore.EnvFromSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EnvFromSource)(nil), (*v1.EnvFromSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EnvFromSource_To_v1_EnvFromSource(a.(*core.EnvFromSource), b.(*v1.EnvFromSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EnvFromSource)(nil), (*apicorev1.EnvFromSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EnvFromSource_To_v1_EnvFromSource(a.(*pkgapiscore.EnvFromSource), b.(*apicorev1.EnvFromSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EnvVar)(nil), (*core.EnvVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EnvVar_To_core_EnvVar(a.(*v1.EnvVar), b.(*core.EnvVar), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EnvVar)(nil), (*pkgapiscore.EnvVar)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EnvVar_To_core_EnvVar(a.(*apicorev1.EnvVar), b.(*pkgapiscore.EnvVar), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EnvVar)(nil), (*v1.EnvVar)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EnvVar_To_v1_EnvVar(a.(*core.EnvVar), b.(*v1.EnvVar), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EnvVar)(nil), (*apicorev1.EnvVar)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EnvVar_To_v1_EnvVar(a.(*pkgapiscore.EnvVar), b.(*apicorev1.EnvVar), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EnvVarSource)(nil), (*core.EnvVarSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EnvVarSource_To_core_EnvVarSource(a.(*v1.EnvVarSource), b.(*core.EnvVarSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EnvVarSource)(nil), (*pkgapiscore.EnvVarSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EnvVarSource_To_core_EnvVarSource(a.(*apicorev1.EnvVarSource), b.(*pkgapiscore.EnvVarSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EnvVarSource)(nil), (*v1.EnvVarSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EnvVarSource_To_v1_EnvVarSource(a.(*core.EnvVarSource), b.(*v1.EnvVarSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EnvVarSource)(nil), (*apicorev1.EnvVarSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EnvVarSource_To_v1_EnvVarSource(a.(*pkgapiscore.EnvVarSource), b.(*apicorev1.EnvVarSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EphemeralContainer)(nil), (*core.EphemeralContainer)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EphemeralContainer_To_core_EphemeralContainer(a.(*v1.EphemeralContainer), b.(*core.EphemeralContainer), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EphemeralContainer)(nil), (*pkgapiscore.EphemeralContainer)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EphemeralContainer_To_core_EphemeralContainer(a.(*apicorev1.EphemeralContainer), b.(*pkgapiscore.EphemeralContainer), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EphemeralContainer)(nil), (*v1.EphemeralContainer)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EphemeralContainer_To_v1_EphemeralContainer(a.(*core.EphemeralContainer), b.(*v1.EphemeralContainer), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EphemeralContainer)(nil), (*apicorev1.EphemeralContainer)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EphemeralContainer_To_v1_EphemeralContainer(a.(*pkgapiscore.EphemeralContainer), b.(*apicorev1.EphemeralContainer), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EphemeralContainerCommon)(nil), (*core.EphemeralContainerCommon)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(a.(*v1.EphemeralContainerCommon), b.(*core.EphemeralContainerCommon), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EphemeralContainerCommon)(nil), (*pkgapiscore.EphemeralContainerCommon)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(a.(*apicorev1.EphemeralContainerCommon), b.(*pkgapiscore.EphemeralContainerCommon), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EphemeralContainerCommon)(nil), (*v1.EphemeralContainerCommon)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(a.(*core.EphemeralContainerCommon), b.(*v1.EphemeralContainerCommon), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EphemeralContainerCommon)(nil), (*apicorev1.EphemeralContainerCommon)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(a.(*pkgapiscore.EphemeralContainerCommon), b.(*apicorev1.EphemeralContainerCommon), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EphemeralVolumeSource)(nil), (*core.EphemeralVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(a.(*v1.EphemeralVolumeSource), b.(*core.EphemeralVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EphemeralVolumeSource)(nil), (*pkgapiscore.EphemeralVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(a.(*apicorev1.EphemeralVolumeSource), b.(*pkgapiscore.EphemeralVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EphemeralVolumeSource)(nil), (*v1.EphemeralVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(a.(*core.EphemeralVolumeSource), b.(*v1.EphemeralVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EphemeralVolumeSource)(nil), (*apicorev1.EphemeralVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(a.(*pkgapiscore.EphemeralVolumeSource), b.(*apicorev1.EphemeralVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Event)(nil), (*core.Event)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Event_To_core_Event(a.(*v1.Event), b.(*core.Event), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Event)(nil), (*pkgapiscore.Event)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Event_To_core_Event(a.(*apicorev1.Event), b.(*pkgapiscore.Event), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Event)(nil), (*v1.Event)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Event_To_v1_Event(a.(*core.Event), b.(*v1.Event), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Event)(nil), (*apicorev1.Event)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Event_To_v1_Event(a.(*pkgapiscore.Event), b.(*apicorev1.Event), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EventList)(nil), (*core.EventList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EventList_To_core_EventList(a.(*v1.EventList), b.(*core.EventList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EventList)(nil), (*pkgapiscore.EventList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EventList_To_core_EventList(a.(*apicorev1.EventList), b.(*pkgapiscore.EventList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EventList)(nil), (*v1.EventList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EventList_To_v1_EventList(a.(*core.EventList), b.(*v1.EventList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EventList)(nil), (*apicorev1.EventList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EventList_To_v1_EventList(a.(*pkgapiscore.EventList), b.(*apicorev1.EventList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EventSeries)(nil), (*core.EventSeries)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EventSeries_To_core_EventSeries(a.(*v1.EventSeries), b.(*core.EventSeries), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EventSeries)(nil), (*pkgapiscore.EventSeries)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EventSeries_To_core_EventSeries(a.(*apicorev1.EventSeries), b.(*pkgapiscore.EventSeries), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EventSeries)(nil), (*v1.EventSeries)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EventSeries_To_v1_EventSeries(a.(*core.EventSeries), b.(*v1.EventSeries), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EventSeries)(nil), (*apicorev1.EventSeries)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EventSeries_To_v1_EventSeries(a.(*pkgapiscore.EventSeries), b.(*apicorev1.EventSeries), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.EventSource)(nil), (*core.EventSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_EventSource_To_core_EventSource(a.(*v1.EventSource), b.(*core.EventSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.EventSource)(nil), (*pkgapiscore.EventSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_EventSource_To_core_EventSource(a.(*apicorev1.EventSource), b.(*pkgapiscore.EventSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.EventSource)(nil), (*v1.EventSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_EventSource_To_v1_EventSource(a.(*core.EventSource), b.(*v1.EventSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.EventSource)(nil), (*apicorev1.EventSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_EventSource_To_v1_EventSource(a.(*pkgapiscore.EventSource), b.(*apicorev1.EventSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ExecAction)(nil), (*core.ExecAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ExecAction_To_core_ExecAction(a.(*v1.ExecAction), b.(*core.ExecAction), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ExecAction)(nil), (*pkgapiscore.ExecAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ExecAction_To_core_ExecAction(a.(*apicorev1.ExecAction), b.(*pkgapiscore.ExecAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ExecAction)(nil), (*v1.ExecAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ExecAction_To_v1_ExecAction(a.(*core.ExecAction), b.(*v1.ExecAction), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ExecAction)(nil), (*apicorev1.ExecAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ExecAction_To_v1_ExecAction(a.(*pkgapiscore.ExecAction), b.(*apicorev1.ExecAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.FCVolumeSource)(nil), (*core.FCVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_FCVolumeSource_To_core_FCVolumeSource(a.(*v1.FCVolumeSource), b.(*core.FCVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.FCVolumeSource)(nil), (*pkgapiscore.FCVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_FCVolumeSource_To_core_FCVolumeSource(a.(*apicorev1.FCVolumeSource), b.(*pkgapiscore.FCVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.FCVolumeSource)(nil), (*v1.FCVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_FCVolumeSource_To_v1_FCVolumeSource(a.(*core.FCVolumeSource), b.(*v1.FCVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.FCVolumeSource)(nil), (*apicorev1.FCVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_FCVolumeSource_To_v1_FCVolumeSource(a.(*pkgapiscore.FCVolumeSource), b.(*apicorev1.FCVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.FlexPersistentVolumeSource)(nil), (*core.FlexPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(a.(*v1.FlexPersistentVolumeSource), b.(*core.FlexPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.FlexPersistentVolumeSource)(nil), (*pkgapiscore.FlexPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(a.(*apicorev1.FlexPersistentVolumeSource), b.(*pkgapiscore.FlexPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.FlexPersistentVolumeSource)(nil), (*v1.FlexPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(a.(*core.FlexPersistentVolumeSource), b.(*v1.FlexPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.FlexPersistentVolumeSource)(nil), (*apicorev1.FlexPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(a.(*pkgapiscore.FlexPersistentVolumeSource), b.(*apicorev1.FlexPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.FlexVolumeSource)(nil), (*core.FlexVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_FlexVolumeSource_To_core_FlexVolumeSource(a.(*v1.FlexVolumeSource), b.(*core.FlexVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.FlexVolumeSource)(nil), (*pkgapiscore.FlexVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_FlexVolumeSource_To_core_FlexVolumeSource(a.(*apicorev1.FlexVolumeSource), b.(*pkgapiscore.FlexVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.FlexVolumeSource)(nil), (*v1.FlexVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_FlexVolumeSource_To_v1_FlexVolumeSource(a.(*core.FlexVolumeSource), b.(*v1.FlexVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.FlexVolumeSource)(nil), (*apicorev1.FlexVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_FlexVolumeSource_To_v1_FlexVolumeSource(a.(*pkgapiscore.FlexVolumeSource), b.(*apicorev1.FlexVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.FlockerVolumeSource)(nil), (*core.FlockerVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(a.(*v1.FlockerVolumeSource), b.(*core.FlockerVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.FlockerVolumeSource)(nil), (*pkgapiscore.FlockerVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(a.(*apicorev1.FlockerVolumeSource), b.(*pkgapiscore.FlockerVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.FlockerVolumeSource)(nil), (*v1.FlockerVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(a.(*core.FlockerVolumeSource), b.(*v1.FlockerVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.FlockerVolumeSource)(nil), (*apicorev1.FlockerVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(a.(*pkgapiscore.FlockerVolumeSource), b.(*apicorev1.FlockerVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.GCEPersistentDiskVolumeSource)(nil), (*core.GCEPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(a.(*v1.GCEPersistentDiskVolumeSource), b.(*core.GCEPersistentDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.GCEPersistentDiskVolumeSource)(nil), (*pkgapiscore.GCEPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(a.(*apicorev1.GCEPersistentDiskVolumeSource), b.(*pkgapiscore.GCEPersistentDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.GCEPersistentDiskVolumeSource)(nil), (*v1.GCEPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(a.(*core.GCEPersistentDiskVolumeSource), b.(*v1.GCEPersistentDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.GCEPersistentDiskVolumeSource)(nil), (*apicorev1.GCEPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(a.(*pkgapiscore.GCEPersistentDiskVolumeSource), b.(*apicorev1.GCEPersistentDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.GRPCAction)(nil), (*core.GRPCAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_GRPCAction_To_core_GRPCAction(a.(*v1.GRPCAction), b.(*core.GRPCAction), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.GRPCAction)(nil), (*pkgapiscore.GRPCAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_GRPCAction_To_core_GRPCAction(a.(*apicorev1.GRPCAction), b.(*pkgapiscore.GRPCAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.GRPCAction)(nil), (*v1.GRPCAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_GRPCAction_To_v1_GRPCAction(a.(*core.GRPCAction), b.(*v1.GRPCAction), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.GRPCAction)(nil), (*apicorev1.GRPCAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_GRPCAction_To_v1_GRPCAction(a.(*pkgapiscore.GRPCAction), b.(*apicorev1.GRPCAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.GitRepoVolumeSource)(nil), (*core.GitRepoVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(a.(*v1.GitRepoVolumeSource), b.(*core.GitRepoVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.GitRepoVolumeSource)(nil), (*pkgapiscore.GitRepoVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(a.(*apicorev1.GitRepoVolumeSource), b.(*pkgapiscore.GitRepoVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.GitRepoVolumeSource)(nil), (*v1.GitRepoVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(a.(*core.GitRepoVolumeSource), b.(*v1.GitRepoVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.GitRepoVolumeSource)(nil), (*apicorev1.GitRepoVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(a.(*pkgapiscore.GitRepoVolumeSource), b.(*apicorev1.GitRepoVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.GlusterfsPersistentVolumeSource)(nil), (*core.GlusterfsPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(a.(*v1.GlusterfsPersistentVolumeSource), b.(*core.GlusterfsPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.GlusterfsPersistentVolumeSource)(nil), (*pkgapiscore.GlusterfsPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(a.(*apicorev1.GlusterfsPersistentVolumeSource), b.(*pkgapiscore.GlusterfsPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.GlusterfsPersistentVolumeSource)(nil), (*v1.GlusterfsPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(a.(*core.GlusterfsPersistentVolumeSource), b.(*v1.GlusterfsPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.GlusterfsPersistentVolumeSource)(nil), (*apicorev1.GlusterfsPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(a.(*pkgapiscore.GlusterfsPersistentVolumeSource), b.(*apicorev1.GlusterfsPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.GlusterfsVolumeSource)(nil), (*core.GlusterfsVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(a.(*v1.GlusterfsVolumeSource), b.(*core.GlusterfsVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.GlusterfsVolumeSource)(nil), (*pkgapiscore.GlusterfsVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(a.(*apicorev1.GlusterfsVolumeSource), b.(*pkgapiscore.GlusterfsVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.GlusterfsVolumeSource)(nil), (*v1.GlusterfsVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(a.(*core.GlusterfsVolumeSource), b.(*v1.GlusterfsVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.GlusterfsVolumeSource)(nil), (*apicorev1.GlusterfsVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(a.(*pkgapiscore.GlusterfsVolumeSource), b.(*apicorev1.GlusterfsVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.HTTPGetAction)(nil), (*core.HTTPGetAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_HTTPGetAction_To_core_HTTPGetAction(a.(*v1.HTTPGetAction), b.(*core.HTTPGetAction), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.HTTPGetAction)(nil), (*pkgapiscore.HTTPGetAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_HTTPGetAction_To_core_HTTPGetAction(a.(*apicorev1.HTTPGetAction), b.(*pkgapiscore.HTTPGetAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.HTTPGetAction)(nil), (*v1.HTTPGetAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_HTTPGetAction_To_v1_HTTPGetAction(a.(*core.HTTPGetAction), b.(*v1.HTTPGetAction), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.HTTPGetAction)(nil), (*apicorev1.HTTPGetAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_HTTPGetAction_To_v1_HTTPGetAction(a.(*pkgapiscore.HTTPGetAction), b.(*apicorev1.HTTPGetAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.HTTPHeader)(nil), (*core.HTTPHeader)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_HTTPHeader_To_core_HTTPHeader(a.(*v1.HTTPHeader), b.(*core.HTTPHeader), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.HTTPHeader)(nil), (*pkgapiscore.HTTPHeader)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_HTTPHeader_To_core_HTTPHeader(a.(*apicorev1.HTTPHeader), b.(*pkgapiscore.HTTPHeader), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.HTTPHeader)(nil), (*v1.HTTPHeader)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_HTTPHeader_To_v1_HTTPHeader(a.(*core.HTTPHeader), b.(*v1.HTTPHeader), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.HTTPHeader)(nil), (*apicorev1.HTTPHeader)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_HTTPHeader_To_v1_HTTPHeader(a.(*pkgapiscore.HTTPHeader), b.(*apicorev1.HTTPHeader), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.HostAlias)(nil), (*core.HostAlias)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_HostAlias_To_core_HostAlias(a.(*v1.HostAlias), b.(*core.HostAlias), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.HostAlias)(nil), (*pkgapiscore.HostAlias)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_HostAlias_To_core_HostAlias(a.(*apicorev1.HostAlias), b.(*pkgapiscore.HostAlias), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.HostAlias)(nil), (*v1.HostAlias)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_HostAlias_To_v1_HostAlias(a.(*core.HostAlias), b.(*v1.HostAlias), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.HostAlias)(nil), (*apicorev1.HostAlias)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_HostAlias_To_v1_HostAlias(a.(*pkgapiscore.HostAlias), b.(*apicorev1.HostAlias), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.HostPathVolumeSource)(nil), (*core.HostPathVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(a.(*v1.HostPathVolumeSource), b.(*core.HostPathVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.HostPathVolumeSource)(nil), (*pkgapiscore.HostPathVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(a.(*apicorev1.HostPathVolumeSource), b.(*pkgapiscore.HostPathVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.HostPathVolumeSource)(nil), (*v1.HostPathVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(a.(*core.HostPathVolumeSource), b.(*v1.HostPathVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.HostPathVolumeSource)(nil), (*apicorev1.HostPathVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(a.(*pkgapiscore.HostPathVolumeSource), b.(*apicorev1.HostPathVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ISCSIPersistentVolumeSource)(nil), (*core.ISCSIPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(a.(*v1.ISCSIPersistentVolumeSource), b.(*core.ISCSIPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ISCSIPersistentVolumeSource)(nil), (*pkgapiscore.ISCSIPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(a.(*apicorev1.ISCSIPersistentVolumeSource), b.(*pkgapiscore.ISCSIPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ISCSIPersistentVolumeSource)(nil), (*v1.ISCSIPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(a.(*core.ISCSIPersistentVolumeSource), b.(*v1.ISCSIPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ISCSIPersistentVolumeSource)(nil), (*apicorev1.ISCSIPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(a.(*pkgapiscore.ISCSIPersistentVolumeSource), b.(*apicorev1.ISCSIPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ISCSIVolumeSource)(nil), (*core.ISCSIVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(a.(*v1.ISCSIVolumeSource), b.(*core.ISCSIVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ISCSIVolumeSource)(nil), (*pkgapiscore.ISCSIVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(a.(*apicorev1.ISCSIVolumeSource), b.(*pkgapiscore.ISCSIVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ISCSIVolumeSource)(nil), (*v1.ISCSIVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(a.(*core.ISCSIVolumeSource), b.(*v1.ISCSIVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ISCSIVolumeSource)(nil), (*apicorev1.ISCSIVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(a.(*pkgapiscore.ISCSIVolumeSource), b.(*apicorev1.ISCSIVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.KeyToPath)(nil), (*core.KeyToPath)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_KeyToPath_To_core_KeyToPath(a.(*v1.KeyToPath), b.(*core.KeyToPath), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.KeyToPath)(nil), (*pkgapiscore.KeyToPath)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_KeyToPath_To_core_KeyToPath(a.(*apicorev1.KeyToPath), b.(*pkgapiscore.KeyToPath), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.KeyToPath)(nil), (*v1.KeyToPath)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_KeyToPath_To_v1_KeyToPath(a.(*core.KeyToPath), b.(*v1.KeyToPath), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.KeyToPath)(nil), (*apicorev1.KeyToPath)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_KeyToPath_To_v1_KeyToPath(a.(*pkgapiscore.KeyToPath), b.(*apicorev1.KeyToPath), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Lifecycle)(nil), (*core.Lifecycle)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Lifecycle_To_core_Lifecycle(a.(*v1.Lifecycle), b.(*core.Lifecycle), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Lifecycle)(nil), (*pkgapiscore.Lifecycle)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Lifecycle_To_core_Lifecycle(a.(*apicorev1.Lifecycle), b.(*pkgapiscore.Lifecycle), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Lifecycle)(nil), (*v1.Lifecycle)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Lifecycle_To_v1_Lifecycle(a.(*core.Lifecycle), b.(*v1.Lifecycle), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Lifecycle)(nil), (*apicorev1.Lifecycle)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Lifecycle_To_v1_Lifecycle(a.(*pkgapiscore.Lifecycle), b.(*apicorev1.Lifecycle), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LifecycleHandler)(nil), (*core.LifecycleHandler)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LifecycleHandler_To_core_LifecycleHandler(a.(*v1.LifecycleHandler), b.(*core.LifecycleHandler), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LifecycleHandler)(nil), (*pkgapiscore.LifecycleHandler)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LifecycleHandler_To_core_LifecycleHandler(a.(*apicorev1.LifecycleHandler), b.(*pkgapiscore.LifecycleHandler), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LifecycleHandler)(nil), (*v1.LifecycleHandler)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LifecycleHandler_To_v1_LifecycleHandler(a.(*core.LifecycleHandler), b.(*v1.LifecycleHandler), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LifecycleHandler)(nil), (*apicorev1.LifecycleHandler)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LifecycleHandler_To_v1_LifecycleHandler(a.(*pkgapiscore.LifecycleHandler), b.(*apicorev1.LifecycleHandler), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LimitRange)(nil), (*core.LimitRange)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LimitRange_To_core_LimitRange(a.(*v1.LimitRange), b.(*core.LimitRange), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LimitRange)(nil), (*pkgapiscore.LimitRange)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LimitRange_To_core_LimitRange(a.(*apicorev1.LimitRange), b.(*pkgapiscore.LimitRange), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LimitRange)(nil), (*v1.LimitRange)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LimitRange_To_v1_LimitRange(a.(*core.LimitRange), b.(*v1.LimitRange), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LimitRange)(nil), (*apicorev1.LimitRange)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LimitRange_To_v1_LimitRange(a.(*pkgapiscore.LimitRange), b.(*apicorev1.LimitRange), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LimitRangeItem)(nil), (*core.LimitRangeItem)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LimitRangeItem_To_core_LimitRangeItem(a.(*v1.LimitRangeItem), b.(*core.LimitRangeItem), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LimitRangeItem)(nil), (*pkgapiscore.LimitRangeItem)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LimitRangeItem_To_core_LimitRangeItem(a.(*apicorev1.LimitRangeItem), b.(*pkgapiscore.LimitRangeItem), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LimitRangeItem)(nil), (*v1.LimitRangeItem)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LimitRangeItem_To_v1_LimitRangeItem(a.(*core.LimitRangeItem), b.(*v1.LimitRangeItem), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LimitRangeItem)(nil), (*apicorev1.LimitRangeItem)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LimitRangeItem_To_v1_LimitRangeItem(a.(*pkgapiscore.LimitRangeItem), b.(*apicorev1.LimitRangeItem), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LimitRangeList)(nil), (*core.LimitRangeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LimitRangeList_To_core_LimitRangeList(a.(*v1.LimitRangeList), b.(*core.LimitRangeList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LimitRangeList)(nil), (*pkgapiscore.LimitRangeList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LimitRangeList_To_core_LimitRangeList(a.(*apicorev1.LimitRangeList), b.(*pkgapiscore.LimitRangeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LimitRangeList)(nil), (*v1.LimitRangeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LimitRangeList_To_v1_LimitRangeList(a.(*core.LimitRangeList), b.(*v1.LimitRangeList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LimitRangeList)(nil), (*apicorev1.LimitRangeList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LimitRangeList_To_v1_LimitRangeList(a.(*pkgapiscore.LimitRangeList), b.(*apicorev1.LimitRangeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LimitRangeSpec)(nil), (*core.LimitRangeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LimitRangeSpec_To_core_LimitRangeSpec(a.(*v1.LimitRangeSpec), b.(*core.LimitRangeSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LimitRangeSpec)(nil), (*pkgapiscore.LimitRangeSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LimitRangeSpec_To_core_LimitRangeSpec(a.(*apicorev1.LimitRangeSpec), b.(*pkgapiscore.LimitRangeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LimitRangeSpec)(nil), (*v1.LimitRangeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LimitRangeSpec_To_v1_LimitRangeSpec(a.(*core.LimitRangeSpec), b.(*v1.LimitRangeSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LimitRangeSpec)(nil), (*apicorev1.LimitRangeSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LimitRangeSpec_To_v1_LimitRangeSpec(a.(*pkgapiscore.LimitRangeSpec), b.(*apicorev1.LimitRangeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.List)(nil), (*core.List)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_List_To_core_List(a.(*v1.List), b.(*core.List), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.List)(nil), (*pkgapiscore.List)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_List_To_core_List(a.(*apicorev1.List), b.(*pkgapiscore.List), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.List)(nil), (*v1.List)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_List_To_v1_List(a.(*core.List), b.(*v1.List), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.List)(nil), (*apicorev1.List)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_List_To_v1_List(a.(*pkgapiscore.List), b.(*apicorev1.List), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LoadBalancerIngress)(nil), (*core.LoadBalancerIngress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(a.(*v1.LoadBalancerIngress), b.(*core.LoadBalancerIngress), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LoadBalancerIngress)(nil), (*pkgapiscore.LoadBalancerIngress)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(a.(*apicorev1.LoadBalancerIngress), b.(*pkgapiscore.LoadBalancerIngress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LoadBalancerIngress)(nil), (*v1.LoadBalancerIngress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(a.(*core.LoadBalancerIngress), b.(*v1.LoadBalancerIngress), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LoadBalancerIngress)(nil), (*apicorev1.LoadBalancerIngress)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(a.(*pkgapiscore.LoadBalancerIngress), b.(*apicorev1.LoadBalancerIngress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LocalObjectReference)(nil), (*core.LocalObjectReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LocalObjectReference_To_core_LocalObjectReference(a.(*v1.LocalObjectReference), b.(*core.LocalObjectReference), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LocalObjectReference)(nil), (*pkgapiscore.LocalObjectReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LocalObjectReference_To_core_LocalObjectReference(a.(*apicorev1.LocalObjectReference), b.(*pkgapiscore.LocalObjectReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LocalObjectReference)(nil), (*v1.LocalObjectReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LocalObjectReference_To_v1_LocalObjectReference(a.(*core.LocalObjectReference), b.(*v1.LocalObjectReference), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LocalObjectReference)(nil), (*apicorev1.LocalObjectReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LocalObjectReference_To_v1_LocalObjectReference(a.(*pkgapiscore.LocalObjectReference), b.(*apicorev1.LocalObjectReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.LocalVolumeSource)(nil), (*core.LocalVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LocalVolumeSource_To_core_LocalVolumeSource(a.(*v1.LocalVolumeSource), b.(*core.LocalVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.LocalVolumeSource)(nil), (*pkgapiscore.LocalVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LocalVolumeSource_To_core_LocalVolumeSource(a.(*apicorev1.LocalVolumeSource), b.(*pkgapiscore.LocalVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.LocalVolumeSource)(nil), (*v1.LocalVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LocalVolumeSource_To_v1_LocalVolumeSource(a.(*core.LocalVolumeSource), b.(*v1.LocalVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.LocalVolumeSource)(nil), (*apicorev1.LocalVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LocalVolumeSource_To_v1_LocalVolumeSource(a.(*pkgapiscore.LocalVolumeSource), b.(*apicorev1.LocalVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NFSVolumeSource)(nil), (*core.NFSVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NFSVolumeSource_To_core_NFSVolumeSource(a.(*v1.NFSVolumeSource), b.(*core.NFSVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NFSVolumeSource)(nil), (*pkgapiscore.NFSVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NFSVolumeSource_To_core_NFSVolumeSource(a.(*apicorev1.NFSVolumeSource), b.(*pkgapiscore.NFSVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NFSVolumeSource)(nil), (*v1.NFSVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NFSVolumeSource_To_v1_NFSVolumeSource(a.(*core.NFSVolumeSource), b.(*v1.NFSVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NFSVolumeSource)(nil), (*apicorev1.NFSVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NFSVolumeSource_To_v1_NFSVolumeSource(a.(*pkgapiscore.NFSVolumeSource), b.(*apicorev1.NFSVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Namespace)(nil), (*core.Namespace)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Namespace_To_core_Namespace(a.(*v1.Namespace), b.(*core.Namespace), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Namespace)(nil), (*pkgapiscore.Namespace)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Namespace_To_core_Namespace(a.(*apicorev1.Namespace), b.(*pkgapiscore.Namespace), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Namespace)(nil), (*v1.Namespace)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Namespace_To_v1_Namespace(a.(*core.Namespace), b.(*v1.Namespace), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Namespace)(nil), (*apicorev1.Namespace)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Namespace_To_v1_Namespace(a.(*pkgapiscore.Namespace), b.(*apicorev1.Namespace), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NamespaceCondition)(nil), (*core.NamespaceCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NamespaceCondition_To_core_NamespaceCondition(a.(*v1.NamespaceCondition), b.(*core.NamespaceCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NamespaceCondition)(nil), (*pkgapiscore.NamespaceCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NamespaceCondition_To_core_NamespaceCondition(a.(*apicorev1.NamespaceCondition), b.(*pkgapiscore.NamespaceCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NamespaceCondition)(nil), (*v1.NamespaceCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NamespaceCondition_To_v1_NamespaceCondition(a.(*core.NamespaceCondition), b.(*v1.NamespaceCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NamespaceCondition)(nil), (*apicorev1.NamespaceCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NamespaceCondition_To_v1_NamespaceCondition(a.(*pkgapiscore.NamespaceCondition), b.(*apicorev1.NamespaceCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NamespaceList)(nil), (*core.NamespaceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NamespaceList_To_core_NamespaceList(a.(*v1.NamespaceList), b.(*core.NamespaceList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NamespaceList)(nil), (*pkgapiscore.NamespaceList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NamespaceList_To_core_NamespaceList(a.(*apicorev1.NamespaceList), b.(*pkgapiscore.NamespaceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NamespaceList)(nil), (*v1.NamespaceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NamespaceList_To_v1_NamespaceList(a.(*core.NamespaceList), b.(*v1.NamespaceList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NamespaceList)(nil), (*apicorev1.NamespaceList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NamespaceList_To_v1_NamespaceList(a.(*pkgapiscore.NamespaceList), b.(*apicorev1.NamespaceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NamespaceSpec)(nil), (*core.NamespaceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NamespaceSpec_To_core_NamespaceSpec(a.(*v1.NamespaceSpec), b.(*core.NamespaceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NamespaceSpec)(nil), (*pkgapiscore.NamespaceSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NamespaceSpec_To_core_NamespaceSpec(a.(*apicorev1.NamespaceSpec), b.(*pkgapiscore.NamespaceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NamespaceSpec)(nil), (*v1.NamespaceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NamespaceSpec_To_v1_NamespaceSpec(a.(*core.NamespaceSpec), b.(*v1.NamespaceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NamespaceSpec)(nil), (*apicorev1.NamespaceSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NamespaceSpec_To_v1_NamespaceSpec(a.(*pkgapiscore.NamespaceSpec), b.(*apicorev1.NamespaceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NamespaceStatus)(nil), (*core.NamespaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NamespaceStatus_To_core_NamespaceStatus(a.(*v1.NamespaceStatus), b.(*core.NamespaceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NamespaceStatus)(nil), (*pkgapiscore.NamespaceStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NamespaceStatus_To_core_NamespaceStatus(a.(*apicorev1.NamespaceStatus), b.(*pkgapiscore.NamespaceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NamespaceStatus)(nil), (*v1.NamespaceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NamespaceStatus_To_v1_NamespaceStatus(a.(*core.NamespaceStatus), b.(*v1.NamespaceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NamespaceStatus)(nil), (*apicorev1.NamespaceStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NamespaceStatus_To_v1_NamespaceStatus(a.(*pkgapiscore.NamespaceStatus), b.(*apicorev1.NamespaceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Node)(nil), (*core.Node)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Node_To_core_Node(a.(*v1.Node), b.(*core.Node), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Node)(nil), (*pkgapiscore.Node)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Node_To_core_Node(a.(*apicorev1.Node), b.(*pkgapiscore.Node), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Node)(nil), (*v1.Node)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Node_To_v1_Node(a.(*core.Node), b.(*v1.Node), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Node)(nil), (*apicorev1.Node)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Node_To_v1_Node(a.(*pkgapiscore.Node), b.(*apicorev1.Node), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeAddress)(nil), (*core.NodeAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeAddress_To_core_NodeAddress(a.(*v1.NodeAddress), b.(*core.NodeAddress), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeAddress)(nil), (*pkgapiscore.NodeAddress)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeAddress_To_core_NodeAddress(a.(*apicorev1.NodeAddress), b.(*pkgapiscore.NodeAddress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeAddress)(nil), (*v1.NodeAddress)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeAddress_To_v1_NodeAddress(a.(*core.NodeAddress), b.(*v1.NodeAddress), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeAddress)(nil), (*apicorev1.NodeAddress)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeAddress_To_v1_NodeAddress(a.(*pkgapiscore.NodeAddress), b.(*apicorev1.NodeAddress), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeAffinity)(nil), (*core.NodeAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeAffinity_To_core_NodeAffinity(a.(*v1.NodeAffinity), b.(*core.NodeAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeAffinity)(nil), (*pkgapiscore.NodeAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeAffinity_To_core_NodeAffinity(a.(*apicorev1.NodeAffinity), b.(*pkgapiscore.NodeAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeAffinity)(nil), (*v1.NodeAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeAffinity_To_v1_NodeAffinity(a.(*core.NodeAffinity), b.(*v1.NodeAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeAffinity)(nil), (*apicorev1.NodeAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeAffinity_To_v1_NodeAffinity(a.(*pkgapiscore.NodeAffinity), b.(*apicorev1.NodeAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeCondition)(nil), (*core.NodeCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeCondition_To_core_NodeCondition(a.(*v1.NodeCondition), b.(*core.NodeCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeCondition)(nil), (*pkgapiscore.NodeCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeCondition_To_core_NodeCondition(a.(*apicorev1.NodeCondition), b.(*pkgapiscore.NodeCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeCondition)(nil), (*v1.NodeCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeCondition_To_v1_NodeCondition(a.(*core.NodeCondition), b.(*v1.NodeCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeCondition)(nil), (*apicorev1.NodeCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeCondition_To_v1_NodeCondition(a.(*pkgapiscore.NodeCondition), b.(*apicorev1.NodeCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeConfigSource)(nil), (*core.NodeConfigSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeConfigSource_To_core_NodeConfigSource(a.(*v1.NodeConfigSource), b.(*core.NodeConfigSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeConfigSource)(nil), (*pkgapiscore.NodeConfigSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeConfigSource_To_core_NodeConfigSource(a.(*apicorev1.NodeConfigSource), b.(*pkgapiscore.NodeConfigSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeConfigSource)(nil), (*v1.NodeConfigSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeConfigSource_To_v1_NodeConfigSource(a.(*core.NodeConfigSource), b.(*v1.NodeConfigSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeConfigSource)(nil), (*apicorev1.NodeConfigSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeConfigSource_To_v1_NodeConfigSource(a.(*pkgapiscore.NodeConfigSource), b.(*apicorev1.NodeConfigSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeConfigStatus)(nil), (*core.NodeConfigStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeConfigStatus_To_core_NodeConfigStatus(a.(*v1.NodeConfigStatus), b.(*core.NodeConfigStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeConfigStatus)(nil), (*pkgapiscore.NodeConfigStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeConfigStatus_To_core_NodeConfigStatus(a.(*apicorev1.NodeConfigStatus), b.(*pkgapiscore.NodeConfigStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeConfigStatus)(nil), (*v1.NodeConfigStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeConfigStatus_To_v1_NodeConfigStatus(a.(*core.NodeConfigStatus), b.(*v1.NodeConfigStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeConfigStatus)(nil), (*apicorev1.NodeConfigStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeConfigStatus_To_v1_NodeConfigStatus(a.(*pkgapiscore.NodeConfigStatus), b.(*apicorev1.NodeConfigStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeDaemonEndpoints)(nil), (*core.NodeDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(a.(*v1.NodeDaemonEndpoints), b.(*core.NodeDaemonEndpoints), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeDaemonEndpoints)(nil), (*pkgapiscore.NodeDaemonEndpoints)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(a.(*apicorev1.NodeDaemonEndpoints), b.(*pkgapiscore.NodeDaemonEndpoints), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeDaemonEndpoints)(nil), (*v1.NodeDaemonEndpoints)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(a.(*core.NodeDaemonEndpoints), b.(*v1.NodeDaemonEndpoints), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeDaemonEndpoints)(nil), (*apicorev1.NodeDaemonEndpoints)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(a.(*pkgapiscore.NodeDaemonEndpoints), b.(*apicorev1.NodeDaemonEndpoints), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeList)(nil), (*core.NodeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeList_To_core_NodeList(a.(*v1.NodeList), b.(*core.NodeList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeList)(nil), (*pkgapiscore.NodeList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeList_To_core_NodeList(a.(*apicorev1.NodeList), b.(*pkgapiscore.NodeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeList)(nil), (*v1.NodeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeList_To_v1_NodeList(a.(*core.NodeList), b.(*v1.NodeList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeList)(nil), (*apicorev1.NodeList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeList_To_v1_NodeList(a.(*pkgapiscore.NodeList), b.(*apicorev1.NodeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeProxyOptions)(nil), (*core.NodeProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeProxyOptions_To_core_NodeProxyOptions(a.(*v1.NodeProxyOptions), b.(*core.NodeProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeProxyOptions)(nil), (*pkgapiscore.NodeProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeProxyOptions_To_core_NodeProxyOptions(a.(*apicorev1.NodeProxyOptions), b.(*pkgapiscore.NodeProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeProxyOptions)(nil), (*v1.NodeProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeProxyOptions_To_v1_NodeProxyOptions(a.(*core.NodeProxyOptions), b.(*v1.NodeProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeProxyOptions)(nil), (*apicorev1.NodeProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeProxyOptions_To_v1_NodeProxyOptions(a.(*pkgapiscore.NodeProxyOptions), b.(*apicorev1.NodeProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeResources)(nil), (*core.NodeResources)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeResources_To_core_NodeResources(a.(*v1.NodeResources), b.(*core.NodeResources), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeResources)(nil), (*pkgapiscore.NodeResources)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeResources_To_core_NodeResources(a.(*apicorev1.NodeResources), b.(*pkgapiscore.NodeResources), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeResources)(nil), (*v1.NodeResources)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeResources_To_v1_NodeResources(a.(*core.NodeResources), b.(*v1.NodeResources), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeResources)(nil), (*apicorev1.NodeResources)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeResources_To_v1_NodeResources(a.(*pkgapiscore.NodeResources), b.(*apicorev1.NodeResources), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeSelector)(nil), (*core.NodeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeSelector_To_core_NodeSelector(a.(*v1.NodeSelector), b.(*core.NodeSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeSelector)(nil), (*pkgapiscore.NodeSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeSelector_To_core_NodeSelector(a.(*apicorev1.NodeSelector), b.(*pkgapiscore.NodeSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeSelector)(nil), (*v1.NodeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeSelector_To_v1_NodeSelector(a.(*core.NodeSelector), b.(*v1.NodeSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeSelector)(nil), (*apicorev1.NodeSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeSelector_To_v1_NodeSelector(a.(*pkgapiscore.NodeSelector), b.(*apicorev1.NodeSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeSelectorRequirement)(nil), (*core.NodeSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(a.(*v1.NodeSelectorRequirement), b.(*core.NodeSelectorRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeSelectorRequirement)(nil), (*pkgapiscore.NodeSelectorRequirement)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(a.(*apicorev1.NodeSelectorRequirement), b.(*pkgapiscore.NodeSelectorRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeSelectorRequirement)(nil), (*v1.NodeSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(a.(*core.NodeSelectorRequirement), b.(*v1.NodeSelectorRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeSelectorRequirement)(nil), (*apicorev1.NodeSelectorRequirement)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(a.(*pkgapiscore.NodeSelectorRequirement), b.(*apicorev1.NodeSelectorRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeSelectorTerm)(nil), (*core.NodeSelectorTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(a.(*v1.NodeSelectorTerm), b.(*core.NodeSelectorTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeSelectorTerm)(nil), (*pkgapiscore.NodeSelectorTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(a.(*apicorev1.NodeSelectorTerm), b.(*pkgapiscore.NodeSelectorTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeSelectorTerm)(nil), (*v1.NodeSelectorTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(a.(*core.NodeSelectorTerm), b.(*v1.NodeSelectorTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeSelectorTerm)(nil), (*apicorev1.NodeSelectorTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(a.(*pkgapiscore.NodeSelectorTerm), b.(*apicorev1.NodeSelectorTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeStatus)(nil), (*core.NodeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeStatus_To_core_NodeStatus(a.(*v1.NodeStatus), b.(*core.NodeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeStatus)(nil), (*pkgapiscore.NodeStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeStatus_To_core_NodeStatus(a.(*apicorev1.NodeStatus), b.(*pkgapiscore.NodeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeStatus)(nil), (*v1.NodeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeStatus_To_v1_NodeStatus(a.(*core.NodeStatus), b.(*v1.NodeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeStatus)(nil), (*apicorev1.NodeStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeStatus_To_v1_NodeStatus(a.(*pkgapiscore.NodeStatus), b.(*apicorev1.NodeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.NodeSystemInfo)(nil), (*core.NodeSystemInfo)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeSystemInfo_To_core_NodeSystemInfo(a.(*v1.NodeSystemInfo), b.(*core.NodeSystemInfo), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.NodeSystemInfo)(nil), (*pkgapiscore.NodeSystemInfo)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeSystemInfo_To_core_NodeSystemInfo(a.(*apicorev1.NodeSystemInfo), b.(*pkgapiscore.NodeSystemInfo), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.NodeSystemInfo)(nil), (*v1.NodeSystemInfo)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeSystemInfo_To_v1_NodeSystemInfo(a.(*core.NodeSystemInfo), b.(*v1.NodeSystemInfo), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.NodeSystemInfo)(nil), (*apicorev1.NodeSystemInfo)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeSystemInfo_To_v1_NodeSystemInfo(a.(*pkgapiscore.NodeSystemInfo), b.(*apicorev1.NodeSystemInfo), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ObjectFieldSelector)(nil), (*core.ObjectFieldSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(a.(*v1.ObjectFieldSelector), b.(*core.ObjectFieldSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ObjectFieldSelector)(nil), (*pkgapiscore.ObjectFieldSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(a.(*apicorev1.ObjectFieldSelector), b.(*pkgapiscore.ObjectFieldSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ObjectFieldSelector)(nil), (*v1.ObjectFieldSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(a.(*core.ObjectFieldSelector), b.(*v1.ObjectFieldSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ObjectFieldSelector)(nil), (*apicorev1.ObjectFieldSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(a.(*pkgapiscore.ObjectFieldSelector), b.(*apicorev1.ObjectFieldSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ObjectReference)(nil), (*core.ObjectReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ObjectReference_To_core_ObjectReference(a.(*v1.ObjectReference), b.(*core.ObjectReference), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ObjectReference)(nil), (*pkgapiscore.ObjectReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ObjectReference_To_core_ObjectReference(a.(*apicorev1.ObjectReference), b.(*pkgapiscore.ObjectReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ObjectReference)(nil), (*v1.ObjectReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ObjectReference_To_v1_ObjectReference(a.(*core.ObjectReference), b.(*v1.ObjectReference), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ObjectReference)(nil), (*apicorev1.ObjectReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ObjectReference_To_v1_ObjectReference(a.(*pkgapiscore.ObjectReference), b.(*apicorev1.ObjectReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolume)(nil), (*core.PersistentVolume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolume_To_core_PersistentVolume(a.(*v1.PersistentVolume), b.(*core.PersistentVolume), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolume)(nil), (*pkgapiscore.PersistentVolume)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolume_To_core_PersistentVolume(a.(*apicorev1.PersistentVolume), b.(*pkgapiscore.PersistentVolume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolume)(nil), (*v1.PersistentVolume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolume_To_v1_PersistentVolume(a.(*core.PersistentVolume), b.(*v1.PersistentVolume), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolume)(nil), (*apicorev1.PersistentVolume)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolume_To_v1_PersistentVolume(a.(*pkgapiscore.PersistentVolume), b.(*apicorev1.PersistentVolume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaim)(nil), (*core.PersistentVolumeClaim)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(a.(*v1.PersistentVolumeClaim), b.(*core.PersistentVolumeClaim), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaim)(nil), (*pkgapiscore.PersistentVolumeClaim)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(a.(*apicorev1.PersistentVolumeClaim), b.(*pkgapiscore.PersistentVolumeClaim), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaim)(nil), (*v1.PersistentVolumeClaim)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(a.(*core.PersistentVolumeClaim), b.(*v1.PersistentVolumeClaim), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaim)(nil), (*apicorev1.PersistentVolumeClaim)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(a.(*pkgapiscore.PersistentVolumeClaim), b.(*apicorev1.PersistentVolumeClaim), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaimCondition)(nil), (*core.PersistentVolumeClaimCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(a.(*v1.PersistentVolumeClaimCondition), b.(*core.PersistentVolumeClaimCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaimCondition)(nil), (*pkgapiscore.PersistentVolumeClaimCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(a.(*apicorev1.PersistentVolumeClaimCondition), b.(*pkgapiscore.PersistentVolumeClaimCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaimCondition)(nil), (*v1.PersistentVolumeClaimCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(a.(*core.PersistentVolumeClaimCondition), b.(*v1.PersistentVolumeClaimCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaimCondition)(nil), (*apicorev1.PersistentVolumeClaimCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(a.(*pkgapiscore.PersistentVolumeClaimCondition), b.(*apicorev1.PersistentVolumeClaimCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaimList)(nil), (*core.PersistentVolumeClaimList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(a.(*v1.PersistentVolumeClaimList), b.(*core.PersistentVolumeClaimList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaimList)(nil), (*pkgapiscore.PersistentVolumeClaimList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(a.(*apicorev1.PersistentVolumeClaimList), b.(*pkgapiscore.PersistentVolumeClaimList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaimList)(nil), (*v1.PersistentVolumeClaimList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(a.(*core.PersistentVolumeClaimList), b.(*v1.PersistentVolumeClaimList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaimList)(nil), (*apicorev1.PersistentVolumeClaimList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(a.(*pkgapiscore.PersistentVolumeClaimList), b.(*apicorev1.PersistentVolumeClaimList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaimSpec)(nil), (*core.PersistentVolumeClaimSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(a.(*v1.PersistentVolumeClaimSpec), b.(*core.PersistentVolumeClaimSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaimSpec)(nil), (*pkgapiscore.PersistentVolumeClaimSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(a.(*apicorev1.PersistentVolumeClaimSpec), b.(*pkgapiscore.PersistentVolumeClaimSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaimSpec)(nil), (*v1.PersistentVolumeClaimSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(a.(*core.PersistentVolumeClaimSpec), b.(*v1.PersistentVolumeClaimSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaimSpec)(nil), (*apicorev1.PersistentVolumeClaimSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(a.(*pkgapiscore.PersistentVolumeClaimSpec), b.(*apicorev1.PersistentVolumeClaimSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaimStatus)(nil), (*core.PersistentVolumeClaimStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(a.(*v1.PersistentVolumeClaimStatus), b.(*core.PersistentVolumeClaimStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaimStatus)(nil), (*pkgapiscore.PersistentVolumeClaimStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(a.(*apicorev1.PersistentVolumeClaimStatus), b.(*pkgapiscore.PersistentVolumeClaimStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaimStatus)(nil), (*v1.PersistentVolumeClaimStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(a.(*core.PersistentVolumeClaimStatus), b.(*v1.PersistentVolumeClaimStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaimStatus)(nil), (*apicorev1.PersistentVolumeClaimStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(a.(*pkgapiscore.PersistentVolumeClaimStatus), b.(*apicorev1.PersistentVolumeClaimStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaimTemplate)(nil), (*core.PersistentVolumeClaimTemplate)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(a.(*v1.PersistentVolumeClaimTemplate), b.(*core.PersistentVolumeClaimTemplate), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaimTemplate)(nil), (*pkgapiscore.PersistentVolumeClaimTemplate)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(a.(*apicorev1.PersistentVolumeClaimTemplate), b.(*pkgapiscore.PersistentVolumeClaimTemplate), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaimTemplate)(nil), (*v1.PersistentVolumeClaimTemplate)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(a.(*core.PersistentVolumeClaimTemplate), b.(*v1.PersistentVolumeClaimTemplate), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaimTemplate)(nil), (*apicorev1.PersistentVolumeClaimTemplate)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(a.(*pkgapiscore.PersistentVolumeClaimTemplate), b.(*apicorev1.PersistentVolumeClaimTemplate), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeClaimVolumeSource)(nil), (*core.PersistentVolumeClaimVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(a.(*v1.PersistentVolumeClaimVolumeSource), b.(*core.PersistentVolumeClaimVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeClaimVolumeSource)(nil), (*pkgapiscore.PersistentVolumeClaimVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(a.(*apicorev1.PersistentVolumeClaimVolumeSource), b.(*pkgapiscore.PersistentVolumeClaimVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeClaimVolumeSource)(nil), (*v1.PersistentVolumeClaimVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(a.(*core.PersistentVolumeClaimVolumeSource), b.(*v1.PersistentVolumeClaimVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeClaimVolumeSource)(nil), (*apicorev1.PersistentVolumeClaimVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(a.(*pkgapiscore.PersistentVolumeClaimVolumeSource), b.(*apicorev1.PersistentVolumeClaimVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeList)(nil), (*core.PersistentVolumeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeList_To_core_PersistentVolumeList(a.(*v1.PersistentVolumeList), b.(*core.PersistentVolumeList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeList)(nil), (*pkgapiscore.PersistentVolumeList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeList_To_core_PersistentVolumeList(a.(*apicorev1.PersistentVolumeList), b.(*pkgapiscore.PersistentVolumeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeList)(nil), (*v1.PersistentVolumeList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeList_To_v1_PersistentVolumeList(a.(*core.PersistentVolumeList), b.(*v1.PersistentVolumeList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeList)(nil), (*apicorev1.PersistentVolumeList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeList_To_v1_PersistentVolumeList(a.(*pkgapiscore.PersistentVolumeList), b.(*apicorev1.PersistentVolumeList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeSource)(nil), (*core.PersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(a.(*v1.PersistentVolumeSource), b.(*core.PersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeSource)(nil), (*pkgapiscore.PersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(a.(*apicorev1.PersistentVolumeSource), b.(*pkgapiscore.PersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeSource)(nil), (*v1.PersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(a.(*core.PersistentVolumeSource), b.(*v1.PersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeSource)(nil), (*apicorev1.PersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(a.(*pkgapiscore.PersistentVolumeSource), b.(*apicorev1.PersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PersistentVolumeStatus)(nil), (*core.PersistentVolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(a.(*v1.PersistentVolumeStatus), b.(*core.PersistentVolumeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PersistentVolumeStatus)(nil), (*pkgapiscore.PersistentVolumeStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(a.(*apicorev1.PersistentVolumeStatus), b.(*pkgapiscore.PersistentVolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PersistentVolumeStatus)(nil), (*v1.PersistentVolumeStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(a.(*core.PersistentVolumeStatus), b.(*v1.PersistentVolumeStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PersistentVolumeStatus)(nil), (*apicorev1.PersistentVolumeStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(a.(*pkgapiscore.PersistentVolumeStatus), b.(*apicorev1.PersistentVolumeStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PhotonPersistentDiskVolumeSource)(nil), (*core.PhotonPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(a.(*v1.PhotonPersistentDiskVolumeSource), b.(*core.PhotonPersistentDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PhotonPersistentDiskVolumeSource)(nil), (*pkgapiscore.PhotonPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(a.(*apicorev1.PhotonPersistentDiskVolumeSource), b.(*pkgapiscore.PhotonPersistentDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PhotonPersistentDiskVolumeSource)(nil), (*v1.PhotonPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(a.(*core.PhotonPersistentDiskVolumeSource), b.(*v1.PhotonPersistentDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PhotonPersistentDiskVolumeSource)(nil), (*apicorev1.PhotonPersistentDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(a.(*pkgapiscore.PhotonPersistentDiskVolumeSource), b.(*apicorev1.PhotonPersistentDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodAffinity)(nil), (*core.PodAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodAffinity_To_core_PodAffinity(a.(*v1.PodAffinity), b.(*core.PodAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodAffinity)(nil), (*pkgapiscore.PodAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodAffinity_To_core_PodAffinity(a.(*apicorev1.PodAffinity), b.(*pkgapiscore.PodAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodAffinity)(nil), (*v1.PodAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodAffinity_To_v1_PodAffinity(a.(*core.PodAffinity), b.(*v1.PodAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodAffinity)(nil), (*apicorev1.PodAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodAffinity_To_v1_PodAffinity(a.(*pkgapiscore.PodAffinity), b.(*apicorev1.PodAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodAffinityTerm)(nil), (*core.PodAffinityTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodAffinityTerm_To_core_PodAffinityTerm(a.(*v1.PodAffinityTerm), b.(*core.PodAffinityTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodAffinityTerm)(nil), (*pkgapiscore.PodAffinityTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodAffinityTerm_To_core_PodAffinityTerm(a.(*apicorev1.PodAffinityTerm), b.(*pkgapiscore.PodAffinityTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodAffinityTerm)(nil), (*v1.PodAffinityTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodAffinityTerm_To_v1_PodAffinityTerm(a.(*core.PodAffinityTerm), b.(*v1.PodAffinityTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodAffinityTerm)(nil), (*apicorev1.PodAffinityTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodAffinityTerm_To_v1_PodAffinityTerm(a.(*pkgapiscore.PodAffinityTerm), b.(*apicorev1.PodAffinityTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodAntiAffinity)(nil), (*core.PodAntiAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodAntiAffinity_To_core_PodAntiAffinity(a.(*v1.PodAntiAffinity), b.(*core.PodAntiAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodAntiAffinity)(nil), (*pkgapiscore.PodAntiAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodAntiAffinity_To_core_PodAntiAffinity(a.(*apicorev1.PodAntiAffinity), b.(*pkgapiscore.PodAntiAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodAntiAffinity)(nil), (*v1.PodAntiAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodAntiAffinity_To_v1_PodAntiAffinity(a.(*core.PodAntiAffinity), b.(*v1.PodAntiAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodAntiAffinity)(nil), (*apicorev1.PodAntiAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodAntiAffinity_To_v1_PodAntiAffinity(a.(*pkgapiscore.PodAntiAffinity), b.(*apicorev1.PodAntiAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodAttachOptions)(nil), (*core.PodAttachOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodAttachOptions_To_core_PodAttachOptions(a.(*v1.PodAttachOptions), b.(*core.PodAttachOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodAttachOptions)(nil), (*pkgapiscore.PodAttachOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodAttachOptions_To_core_PodAttachOptions(a.(*apicorev1.PodAttachOptions), b.(*pkgapiscore.PodAttachOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodAttachOptions)(nil), (*v1.PodAttachOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodAttachOptions_To_v1_PodAttachOptions(a.(*core.PodAttachOptions), b.(*v1.PodAttachOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodAttachOptions)(nil), (*apicorev1.PodAttachOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodAttachOptions_To_v1_PodAttachOptions(a.(*pkgapiscore.PodAttachOptions), b.(*apicorev1.PodAttachOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodCondition)(nil), (*core.PodCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodCondition_To_core_PodCondition(a.(*v1.PodCondition), b.(*core.PodCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodCondition)(nil), (*pkgapiscore.PodCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodCondition_To_core_PodCondition(a.(*apicorev1.PodCondition), b.(*pkgapiscore.PodCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodCondition)(nil), (*v1.PodCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodCondition_To_v1_PodCondition(a.(*core.PodCondition), b.(*v1.PodCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodCondition)(nil), (*apicorev1.PodCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodCondition_To_v1_PodCondition(a.(*pkgapiscore.PodCondition), b.(*apicorev1.PodCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodDNSConfig)(nil), (*core.PodDNSConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodDNSConfig_To_core_PodDNSConfig(a.(*v1.PodDNSConfig), b.(*core.PodDNSConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodDNSConfig)(nil), (*pkgapiscore.PodDNSConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodDNSConfig_To_core_PodDNSConfig(a.(*apicorev1.PodDNSConfig), b.(*pkgapiscore.PodDNSConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodDNSConfig)(nil), (*v1.PodDNSConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodDNSConfig_To_v1_PodDNSConfig(a.(*core.PodDNSConfig), b.(*v1.PodDNSConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodDNSConfig)(nil), (*apicorev1.PodDNSConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodDNSConfig_To_v1_PodDNSConfig(a.(*pkgapiscore.PodDNSConfig), b.(*apicorev1.PodDNSConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodDNSConfigOption)(nil), (*core.PodDNSConfigOption)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(a.(*v1.PodDNSConfigOption), b.(*core.PodDNSConfigOption), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodDNSConfigOption)(nil), (*pkgapiscore.PodDNSConfigOption)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(a.(*apicorev1.PodDNSConfigOption), b.(*pkgapiscore.PodDNSConfigOption), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodDNSConfigOption)(nil), (*v1.PodDNSConfigOption)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(a.(*core.PodDNSConfigOption), b.(*v1.PodDNSConfigOption), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodDNSConfigOption)(nil), (*apicorev1.PodDNSConfigOption)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(a.(*pkgapiscore.PodDNSConfigOption), b.(*apicorev1.PodDNSConfigOption), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodExecOptions)(nil), (*core.PodExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodExecOptions_To_core_PodExecOptions(a.(*v1.PodExecOptions), b.(*core.PodExecOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodExecOptions)(nil), (*pkgapiscore.PodExecOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodExecOptions_To_core_PodExecOptions(a.(*apicorev1.PodExecOptions), b.(*pkgapiscore.PodExecOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodExecOptions)(nil), (*v1.PodExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodExecOptions_To_v1_PodExecOptions(a.(*core.PodExecOptions), b.(*v1.PodExecOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodExecOptions)(nil), (*apicorev1.PodExecOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodExecOptions_To_v1_PodExecOptions(a.(*pkgapiscore.PodExecOptions), b.(*apicorev1.PodExecOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodIP)(nil), (*core.PodIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodIP_To_core_PodIP(a.(*v1.PodIP), b.(*core.PodIP), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodIP)(nil), (*pkgapiscore.PodIP)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodIP_To_core_PodIP(a.(*apicorev1.PodIP), b.(*pkgapiscore.PodIP), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodIP)(nil), (*v1.PodIP)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodIP_To_v1_PodIP(a.(*core.PodIP), b.(*v1.PodIP), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodIP)(nil), (*apicorev1.PodIP)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodIP_To_v1_PodIP(a.(*pkgapiscore.PodIP), b.(*apicorev1.PodIP), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodList)(nil), (*core.PodList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodList_To_core_PodList(a.(*v1.PodList), b.(*core.PodList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodList)(nil), (*pkgapiscore.PodList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodList_To_core_PodList(a.(*apicorev1.PodList), b.(*pkgapiscore.PodList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodList)(nil), (*v1.PodList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodList_To_v1_PodList(a.(*core.PodList), b.(*v1.PodList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodList)(nil), (*apicorev1.PodList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodList_To_v1_PodList(a.(*pkgapiscore.PodList), b.(*apicorev1.PodList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodLogOptions)(nil), (*core.PodLogOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodLogOptions_To_core_PodLogOptions(a.(*v1.PodLogOptions), b.(*core.PodLogOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodLogOptions)(nil), (*pkgapiscore.PodLogOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodLogOptions_To_core_PodLogOptions(a.(*apicorev1.PodLogOptions), b.(*pkgapiscore.PodLogOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodLogOptions)(nil), (*v1.PodLogOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodLogOptions_To_v1_PodLogOptions(a.(*core.PodLogOptions), b.(*v1.PodLogOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodLogOptions)(nil), (*apicorev1.PodLogOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodLogOptions_To_v1_PodLogOptions(a.(*pkgapiscore.PodLogOptions), b.(*apicorev1.PodLogOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodOS)(nil), (*core.PodOS)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodOS_To_core_PodOS(a.(*v1.PodOS), b.(*core.PodOS), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodOS)(nil), (*pkgapiscore.PodOS)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodOS_To_core_PodOS(a.(*apicorev1.PodOS), b.(*pkgapiscore.PodOS), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodOS)(nil), (*v1.PodOS)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodOS_To_v1_PodOS(a.(*core.PodOS), b.(*v1.PodOS), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodOS)(nil), (*apicorev1.PodOS)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodOS_To_v1_PodOS(a.(*pkgapiscore.PodOS), b.(*apicorev1.PodOS), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodPortForwardOptions)(nil), (*core.PodPortForwardOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(a.(*v1.PodPortForwardOptions), b.(*core.PodPortForwardOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodPortForwardOptions)(nil), (*pkgapiscore.PodPortForwardOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(a.(*apicorev1.PodPortForwardOptions), b.(*pkgapiscore.PodPortForwardOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodPortForwardOptions)(nil), (*v1.PodPortForwardOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(a.(*core.PodPortForwardOptions), b.(*v1.PodPortForwardOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodPortForwardOptions)(nil), (*apicorev1.PodPortForwardOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(a.(*pkgapiscore.PodPortForwardOptions), b.(*apicorev1.PodPortForwardOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodProxyOptions)(nil), (*core.PodProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodProxyOptions_To_core_PodProxyOptions(a.(*v1.PodProxyOptions), b.(*core.PodProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodProxyOptions)(nil), (*pkgapiscore.PodProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodProxyOptions_To_core_PodProxyOptions(a.(*apicorev1.PodProxyOptions), b.(*pkgapiscore.PodProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodProxyOptions)(nil), (*v1.PodProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodProxyOptions_To_v1_PodProxyOptions(a.(*core.PodProxyOptions), b.(*v1.PodProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodProxyOptions)(nil), (*apicorev1.PodProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodProxyOptions_To_v1_PodProxyOptions(a.(*pkgapiscore.PodProxyOptions), b.(*apicorev1.PodProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodReadinessGate)(nil), (*core.PodReadinessGate)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodReadinessGate_To_core_PodReadinessGate(a.(*v1.PodReadinessGate), b.(*core.PodReadinessGate), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodReadinessGate)(nil), (*pkgapiscore.PodReadinessGate)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodReadinessGate_To_core_PodReadinessGate(a.(*apicorev1.PodReadinessGate), b.(*pkgapiscore.PodReadinessGate), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodReadinessGate)(nil), (*v1.PodReadinessGate)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodReadinessGate_To_v1_PodReadinessGate(a.(*core.PodReadinessGate), b.(*v1.PodReadinessGate), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodReadinessGate)(nil), (*apicorev1.PodReadinessGate)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodReadinessGate_To_v1_PodReadinessGate(a.(*pkgapiscore.PodReadinessGate), b.(*apicorev1.PodReadinessGate), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodSecurityContext)(nil), (*core.PodSecurityContext)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodSecurityContext_To_core_PodSecurityContext(a.(*v1.PodSecurityContext), b.(*core.PodSecurityContext), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodSecurityContext)(nil), (*pkgapiscore.PodSecurityContext)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodSecurityContext_To_core_PodSecurityContext(a.(*apicorev1.PodSecurityContext), b.(*pkgapiscore.PodSecurityContext), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodSecurityContext)(nil), (*v1.PodSecurityContext)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodSecurityContext_To_v1_PodSecurityContext(a.(*core.PodSecurityContext), b.(*v1.PodSecurityContext), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodSecurityContext)(nil), (*apicorev1.PodSecurityContext)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodSecurityContext_To_v1_PodSecurityContext(a.(*pkgapiscore.PodSecurityContext), b.(*apicorev1.PodSecurityContext), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodSignature)(nil), (*core.PodSignature)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodSignature_To_core_PodSignature(a.(*v1.PodSignature), b.(*core.PodSignature), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodSignature)(nil), (*pkgapiscore.PodSignature)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodSignature_To_core_PodSignature(a.(*apicorev1.PodSignature), b.(*pkgapiscore.PodSignature), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodSignature)(nil), (*v1.PodSignature)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodSignature_To_v1_PodSignature(a.(*core.PodSignature), b.(*v1.PodSignature), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodSignature)(nil), (*apicorev1.PodSignature)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodSignature_To_v1_PodSignature(a.(*pkgapiscore.PodSignature), b.(*apicorev1.PodSignature), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodStatusResult)(nil), (*core.PodStatusResult)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodStatusResult_To_core_PodStatusResult(a.(*v1.PodStatusResult), b.(*core.PodStatusResult), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodStatusResult)(nil), (*pkgapiscore.PodStatusResult)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodStatusResult_To_core_PodStatusResult(a.(*apicorev1.PodStatusResult), b.(*pkgapiscore.PodStatusResult), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodStatusResult)(nil), (*v1.PodStatusResult)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodStatusResult_To_v1_PodStatusResult(a.(*core.PodStatusResult), b.(*v1.PodStatusResult), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodStatusResult)(nil), (*apicorev1.PodStatusResult)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodStatusResult_To_v1_PodStatusResult(a.(*pkgapiscore.PodStatusResult), b.(*apicorev1.PodStatusResult), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodTemplate)(nil), (*core.PodTemplate)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodTemplate_To_core_PodTemplate(a.(*v1.PodTemplate), b.(*core.PodTemplate), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodTemplate)(nil), (*pkgapiscore.PodTemplate)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodTemplate_To_core_PodTemplate(a.(*apicorev1.PodTemplate), b.(*pkgapiscore.PodTemplate), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodTemplate)(nil), (*v1.PodTemplate)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodTemplate_To_v1_PodTemplate(a.(*core.PodTemplate), b.(*v1.PodTemplate), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodTemplate)(nil), (*apicorev1.PodTemplate)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodTemplate_To_v1_PodTemplate(a.(*pkgapiscore.PodTemplate), b.(*apicorev1.PodTemplate), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PodTemplateList)(nil), (*core.PodTemplateList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodTemplateList_To_core_PodTemplateList(a.(*v1.PodTemplateList), b.(*core.PodTemplateList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PodTemplateList)(nil), (*pkgapiscore.PodTemplateList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodTemplateList_To_core_PodTemplateList(a.(*apicorev1.PodTemplateList), b.(*pkgapiscore.PodTemplateList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PodTemplateList)(nil), (*v1.PodTemplateList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodTemplateList_To_v1_PodTemplateList(a.(*core.PodTemplateList), b.(*v1.PodTemplateList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PodTemplateList)(nil), (*apicorev1.PodTemplateList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodTemplateList_To_v1_PodTemplateList(a.(*pkgapiscore.PodTemplateList), b.(*apicorev1.PodTemplateList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PortStatus)(nil), (*core.PortStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PortStatus_To_core_PortStatus(a.(*v1.PortStatus), b.(*core.PortStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PortStatus)(nil), (*pkgapiscore.PortStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PortStatus_To_core_PortStatus(a.(*apicorev1.PortStatus), b.(*pkgapiscore.PortStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PortStatus)(nil), (*v1.PortStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PortStatus_To_v1_PortStatus(a.(*core.PortStatus), b.(*v1.PortStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PortStatus)(nil), (*apicorev1.PortStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PortStatus_To_v1_PortStatus(a.(*pkgapiscore.PortStatus), b.(*apicorev1.PortStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PortworxVolumeSource)(nil), (*core.PortworxVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(a.(*v1.PortworxVolumeSource), b.(*core.PortworxVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PortworxVolumeSource)(nil), (*pkgapiscore.PortworxVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(a.(*apicorev1.PortworxVolumeSource), b.(*pkgapiscore.PortworxVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PortworxVolumeSource)(nil), (*v1.PortworxVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(a.(*core.PortworxVolumeSource), b.(*v1.PortworxVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PortworxVolumeSource)(nil), (*apicorev1.PortworxVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(a.(*pkgapiscore.PortworxVolumeSource), b.(*apicorev1.PortworxVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Preconditions)(nil), (*core.Preconditions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Preconditions_To_core_Preconditions(a.(*v1.Preconditions), b.(*core.Preconditions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Preconditions)(nil), (*pkgapiscore.Preconditions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Preconditions_To_core_Preconditions(a.(*apicorev1.Preconditions), b.(*pkgapiscore.Preconditions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Preconditions)(nil), (*v1.Preconditions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Preconditions_To_v1_Preconditions(a.(*core.Preconditions), b.(*v1.Preconditions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Preconditions)(nil), (*apicorev1.Preconditions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Preconditions_To_v1_Preconditions(a.(*pkgapiscore.Preconditions), b.(*apicorev1.Preconditions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PreferAvoidPodsEntry)(nil), (*core.PreferAvoidPodsEntry)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(a.(*v1.PreferAvoidPodsEntry), b.(*core.PreferAvoidPodsEntry), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PreferAvoidPodsEntry)(nil), (*pkgapiscore.PreferAvoidPodsEntry)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(a.(*apicorev1.PreferAvoidPodsEntry), b.(*pkgapiscore.PreferAvoidPodsEntry), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PreferAvoidPodsEntry)(nil), (*v1.PreferAvoidPodsEntry)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(a.(*core.PreferAvoidPodsEntry), b.(*v1.PreferAvoidPodsEntry), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PreferAvoidPodsEntry)(nil), (*apicorev1.PreferAvoidPodsEntry)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(a.(*pkgapiscore.PreferAvoidPodsEntry), b.(*apicorev1.PreferAvoidPodsEntry), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.PreferredSchedulingTerm)(nil), (*core.PreferredSchedulingTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(a.(*v1.PreferredSchedulingTerm), b.(*core.PreferredSchedulingTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.PreferredSchedulingTerm)(nil), (*pkgapiscore.PreferredSchedulingTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(a.(*apicorev1.PreferredSchedulingTerm), b.(*pkgapiscore.PreferredSchedulingTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.PreferredSchedulingTerm)(nil), (*v1.PreferredSchedulingTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(a.(*core.PreferredSchedulingTerm), b.(*v1.PreferredSchedulingTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.PreferredSchedulingTerm)(nil), (*apicorev1.PreferredSchedulingTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(a.(*pkgapiscore.PreferredSchedulingTerm), b.(*apicorev1.PreferredSchedulingTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Probe)(nil), (*core.Probe)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Probe_To_core_Probe(a.(*v1.Probe), b.(*core.Probe), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Probe)(nil), (*pkgapiscore.Probe)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Probe_To_core_Probe(a.(*apicorev1.Probe), b.(*pkgapiscore.Probe), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Probe)(nil), (*v1.Probe)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Probe_To_v1_Probe(a.(*core.Probe), b.(*v1.Probe), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Probe)(nil), (*apicorev1.Probe)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Probe_To_v1_Probe(a.(*pkgapiscore.Probe), b.(*apicorev1.Probe), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ProbeHandler)(nil), (*core.ProbeHandler)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ProbeHandler_To_core_ProbeHandler(a.(*v1.ProbeHandler), b.(*core.ProbeHandler), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ProbeHandler)(nil), (*pkgapiscore.ProbeHandler)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ProbeHandler_To_core_ProbeHandler(a.(*apicorev1.ProbeHandler), b.(*pkgapiscore.ProbeHandler), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ProbeHandler)(nil), (*v1.ProbeHandler)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ProbeHandler_To_v1_ProbeHandler(a.(*core.ProbeHandler), b.(*v1.ProbeHandler), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ProbeHandler)(nil), (*apicorev1.ProbeHandler)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ProbeHandler_To_v1_ProbeHandler(a.(*pkgapiscore.ProbeHandler), b.(*apicorev1.ProbeHandler), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ProjectedVolumeSource)(nil), (*core.ProjectedVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(a.(*v1.ProjectedVolumeSource), b.(*core.ProjectedVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ProjectedVolumeSource)(nil), (*pkgapiscore.ProjectedVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(a.(*apicorev1.ProjectedVolumeSource), b.(*pkgapiscore.ProjectedVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ProjectedVolumeSource)(nil), (*v1.ProjectedVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(a.(*core.ProjectedVolumeSource), b.(*v1.ProjectedVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ProjectedVolumeSource)(nil), (*apicorev1.ProjectedVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(a.(*pkgapiscore.ProjectedVolumeSource), b.(*apicorev1.ProjectedVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.QuobyteVolumeSource)(nil), (*core.QuobyteVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(a.(*v1.QuobyteVolumeSource), b.(*core.QuobyteVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.QuobyteVolumeSource)(nil), (*pkgapiscore.QuobyteVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(a.(*apicorev1.QuobyteVolumeSource), b.(*pkgapiscore.QuobyteVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.QuobyteVolumeSource)(nil), (*v1.QuobyteVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(a.(*core.QuobyteVolumeSource), b.(*v1.QuobyteVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.QuobyteVolumeSource)(nil), (*apicorev1.QuobyteVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(a.(*pkgapiscore.QuobyteVolumeSource), b.(*apicorev1.QuobyteVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RBDPersistentVolumeSource)(nil), (*core.RBDPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(a.(*v1.RBDPersistentVolumeSource), b.(*core.RBDPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.RBDPersistentVolumeSource)(nil), (*pkgapiscore.RBDPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(a.(*apicorev1.RBDPersistentVolumeSource), b.(*pkgapiscore.RBDPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.RBDPersistentVolumeSource)(nil), (*v1.RBDPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(a.(*core.RBDPersistentVolumeSource), b.(*v1.RBDPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.RBDPersistentVolumeSource)(nil), (*apicorev1.RBDPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(a.(*pkgapiscore.RBDPersistentVolumeSource), b.(*apicorev1.RBDPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RBDVolumeSource)(nil), (*core.RBDVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RBDVolumeSource_To_core_RBDVolumeSource(a.(*v1.RBDVolumeSource), b.(*core.RBDVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.RBDVolumeSource)(nil), (*pkgapiscore.RBDVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_RBDVolumeSource_To_core_RBDVolumeSource(a.(*apicorev1.RBDVolumeSource), b.(*pkgapiscore.RBDVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.RBDVolumeSource)(nil), (*v1.RBDVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_RBDVolumeSource_To_v1_RBDVolumeSource(a.(*core.RBDVolumeSource), b.(*v1.RBDVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.RBDVolumeSource)(nil), (*apicorev1.RBDVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_RBDVolumeSource_To_v1_RBDVolumeSource(a.(*pkgapiscore.RBDVolumeSource), b.(*apicorev1.RBDVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.RangeAllocation)(nil), (*core.RangeAllocation)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_RangeAllocation_To_core_RangeAllocation(a.(*v1.RangeAllocation), b.(*core.RangeAllocation), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.RangeAllocation)(nil), (*pkgapiscore.RangeAllocation)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_RangeAllocation_To_core_RangeAllocation(a.(*apicorev1.RangeAllocation), b.(*pkgapiscore.RangeAllocation), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.RangeAllocation)(nil), (*v1.RangeAllocation)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_RangeAllocation_To_v1_RangeAllocation(a.(*core.RangeAllocation), b.(*v1.RangeAllocation), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.RangeAllocation)(nil), (*apicorev1.RangeAllocation)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_RangeAllocation_To_v1_RangeAllocation(a.(*pkgapiscore.RangeAllocation), b.(*apicorev1.RangeAllocation), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ReplicationController)(nil), (*core.ReplicationController)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationController_To_core_ReplicationController(a.(*v1.ReplicationController), b.(*core.ReplicationController), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ReplicationController)(nil), (*pkgapiscore.ReplicationController)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationController_To_core_ReplicationController(a.(*apicorev1.ReplicationController), b.(*pkgapiscore.ReplicationController), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ReplicationController)(nil), (*v1.ReplicationController)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ReplicationController_To_v1_ReplicationController(a.(*core.ReplicationController), b.(*v1.ReplicationController), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ReplicationController)(nil), (*apicorev1.ReplicationController)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ReplicationController_To_v1_ReplicationController(a.(*pkgapiscore.ReplicationController), b.(*apicorev1.ReplicationController), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ReplicationControllerCondition)(nil), (*core.ReplicationControllerCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(a.(*v1.ReplicationControllerCondition), b.(*core.ReplicationControllerCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ReplicationControllerCondition)(nil), (*pkgapiscore.ReplicationControllerCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(a.(*apicorev1.ReplicationControllerCondition), b.(*pkgapiscore.ReplicationControllerCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ReplicationControllerCondition)(nil), (*v1.ReplicationControllerCondition)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(a.(*core.ReplicationControllerCondition), b.(*v1.ReplicationControllerCondition), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ReplicationControllerCondition)(nil), (*apicorev1.ReplicationControllerCondition)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(a.(*pkgapiscore.ReplicationControllerCondition), b.(*apicorev1.ReplicationControllerCondition), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ReplicationControllerList)(nil), (*core.ReplicationControllerList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationControllerList_To_core_ReplicationControllerList(a.(*v1.ReplicationControllerList), b.(*core.ReplicationControllerList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ReplicationControllerList)(nil), (*pkgapiscore.ReplicationControllerList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationControllerList_To_core_ReplicationControllerList(a.(*apicorev1.ReplicationControllerList), b.(*pkgapiscore.ReplicationControllerList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ReplicationControllerList)(nil), (*v1.ReplicationControllerList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ReplicationControllerList_To_v1_ReplicationControllerList(a.(*core.ReplicationControllerList), b.(*v1.ReplicationControllerList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ReplicationControllerList)(nil), (*apicorev1.ReplicationControllerList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ReplicationControllerList_To_v1_ReplicationControllerList(a.(*pkgapiscore.ReplicationControllerList), b.(*apicorev1.ReplicationControllerList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ReplicationControllerStatus)(nil), (*core.ReplicationControllerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(a.(*v1.ReplicationControllerStatus), b.(*core.ReplicationControllerStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ReplicationControllerStatus)(nil), (*pkgapiscore.ReplicationControllerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(a.(*apicorev1.ReplicationControllerStatus), b.(*pkgapiscore.ReplicationControllerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ReplicationControllerStatus)(nil), (*v1.ReplicationControllerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(a.(*core.ReplicationControllerStatus), b.(*v1.ReplicationControllerStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ReplicationControllerStatus)(nil), (*apicorev1.ReplicationControllerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(a.(*pkgapiscore.ReplicationControllerStatus), b.(*apicorev1.ReplicationControllerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceFieldSelector)(nil), (*core.ResourceFieldSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(a.(*v1.ResourceFieldSelector), b.(*core.ResourceFieldSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ResourceFieldSelector)(nil), (*pkgapiscore.ResourceFieldSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(a.(*apicorev1.ResourceFieldSelector), b.(*pkgapiscore.ResourceFieldSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceFieldSelector)(nil), (*v1.ResourceFieldSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(a.(*core.ResourceFieldSelector), b.(*v1.ResourceFieldSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ResourceFieldSelector)(nil), (*apicorev1.ResourceFieldSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(a.(*pkgapiscore.ResourceFieldSelector), b.(*apicorev1.ResourceFieldSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceQuota)(nil), (*core.ResourceQuota)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceQuota_To_core_ResourceQuota(a.(*v1.ResourceQuota), b.(*core.ResourceQuota), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ResourceQuota)(nil), (*pkgapiscore.ResourceQuota)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceQuota_To_core_ResourceQuota(a.(*apicorev1.ResourceQuota), b.(*pkgapiscore.ResourceQuota), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuota)(nil), (*v1.ResourceQuota)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuota_To_v1_ResourceQuota(a.(*core.ResourceQuota), b.(*v1.ResourceQuota), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ResourceQuota)(nil), (*apicorev1.ResourceQuota)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ResourceQuota_To_v1_ResourceQuota(a.(*pkgapiscore.ResourceQuota), b.(*apicorev1.ResourceQuota), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceQuotaList)(nil), (*core.ResourceQuotaList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceQuotaList_To_core_ResourceQuotaList(a.(*v1.ResourceQuotaList), b.(*core.ResourceQuotaList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ResourceQuotaList)(nil), (*pkgapiscore.ResourceQuotaList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceQuotaList_To_core_ResourceQuotaList(a.(*apicorev1.ResourceQuotaList), b.(*pkgapiscore.ResourceQuotaList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaList)(nil), (*v1.ResourceQuotaList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuotaList_To_v1_ResourceQuotaList(a.(*core.ResourceQuotaList), b.(*v1.ResourceQuotaList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ResourceQuotaList)(nil), (*apicorev1.ResourceQuotaList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ResourceQuotaList_To_v1_ResourceQuotaList(a.(*pkgapiscore.ResourceQuotaList), b.(*apicorev1.ResourceQuotaList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceQuotaSpec)(nil), (*core.ResourceQuotaSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(a.(*v1.ResourceQuotaSpec), b.(*core.ResourceQuotaSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ResourceQuotaSpec)(nil), (*pkgapiscore.ResourceQuotaSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(a.(*apicorev1.ResourceQuotaSpec), b.(*pkgapiscore.ResourceQuotaSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaSpec)(nil), (*v1.ResourceQuotaSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(a.(*core.ResourceQuotaSpec), b.(*v1.ResourceQuotaSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ResourceQuotaSpec)(nil), (*apicorev1.ResourceQuotaSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(a.(*pkgapiscore.ResourceQuotaSpec), b.(*apicorev1.ResourceQuotaSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceQuotaStatus)(nil), (*core.ResourceQuotaStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(a.(*v1.ResourceQuotaStatus), b.(*core.ResourceQuotaStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ResourceQuotaStatus)(nil), (*pkgapiscore.ResourceQuotaStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(a.(*apicorev1.ResourceQuotaStatus), b.(*pkgapiscore.ResourceQuotaStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceQuotaStatus)(nil), (*v1.ResourceQuotaStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(a.(*core.ResourceQuotaStatus), b.(*v1.ResourceQuotaStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ResourceQuotaStatus)(nil), (*apicorev1.ResourceQuotaStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(a.(*pkgapiscore.ResourceQuotaStatus), b.(*apicorev1.ResourceQuotaStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ResourceRequirements)(nil), (*core.ResourceRequirements)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceRequirements_To_core_ResourceRequirements(a.(*v1.ResourceRequirements), b.(*core.ResourceRequirements), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ResourceRequirements)(nil), (*pkgapiscore.ResourceRequirements)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceRequirements_To_core_ResourceRequirements(a.(*apicorev1.ResourceRequirements), b.(*pkgapiscore.ResourceRequirements), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ResourceRequirements)(nil), (*v1.ResourceRequirements)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ResourceRequirements_To_v1_ResourceRequirements(a.(*core.ResourceRequirements), b.(*v1.ResourceRequirements), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ResourceRequirements)(nil), (*apicorev1.ResourceRequirements)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ResourceRequirements_To_v1_ResourceRequirements(a.(*pkgapiscore.ResourceRequirements), b.(*apicorev1.ResourceRequirements), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SELinuxOptions)(nil), (*core.SELinuxOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SELinuxOptions_To_core_SELinuxOptions(a.(*v1.SELinuxOptions), b.(*core.SELinuxOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SELinuxOptions)(nil), (*pkgapiscore.SELinuxOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SELinuxOptions_To_core_SELinuxOptions(a.(*apicorev1.SELinuxOptions), b.(*pkgapiscore.SELinuxOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SELinuxOptions)(nil), (*v1.SELinuxOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SELinuxOptions_To_v1_SELinuxOptions(a.(*core.SELinuxOptions), b.(*v1.SELinuxOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SELinuxOptions)(nil), (*apicorev1.SELinuxOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SELinuxOptions_To_v1_SELinuxOptions(a.(*pkgapiscore.SELinuxOptions), b.(*apicorev1.SELinuxOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ScaleIOPersistentVolumeSource)(nil), (*core.ScaleIOPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(a.(*v1.ScaleIOPersistentVolumeSource), b.(*core.ScaleIOPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ScaleIOPersistentVolumeSource)(nil), (*pkgapiscore.ScaleIOPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(a.(*apicorev1.ScaleIOPersistentVolumeSource), b.(*pkgapiscore.ScaleIOPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ScaleIOPersistentVolumeSource)(nil), (*v1.ScaleIOPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(a.(*core.ScaleIOPersistentVolumeSource), b.(*v1.ScaleIOPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ScaleIOPersistentVolumeSource)(nil), (*apicorev1.ScaleIOPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(a.(*pkgapiscore.ScaleIOPersistentVolumeSource), b.(*apicorev1.ScaleIOPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ScaleIOVolumeSource)(nil), (*core.ScaleIOVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(a.(*v1.ScaleIOVolumeSource), b.(*core.ScaleIOVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ScaleIOVolumeSource)(nil), (*pkgapiscore.ScaleIOVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(a.(*apicorev1.ScaleIOVolumeSource), b.(*pkgapiscore.ScaleIOVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ScaleIOVolumeSource)(nil), (*v1.ScaleIOVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(a.(*core.ScaleIOVolumeSource), b.(*v1.ScaleIOVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ScaleIOVolumeSource)(nil), (*apicorev1.ScaleIOVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(a.(*pkgapiscore.ScaleIOVolumeSource), b.(*apicorev1.ScaleIOVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ScopeSelector)(nil), (*core.ScopeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ScopeSelector_To_core_ScopeSelector(a.(*v1.ScopeSelector), b.(*core.ScopeSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ScopeSelector)(nil), (*pkgapiscore.ScopeSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ScopeSelector_To_core_ScopeSelector(a.(*apicorev1.ScopeSelector), b.(*pkgapiscore.ScopeSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ScopeSelector)(nil), (*v1.ScopeSelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ScopeSelector_To_v1_ScopeSelector(a.(*core.ScopeSelector), b.(*v1.ScopeSelector), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ScopeSelector)(nil), (*apicorev1.ScopeSelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ScopeSelector_To_v1_ScopeSelector(a.(*pkgapiscore.ScopeSelector), b.(*apicorev1.ScopeSelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ScopedResourceSelectorRequirement)(nil), (*core.ScopedResourceSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(a.(*v1.ScopedResourceSelectorRequirement), b.(*core.ScopedResourceSelectorRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ScopedResourceSelectorRequirement)(nil), (*pkgapiscore.ScopedResourceSelectorRequirement)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(a.(*apicorev1.ScopedResourceSelectorRequirement), b.(*pkgapiscore.ScopedResourceSelectorRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ScopedResourceSelectorRequirement)(nil), (*v1.ScopedResourceSelectorRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(a.(*core.ScopedResourceSelectorRequirement), b.(*v1.ScopedResourceSelectorRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ScopedResourceSelectorRequirement)(nil), (*apicorev1.ScopedResourceSelectorRequirement)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(a.(*pkgapiscore.ScopedResourceSelectorRequirement), b.(*apicorev1.ScopedResourceSelectorRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SeccompProfile)(nil), (*core.SeccompProfile)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SeccompProfile_To_core_SeccompProfile(a.(*v1.SeccompProfile), b.(*core.SeccompProfile), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SeccompProfile)(nil), (*pkgapiscore.SeccompProfile)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SeccompProfile_To_core_SeccompProfile(a.(*apicorev1.SeccompProfile), b.(*pkgapiscore.SeccompProfile), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SeccompProfile)(nil), (*v1.SeccompProfile)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SeccompProfile_To_v1_SeccompProfile(a.(*core.SeccompProfile), b.(*v1.SeccompProfile), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SeccompProfile)(nil), (*apicorev1.SeccompProfile)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SeccompProfile_To_v1_SeccompProfile(a.(*pkgapiscore.SeccompProfile), b.(*apicorev1.SeccompProfile), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Secret)(nil), (*v1.Secret)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Secret_To_v1_Secret(a.(*core.Secret), b.(*v1.Secret), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Secret)(nil), (*apicorev1.Secret)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Secret_To_v1_Secret(a.(*pkgapiscore.Secret), b.(*apicorev1.Secret), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecretEnvSource)(nil), (*core.SecretEnvSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecretEnvSource_To_core_SecretEnvSource(a.(*v1.SecretEnvSource), b.(*core.SecretEnvSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecretEnvSource)(nil), (*pkgapiscore.SecretEnvSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecretEnvSource_To_core_SecretEnvSource(a.(*apicorev1.SecretEnvSource), b.(*pkgapiscore.SecretEnvSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecretEnvSource)(nil), (*v1.SecretEnvSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecretEnvSource_To_v1_SecretEnvSource(a.(*core.SecretEnvSource), b.(*v1.SecretEnvSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecretEnvSource)(nil), (*apicorev1.SecretEnvSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecretEnvSource_To_v1_SecretEnvSource(a.(*pkgapiscore.SecretEnvSource), b.(*apicorev1.SecretEnvSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecretKeySelector)(nil), (*core.SecretKeySelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecretKeySelector_To_core_SecretKeySelector(a.(*v1.SecretKeySelector), b.(*core.SecretKeySelector), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecretKeySelector)(nil), (*pkgapiscore.SecretKeySelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecretKeySelector_To_core_SecretKeySelector(a.(*apicorev1.SecretKeySelector), b.(*pkgapiscore.SecretKeySelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecretKeySelector)(nil), (*v1.SecretKeySelector)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecretKeySelector_To_v1_SecretKeySelector(a.(*core.SecretKeySelector), b.(*v1.SecretKeySelector), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecretKeySelector)(nil), (*apicorev1.SecretKeySelector)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecretKeySelector_To_v1_SecretKeySelector(a.(*pkgapiscore.SecretKeySelector), b.(*apicorev1.SecretKeySelector), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecretList)(nil), (*core.SecretList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecretList_To_core_SecretList(a.(*v1.SecretList), b.(*core.SecretList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecretList)(nil), (*pkgapiscore.SecretList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecretList_To_core_SecretList(a.(*apicorev1.SecretList), b.(*pkgapiscore.SecretList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecretList)(nil), (*v1.SecretList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecretList_To_v1_SecretList(a.(*core.SecretList), b.(*v1.SecretList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecretList)(nil), (*apicorev1.SecretList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecretList_To_v1_SecretList(a.(*pkgapiscore.SecretList), b.(*apicorev1.SecretList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecretProjection)(nil), (*core.SecretProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecretProjection_To_core_SecretProjection(a.(*v1.SecretProjection), b.(*core.SecretProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecretProjection)(nil), (*pkgapiscore.SecretProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecretProjection_To_core_SecretProjection(a.(*apicorev1.SecretProjection), b.(*pkgapiscore.SecretProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecretProjection)(nil), (*v1.SecretProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecretProjection_To_v1_SecretProjection(a.(*core.SecretProjection), b.(*v1.SecretProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecretProjection)(nil), (*apicorev1.SecretProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecretProjection_To_v1_SecretProjection(a.(*pkgapiscore.SecretProjection), b.(*apicorev1.SecretProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecretReference)(nil), (*core.SecretReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecretReference_To_core_SecretReference(a.(*v1.SecretReference), b.(*core.SecretReference), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecretReference)(nil), (*pkgapiscore.SecretReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecretReference_To_core_SecretReference(a.(*apicorev1.SecretReference), b.(*pkgapiscore.SecretReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecretReference)(nil), (*v1.SecretReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecretReference_To_v1_SecretReference(a.(*core.SecretReference), b.(*v1.SecretReference), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecretReference)(nil), (*apicorev1.SecretReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecretReference_To_v1_SecretReference(a.(*pkgapiscore.SecretReference), b.(*apicorev1.SecretReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecretVolumeSource)(nil), (*core.SecretVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecretVolumeSource_To_core_SecretVolumeSource(a.(*v1.SecretVolumeSource), b.(*core.SecretVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecretVolumeSource)(nil), (*pkgapiscore.SecretVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecretVolumeSource_To_core_SecretVolumeSource(a.(*apicorev1.SecretVolumeSource), b.(*pkgapiscore.SecretVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecretVolumeSource)(nil), (*v1.SecretVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecretVolumeSource_To_v1_SecretVolumeSource(a.(*core.SecretVolumeSource), b.(*v1.SecretVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecretVolumeSource)(nil), (*apicorev1.SecretVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecretVolumeSource_To_v1_SecretVolumeSource(a.(*pkgapiscore.SecretVolumeSource), b.(*apicorev1.SecretVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SecurityContext)(nil), (*core.SecurityContext)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SecurityContext_To_core_SecurityContext(a.(*v1.SecurityContext), b.(*core.SecurityContext), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SecurityContext)(nil), (*pkgapiscore.SecurityContext)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SecurityContext_To_core_SecurityContext(a.(*apicorev1.SecurityContext), b.(*pkgapiscore.SecurityContext), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SecurityContext)(nil), (*v1.SecurityContext)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SecurityContext_To_v1_SecurityContext(a.(*core.SecurityContext), b.(*v1.SecurityContext), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SecurityContext)(nil), (*apicorev1.SecurityContext)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SecurityContext_To_v1_SecurityContext(a.(*pkgapiscore.SecurityContext), b.(*apicorev1.SecurityContext), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SerializedReference)(nil), (*core.SerializedReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SerializedReference_To_core_SerializedReference(a.(*v1.SerializedReference), b.(*core.SerializedReference), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SerializedReference)(nil), (*pkgapiscore.SerializedReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SerializedReference_To_core_SerializedReference(a.(*apicorev1.SerializedReference), b.(*pkgapiscore.SerializedReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SerializedReference)(nil), (*v1.SerializedReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SerializedReference_To_v1_SerializedReference(a.(*core.SerializedReference), b.(*v1.SerializedReference), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SerializedReference)(nil), (*apicorev1.SerializedReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SerializedReference_To_v1_SerializedReference(a.(*pkgapiscore.SerializedReference), b.(*apicorev1.SerializedReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Service)(nil), (*core.Service)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Service_To_core_Service(a.(*v1.Service), b.(*core.Service), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Service)(nil), (*pkgapiscore.Service)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Service_To_core_Service(a.(*apicorev1.Service), b.(*pkgapiscore.Service), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Service)(nil), (*v1.Service)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Service_To_v1_Service(a.(*core.Service), b.(*v1.Service), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Service)(nil), (*apicorev1.Service)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Service_To_v1_Service(a.(*pkgapiscore.Service), b.(*apicorev1.Service), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceAccount)(nil), (*core.ServiceAccount)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceAccount_To_core_ServiceAccount(a.(*v1.ServiceAccount), b.(*core.ServiceAccount), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceAccount)(nil), (*pkgapiscore.ServiceAccount)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceAccount_To_core_ServiceAccount(a.(*apicorev1.ServiceAccount), b.(*pkgapiscore.ServiceAccount), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceAccount)(nil), (*v1.ServiceAccount)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceAccount_To_v1_ServiceAccount(a.(*core.ServiceAccount), b.(*v1.ServiceAccount), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceAccount)(nil), (*apicorev1.ServiceAccount)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceAccount_To_v1_ServiceAccount(a.(*pkgapiscore.ServiceAccount), b.(*apicorev1.ServiceAccount), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceAccountList)(nil), (*core.ServiceAccountList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceAccountList_To_core_ServiceAccountList(a.(*v1.ServiceAccountList), b.(*core.ServiceAccountList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceAccountList)(nil), (*pkgapiscore.ServiceAccountList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceAccountList_To_core_ServiceAccountList(a.(*apicorev1.ServiceAccountList), b.(*pkgapiscore.ServiceAccountList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceAccountList)(nil), (*v1.ServiceAccountList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceAccountList_To_v1_ServiceAccountList(a.(*core.ServiceAccountList), b.(*v1.ServiceAccountList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceAccountList)(nil), (*apicorev1.ServiceAccountList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceAccountList_To_v1_ServiceAccountList(a.(*pkgapiscore.ServiceAccountList), b.(*apicorev1.ServiceAccountList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceAccountTokenProjection)(nil), (*core.ServiceAccountTokenProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(a.(*v1.ServiceAccountTokenProjection), b.(*core.ServiceAccountTokenProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceAccountTokenProjection)(nil), (*pkgapiscore.ServiceAccountTokenProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(a.(*apicorev1.ServiceAccountTokenProjection), b.(*pkgapiscore.ServiceAccountTokenProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceAccountTokenProjection)(nil), (*v1.ServiceAccountTokenProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(a.(*core.ServiceAccountTokenProjection), b.(*v1.ServiceAccountTokenProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceAccountTokenProjection)(nil), (*apicorev1.ServiceAccountTokenProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(a.(*pkgapiscore.ServiceAccountTokenProjection), b.(*apicorev1.ServiceAccountTokenProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceList)(nil), (*core.ServiceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceList_To_core_ServiceList(a.(*v1.ServiceList), b.(*core.ServiceList), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceList)(nil), (*pkgapiscore.ServiceList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceList_To_core_ServiceList(a.(*apicorev1.ServiceList), b.(*pkgapiscore.ServiceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceList)(nil), (*v1.ServiceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceList_To_v1_ServiceList(a.(*core.ServiceList), b.(*v1.ServiceList), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceList)(nil), (*apicorev1.ServiceList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceList_To_v1_ServiceList(a.(*pkgapiscore.ServiceList), b.(*apicorev1.ServiceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServicePort)(nil), (*core.ServicePort)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServicePort_To_core_ServicePort(a.(*v1.ServicePort), b.(*core.ServicePort), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServicePort)(nil), (*pkgapiscore.ServicePort)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServicePort_To_core_ServicePort(a.(*apicorev1.ServicePort), b.(*pkgapiscore.ServicePort), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServicePort)(nil), (*v1.ServicePort)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServicePort_To_v1_ServicePort(a.(*core.ServicePort), b.(*v1.ServicePort), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServicePort)(nil), (*apicorev1.ServicePort)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServicePort_To_v1_ServicePort(a.(*pkgapiscore.ServicePort), b.(*apicorev1.ServicePort), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceProxyOptions)(nil), (*core.ServiceProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(a.(*v1.ServiceProxyOptions), b.(*core.ServiceProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceProxyOptions)(nil), (*pkgapiscore.ServiceProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(a.(*apicorev1.ServiceProxyOptions), b.(*pkgapiscore.ServiceProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceProxyOptions)(nil), (*v1.ServiceProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(a.(*core.ServiceProxyOptions), b.(*v1.ServiceProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceProxyOptions)(nil), (*apicorev1.ServiceProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(a.(*pkgapiscore.ServiceProxyOptions), b.(*apicorev1.ServiceProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceSpec)(nil), (*core.ServiceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceSpec_To_core_ServiceSpec(a.(*v1.ServiceSpec), b.(*core.ServiceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceSpec)(nil), (*pkgapiscore.ServiceSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceSpec_To_core_ServiceSpec(a.(*apicorev1.ServiceSpec), b.(*pkgapiscore.ServiceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceSpec)(nil), (*v1.ServiceSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceSpec_To_v1_ServiceSpec(a.(*core.ServiceSpec), b.(*v1.ServiceSpec), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceSpec)(nil), (*apicorev1.ServiceSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceSpec_To_v1_ServiceSpec(a.(*pkgapiscore.ServiceSpec), b.(*apicorev1.ServiceSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.ServiceStatus)(nil), (*core.ServiceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ServiceStatus_To_core_ServiceStatus(a.(*v1.ServiceStatus), b.(*core.ServiceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.ServiceStatus)(nil), (*pkgapiscore.ServiceStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ServiceStatus_To_core_ServiceStatus(a.(*apicorev1.ServiceStatus), b.(*pkgapiscore.ServiceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.ServiceStatus)(nil), (*v1.ServiceStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ServiceStatus_To_v1_ServiceStatus(a.(*core.ServiceStatus), b.(*v1.ServiceStatus), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.ServiceStatus)(nil), (*apicorev1.ServiceStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ServiceStatus_To_v1_ServiceStatus(a.(*pkgapiscore.ServiceStatus), b.(*apicorev1.ServiceStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.SessionAffinityConfig)(nil), (*core.SessionAffinityConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(a.(*v1.SessionAffinityConfig), b.(*core.SessionAffinityConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.SessionAffinityConfig)(nil), (*pkgapiscore.SessionAffinityConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(a.(*apicorev1.SessionAffinityConfig), b.(*pkgapiscore.SessionAffinityConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.SessionAffinityConfig)(nil), (*v1.SessionAffinityConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(a.(*core.SessionAffinityConfig), b.(*v1.SessionAffinityConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.SessionAffinityConfig)(nil), (*apicorev1.SessionAffinityConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(a.(*pkgapiscore.SessionAffinityConfig), b.(*apicorev1.SessionAffinityConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.StorageOSPersistentVolumeSource)(nil), (*core.StorageOSPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(a.(*v1.StorageOSPersistentVolumeSource), b.(*core.StorageOSPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.StorageOSPersistentVolumeSource)(nil), (*pkgapiscore.StorageOSPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(a.(*apicorev1.StorageOSPersistentVolumeSource), b.(*pkgapiscore.StorageOSPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.StorageOSPersistentVolumeSource)(nil), (*v1.StorageOSPersistentVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(a.(*core.StorageOSPersistentVolumeSource), b.(*v1.StorageOSPersistentVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.StorageOSPersistentVolumeSource)(nil), (*apicorev1.StorageOSPersistentVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(a.(*pkgapiscore.StorageOSPersistentVolumeSource), b.(*apicorev1.StorageOSPersistentVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.StorageOSVolumeSource)(nil), (*core.StorageOSVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(a.(*v1.StorageOSVolumeSource), b.(*core.StorageOSVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.StorageOSVolumeSource)(nil), (*pkgapiscore.StorageOSVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(a.(*apicorev1.StorageOSVolumeSource), b.(*pkgapiscore.StorageOSVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.StorageOSVolumeSource)(nil), (*v1.StorageOSVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(a.(*core.StorageOSVolumeSource), b.(*v1.StorageOSVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.StorageOSVolumeSource)(nil), (*apicorev1.StorageOSVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(a.(*pkgapiscore.StorageOSVolumeSource), b.(*apicorev1.StorageOSVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Sysctl)(nil), (*core.Sysctl)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Sysctl_To_core_Sysctl(a.(*v1.Sysctl), b.(*core.Sysctl), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Sysctl)(nil), (*pkgapiscore.Sysctl)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Sysctl_To_core_Sysctl(a.(*apicorev1.Sysctl), b.(*pkgapiscore.Sysctl), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Sysctl)(nil), (*v1.Sysctl)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Sysctl_To_v1_Sysctl(a.(*core.Sysctl), b.(*v1.Sysctl), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Sysctl)(nil), (*apicorev1.Sysctl)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Sysctl_To_v1_Sysctl(a.(*pkgapiscore.Sysctl), b.(*apicorev1.Sysctl), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TCPSocketAction)(nil), (*core.TCPSocketAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TCPSocketAction_To_core_TCPSocketAction(a.(*v1.TCPSocketAction), b.(*core.TCPSocketAction), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.TCPSocketAction)(nil), (*pkgapiscore.TCPSocketAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_TCPSocketAction_To_core_TCPSocketAction(a.(*apicorev1.TCPSocketAction), b.(*pkgapiscore.TCPSocketAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.TCPSocketAction)(nil), (*v1.TCPSocketAction)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_TCPSocketAction_To_v1_TCPSocketAction(a.(*core.TCPSocketAction), b.(*v1.TCPSocketAction), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.TCPSocketAction)(nil), (*apicorev1.TCPSocketAction)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_TCPSocketAction_To_v1_TCPSocketAction(a.(*pkgapiscore.TCPSocketAction), b.(*apicorev1.TCPSocketAction), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Taint)(nil), (*core.Taint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Taint_To_core_Taint(a.(*v1.Taint), b.(*core.Taint), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Taint)(nil), (*pkgapiscore.Taint)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Taint_To_core_Taint(a.(*apicorev1.Taint), b.(*pkgapiscore.Taint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Taint)(nil), (*v1.Taint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Taint_To_v1_Taint(a.(*core.Taint), b.(*v1.Taint), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Taint)(nil), (*apicorev1.Taint)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Taint_To_v1_Taint(a.(*pkgapiscore.Taint), b.(*apicorev1.Taint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.Toleration)(nil), (*core.Toleration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Toleration_To_core_Toleration(a.(*v1.Toleration), b.(*core.Toleration), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.Toleration)(nil), (*pkgapiscore.Toleration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Toleration_To_core_Toleration(a.(*apicorev1.Toleration), b.(*pkgapiscore.Toleration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.Toleration)(nil), (*v1.Toleration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Toleration_To_v1_Toleration(a.(*core.Toleration), b.(*v1.Toleration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.Toleration)(nil), (*apicorev1.Toleration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Toleration_To_v1_Toleration(a.(*pkgapiscore.Toleration), b.(*apicorev1.Toleration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TopologySelectorLabelRequirement)(nil), (*core.TopologySelectorLabelRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(a.(*v1.TopologySelectorLabelRequirement), b.(*core.TopologySelectorLabelRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.TopologySelectorLabelRequirement)(nil), (*pkgapiscore.TopologySelectorLabelRequirement)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(a.(*apicorev1.TopologySelectorLabelRequirement), b.(*pkgapiscore.TopologySelectorLabelRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.TopologySelectorLabelRequirement)(nil), (*v1.TopologySelectorLabelRequirement)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(a.(*core.TopologySelectorLabelRequirement), b.(*v1.TopologySelectorLabelRequirement), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.TopologySelectorLabelRequirement)(nil), (*apicorev1.TopologySelectorLabelRequirement)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(a.(*pkgapiscore.TopologySelectorLabelRequirement), b.(*apicorev1.TopologySelectorLabelRequirement), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TopologySelectorTerm)(nil), (*core.TopologySelectorTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(a.(*v1.TopologySelectorTerm), b.(*core.TopologySelectorTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.TopologySelectorTerm)(nil), (*pkgapiscore.TopologySelectorTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(a.(*apicorev1.TopologySelectorTerm), b.(*pkgapiscore.TopologySelectorTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.TopologySelectorTerm)(nil), (*v1.TopologySelectorTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(a.(*core.TopologySelectorTerm), b.(*v1.TopologySelectorTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.TopologySelectorTerm)(nil), (*apicorev1.TopologySelectorTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(a.(*pkgapiscore.TopologySelectorTerm), b.(*apicorev1.TopologySelectorTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TopologySpreadConstraint)(nil), (*core.TopologySpreadConstraint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(a.(*v1.TopologySpreadConstraint), b.(*core.TopologySpreadConstraint), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.TopologySpreadConstraint)(nil), (*pkgapiscore.TopologySpreadConstraint)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(a.(*apicorev1.TopologySpreadConstraint), b.(*pkgapiscore.TopologySpreadConstraint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.TopologySpreadConstraint)(nil), (*v1.TopologySpreadConstraint)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(a.(*core.TopologySpreadConstraint), b.(*v1.TopologySpreadConstraint), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.TopologySpreadConstraint)(nil), (*apicorev1.TopologySpreadConstraint)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(a.(*pkgapiscore.TopologySpreadConstraint), b.(*apicorev1.TopologySpreadConstraint), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.TypedLocalObjectReference)(nil), (*core.TypedLocalObjectReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(a.(*v1.TypedLocalObjectReference), b.(*core.TypedLocalObjectReference), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.TypedLocalObjectReference)(nil), (*pkgapiscore.TypedLocalObjectReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(a.(*apicorev1.TypedLocalObjectReference), b.(*pkgapiscore.TypedLocalObjectReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.TypedLocalObjectReference)(nil), (*v1.TypedLocalObjectReference)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(a.(*core.TypedLocalObjectReference), b.(*v1.TypedLocalObjectReference), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.TypedLocalObjectReference)(nil), (*apicorev1.TypedLocalObjectReference)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(a.(*pkgapiscore.TypedLocalObjectReference), b.(*apicorev1.TypedLocalObjectReference), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.VolumeDevice)(nil), (*core.VolumeDevice)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_VolumeDevice_To_core_VolumeDevice(a.(*v1.VolumeDevice), b.(*core.VolumeDevice), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.VolumeDevice)(nil), (*pkgapiscore.VolumeDevice)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_VolumeDevice_To_core_VolumeDevice(a.(*apicorev1.VolumeDevice), b.(*pkgapiscore.VolumeDevice), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.VolumeDevice)(nil), (*v1.VolumeDevice)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_VolumeDevice_To_v1_VolumeDevice(a.(*core.VolumeDevice), b.(*v1.VolumeDevice), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.VolumeDevice)(nil), (*apicorev1.VolumeDevice)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_VolumeDevice_To_v1_VolumeDevice(a.(*pkgapiscore.VolumeDevice), b.(*apicorev1.VolumeDevice), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.VolumeMount)(nil), (*core.VolumeMount)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_VolumeMount_To_core_VolumeMount(a.(*v1.VolumeMount), b.(*core.VolumeMount), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.VolumeMount)(nil), (*pkgapiscore.VolumeMount)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_VolumeMount_To_core_VolumeMount(a.(*apicorev1.VolumeMount), b.(*pkgapiscore.VolumeMount), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.VolumeMount)(nil), (*v1.VolumeMount)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_VolumeMount_To_v1_VolumeMount(a.(*core.VolumeMount), b.(*v1.VolumeMount), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.VolumeMount)(nil), (*apicorev1.VolumeMount)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_VolumeMount_To_v1_VolumeMount(a.(*pkgapiscore.VolumeMount), b.(*apicorev1.VolumeMount), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.VolumeNodeAffinity)(nil), (*core.VolumeNodeAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(a.(*v1.VolumeNodeAffinity), b.(*core.VolumeNodeAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.VolumeNodeAffinity)(nil), (*pkgapiscore.VolumeNodeAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(a.(*apicorev1.VolumeNodeAffinity), b.(*pkgapiscore.VolumeNodeAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.VolumeNodeAffinity)(nil), (*v1.VolumeNodeAffinity)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(a.(*core.VolumeNodeAffinity), b.(*v1.VolumeNodeAffinity), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.VolumeNodeAffinity)(nil), (*apicorev1.VolumeNodeAffinity)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(a.(*pkgapiscore.VolumeNodeAffinity), b.(*apicorev1.VolumeNodeAffinity), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.VolumeProjection)(nil), (*core.VolumeProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_VolumeProjection_To_core_VolumeProjection(a.(*v1.VolumeProjection), b.(*core.VolumeProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.VolumeProjection)(nil), (*pkgapiscore.VolumeProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_VolumeProjection_To_core_VolumeProjection(a.(*apicorev1.VolumeProjection), b.(*pkgapiscore.VolumeProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.VolumeProjection)(nil), (*v1.VolumeProjection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_VolumeProjection_To_v1_VolumeProjection(a.(*core.VolumeProjection), b.(*v1.VolumeProjection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.VolumeProjection)(nil), (*apicorev1.VolumeProjection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_VolumeProjection_To_v1_VolumeProjection(a.(*pkgapiscore.VolumeProjection), b.(*apicorev1.VolumeProjection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.VolumeSource)(nil), (*core.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_VolumeSource_To_core_VolumeSource(a.(*v1.VolumeSource), b.(*core.VolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.VolumeSource)(nil), (*pkgapiscore.VolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_VolumeSource_To_core_VolumeSource(a.(*apicorev1.VolumeSource), b.(*pkgapiscore.VolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.VolumeSource)(nil), (*v1.VolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_VolumeSource_To_v1_VolumeSource(a.(*core.VolumeSource), b.(*v1.VolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.VolumeSource)(nil), (*apicorev1.VolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_VolumeSource_To_v1_VolumeSource(a.(*pkgapiscore.VolumeSource), b.(*apicorev1.VolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.VsphereVirtualDiskVolumeSource)(nil), (*core.VsphereVirtualDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(a.(*v1.VsphereVirtualDiskVolumeSource), b.(*core.VsphereVirtualDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.VsphereVirtualDiskVolumeSource)(nil), (*pkgapiscore.VsphereVirtualDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(a.(*apicorev1.VsphereVirtualDiskVolumeSource), b.(*pkgapiscore.VsphereVirtualDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.VsphereVirtualDiskVolumeSource)(nil), (*v1.VsphereVirtualDiskVolumeSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(a.(*core.VsphereVirtualDiskVolumeSource), b.(*v1.VsphereVirtualDiskVolumeSource), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.VsphereVirtualDiskVolumeSource)(nil), (*apicorev1.VsphereVirtualDiskVolumeSource)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(a.(*pkgapiscore.VsphereVirtualDiskVolumeSource), b.(*apicorev1.VsphereVirtualDiskVolumeSource), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.WeightedPodAffinityTerm)(nil), (*core.WeightedPodAffinityTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(a.(*v1.WeightedPodAffinityTerm), b.(*core.WeightedPodAffinityTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.WeightedPodAffinityTerm)(nil), (*pkgapiscore.WeightedPodAffinityTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(a.(*apicorev1.WeightedPodAffinityTerm), b.(*pkgapiscore.WeightedPodAffinityTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.WeightedPodAffinityTerm)(nil), (*v1.WeightedPodAffinityTerm)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(a.(*core.WeightedPodAffinityTerm), b.(*v1.WeightedPodAffinityTerm), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.WeightedPodAffinityTerm)(nil), (*apicorev1.WeightedPodAffinityTerm)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(a.(*pkgapiscore.WeightedPodAffinityTerm), b.(*apicorev1.WeightedPodAffinityTerm), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*v1.WindowsSecurityContextOptions)(nil), (*core.WindowsSecurityContextOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(a.(*v1.WindowsSecurityContextOptions), b.(*core.WindowsSecurityContextOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*apicorev1.WindowsSecurityContextOptions)(nil), (*pkgapiscore.WindowsSecurityContextOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(a.(*apicorev1.WindowsSecurityContextOptions), b.(*pkgapiscore.WindowsSecurityContextOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*core.WindowsSecurityContextOptions)(nil), (*v1.WindowsSecurityContextOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(a.(*core.WindowsSecurityContextOptions), b.(*v1.WindowsSecurityContextOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapiscore.WindowsSecurityContextOptions)(nil), (*apicorev1.WindowsSecurityContextOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(a.(*pkgapiscore.WindowsSecurityContextOptions), b.(*apicorev1.WindowsSecurityContextOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.NodeProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_NodeProxyOptions(a.(*url.Values), b.(*v1.NodeProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.NodeProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_NodeProxyOptions(a.(*url.Values), b.(*apicorev1.NodeProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.PodAttachOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_PodAttachOptions(a.(*url.Values), b.(*v1.PodAttachOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.PodAttachOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_PodAttachOptions(a.(*url.Values), b.(*apicorev1.PodAttachOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.PodExecOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_PodExecOptions(a.(*url.Values), b.(*v1.PodExecOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.PodExecOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_PodExecOptions(a.(*url.Values), b.(*apicorev1.PodExecOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.PodLogOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_PodLogOptions(a.(*url.Values), b.(*v1.PodLogOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.PodLogOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_PodLogOptions(a.(*url.Values), b.(*apicorev1.PodLogOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.PodPortForwardOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_PodPortForwardOptions(a.(*url.Values), b.(*v1.PodPortForwardOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.PodPortForwardOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_PodPortForwardOptions(a.(*url.Values), b.(*apicorev1.PodPortForwardOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.PodProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_PodProxyOptions(a.(*url.Values), b.(*v1.PodProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.PodProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_PodProxyOptions(a.(*url.Values), b.(*apicorev1.PodProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*v1.ServiceProxyOptions)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_url_Values_To_v1_ServiceProxyOptions(a.(*url.Values), b.(*v1.ServiceProxyOptions), scope)
+	if err := s.AddGeneratedConversionFunc((*url.Values)(nil), (*apicorev1.ServiceProxyOptions)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_url_Values_To_v1_ServiceProxyOptions(a.(*url.Values), b.(*apicorev1.ServiceProxyOptions), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*apps.ReplicaSetSpec)(nil), (*v1.ReplicationControllerSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apps_ReplicaSetSpec_To_v1_ReplicationControllerSpec(a.(*apps.ReplicaSetSpec), b.(*v1.ReplicationControllerSpec), scope)
+	if err := s.AddConversionFunc((*pkgapisapps.ReplicaSetSpec)(nil), (*apicorev1.ReplicationControllerSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apps_ReplicaSetSpec_To_v1_ReplicationControllerSpec(a.(*pkgapisapps.ReplicaSetSpec), b.(*apicorev1.ReplicationControllerSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*apps.ReplicaSetStatus)(nil), (*v1.ReplicationControllerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apps_ReplicaSetStatus_To_v1_ReplicationControllerStatus(a.(*apps.ReplicaSetStatus), b.(*v1.ReplicationControllerStatus), scope)
+	if err := s.AddConversionFunc((*pkgapisapps.ReplicaSetStatus)(nil), (*apicorev1.ReplicationControllerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apps_ReplicaSetStatus_To_v1_ReplicationControllerStatus(a.(*pkgapisapps.ReplicaSetStatus), b.(*apicorev1.ReplicationControllerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*apps.ReplicaSet)(nil), (*v1.ReplicationController)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apps_ReplicaSet_To_v1_ReplicationController(a.(*apps.ReplicaSet), b.(*v1.ReplicationController), scope)
+	if err := s.AddConversionFunc((*pkgapisapps.ReplicaSet)(nil), (*apicorev1.ReplicationController)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apps_ReplicaSet_To_v1_ReplicationController(a.(*pkgapisapps.ReplicaSet), b.(*apicorev1.ReplicationController), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.LoadBalancerStatus)(nil), (*v1.LoadBalancerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_LoadBalancerStatus_To_v1_LoadBalancerStatus(a.(*core.LoadBalancerStatus), b.(*v1.LoadBalancerStatus), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.LoadBalancerStatus)(nil), (*apicorev1.LoadBalancerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_LoadBalancerStatus_To_v1_LoadBalancerStatus(a.(*pkgapiscore.LoadBalancerStatus), b.(*apicorev1.LoadBalancerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.NodeSpec)(nil), (*v1.NodeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_NodeSpec_To_v1_NodeSpec(a.(*core.NodeSpec), b.(*v1.NodeSpec), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.NodeSpec)(nil), (*apicorev1.NodeSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_NodeSpec_To_v1_NodeSpec(a.(*pkgapiscore.NodeSpec), b.(*apicorev1.NodeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.PersistentVolumeSpec)(nil), (*v1.PersistentVolumeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PersistentVolumeSpec_To_v1_PersistentVolumeSpec(a.(*core.PersistentVolumeSpec), b.(*v1.PersistentVolumeSpec), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.PersistentVolumeSpec)(nil), (*apicorev1.PersistentVolumeSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PersistentVolumeSpec_To_v1_PersistentVolumeSpec(a.(*pkgapiscore.PersistentVolumeSpec), b.(*apicorev1.PersistentVolumeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.PodSpec)(nil), (*v1.PodSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodSpec_To_v1_PodSpec(a.(*core.PodSpec), b.(*v1.PodSpec), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.PodSpec)(nil), (*apicorev1.PodSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodSpec_To_v1_PodSpec(a.(*pkgapiscore.PodSpec), b.(*apicorev1.PodSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.PodStatus)(nil), (*v1.PodStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodStatus_To_v1_PodStatus(a.(*core.PodStatus), b.(*v1.PodStatus), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.PodStatus)(nil), (*apicorev1.PodStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodStatus_To_v1_PodStatus(a.(*pkgapiscore.PodStatus), b.(*apicorev1.PodStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.PodTemplateSpec)(nil), (*v1.PodTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PodTemplateSpec_To_v1_PodTemplateSpec(a.(*core.PodTemplateSpec), b.(*v1.PodTemplateSpec), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.PodTemplateSpec)(nil), (*apicorev1.PodTemplateSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_PodTemplateSpec_To_v1_PodTemplateSpec(a.(*pkgapiscore.PodTemplateSpec), b.(*apicorev1.PodTemplateSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.Pod)(nil), (*v1.Pod)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Pod_To_v1_Pod(a.(*core.Pod), b.(*v1.Pod), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.Pod)(nil), (*apicorev1.Pod)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Pod_To_v1_Pod(a.(*pkgapiscore.Pod), b.(*apicorev1.Pod), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.ReplicationControllerSpec)(nil), (*v1.ReplicationControllerSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_ReplicationControllerSpec_To_v1_ReplicationControllerSpec(a.(*core.ReplicationControllerSpec), b.(*v1.ReplicationControllerSpec), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.ReplicationControllerSpec)(nil), (*apicorev1.ReplicationControllerSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_ReplicationControllerSpec_To_v1_ReplicationControllerSpec(a.(*pkgapiscore.ReplicationControllerSpec), b.(*apicorev1.ReplicationControllerSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*core.Volume)(nil), (*v1.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_Volume_To_v1_Volume(a.(*core.Volume), b.(*v1.Volume), scope)
+	if err := s.AddConversionFunc((*pkgapiscore.Volume)(nil), (*apicorev1.Volume)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_core_Volume_To_v1_Volume(a.(*pkgapiscore.Volume), b.(*apicorev1.Volume), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.LoadBalancerStatus)(nil), (*core.LoadBalancerStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_LoadBalancerStatus_To_core_LoadBalancerStatus(a.(*v1.LoadBalancerStatus), b.(*core.LoadBalancerStatus), scope)
+	if err := s.AddConversionFunc((*apicorev1.LoadBalancerStatus)(nil), (*pkgapiscore.LoadBalancerStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_LoadBalancerStatus_To_core_LoadBalancerStatus(a.(*apicorev1.LoadBalancerStatus), b.(*pkgapiscore.LoadBalancerStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.NodeSpec)(nil), (*core.NodeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_NodeSpec_To_core_NodeSpec(a.(*v1.NodeSpec), b.(*core.NodeSpec), scope)
+	if err := s.AddConversionFunc((*apicorev1.NodeSpec)(nil), (*pkgapiscore.NodeSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_NodeSpec_To_core_NodeSpec(a.(*apicorev1.NodeSpec), b.(*pkgapiscore.NodeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.PersistentVolumeSpec)(nil), (*core.PersistentVolumeSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PersistentVolumeSpec_To_core_PersistentVolumeSpec(a.(*v1.PersistentVolumeSpec), b.(*core.PersistentVolumeSpec), scope)
+	if err := s.AddConversionFunc((*apicorev1.PersistentVolumeSpec)(nil), (*pkgapiscore.PersistentVolumeSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PersistentVolumeSpec_To_core_PersistentVolumeSpec(a.(*apicorev1.PersistentVolumeSpec), b.(*pkgapiscore.PersistentVolumeSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.PodSpec)(nil), (*core.PodSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodSpec_To_core_PodSpec(a.(*v1.PodSpec), b.(*core.PodSpec), scope)
+	if err := s.AddConversionFunc((*apicorev1.PodSpec)(nil), (*pkgapiscore.PodSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodSpec_To_core_PodSpec(a.(*apicorev1.PodSpec), b.(*pkgapiscore.PodSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.PodStatus)(nil), (*core.PodStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodStatus_To_core_PodStatus(a.(*v1.PodStatus), b.(*core.PodStatus), scope)
+	if err := s.AddConversionFunc((*apicorev1.PodStatus)(nil), (*pkgapiscore.PodStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodStatus_To_core_PodStatus(a.(*apicorev1.PodStatus), b.(*pkgapiscore.PodStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.PodTemplateSpec)(nil), (*core.PodTemplateSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_PodTemplateSpec_To_core_PodTemplateSpec(a.(*v1.PodTemplateSpec), b.(*core.PodTemplateSpec), scope)
+	if err := s.AddConversionFunc((*apicorev1.PodTemplateSpec)(nil), (*pkgapiscore.PodTemplateSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_PodTemplateSpec_To_core_PodTemplateSpec(a.(*apicorev1.PodTemplateSpec), b.(*pkgapiscore.PodTemplateSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.Pod)(nil), (*core.Pod)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Pod_To_core_Pod(a.(*v1.Pod), b.(*core.Pod), scope)
+	if err := s.AddConversionFunc((*apicorev1.Pod)(nil), (*pkgapiscore.Pod)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Pod_To_core_Pod(a.(*apicorev1.Pod), b.(*pkgapiscore.Pod), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ReplicationControllerSpec)(nil), (*apps.ReplicaSetSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationControllerSpec_To_apps_ReplicaSetSpec(a.(*v1.ReplicationControllerSpec), b.(*apps.ReplicaSetSpec), scope)
+	if err := s.AddConversionFunc((*apicorev1.ReplicationControllerSpec)(nil), (*pkgapisapps.ReplicaSetSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationControllerSpec_To_apps_ReplicaSetSpec(a.(*apicorev1.ReplicationControllerSpec), b.(*pkgapisapps.ReplicaSetSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ReplicationControllerSpec)(nil), (*core.ReplicationControllerSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationControllerSpec_To_core_ReplicationControllerSpec(a.(*v1.ReplicationControllerSpec), b.(*core.ReplicationControllerSpec), scope)
+	if err := s.AddConversionFunc((*apicorev1.ReplicationControllerSpec)(nil), (*pkgapiscore.ReplicationControllerSpec)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationControllerSpec_To_core_ReplicationControllerSpec(a.(*apicorev1.ReplicationControllerSpec), b.(*pkgapiscore.ReplicationControllerSpec), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ReplicationControllerStatus)(nil), (*apps.ReplicaSetStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationControllerStatus_To_apps_ReplicaSetStatus(a.(*v1.ReplicationControllerStatus), b.(*apps.ReplicaSetStatus), scope)
+	if err := s.AddConversionFunc((*apicorev1.ReplicationControllerStatus)(nil), (*pkgapisapps.ReplicaSetStatus)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationControllerStatus_To_apps_ReplicaSetStatus(a.(*apicorev1.ReplicationControllerStatus), b.(*pkgapisapps.ReplicaSetStatus), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ReplicationController)(nil), (*apps.ReplicaSet)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ReplicationController_To_apps_ReplicaSet(a.(*v1.ReplicationController), b.(*apps.ReplicaSet), scope)
+	if err := s.AddConversionFunc((*apicorev1.ReplicationController)(nil), (*pkgapisapps.ReplicaSet)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ReplicationController_To_apps_ReplicaSet(a.(*apicorev1.ReplicationController), b.(*pkgapisapps.ReplicaSet), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.ResourceList)(nil), (*core.ResourceList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_ResourceList_To_core_ResourceList(a.(*v1.ResourceList), b.(*core.ResourceList), scope)
+	if err := s.AddConversionFunc((*apicorev1.ResourceList)(nil), (*pkgapiscore.ResourceList)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_ResourceList_To_core_ResourceList(a.(*apicorev1.ResourceList), b.(*pkgapiscore.ResourceList), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.Secret)(nil), (*core.Secret)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Secret_To_core_Secret(a.(*v1.Secret), b.(*core.Secret), scope)
+	if err := s.AddConversionFunc((*apicorev1.Secret)(nil), (*pkgapiscore.Secret)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Secret_To_core_Secret(a.(*apicorev1.Secret), b.(*pkgapiscore.Secret), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*v1.Volume)(nil), (*core.Volume)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1_Volume_To_core_Volume(a.(*v1.Volume), b.(*core.Volume), scope)
+	if err := s.AddConversionFunc((*apicorev1.Volume)(nil), (*pkgapiscore.Volume)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1_Volume_To_core_Volume(a.(*apicorev1.Volume), b.(*pkgapiscore.Volume), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(in *v1.AWSElasticBlockStoreVolumeSource, out *core.AWSElasticBlockStoreVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(in *apicorev1.AWSElasticBlockStoreVolumeSource, out *pkgapiscore.AWSElasticBlockStoreVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.Partition = in.Partition
@@ -2224,11 +2224,11 @@ func autoConvert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStor
 }
 
 // Convert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource is an autogenerated conversion function.
-func Convert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(in *v1.AWSElasticBlockStoreVolumeSource, out *core.AWSElasticBlockStoreVolumeSource, s conversion.Scope) error {
+func Convert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(in *apicorev1.AWSElasticBlockStoreVolumeSource, out *pkgapiscore.AWSElasticBlockStoreVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_AWSElasticBlockStoreVolumeSource_To_core_AWSElasticBlockStoreVolumeSource(in, out, s)
 }
 
-func autoConvert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(in *core.AWSElasticBlockStoreVolumeSource, out *v1.AWSElasticBlockStoreVolumeSource, s conversion.Scope) error {
+func autoConvert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(in *pkgapiscore.AWSElasticBlockStoreVolumeSource, out *apicorev1.AWSElasticBlockStoreVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.Partition = in.Partition
@@ -2237,107 +2237,107 @@ func autoConvert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStor
 }
 
 // Convert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource is an autogenerated conversion function.
-func Convert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(in *core.AWSElasticBlockStoreVolumeSource, out *v1.AWSElasticBlockStoreVolumeSource, s conversion.Scope) error {
+func Convert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(in *pkgapiscore.AWSElasticBlockStoreVolumeSource, out *apicorev1.AWSElasticBlockStoreVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Affinity_To_core_Affinity(in *v1.Affinity, out *core.Affinity, s conversion.Scope) error {
-	out.NodeAffinity = (*core.NodeAffinity)(unsafe.Pointer(in.NodeAffinity))
-	out.PodAffinity = (*core.PodAffinity)(unsafe.Pointer(in.PodAffinity))
-	out.PodAntiAffinity = (*core.PodAntiAffinity)(unsafe.Pointer(in.PodAntiAffinity))
+func autoConvert_v1_Affinity_To_core_Affinity(in *apicorev1.Affinity, out *pkgapiscore.Affinity, s apimachinerypkgconversion.Scope) error {
+	out.NodeAffinity = (*pkgapiscore.NodeAffinity)(unsafe.Pointer(in.NodeAffinity))
+	out.PodAffinity = (*pkgapiscore.PodAffinity)(unsafe.Pointer(in.PodAffinity))
+	out.PodAntiAffinity = (*pkgapiscore.PodAntiAffinity)(unsafe.Pointer(in.PodAntiAffinity))
 	return nil
 }
 
 // Convert_v1_Affinity_To_core_Affinity is an autogenerated conversion function.
-func Convert_v1_Affinity_To_core_Affinity(in *v1.Affinity, out *core.Affinity, s conversion.Scope) error {
+func Convert_v1_Affinity_To_core_Affinity(in *apicorev1.Affinity, out *pkgapiscore.Affinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Affinity_To_core_Affinity(in, out, s)
 }
 
-func autoConvert_core_Affinity_To_v1_Affinity(in *core.Affinity, out *v1.Affinity, s conversion.Scope) error {
-	out.NodeAffinity = (*v1.NodeAffinity)(unsafe.Pointer(in.NodeAffinity))
-	out.PodAffinity = (*v1.PodAffinity)(unsafe.Pointer(in.PodAffinity))
-	out.PodAntiAffinity = (*v1.PodAntiAffinity)(unsafe.Pointer(in.PodAntiAffinity))
+func autoConvert_core_Affinity_To_v1_Affinity(in *pkgapiscore.Affinity, out *apicorev1.Affinity, s apimachinerypkgconversion.Scope) error {
+	out.NodeAffinity = (*apicorev1.NodeAffinity)(unsafe.Pointer(in.NodeAffinity))
+	out.PodAffinity = (*apicorev1.PodAffinity)(unsafe.Pointer(in.PodAffinity))
+	out.PodAntiAffinity = (*apicorev1.PodAntiAffinity)(unsafe.Pointer(in.PodAntiAffinity))
 	return nil
 }
 
 // Convert_core_Affinity_To_v1_Affinity is an autogenerated conversion function.
-func Convert_core_Affinity_To_v1_Affinity(in *core.Affinity, out *v1.Affinity, s conversion.Scope) error {
+func Convert_core_Affinity_To_v1_Affinity(in *pkgapiscore.Affinity, out *apicorev1.Affinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Affinity_To_v1_Affinity(in, out, s)
 }
 
-func autoConvert_v1_AttachedVolume_To_core_AttachedVolume(in *v1.AttachedVolume, out *core.AttachedVolume, s conversion.Scope) error {
-	out.Name = core.UniqueVolumeName(in.Name)
+func autoConvert_v1_AttachedVolume_To_core_AttachedVolume(in *apicorev1.AttachedVolume, out *pkgapiscore.AttachedVolume, s apimachinerypkgconversion.Scope) error {
+	out.Name = pkgapiscore.UniqueVolumeName(in.Name)
 	out.DevicePath = in.DevicePath
 	return nil
 }
 
 // Convert_v1_AttachedVolume_To_core_AttachedVolume is an autogenerated conversion function.
-func Convert_v1_AttachedVolume_To_core_AttachedVolume(in *v1.AttachedVolume, out *core.AttachedVolume, s conversion.Scope) error {
+func Convert_v1_AttachedVolume_To_core_AttachedVolume(in *apicorev1.AttachedVolume, out *pkgapiscore.AttachedVolume, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_AttachedVolume_To_core_AttachedVolume(in, out, s)
 }
 
-func autoConvert_core_AttachedVolume_To_v1_AttachedVolume(in *core.AttachedVolume, out *v1.AttachedVolume, s conversion.Scope) error {
-	out.Name = v1.UniqueVolumeName(in.Name)
+func autoConvert_core_AttachedVolume_To_v1_AttachedVolume(in *pkgapiscore.AttachedVolume, out *apicorev1.AttachedVolume, s apimachinerypkgconversion.Scope) error {
+	out.Name = apicorev1.UniqueVolumeName(in.Name)
 	out.DevicePath = in.DevicePath
 	return nil
 }
 
 // Convert_core_AttachedVolume_To_v1_AttachedVolume is an autogenerated conversion function.
-func Convert_core_AttachedVolume_To_v1_AttachedVolume(in *core.AttachedVolume, out *v1.AttachedVolume, s conversion.Scope) error {
+func Convert_core_AttachedVolume_To_v1_AttachedVolume(in *pkgapiscore.AttachedVolume, out *apicorev1.AttachedVolume, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_AttachedVolume_To_v1_AttachedVolume(in, out, s)
 }
 
-func autoConvert_v1_AvoidPods_To_core_AvoidPods(in *v1.AvoidPods, out *core.AvoidPods, s conversion.Scope) error {
-	out.PreferAvoidPods = *(*[]core.PreferAvoidPodsEntry)(unsafe.Pointer(&in.PreferAvoidPods))
+func autoConvert_v1_AvoidPods_To_core_AvoidPods(in *apicorev1.AvoidPods, out *pkgapiscore.AvoidPods, s apimachinerypkgconversion.Scope) error {
+	out.PreferAvoidPods = *(*[]pkgapiscore.PreferAvoidPodsEntry)(unsafe.Pointer(&in.PreferAvoidPods))
 	return nil
 }
 
 // Convert_v1_AvoidPods_To_core_AvoidPods is an autogenerated conversion function.
-func Convert_v1_AvoidPods_To_core_AvoidPods(in *v1.AvoidPods, out *core.AvoidPods, s conversion.Scope) error {
+func Convert_v1_AvoidPods_To_core_AvoidPods(in *apicorev1.AvoidPods, out *pkgapiscore.AvoidPods, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_AvoidPods_To_core_AvoidPods(in, out, s)
 }
 
-func autoConvert_core_AvoidPods_To_v1_AvoidPods(in *core.AvoidPods, out *v1.AvoidPods, s conversion.Scope) error {
-	out.PreferAvoidPods = *(*[]v1.PreferAvoidPodsEntry)(unsafe.Pointer(&in.PreferAvoidPods))
+func autoConvert_core_AvoidPods_To_v1_AvoidPods(in *pkgapiscore.AvoidPods, out *apicorev1.AvoidPods, s apimachinerypkgconversion.Scope) error {
+	out.PreferAvoidPods = *(*[]apicorev1.PreferAvoidPodsEntry)(unsafe.Pointer(&in.PreferAvoidPods))
 	return nil
 }
 
 // Convert_core_AvoidPods_To_v1_AvoidPods is an autogenerated conversion function.
-func Convert_core_AvoidPods_To_v1_AvoidPods(in *core.AvoidPods, out *v1.AvoidPods, s conversion.Scope) error {
+func Convert_core_AvoidPods_To_v1_AvoidPods(in *pkgapiscore.AvoidPods, out *apicorev1.AvoidPods, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_AvoidPods_To_v1_AvoidPods(in, out, s)
 }
 
-func autoConvert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(in *v1.AzureDiskVolumeSource, out *core.AzureDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(in *apicorev1.AzureDiskVolumeSource, out *pkgapiscore.AzureDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.DiskName = in.DiskName
 	out.DataDiskURI = in.DataDiskURI
-	out.CachingMode = (*core.AzureDataDiskCachingMode)(unsafe.Pointer(in.CachingMode))
+	out.CachingMode = (*pkgapiscore.AzureDataDiskCachingMode)(unsafe.Pointer(in.CachingMode))
 	out.FSType = (*string)(unsafe.Pointer(in.FSType))
 	out.ReadOnly = (*bool)(unsafe.Pointer(in.ReadOnly))
-	out.Kind = (*core.AzureDataDiskKind)(unsafe.Pointer(in.Kind))
+	out.Kind = (*pkgapiscore.AzureDataDiskKind)(unsafe.Pointer(in.Kind))
 	return nil
 }
 
 // Convert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource is an autogenerated conversion function.
-func Convert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(in *v1.AzureDiskVolumeSource, out *core.AzureDiskVolumeSource, s conversion.Scope) error {
+func Convert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(in *apicorev1.AzureDiskVolumeSource, out *pkgapiscore.AzureDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_AzureDiskVolumeSource_To_core_AzureDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(in *core.AzureDiskVolumeSource, out *v1.AzureDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(in *pkgapiscore.AzureDiskVolumeSource, out *apicorev1.AzureDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.DiskName = in.DiskName
 	out.DataDiskURI = in.DataDiskURI
-	out.CachingMode = (*v1.AzureDataDiskCachingMode)(unsafe.Pointer(in.CachingMode))
+	out.CachingMode = (*apicorev1.AzureDataDiskCachingMode)(unsafe.Pointer(in.CachingMode))
 	out.FSType = (*string)(unsafe.Pointer(in.FSType))
 	out.ReadOnly = (*bool)(unsafe.Pointer(in.ReadOnly))
-	out.Kind = (*v1.AzureDataDiskKind)(unsafe.Pointer(in.Kind))
+	out.Kind = (*apicorev1.AzureDataDiskKind)(unsafe.Pointer(in.Kind))
 	return nil
 }
 
 // Convert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource is an autogenerated conversion function.
-func Convert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(in *core.AzureDiskVolumeSource, out *v1.AzureDiskVolumeSource, s conversion.Scope) error {
+func Convert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(in *pkgapiscore.AzureDiskVolumeSource, out *apicorev1.AzureDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_AzureDiskVolumeSource_To_v1_AzureDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(in *v1.AzureFilePersistentVolumeSource, out *core.AzureFilePersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(in *apicorev1.AzureFilePersistentVolumeSource, out *pkgapiscore.AzureFilePersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.SecretName = in.SecretName
 	out.ShareName = in.ShareName
 	out.ReadOnly = in.ReadOnly
@@ -2346,11 +2346,11 @@ func autoConvert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentV
 }
 
 // Convert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(in *v1.AzureFilePersistentVolumeSource, out *core.AzureFilePersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(in *apicorev1.AzureFilePersistentVolumeSource, out *pkgapiscore.AzureFilePersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_AzureFilePersistentVolumeSource_To_core_AzureFilePersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(in *core.AzureFilePersistentVolumeSource, out *v1.AzureFilePersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(in *pkgapiscore.AzureFilePersistentVolumeSource, out *apicorev1.AzureFilePersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.SecretName = in.SecretName
 	out.ShareName = in.ShareName
 	out.ReadOnly = in.ReadOnly
@@ -2359,11 +2359,11 @@ func autoConvert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentV
 }
 
 // Convert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(in *core.AzureFilePersistentVolumeSource, out *v1.AzureFilePersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(in *pkgapiscore.AzureFilePersistentVolumeSource, out *apicorev1.AzureFilePersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_AzureFilePersistentVolumeSource_To_v1_AzureFilePersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(in *v1.AzureFileVolumeSource, out *core.AzureFileVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(in *apicorev1.AzureFileVolumeSource, out *pkgapiscore.AzureFileVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.SecretName = in.SecretName
 	out.ShareName = in.ShareName
 	out.ReadOnly = in.ReadOnly
@@ -2371,11 +2371,11 @@ func autoConvert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(in *v1.A
 }
 
 // Convert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource is an autogenerated conversion function.
-func Convert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(in *v1.AzureFileVolumeSource, out *core.AzureFileVolumeSource, s conversion.Scope) error {
+func Convert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(in *apicorev1.AzureFileVolumeSource, out *pkgapiscore.AzureFileVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_AzureFileVolumeSource_To_core_AzureFileVolumeSource(in, out, s)
 }
 
-func autoConvert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(in *core.AzureFileVolumeSource, out *v1.AzureFileVolumeSource, s conversion.Scope) error {
+func autoConvert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(in *pkgapiscore.AzureFileVolumeSource, out *apicorev1.AzureFileVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.SecretName = in.SecretName
 	out.ShareName = in.ShareName
 	out.ReadOnly = in.ReadOnly
@@ -2383,11 +2383,11 @@ func autoConvert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(in *core
 }
 
 // Convert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource is an autogenerated conversion function.
-func Convert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(in *core.AzureFileVolumeSource, out *v1.AzureFileVolumeSource, s conversion.Scope) error {
+func Convert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(in *pkgapiscore.AzureFileVolumeSource, out *apicorev1.AzureFileVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_AzureFileVolumeSource_To_v1_AzureFileVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Binding_To_core_Binding(in *v1.Binding, out *core.Binding, s conversion.Scope) error {
+func autoConvert_v1_Binding_To_core_Binding(in *apicorev1.Binding, out *pkgapiscore.Binding, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_ObjectReference_To_core_ObjectReference(&in.Target, &out.Target, s); err != nil {
 		return err
@@ -2396,11 +2396,11 @@ func autoConvert_v1_Binding_To_core_Binding(in *v1.Binding, out *core.Binding, s
 }
 
 // Convert_v1_Binding_To_core_Binding is an autogenerated conversion function.
-func Convert_v1_Binding_To_core_Binding(in *v1.Binding, out *core.Binding, s conversion.Scope) error {
+func Convert_v1_Binding_To_core_Binding(in *apicorev1.Binding, out *pkgapiscore.Binding, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Binding_To_core_Binding(in, out, s)
 }
 
-func autoConvert_core_Binding_To_v1_Binding(in *core.Binding, out *v1.Binding, s conversion.Scope) error {
+func autoConvert_core_Binding_To_v1_Binding(in *pkgapiscore.Binding, out *apicorev1.Binding, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_ObjectReference_To_v1_ObjectReference(&in.Target, &out.Target, s); err != nil {
 		return err
@@ -2409,301 +2409,301 @@ func autoConvert_core_Binding_To_v1_Binding(in *core.Binding, out *v1.Binding, s
 }
 
 // Convert_core_Binding_To_v1_Binding is an autogenerated conversion function.
-func Convert_core_Binding_To_v1_Binding(in *core.Binding, out *v1.Binding, s conversion.Scope) error {
+func Convert_core_Binding_To_v1_Binding(in *pkgapiscore.Binding, out *apicorev1.Binding, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Binding_To_v1_Binding(in, out, s)
 }
 
-func autoConvert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(in *v1.CSIPersistentVolumeSource, out *core.CSIPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(in *apicorev1.CSIPersistentVolumeSource, out *pkgapiscore.CSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.VolumeHandle = in.VolumeHandle
 	out.ReadOnly = in.ReadOnly
 	out.FSType = in.FSType
 	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
-	out.ControllerPublishSecretRef = (*core.SecretReference)(unsafe.Pointer(in.ControllerPublishSecretRef))
-	out.NodeStageSecretRef = (*core.SecretReference)(unsafe.Pointer(in.NodeStageSecretRef))
-	out.NodePublishSecretRef = (*core.SecretReference)(unsafe.Pointer(in.NodePublishSecretRef))
-	out.ControllerExpandSecretRef = (*core.SecretReference)(unsafe.Pointer(in.ControllerExpandSecretRef))
-	out.NodeExpandSecretRef = (*core.SecretReference)(unsafe.Pointer(in.NodeExpandSecretRef))
+	out.ControllerPublishSecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.ControllerPublishSecretRef))
+	out.NodeStageSecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.NodeStageSecretRef))
+	out.NodePublishSecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.NodePublishSecretRef))
+	out.ControllerExpandSecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.ControllerExpandSecretRef))
+	out.NodeExpandSecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.NodeExpandSecretRef))
 	return nil
 }
 
 // Convert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(in *v1.CSIPersistentVolumeSource, out *core.CSIPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(in *apicorev1.CSIPersistentVolumeSource, out *pkgapiscore.CSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_CSIPersistentVolumeSource_To_core_CSIPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(in *core.CSIPersistentVolumeSource, out *v1.CSIPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(in *pkgapiscore.CSIPersistentVolumeSource, out *apicorev1.CSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.VolumeHandle = in.VolumeHandle
 	out.ReadOnly = in.ReadOnly
 	out.FSType = in.FSType
 	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
-	out.ControllerPublishSecretRef = (*v1.SecretReference)(unsafe.Pointer(in.ControllerPublishSecretRef))
-	out.NodeStageSecretRef = (*v1.SecretReference)(unsafe.Pointer(in.NodeStageSecretRef))
-	out.NodePublishSecretRef = (*v1.SecretReference)(unsafe.Pointer(in.NodePublishSecretRef))
-	out.ControllerExpandSecretRef = (*v1.SecretReference)(unsafe.Pointer(in.ControllerExpandSecretRef))
-	out.NodeExpandSecretRef = (*v1.SecretReference)(unsafe.Pointer(in.NodeExpandSecretRef))
+	out.ControllerPublishSecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.ControllerPublishSecretRef))
+	out.NodeStageSecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.NodeStageSecretRef))
+	out.NodePublishSecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.NodePublishSecretRef))
+	out.ControllerExpandSecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.ControllerExpandSecretRef))
+	out.NodeExpandSecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.NodeExpandSecretRef))
 	return nil
 }
 
 // Convert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(in *core.CSIPersistentVolumeSource, out *v1.CSIPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(in *pkgapiscore.CSIPersistentVolumeSource, out *apicorev1.CSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_CSIPersistentVolumeSource_To_v1_CSIPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_CSIVolumeSource_To_core_CSIVolumeSource(in *v1.CSIVolumeSource, out *core.CSIVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_CSIVolumeSource_To_core_CSIVolumeSource(in *apicorev1.CSIVolumeSource, out *pkgapiscore.CSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.ReadOnly = (*bool)(unsafe.Pointer(in.ReadOnly))
 	out.FSType = (*string)(unsafe.Pointer(in.FSType))
 	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
-	out.NodePublishSecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.NodePublishSecretRef))
+	out.NodePublishSecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.NodePublishSecretRef))
 	return nil
 }
 
 // Convert_v1_CSIVolumeSource_To_core_CSIVolumeSource is an autogenerated conversion function.
-func Convert_v1_CSIVolumeSource_To_core_CSIVolumeSource(in *v1.CSIVolumeSource, out *core.CSIVolumeSource, s conversion.Scope) error {
+func Convert_v1_CSIVolumeSource_To_core_CSIVolumeSource(in *apicorev1.CSIVolumeSource, out *pkgapiscore.CSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_CSIVolumeSource_To_core_CSIVolumeSource(in, out, s)
 }
 
-func autoConvert_core_CSIVolumeSource_To_v1_CSIVolumeSource(in *core.CSIVolumeSource, out *v1.CSIVolumeSource, s conversion.Scope) error {
+func autoConvert_core_CSIVolumeSource_To_v1_CSIVolumeSource(in *pkgapiscore.CSIVolumeSource, out *apicorev1.CSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.ReadOnly = (*bool)(unsafe.Pointer(in.ReadOnly))
 	out.FSType = (*string)(unsafe.Pointer(in.FSType))
 	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
-	out.NodePublishSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.NodePublishSecretRef))
+	out.NodePublishSecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.NodePublishSecretRef))
 	return nil
 }
 
 // Convert_core_CSIVolumeSource_To_v1_CSIVolumeSource is an autogenerated conversion function.
-func Convert_core_CSIVolumeSource_To_v1_CSIVolumeSource(in *core.CSIVolumeSource, out *v1.CSIVolumeSource, s conversion.Scope) error {
+func Convert_core_CSIVolumeSource_To_v1_CSIVolumeSource(in *pkgapiscore.CSIVolumeSource, out *apicorev1.CSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_CSIVolumeSource_To_v1_CSIVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Capabilities_To_core_Capabilities(in *v1.Capabilities, out *core.Capabilities, s conversion.Scope) error {
-	out.Add = *(*[]core.Capability)(unsafe.Pointer(&in.Add))
-	out.Drop = *(*[]core.Capability)(unsafe.Pointer(&in.Drop))
+func autoConvert_v1_Capabilities_To_core_Capabilities(in *apicorev1.Capabilities, out *pkgapiscore.Capabilities, s apimachinerypkgconversion.Scope) error {
+	out.Add = *(*[]pkgapiscore.Capability)(unsafe.Pointer(&in.Add))
+	out.Drop = *(*[]pkgapiscore.Capability)(unsafe.Pointer(&in.Drop))
 	return nil
 }
 
 // Convert_v1_Capabilities_To_core_Capabilities is an autogenerated conversion function.
-func Convert_v1_Capabilities_To_core_Capabilities(in *v1.Capabilities, out *core.Capabilities, s conversion.Scope) error {
+func Convert_v1_Capabilities_To_core_Capabilities(in *apicorev1.Capabilities, out *pkgapiscore.Capabilities, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Capabilities_To_core_Capabilities(in, out, s)
 }
 
-func autoConvert_core_Capabilities_To_v1_Capabilities(in *core.Capabilities, out *v1.Capabilities, s conversion.Scope) error {
-	out.Add = *(*[]v1.Capability)(unsafe.Pointer(&in.Add))
-	out.Drop = *(*[]v1.Capability)(unsafe.Pointer(&in.Drop))
+func autoConvert_core_Capabilities_To_v1_Capabilities(in *pkgapiscore.Capabilities, out *apicorev1.Capabilities, s apimachinerypkgconversion.Scope) error {
+	out.Add = *(*[]apicorev1.Capability)(unsafe.Pointer(&in.Add))
+	out.Drop = *(*[]apicorev1.Capability)(unsafe.Pointer(&in.Drop))
 	return nil
 }
 
 // Convert_core_Capabilities_To_v1_Capabilities is an autogenerated conversion function.
-func Convert_core_Capabilities_To_v1_Capabilities(in *core.Capabilities, out *v1.Capabilities, s conversion.Scope) error {
+func Convert_core_Capabilities_To_v1_Capabilities(in *pkgapiscore.Capabilities, out *apicorev1.Capabilities, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Capabilities_To_v1_Capabilities(in, out, s)
 }
 
-func autoConvert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(in *v1.CephFSPersistentVolumeSource, out *core.CephFSPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(in *apicorev1.CephFSPersistentVolumeSource, out *pkgapiscore.CephFSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Monitors = *(*[]string)(unsafe.Pointer(&in.Monitors))
 	out.Path = in.Path
 	out.User = in.User
 	out.SecretFile = in.SecretFile
-	out.SecretRef = (*core.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(in *v1.CephFSPersistentVolumeSource, out *core.CephFSPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(in *apicorev1.CephFSPersistentVolumeSource, out *pkgapiscore.CephFSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_CephFSPersistentVolumeSource_To_core_CephFSPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(in *core.CephFSPersistentVolumeSource, out *v1.CephFSPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(in *pkgapiscore.CephFSPersistentVolumeSource, out *apicorev1.CephFSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Monitors = *(*[]string)(unsafe.Pointer(&in.Monitors))
 	out.Path = in.Path
 	out.User = in.User
 	out.SecretFile = in.SecretFile
-	out.SecretRef = (*v1.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(in *core.CephFSPersistentVolumeSource, out *v1.CephFSPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(in *pkgapiscore.CephFSPersistentVolumeSource, out *apicorev1.CephFSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_CephFSPersistentVolumeSource_To_v1_CephFSPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(in *v1.CephFSVolumeSource, out *core.CephFSVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(in *apicorev1.CephFSVolumeSource, out *pkgapiscore.CephFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Monitors = *(*[]string)(unsafe.Pointer(&in.Monitors))
 	out.Path = in.Path
 	out.User = in.User
 	out.SecretFile = in.SecretFile
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource is an autogenerated conversion function.
-func Convert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(in *v1.CephFSVolumeSource, out *core.CephFSVolumeSource, s conversion.Scope) error {
+func Convert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(in *apicorev1.CephFSVolumeSource, out *pkgapiscore.CephFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_CephFSVolumeSource_To_core_CephFSVolumeSource(in, out, s)
 }
 
-func autoConvert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(in *core.CephFSVolumeSource, out *v1.CephFSVolumeSource, s conversion.Scope) error {
+func autoConvert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(in *pkgapiscore.CephFSVolumeSource, out *apicorev1.CephFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Monitors = *(*[]string)(unsafe.Pointer(&in.Monitors))
 	out.Path = in.Path
 	out.User = in.User
 	out.SecretFile = in.SecretFile
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource is an autogenerated conversion function.
-func Convert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(in *core.CephFSVolumeSource, out *v1.CephFSVolumeSource, s conversion.Scope) error {
+func Convert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(in *pkgapiscore.CephFSVolumeSource, out *apicorev1.CephFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_CephFSVolumeSource_To_v1_CephFSVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(in *v1.CinderPersistentVolumeSource, out *core.CinderPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(in *apicorev1.CinderPersistentVolumeSource, out *pkgapiscore.CinderPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*core.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(in *v1.CinderPersistentVolumeSource, out *core.CinderPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(in *apicorev1.CinderPersistentVolumeSource, out *pkgapiscore.CinderPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_CinderPersistentVolumeSource_To_core_CinderPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(in *core.CinderPersistentVolumeSource, out *v1.CinderPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(in *pkgapiscore.CinderPersistentVolumeSource, out *apicorev1.CinderPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*v1.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(in *core.CinderPersistentVolumeSource, out *v1.CinderPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(in *pkgapiscore.CinderPersistentVolumeSource, out *apicorev1.CinderPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_CinderPersistentVolumeSource_To_v1_CinderPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_CinderVolumeSource_To_core_CinderVolumeSource(in *v1.CinderVolumeSource, out *core.CinderVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_CinderVolumeSource_To_core_CinderVolumeSource(in *apicorev1.CinderVolumeSource, out *pkgapiscore.CinderVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_v1_CinderVolumeSource_To_core_CinderVolumeSource is an autogenerated conversion function.
-func Convert_v1_CinderVolumeSource_To_core_CinderVolumeSource(in *v1.CinderVolumeSource, out *core.CinderVolumeSource, s conversion.Scope) error {
+func Convert_v1_CinderVolumeSource_To_core_CinderVolumeSource(in *apicorev1.CinderVolumeSource, out *pkgapiscore.CinderVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_CinderVolumeSource_To_core_CinderVolumeSource(in, out, s)
 }
 
-func autoConvert_core_CinderVolumeSource_To_v1_CinderVolumeSource(in *core.CinderVolumeSource, out *v1.CinderVolumeSource, s conversion.Scope) error {
+func autoConvert_core_CinderVolumeSource_To_v1_CinderVolumeSource(in *pkgapiscore.CinderVolumeSource, out *apicorev1.CinderVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_core_CinderVolumeSource_To_v1_CinderVolumeSource is an autogenerated conversion function.
-func Convert_core_CinderVolumeSource_To_v1_CinderVolumeSource(in *core.CinderVolumeSource, out *v1.CinderVolumeSource, s conversion.Scope) error {
+func Convert_core_CinderVolumeSource_To_v1_CinderVolumeSource(in *pkgapiscore.CinderVolumeSource, out *apicorev1.CinderVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_CinderVolumeSource_To_v1_CinderVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_ClientIPConfig_To_core_ClientIPConfig(in *v1.ClientIPConfig, out *core.ClientIPConfig, s conversion.Scope) error {
+func autoConvert_v1_ClientIPConfig_To_core_ClientIPConfig(in *apicorev1.ClientIPConfig, out *pkgapiscore.ClientIPConfig, s apimachinerypkgconversion.Scope) error {
 	out.TimeoutSeconds = (*int32)(unsafe.Pointer(in.TimeoutSeconds))
 	return nil
 }
 
 // Convert_v1_ClientIPConfig_To_core_ClientIPConfig is an autogenerated conversion function.
-func Convert_v1_ClientIPConfig_To_core_ClientIPConfig(in *v1.ClientIPConfig, out *core.ClientIPConfig, s conversion.Scope) error {
+func Convert_v1_ClientIPConfig_To_core_ClientIPConfig(in *apicorev1.ClientIPConfig, out *pkgapiscore.ClientIPConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ClientIPConfig_To_core_ClientIPConfig(in, out, s)
 }
 
-func autoConvert_core_ClientIPConfig_To_v1_ClientIPConfig(in *core.ClientIPConfig, out *v1.ClientIPConfig, s conversion.Scope) error {
+func autoConvert_core_ClientIPConfig_To_v1_ClientIPConfig(in *pkgapiscore.ClientIPConfig, out *apicorev1.ClientIPConfig, s apimachinerypkgconversion.Scope) error {
 	out.TimeoutSeconds = (*int32)(unsafe.Pointer(in.TimeoutSeconds))
 	return nil
 }
 
 // Convert_core_ClientIPConfig_To_v1_ClientIPConfig is an autogenerated conversion function.
-func Convert_core_ClientIPConfig_To_v1_ClientIPConfig(in *core.ClientIPConfig, out *v1.ClientIPConfig, s conversion.Scope) error {
+func Convert_core_ClientIPConfig_To_v1_ClientIPConfig(in *pkgapiscore.ClientIPConfig, out *apicorev1.ClientIPConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ClientIPConfig_To_v1_ClientIPConfig(in, out, s)
 }
 
-func autoConvert_v1_ComponentCondition_To_core_ComponentCondition(in *v1.ComponentCondition, out *core.ComponentCondition, s conversion.Scope) error {
-	out.Type = core.ComponentConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
+func autoConvert_v1_ComponentCondition_To_core_ComponentCondition(in *apicorev1.ComponentCondition, out *pkgapiscore.ComponentCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.ComponentConditionType(in.Type)
+	out.Status = pkgapiscore.ConditionStatus(in.Status)
 	out.Message = in.Message
 	out.Error = in.Error
 	return nil
 }
 
 // Convert_v1_ComponentCondition_To_core_ComponentCondition is an autogenerated conversion function.
-func Convert_v1_ComponentCondition_To_core_ComponentCondition(in *v1.ComponentCondition, out *core.ComponentCondition, s conversion.Scope) error {
+func Convert_v1_ComponentCondition_To_core_ComponentCondition(in *apicorev1.ComponentCondition, out *pkgapiscore.ComponentCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ComponentCondition_To_core_ComponentCondition(in, out, s)
 }
 
-func autoConvert_core_ComponentCondition_To_v1_ComponentCondition(in *core.ComponentCondition, out *v1.ComponentCondition, s conversion.Scope) error {
-	out.Type = v1.ComponentConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
+func autoConvert_core_ComponentCondition_To_v1_ComponentCondition(in *pkgapiscore.ComponentCondition, out *apicorev1.ComponentCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.ComponentConditionType(in.Type)
+	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.Message = in.Message
 	out.Error = in.Error
 	return nil
 }
 
 // Convert_core_ComponentCondition_To_v1_ComponentCondition is an autogenerated conversion function.
-func Convert_core_ComponentCondition_To_v1_ComponentCondition(in *core.ComponentCondition, out *v1.ComponentCondition, s conversion.Scope) error {
+func Convert_core_ComponentCondition_To_v1_ComponentCondition(in *pkgapiscore.ComponentCondition, out *apicorev1.ComponentCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ComponentCondition_To_v1_ComponentCondition(in, out, s)
 }
 
-func autoConvert_v1_ComponentStatus_To_core_ComponentStatus(in *v1.ComponentStatus, out *core.ComponentStatus, s conversion.Scope) error {
+func autoConvert_v1_ComponentStatus_To_core_ComponentStatus(in *apicorev1.ComponentStatus, out *pkgapiscore.ComponentStatus, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Conditions = *(*[]core.ComponentCondition)(unsafe.Pointer(&in.Conditions))
+	out.Conditions = *(*[]pkgapiscore.ComponentCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_v1_ComponentStatus_To_core_ComponentStatus is an autogenerated conversion function.
-func Convert_v1_ComponentStatus_To_core_ComponentStatus(in *v1.ComponentStatus, out *core.ComponentStatus, s conversion.Scope) error {
+func Convert_v1_ComponentStatus_To_core_ComponentStatus(in *apicorev1.ComponentStatus, out *pkgapiscore.ComponentStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ComponentStatus_To_core_ComponentStatus(in, out, s)
 }
 
-func autoConvert_core_ComponentStatus_To_v1_ComponentStatus(in *core.ComponentStatus, out *v1.ComponentStatus, s conversion.Scope) error {
+func autoConvert_core_ComponentStatus_To_v1_ComponentStatus(in *pkgapiscore.ComponentStatus, out *apicorev1.ComponentStatus, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Conditions = *(*[]v1.ComponentCondition)(unsafe.Pointer(&in.Conditions))
+	out.Conditions = *(*[]apicorev1.ComponentCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_core_ComponentStatus_To_v1_ComponentStatus is an autogenerated conversion function.
-func Convert_core_ComponentStatus_To_v1_ComponentStatus(in *core.ComponentStatus, out *v1.ComponentStatus, s conversion.Scope) error {
+func Convert_core_ComponentStatus_To_v1_ComponentStatus(in *pkgapiscore.ComponentStatus, out *apicorev1.ComponentStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ComponentStatus_To_v1_ComponentStatus(in, out, s)
 }
 
-func autoConvert_v1_ComponentStatusList_To_core_ComponentStatusList(in *v1.ComponentStatusList, out *core.ComponentStatusList, s conversion.Scope) error {
+func autoConvert_v1_ComponentStatusList_To_core_ComponentStatusList(in *apicorev1.ComponentStatusList, out *pkgapiscore.ComponentStatusList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.ComponentStatus)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.ComponentStatus)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_ComponentStatusList_To_core_ComponentStatusList is an autogenerated conversion function.
-func Convert_v1_ComponentStatusList_To_core_ComponentStatusList(in *v1.ComponentStatusList, out *core.ComponentStatusList, s conversion.Scope) error {
+func Convert_v1_ComponentStatusList_To_core_ComponentStatusList(in *apicorev1.ComponentStatusList, out *pkgapiscore.ComponentStatusList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ComponentStatusList_To_core_ComponentStatusList(in, out, s)
 }
 
-func autoConvert_core_ComponentStatusList_To_v1_ComponentStatusList(in *core.ComponentStatusList, out *v1.ComponentStatusList, s conversion.Scope) error {
+func autoConvert_core_ComponentStatusList_To_v1_ComponentStatusList(in *pkgapiscore.ComponentStatusList, out *apicorev1.ComponentStatusList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.ComponentStatus)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.ComponentStatus)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_ComponentStatusList_To_v1_ComponentStatusList is an autogenerated conversion function.
-func Convert_core_ComponentStatusList_To_v1_ComponentStatusList(in *core.ComponentStatusList, out *v1.ComponentStatusList, s conversion.Scope) error {
+func Convert_core_ComponentStatusList_To_v1_ComponentStatusList(in *pkgapiscore.ComponentStatusList, out *apicorev1.ComponentStatusList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ComponentStatusList_To_v1_ComponentStatusList(in, out, s)
 }
 
-func autoConvert_v1_ConfigMap_To_core_ConfigMap(in *v1.ConfigMap, out *core.ConfigMap, s conversion.Scope) error {
+func autoConvert_v1_ConfigMap_To_core_ConfigMap(in *apicorev1.ConfigMap, out *pkgapiscore.ConfigMap, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Immutable = (*bool)(unsafe.Pointer(in.Immutable))
 	out.Data = *(*map[string]string)(unsafe.Pointer(&in.Data))
@@ -2712,11 +2712,11 @@ func autoConvert_v1_ConfigMap_To_core_ConfigMap(in *v1.ConfigMap, out *core.Conf
 }
 
 // Convert_v1_ConfigMap_To_core_ConfigMap is an autogenerated conversion function.
-func Convert_v1_ConfigMap_To_core_ConfigMap(in *v1.ConfigMap, out *core.ConfigMap, s conversion.Scope) error {
+func Convert_v1_ConfigMap_To_core_ConfigMap(in *apicorev1.ConfigMap, out *pkgapiscore.ConfigMap, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMap_To_core_ConfigMap(in, out, s)
 }
 
-func autoConvert_core_ConfigMap_To_v1_ConfigMap(in *core.ConfigMap, out *v1.ConfigMap, s conversion.Scope) error {
+func autoConvert_core_ConfigMap_To_v1_ConfigMap(in *pkgapiscore.ConfigMap, out *apicorev1.ConfigMap, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Immutable = (*bool)(unsafe.Pointer(in.Immutable))
 	out.Data = *(*map[string]string)(unsafe.Pointer(&in.Data))
@@ -2725,11 +2725,11 @@ func autoConvert_core_ConfigMap_To_v1_ConfigMap(in *core.ConfigMap, out *v1.Conf
 }
 
 // Convert_core_ConfigMap_To_v1_ConfigMap is an autogenerated conversion function.
-func Convert_core_ConfigMap_To_v1_ConfigMap(in *core.ConfigMap, out *v1.ConfigMap, s conversion.Scope) error {
+func Convert_core_ConfigMap_To_v1_ConfigMap(in *pkgapiscore.ConfigMap, out *apicorev1.ConfigMap, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMap_To_v1_ConfigMap(in, out, s)
 }
 
-func autoConvert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(in *v1.ConfigMapEnvSource, out *core.ConfigMapEnvSource, s conversion.Scope) error {
+func autoConvert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(in *apicorev1.ConfigMapEnvSource, out *pkgapiscore.ConfigMapEnvSource, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -2738,11 +2738,11 @@ func autoConvert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(in *v1.ConfigM
 }
 
 // Convert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource is an autogenerated conversion function.
-func Convert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(in *v1.ConfigMapEnvSource, out *core.ConfigMapEnvSource, s conversion.Scope) error {
+func Convert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(in *apicorev1.ConfigMapEnvSource, out *pkgapiscore.ConfigMapEnvSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMapEnvSource_To_core_ConfigMapEnvSource(in, out, s)
 }
 
-func autoConvert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(in *core.ConfigMapEnvSource, out *v1.ConfigMapEnvSource, s conversion.Scope) error {
+func autoConvert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(in *pkgapiscore.ConfigMapEnvSource, out *apicorev1.ConfigMapEnvSource, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -2751,11 +2751,11 @@ func autoConvert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(in *core.Confi
 }
 
 // Convert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource is an autogenerated conversion function.
-func Convert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(in *core.ConfigMapEnvSource, out *v1.ConfigMapEnvSource, s conversion.Scope) error {
+func Convert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(in *pkgapiscore.ConfigMapEnvSource, out *apicorev1.ConfigMapEnvSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMapEnvSource_To_v1_ConfigMapEnvSource(in, out, s)
 }
 
-func autoConvert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(in *v1.ConfigMapKeySelector, out *core.ConfigMapKeySelector, s conversion.Scope) error {
+func autoConvert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(in *apicorev1.ConfigMapKeySelector, out *pkgapiscore.ConfigMapKeySelector, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -2765,11 +2765,11 @@ func autoConvert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(in *v1.Con
 }
 
 // Convert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector is an autogenerated conversion function.
-func Convert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(in *v1.ConfigMapKeySelector, out *core.ConfigMapKeySelector, s conversion.Scope) error {
+func Convert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(in *apicorev1.ConfigMapKeySelector, out *pkgapiscore.ConfigMapKeySelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMapKeySelector_To_core_ConfigMapKeySelector(in, out, s)
 }
 
-func autoConvert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(in *core.ConfigMapKeySelector, out *v1.ConfigMapKeySelector, s conversion.Scope) error {
+func autoConvert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(in *pkgapiscore.ConfigMapKeySelector, out *apicorev1.ConfigMapKeySelector, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -2779,140 +2779,140 @@ func autoConvert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(in *core.C
 }
 
 // Convert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector is an autogenerated conversion function.
-func Convert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(in *core.ConfigMapKeySelector, out *v1.ConfigMapKeySelector, s conversion.Scope) error {
+func Convert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(in *pkgapiscore.ConfigMapKeySelector, out *apicorev1.ConfigMapKeySelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMapKeySelector_To_v1_ConfigMapKeySelector(in, out, s)
 }
 
-func autoConvert_v1_ConfigMapList_To_core_ConfigMapList(in *v1.ConfigMapList, out *core.ConfigMapList, s conversion.Scope) error {
+func autoConvert_v1_ConfigMapList_To_core_ConfigMapList(in *apicorev1.ConfigMapList, out *pkgapiscore.ConfigMapList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.ConfigMap)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.ConfigMap)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_ConfigMapList_To_core_ConfigMapList is an autogenerated conversion function.
-func Convert_v1_ConfigMapList_To_core_ConfigMapList(in *v1.ConfigMapList, out *core.ConfigMapList, s conversion.Scope) error {
+func Convert_v1_ConfigMapList_To_core_ConfigMapList(in *apicorev1.ConfigMapList, out *pkgapiscore.ConfigMapList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMapList_To_core_ConfigMapList(in, out, s)
 }
 
-func autoConvert_core_ConfigMapList_To_v1_ConfigMapList(in *core.ConfigMapList, out *v1.ConfigMapList, s conversion.Scope) error {
+func autoConvert_core_ConfigMapList_To_v1_ConfigMapList(in *pkgapiscore.ConfigMapList, out *apicorev1.ConfigMapList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.ConfigMap)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.ConfigMap)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_ConfigMapList_To_v1_ConfigMapList is an autogenerated conversion function.
-func Convert_core_ConfigMapList_To_v1_ConfigMapList(in *core.ConfigMapList, out *v1.ConfigMapList, s conversion.Scope) error {
+func Convert_core_ConfigMapList_To_v1_ConfigMapList(in *pkgapiscore.ConfigMapList, out *apicorev1.ConfigMapList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMapList_To_v1_ConfigMapList(in, out, s)
 }
 
-func autoConvert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(in *v1.ConfigMapNodeConfigSource, out *core.ConfigMapNodeConfigSource, s conversion.Scope) error {
+func autoConvert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(in *apicorev1.ConfigMapNodeConfigSource, out *pkgapiscore.ConfigMapNodeConfigSource, s apimachinerypkgconversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	out.UID = apimachinerypkgtypes.UID(in.UID)
 	out.ResourceVersion = in.ResourceVersion
 	out.KubeletConfigKey = in.KubeletConfigKey
 	return nil
 }
 
 // Convert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource is an autogenerated conversion function.
-func Convert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(in *v1.ConfigMapNodeConfigSource, out *core.ConfigMapNodeConfigSource, s conversion.Scope) error {
+func Convert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(in *apicorev1.ConfigMapNodeConfigSource, out *pkgapiscore.ConfigMapNodeConfigSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMapNodeConfigSource_To_core_ConfigMapNodeConfigSource(in, out, s)
 }
 
-func autoConvert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(in *core.ConfigMapNodeConfigSource, out *v1.ConfigMapNodeConfigSource, s conversion.Scope) error {
+func autoConvert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(in *pkgapiscore.ConfigMapNodeConfigSource, out *apicorev1.ConfigMapNodeConfigSource, s apimachinerypkgconversion.Scope) error {
 	out.Namespace = in.Namespace
 	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	out.UID = apimachinerypkgtypes.UID(in.UID)
 	out.ResourceVersion = in.ResourceVersion
 	out.KubeletConfigKey = in.KubeletConfigKey
 	return nil
 }
 
 // Convert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource is an autogenerated conversion function.
-func Convert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(in *core.ConfigMapNodeConfigSource, out *v1.ConfigMapNodeConfigSource, s conversion.Scope) error {
+func Convert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(in *pkgapiscore.ConfigMapNodeConfigSource, out *apicorev1.ConfigMapNodeConfigSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMapNodeConfigSource_To_v1_ConfigMapNodeConfigSource(in, out, s)
 }
 
-func autoConvert_v1_ConfigMapProjection_To_core_ConfigMapProjection(in *v1.ConfigMapProjection, out *core.ConfigMapProjection, s conversion.Scope) error {
+func autoConvert_v1_ConfigMapProjection_To_core_ConfigMapProjection(in *apicorev1.ConfigMapProjection, out *pkgapiscore.ConfigMapProjection, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
-	out.Items = *(*[]core.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_v1_ConfigMapProjection_To_core_ConfigMapProjection is an autogenerated conversion function.
-func Convert_v1_ConfigMapProjection_To_core_ConfigMapProjection(in *v1.ConfigMapProjection, out *core.ConfigMapProjection, s conversion.Scope) error {
+func Convert_v1_ConfigMapProjection_To_core_ConfigMapProjection(in *apicorev1.ConfigMapProjection, out *pkgapiscore.ConfigMapProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMapProjection_To_core_ConfigMapProjection(in, out, s)
 }
 
-func autoConvert_core_ConfigMapProjection_To_v1_ConfigMapProjection(in *core.ConfigMapProjection, out *v1.ConfigMapProjection, s conversion.Scope) error {
+func autoConvert_core_ConfigMapProjection_To_v1_ConfigMapProjection(in *pkgapiscore.ConfigMapProjection, out *apicorev1.ConfigMapProjection, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
-	out.Items = *(*[]v1.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_core_ConfigMapProjection_To_v1_ConfigMapProjection is an autogenerated conversion function.
-func Convert_core_ConfigMapProjection_To_v1_ConfigMapProjection(in *core.ConfigMapProjection, out *v1.ConfigMapProjection, s conversion.Scope) error {
+func Convert_core_ConfigMapProjection_To_v1_ConfigMapProjection(in *pkgapiscore.ConfigMapProjection, out *apicorev1.ConfigMapProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMapProjection_To_v1_ConfigMapProjection(in, out, s)
 }
 
-func autoConvert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(in *v1.ConfigMapVolumeSource, out *core.ConfigMapVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(in *apicorev1.ConfigMapVolumeSource, out *pkgapiscore.ConfigMapVolumeSource, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
-	out.Items = *(*[]core.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.DefaultMode = (*int32)(unsafe.Pointer(in.DefaultMode))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource is an autogenerated conversion function.
-func Convert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(in *v1.ConfigMapVolumeSource, out *core.ConfigMapVolumeSource, s conversion.Scope) error {
+func Convert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(in *apicorev1.ConfigMapVolumeSource, out *pkgapiscore.ConfigMapVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ConfigMapVolumeSource_To_core_ConfigMapVolumeSource(in, out, s)
 }
 
-func autoConvert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(in *core.ConfigMapVolumeSource, out *v1.ConfigMapVolumeSource, s conversion.Scope) error {
+func autoConvert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(in *pkgapiscore.ConfigMapVolumeSource, out *apicorev1.ConfigMapVolumeSource, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
-	out.Items = *(*[]v1.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.DefaultMode = (*int32)(unsafe.Pointer(in.DefaultMode))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource is an autogenerated conversion function.
-func Convert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(in *core.ConfigMapVolumeSource, out *v1.ConfigMapVolumeSource, s conversion.Scope) error {
+func Convert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(in *pkgapiscore.ConfigMapVolumeSource, out *apicorev1.ConfigMapVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ConfigMapVolumeSource_To_v1_ConfigMapVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Container_To_core_Container(in *v1.Container, out *core.Container, s conversion.Scope) error {
+func autoConvert_v1_Container_To_core_Container(in *apicorev1.Container, out *pkgapiscore.Container, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Image = in.Image
 	out.Command = *(*[]string)(unsafe.Pointer(&in.Command))
 	out.Args = *(*[]string)(unsafe.Pointer(&in.Args))
 	out.WorkingDir = in.WorkingDir
-	out.Ports = *(*[]core.ContainerPort)(unsafe.Pointer(&in.Ports))
-	out.EnvFrom = *(*[]core.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
-	out.Env = *(*[]core.EnvVar)(unsafe.Pointer(&in.Env))
+	out.Ports = *(*[]pkgapiscore.ContainerPort)(unsafe.Pointer(&in.Ports))
+	out.EnvFrom = *(*[]pkgapiscore.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
+	out.Env = *(*[]pkgapiscore.EnvVar)(unsafe.Pointer(&in.Env))
 	if err := Convert_v1_ResourceRequirements_To_core_ResourceRequirements(&in.Resources, &out.Resources, s); err != nil {
 		return err
 	}
-	out.VolumeMounts = *(*[]core.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
-	out.VolumeDevices = *(*[]core.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
-	out.LivenessProbe = (*core.Probe)(unsafe.Pointer(in.LivenessProbe))
-	out.ReadinessProbe = (*core.Probe)(unsafe.Pointer(in.ReadinessProbe))
-	out.StartupProbe = (*core.Probe)(unsafe.Pointer(in.StartupProbe))
-	out.Lifecycle = (*core.Lifecycle)(unsafe.Pointer(in.Lifecycle))
+	out.VolumeMounts = *(*[]pkgapiscore.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
+	out.VolumeDevices = *(*[]pkgapiscore.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
+	out.LivenessProbe = (*pkgapiscore.Probe)(unsafe.Pointer(in.LivenessProbe))
+	out.ReadinessProbe = (*pkgapiscore.Probe)(unsafe.Pointer(in.ReadinessProbe))
+	out.StartupProbe = (*pkgapiscore.Probe)(unsafe.Pointer(in.StartupProbe))
+	out.Lifecycle = (*pkgapiscore.Lifecycle)(unsafe.Pointer(in.Lifecycle))
 	out.TerminationMessagePath = in.TerminationMessagePath
-	out.TerminationMessagePolicy = core.TerminationMessagePolicy(in.TerminationMessagePolicy)
-	out.ImagePullPolicy = core.PullPolicy(in.ImagePullPolicy)
-	out.SecurityContext = (*core.SecurityContext)(unsafe.Pointer(in.SecurityContext))
+	out.TerminationMessagePolicy = pkgapiscore.TerminationMessagePolicy(in.TerminationMessagePolicy)
+	out.ImagePullPolicy = pkgapiscore.PullPolicy(in.ImagePullPolicy)
+	out.SecurityContext = (*pkgapiscore.SecurityContext)(unsafe.Pointer(in.SecurityContext))
 	out.Stdin = in.Stdin
 	out.StdinOnce = in.StdinOnce
 	out.TTY = in.TTY
@@ -2920,32 +2920,32 @@ func autoConvert_v1_Container_To_core_Container(in *v1.Container, out *core.Cont
 }
 
 // Convert_v1_Container_To_core_Container is an autogenerated conversion function.
-func Convert_v1_Container_To_core_Container(in *v1.Container, out *core.Container, s conversion.Scope) error {
+func Convert_v1_Container_To_core_Container(in *apicorev1.Container, out *pkgapiscore.Container, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Container_To_core_Container(in, out, s)
 }
 
-func autoConvert_core_Container_To_v1_Container(in *core.Container, out *v1.Container, s conversion.Scope) error {
+func autoConvert_core_Container_To_v1_Container(in *pkgapiscore.Container, out *apicorev1.Container, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Image = in.Image
 	out.Command = *(*[]string)(unsafe.Pointer(&in.Command))
 	out.Args = *(*[]string)(unsafe.Pointer(&in.Args))
 	out.WorkingDir = in.WorkingDir
-	out.Ports = *(*[]v1.ContainerPort)(unsafe.Pointer(&in.Ports))
-	out.EnvFrom = *(*[]v1.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
-	out.Env = *(*[]v1.EnvVar)(unsafe.Pointer(&in.Env))
+	out.Ports = *(*[]apicorev1.ContainerPort)(unsafe.Pointer(&in.Ports))
+	out.EnvFrom = *(*[]apicorev1.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
+	out.Env = *(*[]apicorev1.EnvVar)(unsafe.Pointer(&in.Env))
 	if err := Convert_core_ResourceRequirements_To_v1_ResourceRequirements(&in.Resources, &out.Resources, s); err != nil {
 		return err
 	}
-	out.VolumeMounts = *(*[]v1.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
-	out.VolumeDevices = *(*[]v1.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
-	out.LivenessProbe = (*v1.Probe)(unsafe.Pointer(in.LivenessProbe))
-	out.ReadinessProbe = (*v1.Probe)(unsafe.Pointer(in.ReadinessProbe))
-	out.StartupProbe = (*v1.Probe)(unsafe.Pointer(in.StartupProbe))
-	out.Lifecycle = (*v1.Lifecycle)(unsafe.Pointer(in.Lifecycle))
+	out.VolumeMounts = *(*[]apicorev1.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
+	out.VolumeDevices = *(*[]apicorev1.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
+	out.LivenessProbe = (*apicorev1.Probe)(unsafe.Pointer(in.LivenessProbe))
+	out.ReadinessProbe = (*apicorev1.Probe)(unsafe.Pointer(in.ReadinessProbe))
+	out.StartupProbe = (*apicorev1.Probe)(unsafe.Pointer(in.StartupProbe))
+	out.Lifecycle = (*apicorev1.Lifecycle)(unsafe.Pointer(in.Lifecycle))
 	out.TerminationMessagePath = in.TerminationMessagePath
-	out.TerminationMessagePolicy = v1.TerminationMessagePolicy(in.TerminationMessagePolicy)
-	out.ImagePullPolicy = v1.PullPolicy(in.ImagePullPolicy)
-	out.SecurityContext = (*v1.SecurityContext)(unsafe.Pointer(in.SecurityContext))
+	out.TerminationMessagePolicy = apicorev1.TerminationMessagePolicy(in.TerminationMessagePolicy)
+	out.ImagePullPolicy = apicorev1.PullPolicy(in.ImagePullPolicy)
+	out.SecurityContext = (*apicorev1.SecurityContext)(unsafe.Pointer(in.SecurityContext))
 	out.Stdin = in.Stdin
 	out.StdinOnce = in.StdinOnce
 	out.TTY = in.TTY
@@ -2953,105 +2953,105 @@ func autoConvert_core_Container_To_v1_Container(in *core.Container, out *v1.Cont
 }
 
 // Convert_core_Container_To_v1_Container is an autogenerated conversion function.
-func Convert_core_Container_To_v1_Container(in *core.Container, out *v1.Container, s conversion.Scope) error {
+func Convert_core_Container_To_v1_Container(in *pkgapiscore.Container, out *apicorev1.Container, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Container_To_v1_Container(in, out, s)
 }
 
-func autoConvert_v1_ContainerImage_To_core_ContainerImage(in *v1.ContainerImage, out *core.ContainerImage, s conversion.Scope) error {
+func autoConvert_v1_ContainerImage_To_core_ContainerImage(in *apicorev1.ContainerImage, out *pkgapiscore.ContainerImage, s apimachinerypkgconversion.Scope) error {
 	out.Names = *(*[]string)(unsafe.Pointer(&in.Names))
 	out.SizeBytes = in.SizeBytes
 	return nil
 }
 
 // Convert_v1_ContainerImage_To_core_ContainerImage is an autogenerated conversion function.
-func Convert_v1_ContainerImage_To_core_ContainerImage(in *v1.ContainerImage, out *core.ContainerImage, s conversion.Scope) error {
+func Convert_v1_ContainerImage_To_core_ContainerImage(in *apicorev1.ContainerImage, out *pkgapiscore.ContainerImage, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerImage_To_core_ContainerImage(in, out, s)
 }
 
-func autoConvert_core_ContainerImage_To_v1_ContainerImage(in *core.ContainerImage, out *v1.ContainerImage, s conversion.Scope) error {
+func autoConvert_core_ContainerImage_To_v1_ContainerImage(in *pkgapiscore.ContainerImage, out *apicorev1.ContainerImage, s apimachinerypkgconversion.Scope) error {
 	out.Names = *(*[]string)(unsafe.Pointer(&in.Names))
 	out.SizeBytes = in.SizeBytes
 	return nil
 }
 
 // Convert_core_ContainerImage_To_v1_ContainerImage is an autogenerated conversion function.
-func Convert_core_ContainerImage_To_v1_ContainerImage(in *core.ContainerImage, out *v1.ContainerImage, s conversion.Scope) error {
+func Convert_core_ContainerImage_To_v1_ContainerImage(in *pkgapiscore.ContainerImage, out *apicorev1.ContainerImage, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerImage_To_v1_ContainerImage(in, out, s)
 }
 
-func autoConvert_v1_ContainerPort_To_core_ContainerPort(in *v1.ContainerPort, out *core.ContainerPort, s conversion.Scope) error {
+func autoConvert_v1_ContainerPort_To_core_ContainerPort(in *apicorev1.ContainerPort, out *pkgapiscore.ContainerPort, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.HostPort = in.HostPort
 	out.ContainerPort = in.ContainerPort
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = pkgapiscore.Protocol(in.Protocol)
 	out.HostIP = in.HostIP
 	return nil
 }
 
 // Convert_v1_ContainerPort_To_core_ContainerPort is an autogenerated conversion function.
-func Convert_v1_ContainerPort_To_core_ContainerPort(in *v1.ContainerPort, out *core.ContainerPort, s conversion.Scope) error {
+func Convert_v1_ContainerPort_To_core_ContainerPort(in *apicorev1.ContainerPort, out *pkgapiscore.ContainerPort, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerPort_To_core_ContainerPort(in, out, s)
 }
 
-func autoConvert_core_ContainerPort_To_v1_ContainerPort(in *core.ContainerPort, out *v1.ContainerPort, s conversion.Scope) error {
+func autoConvert_core_ContainerPort_To_v1_ContainerPort(in *pkgapiscore.ContainerPort, out *apicorev1.ContainerPort, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.HostPort = in.HostPort
 	out.ContainerPort = in.ContainerPort
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = apicorev1.Protocol(in.Protocol)
 	out.HostIP = in.HostIP
 	return nil
 }
 
 // Convert_core_ContainerPort_To_v1_ContainerPort is an autogenerated conversion function.
-func Convert_core_ContainerPort_To_v1_ContainerPort(in *core.ContainerPort, out *v1.ContainerPort, s conversion.Scope) error {
+func Convert_core_ContainerPort_To_v1_ContainerPort(in *pkgapiscore.ContainerPort, out *apicorev1.ContainerPort, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerPort_To_v1_ContainerPort(in, out, s)
 }
 
-func autoConvert_v1_ContainerState_To_core_ContainerState(in *v1.ContainerState, out *core.ContainerState, s conversion.Scope) error {
-	out.Waiting = (*core.ContainerStateWaiting)(unsafe.Pointer(in.Waiting))
-	out.Running = (*core.ContainerStateRunning)(unsafe.Pointer(in.Running))
-	out.Terminated = (*core.ContainerStateTerminated)(unsafe.Pointer(in.Terminated))
+func autoConvert_v1_ContainerState_To_core_ContainerState(in *apicorev1.ContainerState, out *pkgapiscore.ContainerState, s apimachinerypkgconversion.Scope) error {
+	out.Waiting = (*pkgapiscore.ContainerStateWaiting)(unsafe.Pointer(in.Waiting))
+	out.Running = (*pkgapiscore.ContainerStateRunning)(unsafe.Pointer(in.Running))
+	out.Terminated = (*pkgapiscore.ContainerStateTerminated)(unsafe.Pointer(in.Terminated))
 	return nil
 }
 
 // Convert_v1_ContainerState_To_core_ContainerState is an autogenerated conversion function.
-func Convert_v1_ContainerState_To_core_ContainerState(in *v1.ContainerState, out *core.ContainerState, s conversion.Scope) error {
+func Convert_v1_ContainerState_To_core_ContainerState(in *apicorev1.ContainerState, out *pkgapiscore.ContainerState, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerState_To_core_ContainerState(in, out, s)
 }
 
-func autoConvert_core_ContainerState_To_v1_ContainerState(in *core.ContainerState, out *v1.ContainerState, s conversion.Scope) error {
-	out.Waiting = (*v1.ContainerStateWaiting)(unsafe.Pointer(in.Waiting))
-	out.Running = (*v1.ContainerStateRunning)(unsafe.Pointer(in.Running))
-	out.Terminated = (*v1.ContainerStateTerminated)(unsafe.Pointer(in.Terminated))
+func autoConvert_core_ContainerState_To_v1_ContainerState(in *pkgapiscore.ContainerState, out *apicorev1.ContainerState, s apimachinerypkgconversion.Scope) error {
+	out.Waiting = (*apicorev1.ContainerStateWaiting)(unsafe.Pointer(in.Waiting))
+	out.Running = (*apicorev1.ContainerStateRunning)(unsafe.Pointer(in.Running))
+	out.Terminated = (*apicorev1.ContainerStateTerminated)(unsafe.Pointer(in.Terminated))
 	return nil
 }
 
 // Convert_core_ContainerState_To_v1_ContainerState is an autogenerated conversion function.
-func Convert_core_ContainerState_To_v1_ContainerState(in *core.ContainerState, out *v1.ContainerState, s conversion.Scope) error {
+func Convert_core_ContainerState_To_v1_ContainerState(in *pkgapiscore.ContainerState, out *apicorev1.ContainerState, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerState_To_v1_ContainerState(in, out, s)
 }
 
-func autoConvert_v1_ContainerStateRunning_To_core_ContainerStateRunning(in *v1.ContainerStateRunning, out *core.ContainerStateRunning, s conversion.Scope) error {
+func autoConvert_v1_ContainerStateRunning_To_core_ContainerStateRunning(in *apicorev1.ContainerStateRunning, out *pkgapiscore.ContainerStateRunning, s apimachinerypkgconversion.Scope) error {
 	out.StartedAt = in.StartedAt
 	return nil
 }
 
 // Convert_v1_ContainerStateRunning_To_core_ContainerStateRunning is an autogenerated conversion function.
-func Convert_v1_ContainerStateRunning_To_core_ContainerStateRunning(in *v1.ContainerStateRunning, out *core.ContainerStateRunning, s conversion.Scope) error {
+func Convert_v1_ContainerStateRunning_To_core_ContainerStateRunning(in *apicorev1.ContainerStateRunning, out *pkgapiscore.ContainerStateRunning, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerStateRunning_To_core_ContainerStateRunning(in, out, s)
 }
 
-func autoConvert_core_ContainerStateRunning_To_v1_ContainerStateRunning(in *core.ContainerStateRunning, out *v1.ContainerStateRunning, s conversion.Scope) error {
+func autoConvert_core_ContainerStateRunning_To_v1_ContainerStateRunning(in *pkgapiscore.ContainerStateRunning, out *apicorev1.ContainerStateRunning, s apimachinerypkgconversion.Scope) error {
 	out.StartedAt = in.StartedAt
 	return nil
 }
 
 // Convert_core_ContainerStateRunning_To_v1_ContainerStateRunning is an autogenerated conversion function.
-func Convert_core_ContainerStateRunning_To_v1_ContainerStateRunning(in *core.ContainerStateRunning, out *v1.ContainerStateRunning, s conversion.Scope) error {
+func Convert_core_ContainerStateRunning_To_v1_ContainerStateRunning(in *pkgapiscore.ContainerStateRunning, out *apicorev1.ContainerStateRunning, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerStateRunning_To_v1_ContainerStateRunning(in, out, s)
 }
 
-func autoConvert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(in *v1.ContainerStateTerminated, out *core.ContainerStateTerminated, s conversion.Scope) error {
+func autoConvert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(in *apicorev1.ContainerStateTerminated, out *pkgapiscore.ContainerStateTerminated, s apimachinerypkgconversion.Scope) error {
 	out.ExitCode = in.ExitCode
 	out.Signal = in.Signal
 	out.Reason = in.Reason
@@ -3063,11 +3063,11 @@ func autoConvert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(in
 }
 
 // Convert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated is an autogenerated conversion function.
-func Convert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(in *v1.ContainerStateTerminated, out *core.ContainerStateTerminated, s conversion.Scope) error {
+func Convert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(in *apicorev1.ContainerStateTerminated, out *pkgapiscore.ContainerStateTerminated, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerStateTerminated_To_core_ContainerStateTerminated(in, out, s)
 }
 
-func autoConvert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(in *core.ContainerStateTerminated, out *v1.ContainerStateTerminated, s conversion.Scope) error {
+func autoConvert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(in *pkgapiscore.ContainerStateTerminated, out *apicorev1.ContainerStateTerminated, s apimachinerypkgconversion.Scope) error {
 	out.ExitCode = in.ExitCode
 	out.Signal = in.Signal
 	out.Reason = in.Reason
@@ -3079,33 +3079,33 @@ func autoConvert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(in
 }
 
 // Convert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated is an autogenerated conversion function.
-func Convert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(in *core.ContainerStateTerminated, out *v1.ContainerStateTerminated, s conversion.Scope) error {
+func Convert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(in *pkgapiscore.ContainerStateTerminated, out *apicorev1.ContainerStateTerminated, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerStateTerminated_To_v1_ContainerStateTerminated(in, out, s)
 }
 
-func autoConvert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(in *v1.ContainerStateWaiting, out *core.ContainerStateWaiting, s conversion.Scope) error {
+func autoConvert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(in *apicorev1.ContainerStateWaiting, out *pkgapiscore.ContainerStateWaiting, s apimachinerypkgconversion.Scope) error {
 	out.Reason = in.Reason
 	out.Message = in.Message
 	return nil
 }
 
 // Convert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting is an autogenerated conversion function.
-func Convert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(in *v1.ContainerStateWaiting, out *core.ContainerStateWaiting, s conversion.Scope) error {
+func Convert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(in *apicorev1.ContainerStateWaiting, out *pkgapiscore.ContainerStateWaiting, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerStateWaiting_To_core_ContainerStateWaiting(in, out, s)
 }
 
-func autoConvert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(in *core.ContainerStateWaiting, out *v1.ContainerStateWaiting, s conversion.Scope) error {
+func autoConvert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(in *pkgapiscore.ContainerStateWaiting, out *apicorev1.ContainerStateWaiting, s apimachinerypkgconversion.Scope) error {
 	out.Reason = in.Reason
 	out.Message = in.Message
 	return nil
 }
 
 // Convert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting is an autogenerated conversion function.
-func Convert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(in *core.ContainerStateWaiting, out *v1.ContainerStateWaiting, s conversion.Scope) error {
+func Convert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(in *pkgapiscore.ContainerStateWaiting, out *apicorev1.ContainerStateWaiting, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerStateWaiting_To_v1_ContainerStateWaiting(in, out, s)
 }
 
-func autoConvert_v1_ContainerStatus_To_core_ContainerStatus(in *v1.ContainerStatus, out *core.ContainerStatus, s conversion.Scope) error {
+func autoConvert_v1_ContainerStatus_To_core_ContainerStatus(in *apicorev1.ContainerStatus, out *pkgapiscore.ContainerStatus, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_v1_ContainerState_To_core_ContainerState(&in.State, &out.State, s); err != nil {
 		return err
@@ -3123,11 +3123,11 @@ func autoConvert_v1_ContainerStatus_To_core_ContainerStatus(in *v1.ContainerStat
 }
 
 // Convert_v1_ContainerStatus_To_core_ContainerStatus is an autogenerated conversion function.
-func Convert_v1_ContainerStatus_To_core_ContainerStatus(in *v1.ContainerStatus, out *core.ContainerStatus, s conversion.Scope) error {
+func Convert_v1_ContainerStatus_To_core_ContainerStatus(in *apicorev1.ContainerStatus, out *pkgapiscore.ContainerStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ContainerStatus_To_core_ContainerStatus(in, out, s)
 }
 
-func autoConvert_core_ContainerStatus_To_v1_ContainerStatus(in *core.ContainerStatus, out *v1.ContainerStatus, s conversion.Scope) error {
+func autoConvert_core_ContainerStatus_To_v1_ContainerStatus(in *pkgapiscore.ContainerStatus, out *apicorev1.ContainerStatus, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_core_ContainerState_To_v1_ContainerState(&in.State, &out.State, s); err != nil {
 		return err
@@ -3145,315 +3145,315 @@ func autoConvert_core_ContainerStatus_To_v1_ContainerStatus(in *core.ContainerSt
 }
 
 // Convert_core_ContainerStatus_To_v1_ContainerStatus is an autogenerated conversion function.
-func Convert_core_ContainerStatus_To_v1_ContainerStatus(in *core.ContainerStatus, out *v1.ContainerStatus, s conversion.Scope) error {
+func Convert_core_ContainerStatus_To_v1_ContainerStatus(in *pkgapiscore.ContainerStatus, out *apicorev1.ContainerStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ContainerStatus_To_v1_ContainerStatus(in, out, s)
 }
 
-func autoConvert_v1_DaemonEndpoint_To_core_DaemonEndpoint(in *v1.DaemonEndpoint, out *core.DaemonEndpoint, s conversion.Scope) error {
+func autoConvert_v1_DaemonEndpoint_To_core_DaemonEndpoint(in *apicorev1.DaemonEndpoint, out *pkgapiscore.DaemonEndpoint, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
 	return nil
 }
 
 // Convert_v1_DaemonEndpoint_To_core_DaemonEndpoint is an autogenerated conversion function.
-func Convert_v1_DaemonEndpoint_To_core_DaemonEndpoint(in *v1.DaemonEndpoint, out *core.DaemonEndpoint, s conversion.Scope) error {
+func Convert_v1_DaemonEndpoint_To_core_DaemonEndpoint(in *apicorev1.DaemonEndpoint, out *pkgapiscore.DaemonEndpoint, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_DaemonEndpoint_To_core_DaemonEndpoint(in, out, s)
 }
 
-func autoConvert_core_DaemonEndpoint_To_v1_DaemonEndpoint(in *core.DaemonEndpoint, out *v1.DaemonEndpoint, s conversion.Scope) error {
+func autoConvert_core_DaemonEndpoint_To_v1_DaemonEndpoint(in *pkgapiscore.DaemonEndpoint, out *apicorev1.DaemonEndpoint, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
 	return nil
 }
 
 // Convert_core_DaemonEndpoint_To_v1_DaemonEndpoint is an autogenerated conversion function.
-func Convert_core_DaemonEndpoint_To_v1_DaemonEndpoint(in *core.DaemonEndpoint, out *v1.DaemonEndpoint, s conversion.Scope) error {
+func Convert_core_DaemonEndpoint_To_v1_DaemonEndpoint(in *pkgapiscore.DaemonEndpoint, out *apicorev1.DaemonEndpoint, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_DaemonEndpoint_To_v1_DaemonEndpoint(in, out, s)
 }
 
-func autoConvert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(in *v1.DownwardAPIProjection, out *core.DownwardAPIProjection, s conversion.Scope) error {
-	out.Items = *(*[]core.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
+func autoConvert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(in *apicorev1.DownwardAPIProjection, out *pkgapiscore.DownwardAPIProjection, s apimachinerypkgconversion.Scope) error {
+	out.Items = *(*[]pkgapiscore.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection is an autogenerated conversion function.
-func Convert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(in *v1.DownwardAPIProjection, out *core.DownwardAPIProjection, s conversion.Scope) error {
+func Convert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(in *apicorev1.DownwardAPIProjection, out *pkgapiscore.DownwardAPIProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_DownwardAPIProjection_To_core_DownwardAPIProjection(in, out, s)
 }
 
-func autoConvert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(in *core.DownwardAPIProjection, out *v1.DownwardAPIProjection, s conversion.Scope) error {
-	out.Items = *(*[]v1.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
+func autoConvert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(in *pkgapiscore.DownwardAPIProjection, out *apicorev1.DownwardAPIProjection, s apimachinerypkgconversion.Scope) error {
+	out.Items = *(*[]apicorev1.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection is an autogenerated conversion function.
-func Convert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(in *core.DownwardAPIProjection, out *v1.DownwardAPIProjection, s conversion.Scope) error {
+func Convert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(in *pkgapiscore.DownwardAPIProjection, out *apicorev1.DownwardAPIProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_DownwardAPIProjection_To_v1_DownwardAPIProjection(in, out, s)
 }
 
-func autoConvert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(in *v1.DownwardAPIVolumeFile, out *core.DownwardAPIVolumeFile, s conversion.Scope) error {
+func autoConvert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(in *apicorev1.DownwardAPIVolumeFile, out *pkgapiscore.DownwardAPIVolumeFile, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
-	out.FieldRef = (*core.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
-	out.ResourceFieldRef = (*core.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
+	out.FieldRef = (*pkgapiscore.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
+	out.ResourceFieldRef = (*pkgapiscore.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
 	out.Mode = (*int32)(unsafe.Pointer(in.Mode))
 	return nil
 }
 
 // Convert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile is an autogenerated conversion function.
-func Convert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(in *v1.DownwardAPIVolumeFile, out *core.DownwardAPIVolumeFile, s conversion.Scope) error {
+func Convert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(in *apicorev1.DownwardAPIVolumeFile, out *pkgapiscore.DownwardAPIVolumeFile, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_DownwardAPIVolumeFile_To_core_DownwardAPIVolumeFile(in, out, s)
 }
 
-func autoConvert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(in *core.DownwardAPIVolumeFile, out *v1.DownwardAPIVolumeFile, s conversion.Scope) error {
+func autoConvert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(in *pkgapiscore.DownwardAPIVolumeFile, out *apicorev1.DownwardAPIVolumeFile, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
-	out.FieldRef = (*v1.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
-	out.ResourceFieldRef = (*v1.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
+	out.FieldRef = (*apicorev1.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
+	out.ResourceFieldRef = (*apicorev1.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
 	out.Mode = (*int32)(unsafe.Pointer(in.Mode))
 	return nil
 }
 
 // Convert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile is an autogenerated conversion function.
-func Convert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(in *core.DownwardAPIVolumeFile, out *v1.DownwardAPIVolumeFile, s conversion.Scope) error {
+func Convert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(in *pkgapiscore.DownwardAPIVolumeFile, out *apicorev1.DownwardAPIVolumeFile, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_DownwardAPIVolumeFile_To_v1_DownwardAPIVolumeFile(in, out, s)
 }
 
-func autoConvert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(in *v1.DownwardAPIVolumeSource, out *core.DownwardAPIVolumeSource, s conversion.Scope) error {
-	out.Items = *(*[]core.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
+func autoConvert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(in *apicorev1.DownwardAPIVolumeSource, out *pkgapiscore.DownwardAPIVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.Items = *(*[]pkgapiscore.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
 	out.DefaultMode = (*int32)(unsafe.Pointer(in.DefaultMode))
 	return nil
 }
 
 // Convert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource is an autogenerated conversion function.
-func Convert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(in *v1.DownwardAPIVolumeSource, out *core.DownwardAPIVolumeSource, s conversion.Scope) error {
+func Convert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(in *apicorev1.DownwardAPIVolumeSource, out *pkgapiscore.DownwardAPIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_DownwardAPIVolumeSource_To_core_DownwardAPIVolumeSource(in, out, s)
 }
 
-func autoConvert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(in *core.DownwardAPIVolumeSource, out *v1.DownwardAPIVolumeSource, s conversion.Scope) error {
-	out.Items = *(*[]v1.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
+func autoConvert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(in *pkgapiscore.DownwardAPIVolumeSource, out *apicorev1.DownwardAPIVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.Items = *(*[]apicorev1.DownwardAPIVolumeFile)(unsafe.Pointer(&in.Items))
 	out.DefaultMode = (*int32)(unsafe.Pointer(in.DefaultMode))
 	return nil
 }
 
 // Convert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource is an autogenerated conversion function.
-func Convert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(in *core.DownwardAPIVolumeSource, out *v1.DownwardAPIVolumeSource, s conversion.Scope) error {
+func Convert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(in *pkgapiscore.DownwardAPIVolumeSource, out *apicorev1.DownwardAPIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_DownwardAPIVolumeSource_To_v1_DownwardAPIVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(in *v1.EmptyDirVolumeSource, out *core.EmptyDirVolumeSource, s conversion.Scope) error {
-	out.Medium = core.StorageMedium(in.Medium)
-	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
+func autoConvert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(in *apicorev1.EmptyDirVolumeSource, out *pkgapiscore.EmptyDirVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.Medium = pkgapiscore.StorageMedium(in.Medium)
+	out.SizeLimit = (*pkgapiresource.Quantity)(unsafe.Pointer(in.SizeLimit))
 	return nil
 }
 
 // Convert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource is an autogenerated conversion function.
-func Convert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(in *v1.EmptyDirVolumeSource, out *core.EmptyDirVolumeSource, s conversion.Scope) error {
+func Convert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(in *apicorev1.EmptyDirVolumeSource, out *pkgapiscore.EmptyDirVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EmptyDirVolumeSource_To_core_EmptyDirVolumeSource(in, out, s)
 }
 
-func autoConvert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(in *core.EmptyDirVolumeSource, out *v1.EmptyDirVolumeSource, s conversion.Scope) error {
-	out.Medium = v1.StorageMedium(in.Medium)
-	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
+func autoConvert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(in *pkgapiscore.EmptyDirVolumeSource, out *apicorev1.EmptyDirVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.Medium = apicorev1.StorageMedium(in.Medium)
+	out.SizeLimit = (*pkgapiresource.Quantity)(unsafe.Pointer(in.SizeLimit))
 	return nil
 }
 
 // Convert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource is an autogenerated conversion function.
-func Convert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(in *core.EmptyDirVolumeSource, out *v1.EmptyDirVolumeSource, s conversion.Scope) error {
+func Convert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(in *pkgapiscore.EmptyDirVolumeSource, out *apicorev1.EmptyDirVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EmptyDirVolumeSource_To_v1_EmptyDirVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_EndpointAddress_To_core_EndpointAddress(in *v1.EndpointAddress, out *core.EndpointAddress, s conversion.Scope) error {
+func autoConvert_v1_EndpointAddress_To_core_EndpointAddress(in *apicorev1.EndpointAddress, out *pkgapiscore.EndpointAddress, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	out.Hostname = in.Hostname
 	out.NodeName = (*string)(unsafe.Pointer(in.NodeName))
-	out.TargetRef = (*core.ObjectReference)(unsafe.Pointer(in.TargetRef))
+	out.TargetRef = (*pkgapiscore.ObjectReference)(unsafe.Pointer(in.TargetRef))
 	return nil
 }
 
 // Convert_v1_EndpointAddress_To_core_EndpointAddress is an autogenerated conversion function.
-func Convert_v1_EndpointAddress_To_core_EndpointAddress(in *v1.EndpointAddress, out *core.EndpointAddress, s conversion.Scope) error {
+func Convert_v1_EndpointAddress_To_core_EndpointAddress(in *apicorev1.EndpointAddress, out *pkgapiscore.EndpointAddress, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EndpointAddress_To_core_EndpointAddress(in, out, s)
 }
 
-func autoConvert_core_EndpointAddress_To_v1_EndpointAddress(in *core.EndpointAddress, out *v1.EndpointAddress, s conversion.Scope) error {
+func autoConvert_core_EndpointAddress_To_v1_EndpointAddress(in *pkgapiscore.EndpointAddress, out *apicorev1.EndpointAddress, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	out.Hostname = in.Hostname
 	out.NodeName = (*string)(unsafe.Pointer(in.NodeName))
-	out.TargetRef = (*v1.ObjectReference)(unsafe.Pointer(in.TargetRef))
+	out.TargetRef = (*apicorev1.ObjectReference)(unsafe.Pointer(in.TargetRef))
 	return nil
 }
 
 // Convert_core_EndpointAddress_To_v1_EndpointAddress is an autogenerated conversion function.
-func Convert_core_EndpointAddress_To_v1_EndpointAddress(in *core.EndpointAddress, out *v1.EndpointAddress, s conversion.Scope) error {
+func Convert_core_EndpointAddress_To_v1_EndpointAddress(in *pkgapiscore.EndpointAddress, out *apicorev1.EndpointAddress, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EndpointAddress_To_v1_EndpointAddress(in, out, s)
 }
 
-func autoConvert_v1_EndpointPort_To_core_EndpointPort(in *v1.EndpointPort, out *core.EndpointPort, s conversion.Scope) error {
+func autoConvert_v1_EndpointPort_To_core_EndpointPort(in *apicorev1.EndpointPort, out *pkgapiscore.EndpointPort, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Port = in.Port
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = pkgapiscore.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	return nil
 }
 
 // Convert_v1_EndpointPort_To_core_EndpointPort is an autogenerated conversion function.
-func Convert_v1_EndpointPort_To_core_EndpointPort(in *v1.EndpointPort, out *core.EndpointPort, s conversion.Scope) error {
+func Convert_v1_EndpointPort_To_core_EndpointPort(in *apicorev1.EndpointPort, out *pkgapiscore.EndpointPort, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EndpointPort_To_core_EndpointPort(in, out, s)
 }
 
-func autoConvert_core_EndpointPort_To_v1_EndpointPort(in *core.EndpointPort, out *v1.EndpointPort, s conversion.Scope) error {
+func autoConvert_core_EndpointPort_To_v1_EndpointPort(in *pkgapiscore.EndpointPort, out *apicorev1.EndpointPort, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Port = in.Port
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = apicorev1.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	return nil
 }
 
 // Convert_core_EndpointPort_To_v1_EndpointPort is an autogenerated conversion function.
-func Convert_core_EndpointPort_To_v1_EndpointPort(in *core.EndpointPort, out *v1.EndpointPort, s conversion.Scope) error {
+func Convert_core_EndpointPort_To_v1_EndpointPort(in *pkgapiscore.EndpointPort, out *apicorev1.EndpointPort, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EndpointPort_To_v1_EndpointPort(in, out, s)
 }
 
-func autoConvert_v1_EndpointSubset_To_core_EndpointSubset(in *v1.EndpointSubset, out *core.EndpointSubset, s conversion.Scope) error {
-	out.Addresses = *(*[]core.EndpointAddress)(unsafe.Pointer(&in.Addresses))
-	out.NotReadyAddresses = *(*[]core.EndpointAddress)(unsafe.Pointer(&in.NotReadyAddresses))
-	out.Ports = *(*[]core.EndpointPort)(unsafe.Pointer(&in.Ports))
+func autoConvert_v1_EndpointSubset_To_core_EndpointSubset(in *apicorev1.EndpointSubset, out *pkgapiscore.EndpointSubset, s apimachinerypkgconversion.Scope) error {
+	out.Addresses = *(*[]pkgapiscore.EndpointAddress)(unsafe.Pointer(&in.Addresses))
+	out.NotReadyAddresses = *(*[]pkgapiscore.EndpointAddress)(unsafe.Pointer(&in.NotReadyAddresses))
+	out.Ports = *(*[]pkgapiscore.EndpointPort)(unsafe.Pointer(&in.Ports))
 	return nil
 }
 
 // Convert_v1_EndpointSubset_To_core_EndpointSubset is an autogenerated conversion function.
-func Convert_v1_EndpointSubset_To_core_EndpointSubset(in *v1.EndpointSubset, out *core.EndpointSubset, s conversion.Scope) error {
+func Convert_v1_EndpointSubset_To_core_EndpointSubset(in *apicorev1.EndpointSubset, out *pkgapiscore.EndpointSubset, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EndpointSubset_To_core_EndpointSubset(in, out, s)
 }
 
-func autoConvert_core_EndpointSubset_To_v1_EndpointSubset(in *core.EndpointSubset, out *v1.EndpointSubset, s conversion.Scope) error {
-	out.Addresses = *(*[]v1.EndpointAddress)(unsafe.Pointer(&in.Addresses))
-	out.NotReadyAddresses = *(*[]v1.EndpointAddress)(unsafe.Pointer(&in.NotReadyAddresses))
-	out.Ports = *(*[]v1.EndpointPort)(unsafe.Pointer(&in.Ports))
+func autoConvert_core_EndpointSubset_To_v1_EndpointSubset(in *pkgapiscore.EndpointSubset, out *apicorev1.EndpointSubset, s apimachinerypkgconversion.Scope) error {
+	out.Addresses = *(*[]apicorev1.EndpointAddress)(unsafe.Pointer(&in.Addresses))
+	out.NotReadyAddresses = *(*[]apicorev1.EndpointAddress)(unsafe.Pointer(&in.NotReadyAddresses))
+	out.Ports = *(*[]apicorev1.EndpointPort)(unsafe.Pointer(&in.Ports))
 	return nil
 }
 
 // Convert_core_EndpointSubset_To_v1_EndpointSubset is an autogenerated conversion function.
-func Convert_core_EndpointSubset_To_v1_EndpointSubset(in *core.EndpointSubset, out *v1.EndpointSubset, s conversion.Scope) error {
+func Convert_core_EndpointSubset_To_v1_EndpointSubset(in *pkgapiscore.EndpointSubset, out *apicorev1.EndpointSubset, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EndpointSubset_To_v1_EndpointSubset(in, out, s)
 }
 
-func autoConvert_v1_Endpoints_To_core_Endpoints(in *v1.Endpoints, out *core.Endpoints, s conversion.Scope) error {
+func autoConvert_v1_Endpoints_To_core_Endpoints(in *apicorev1.Endpoints, out *pkgapiscore.Endpoints, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Subsets = *(*[]core.EndpointSubset)(unsafe.Pointer(&in.Subsets))
+	out.Subsets = *(*[]pkgapiscore.EndpointSubset)(unsafe.Pointer(&in.Subsets))
 	return nil
 }
 
 // Convert_v1_Endpoints_To_core_Endpoints is an autogenerated conversion function.
-func Convert_v1_Endpoints_To_core_Endpoints(in *v1.Endpoints, out *core.Endpoints, s conversion.Scope) error {
+func Convert_v1_Endpoints_To_core_Endpoints(in *apicorev1.Endpoints, out *pkgapiscore.Endpoints, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Endpoints_To_core_Endpoints(in, out, s)
 }
 
-func autoConvert_core_Endpoints_To_v1_Endpoints(in *core.Endpoints, out *v1.Endpoints, s conversion.Scope) error {
+func autoConvert_core_Endpoints_To_v1_Endpoints(in *pkgapiscore.Endpoints, out *apicorev1.Endpoints, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Subsets = *(*[]v1.EndpointSubset)(unsafe.Pointer(&in.Subsets))
+	out.Subsets = *(*[]apicorev1.EndpointSubset)(unsafe.Pointer(&in.Subsets))
 	return nil
 }
 
 // Convert_core_Endpoints_To_v1_Endpoints is an autogenerated conversion function.
-func Convert_core_Endpoints_To_v1_Endpoints(in *core.Endpoints, out *v1.Endpoints, s conversion.Scope) error {
+func Convert_core_Endpoints_To_v1_Endpoints(in *pkgapiscore.Endpoints, out *apicorev1.Endpoints, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Endpoints_To_v1_Endpoints(in, out, s)
 }
 
-func autoConvert_v1_EndpointsList_To_core_EndpointsList(in *v1.EndpointsList, out *core.EndpointsList, s conversion.Scope) error {
+func autoConvert_v1_EndpointsList_To_core_EndpointsList(in *apicorev1.EndpointsList, out *pkgapiscore.EndpointsList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.Endpoints)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.Endpoints)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_EndpointsList_To_core_EndpointsList is an autogenerated conversion function.
-func Convert_v1_EndpointsList_To_core_EndpointsList(in *v1.EndpointsList, out *core.EndpointsList, s conversion.Scope) error {
+func Convert_v1_EndpointsList_To_core_EndpointsList(in *apicorev1.EndpointsList, out *pkgapiscore.EndpointsList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EndpointsList_To_core_EndpointsList(in, out, s)
 }
 
-func autoConvert_core_EndpointsList_To_v1_EndpointsList(in *core.EndpointsList, out *v1.EndpointsList, s conversion.Scope) error {
+func autoConvert_core_EndpointsList_To_v1_EndpointsList(in *pkgapiscore.EndpointsList, out *apicorev1.EndpointsList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.Endpoints)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.Endpoints)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_EndpointsList_To_v1_EndpointsList is an autogenerated conversion function.
-func Convert_core_EndpointsList_To_v1_EndpointsList(in *core.EndpointsList, out *v1.EndpointsList, s conversion.Scope) error {
+func Convert_core_EndpointsList_To_v1_EndpointsList(in *pkgapiscore.EndpointsList, out *apicorev1.EndpointsList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EndpointsList_To_v1_EndpointsList(in, out, s)
 }
 
-func autoConvert_v1_EnvFromSource_To_core_EnvFromSource(in *v1.EnvFromSource, out *core.EnvFromSource, s conversion.Scope) error {
+func autoConvert_v1_EnvFromSource_To_core_EnvFromSource(in *apicorev1.EnvFromSource, out *pkgapiscore.EnvFromSource, s apimachinerypkgconversion.Scope) error {
 	out.Prefix = in.Prefix
-	out.ConfigMapRef = (*core.ConfigMapEnvSource)(unsafe.Pointer(in.ConfigMapRef))
-	out.SecretRef = (*core.SecretEnvSource)(unsafe.Pointer(in.SecretRef))
+	out.ConfigMapRef = (*pkgapiscore.ConfigMapEnvSource)(unsafe.Pointer(in.ConfigMapRef))
+	out.SecretRef = (*pkgapiscore.SecretEnvSource)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_v1_EnvFromSource_To_core_EnvFromSource is an autogenerated conversion function.
-func Convert_v1_EnvFromSource_To_core_EnvFromSource(in *v1.EnvFromSource, out *core.EnvFromSource, s conversion.Scope) error {
+func Convert_v1_EnvFromSource_To_core_EnvFromSource(in *apicorev1.EnvFromSource, out *pkgapiscore.EnvFromSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EnvFromSource_To_core_EnvFromSource(in, out, s)
 }
 
-func autoConvert_core_EnvFromSource_To_v1_EnvFromSource(in *core.EnvFromSource, out *v1.EnvFromSource, s conversion.Scope) error {
+func autoConvert_core_EnvFromSource_To_v1_EnvFromSource(in *pkgapiscore.EnvFromSource, out *apicorev1.EnvFromSource, s apimachinerypkgconversion.Scope) error {
 	out.Prefix = in.Prefix
-	out.ConfigMapRef = (*v1.ConfigMapEnvSource)(unsafe.Pointer(in.ConfigMapRef))
-	out.SecretRef = (*v1.SecretEnvSource)(unsafe.Pointer(in.SecretRef))
+	out.ConfigMapRef = (*apicorev1.ConfigMapEnvSource)(unsafe.Pointer(in.ConfigMapRef))
+	out.SecretRef = (*apicorev1.SecretEnvSource)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_core_EnvFromSource_To_v1_EnvFromSource is an autogenerated conversion function.
-func Convert_core_EnvFromSource_To_v1_EnvFromSource(in *core.EnvFromSource, out *v1.EnvFromSource, s conversion.Scope) error {
+func Convert_core_EnvFromSource_To_v1_EnvFromSource(in *pkgapiscore.EnvFromSource, out *apicorev1.EnvFromSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EnvFromSource_To_v1_EnvFromSource(in, out, s)
 }
 
-func autoConvert_v1_EnvVar_To_core_EnvVar(in *v1.EnvVar, out *core.EnvVar, s conversion.Scope) error {
+func autoConvert_v1_EnvVar_To_core_EnvVar(in *apicorev1.EnvVar, out *pkgapiscore.EnvVar, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = in.Value
-	out.ValueFrom = (*core.EnvVarSource)(unsafe.Pointer(in.ValueFrom))
+	out.ValueFrom = (*pkgapiscore.EnvVarSource)(unsafe.Pointer(in.ValueFrom))
 	return nil
 }
 
 // Convert_v1_EnvVar_To_core_EnvVar is an autogenerated conversion function.
-func Convert_v1_EnvVar_To_core_EnvVar(in *v1.EnvVar, out *core.EnvVar, s conversion.Scope) error {
+func Convert_v1_EnvVar_To_core_EnvVar(in *apicorev1.EnvVar, out *pkgapiscore.EnvVar, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EnvVar_To_core_EnvVar(in, out, s)
 }
 
-func autoConvert_core_EnvVar_To_v1_EnvVar(in *core.EnvVar, out *v1.EnvVar, s conversion.Scope) error {
+func autoConvert_core_EnvVar_To_v1_EnvVar(in *pkgapiscore.EnvVar, out *apicorev1.EnvVar, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = in.Value
-	out.ValueFrom = (*v1.EnvVarSource)(unsafe.Pointer(in.ValueFrom))
+	out.ValueFrom = (*apicorev1.EnvVarSource)(unsafe.Pointer(in.ValueFrom))
 	return nil
 }
 
 // Convert_core_EnvVar_To_v1_EnvVar is an autogenerated conversion function.
-func Convert_core_EnvVar_To_v1_EnvVar(in *core.EnvVar, out *v1.EnvVar, s conversion.Scope) error {
+func Convert_core_EnvVar_To_v1_EnvVar(in *pkgapiscore.EnvVar, out *apicorev1.EnvVar, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EnvVar_To_v1_EnvVar(in, out, s)
 }
 
-func autoConvert_v1_EnvVarSource_To_core_EnvVarSource(in *v1.EnvVarSource, out *core.EnvVarSource, s conversion.Scope) error {
-	out.FieldRef = (*core.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
-	out.ResourceFieldRef = (*core.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
-	out.ConfigMapKeyRef = (*core.ConfigMapKeySelector)(unsafe.Pointer(in.ConfigMapKeyRef))
-	out.SecretKeyRef = (*core.SecretKeySelector)(unsafe.Pointer(in.SecretKeyRef))
+func autoConvert_v1_EnvVarSource_To_core_EnvVarSource(in *apicorev1.EnvVarSource, out *pkgapiscore.EnvVarSource, s apimachinerypkgconversion.Scope) error {
+	out.FieldRef = (*pkgapiscore.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
+	out.ResourceFieldRef = (*pkgapiscore.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
+	out.ConfigMapKeyRef = (*pkgapiscore.ConfigMapKeySelector)(unsafe.Pointer(in.ConfigMapKeyRef))
+	out.SecretKeyRef = (*pkgapiscore.SecretKeySelector)(unsafe.Pointer(in.SecretKeyRef))
 	return nil
 }
 
 // Convert_v1_EnvVarSource_To_core_EnvVarSource is an autogenerated conversion function.
-func Convert_v1_EnvVarSource_To_core_EnvVarSource(in *v1.EnvVarSource, out *core.EnvVarSource, s conversion.Scope) error {
+func Convert_v1_EnvVarSource_To_core_EnvVarSource(in *apicorev1.EnvVarSource, out *pkgapiscore.EnvVarSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EnvVarSource_To_core_EnvVarSource(in, out, s)
 }
 
-func autoConvert_core_EnvVarSource_To_v1_EnvVarSource(in *core.EnvVarSource, out *v1.EnvVarSource, s conversion.Scope) error {
-	out.FieldRef = (*v1.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
-	out.ResourceFieldRef = (*v1.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
-	out.ConfigMapKeyRef = (*v1.ConfigMapKeySelector)(unsafe.Pointer(in.ConfigMapKeyRef))
-	out.SecretKeyRef = (*v1.SecretKeySelector)(unsafe.Pointer(in.SecretKeyRef))
+func autoConvert_core_EnvVarSource_To_v1_EnvVarSource(in *pkgapiscore.EnvVarSource, out *apicorev1.EnvVarSource, s apimachinerypkgconversion.Scope) error {
+	out.FieldRef = (*apicorev1.ObjectFieldSelector)(unsafe.Pointer(in.FieldRef))
+	out.ResourceFieldRef = (*apicorev1.ResourceFieldSelector)(unsafe.Pointer(in.ResourceFieldRef))
+	out.ConfigMapKeyRef = (*apicorev1.ConfigMapKeySelector)(unsafe.Pointer(in.ConfigMapKeyRef))
+	out.SecretKeyRef = (*apicorev1.SecretKeySelector)(unsafe.Pointer(in.SecretKeyRef))
 	return nil
 }
 
 // Convert_core_EnvVarSource_To_v1_EnvVarSource is an autogenerated conversion function.
-func Convert_core_EnvVarSource_To_v1_EnvVarSource(in *core.EnvVarSource, out *v1.EnvVarSource, s conversion.Scope) error {
+func Convert_core_EnvVarSource_To_v1_EnvVarSource(in *pkgapiscore.EnvVarSource, out *apicorev1.EnvVarSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EnvVarSource_To_v1_EnvVarSource(in, out, s)
 }
 
-func autoConvert_v1_EphemeralContainer_To_core_EphemeralContainer(in *v1.EphemeralContainer, out *core.EphemeralContainer, s conversion.Scope) error {
+func autoConvert_v1_EphemeralContainer_To_core_EphemeralContainer(in *apicorev1.EphemeralContainer, out *pkgapiscore.EphemeralContainer, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(&in.EphemeralContainerCommon, &out.EphemeralContainerCommon, s); err != nil {
 		return err
 	}
@@ -3462,11 +3462,11 @@ func autoConvert_v1_EphemeralContainer_To_core_EphemeralContainer(in *v1.Ephemer
 }
 
 // Convert_v1_EphemeralContainer_To_core_EphemeralContainer is an autogenerated conversion function.
-func Convert_v1_EphemeralContainer_To_core_EphemeralContainer(in *v1.EphemeralContainer, out *core.EphemeralContainer, s conversion.Scope) error {
+func Convert_v1_EphemeralContainer_To_core_EphemeralContainer(in *apicorev1.EphemeralContainer, out *pkgapiscore.EphemeralContainer, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EphemeralContainer_To_core_EphemeralContainer(in, out, s)
 }
 
-func autoConvert_core_EphemeralContainer_To_v1_EphemeralContainer(in *core.EphemeralContainer, out *v1.EphemeralContainer, s conversion.Scope) error {
+func autoConvert_core_EphemeralContainer_To_v1_EphemeralContainer(in *pkgapiscore.EphemeralContainer, out *apicorev1.EphemeralContainer, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(&in.EphemeralContainerCommon, &out.EphemeralContainerCommon, s); err != nil {
 		return err
 	}
@@ -3475,32 +3475,32 @@ func autoConvert_core_EphemeralContainer_To_v1_EphemeralContainer(in *core.Ephem
 }
 
 // Convert_core_EphemeralContainer_To_v1_EphemeralContainer is an autogenerated conversion function.
-func Convert_core_EphemeralContainer_To_v1_EphemeralContainer(in *core.EphemeralContainer, out *v1.EphemeralContainer, s conversion.Scope) error {
+func Convert_core_EphemeralContainer_To_v1_EphemeralContainer(in *pkgapiscore.EphemeralContainer, out *apicorev1.EphemeralContainer, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EphemeralContainer_To_v1_EphemeralContainer(in, out, s)
 }
 
-func autoConvert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(in *v1.EphemeralContainerCommon, out *core.EphemeralContainerCommon, s conversion.Scope) error {
+func autoConvert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(in *apicorev1.EphemeralContainerCommon, out *pkgapiscore.EphemeralContainerCommon, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Image = in.Image
 	out.Command = *(*[]string)(unsafe.Pointer(&in.Command))
 	out.Args = *(*[]string)(unsafe.Pointer(&in.Args))
 	out.WorkingDir = in.WorkingDir
-	out.Ports = *(*[]core.ContainerPort)(unsafe.Pointer(&in.Ports))
-	out.EnvFrom = *(*[]core.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
-	out.Env = *(*[]core.EnvVar)(unsafe.Pointer(&in.Env))
+	out.Ports = *(*[]pkgapiscore.ContainerPort)(unsafe.Pointer(&in.Ports))
+	out.EnvFrom = *(*[]pkgapiscore.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
+	out.Env = *(*[]pkgapiscore.EnvVar)(unsafe.Pointer(&in.Env))
 	if err := Convert_v1_ResourceRequirements_To_core_ResourceRequirements(&in.Resources, &out.Resources, s); err != nil {
 		return err
 	}
-	out.VolumeMounts = *(*[]core.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
-	out.VolumeDevices = *(*[]core.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
-	out.LivenessProbe = (*core.Probe)(unsafe.Pointer(in.LivenessProbe))
-	out.ReadinessProbe = (*core.Probe)(unsafe.Pointer(in.ReadinessProbe))
-	out.StartupProbe = (*core.Probe)(unsafe.Pointer(in.StartupProbe))
-	out.Lifecycle = (*core.Lifecycle)(unsafe.Pointer(in.Lifecycle))
+	out.VolumeMounts = *(*[]pkgapiscore.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
+	out.VolumeDevices = *(*[]pkgapiscore.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
+	out.LivenessProbe = (*pkgapiscore.Probe)(unsafe.Pointer(in.LivenessProbe))
+	out.ReadinessProbe = (*pkgapiscore.Probe)(unsafe.Pointer(in.ReadinessProbe))
+	out.StartupProbe = (*pkgapiscore.Probe)(unsafe.Pointer(in.StartupProbe))
+	out.Lifecycle = (*pkgapiscore.Lifecycle)(unsafe.Pointer(in.Lifecycle))
 	out.TerminationMessagePath = in.TerminationMessagePath
-	out.TerminationMessagePolicy = core.TerminationMessagePolicy(in.TerminationMessagePolicy)
-	out.ImagePullPolicy = core.PullPolicy(in.ImagePullPolicy)
-	out.SecurityContext = (*core.SecurityContext)(unsafe.Pointer(in.SecurityContext))
+	out.TerminationMessagePolicy = pkgapiscore.TerminationMessagePolicy(in.TerminationMessagePolicy)
+	out.ImagePullPolicy = pkgapiscore.PullPolicy(in.ImagePullPolicy)
+	out.SecurityContext = (*pkgapiscore.SecurityContext)(unsafe.Pointer(in.SecurityContext))
 	out.Stdin = in.Stdin
 	out.StdinOnce = in.StdinOnce
 	out.TTY = in.TTY
@@ -3508,32 +3508,32 @@ func autoConvert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(in
 }
 
 // Convert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon is an autogenerated conversion function.
-func Convert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(in *v1.EphemeralContainerCommon, out *core.EphemeralContainerCommon, s conversion.Scope) error {
+func Convert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(in *apicorev1.EphemeralContainerCommon, out *pkgapiscore.EphemeralContainerCommon, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EphemeralContainerCommon_To_core_EphemeralContainerCommon(in, out, s)
 }
 
-func autoConvert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(in *core.EphemeralContainerCommon, out *v1.EphemeralContainerCommon, s conversion.Scope) error {
+func autoConvert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(in *pkgapiscore.EphemeralContainerCommon, out *apicorev1.EphemeralContainerCommon, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Image = in.Image
 	out.Command = *(*[]string)(unsafe.Pointer(&in.Command))
 	out.Args = *(*[]string)(unsafe.Pointer(&in.Args))
 	out.WorkingDir = in.WorkingDir
-	out.Ports = *(*[]v1.ContainerPort)(unsafe.Pointer(&in.Ports))
-	out.EnvFrom = *(*[]v1.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
-	out.Env = *(*[]v1.EnvVar)(unsafe.Pointer(&in.Env))
+	out.Ports = *(*[]apicorev1.ContainerPort)(unsafe.Pointer(&in.Ports))
+	out.EnvFrom = *(*[]apicorev1.EnvFromSource)(unsafe.Pointer(&in.EnvFrom))
+	out.Env = *(*[]apicorev1.EnvVar)(unsafe.Pointer(&in.Env))
 	if err := Convert_core_ResourceRequirements_To_v1_ResourceRequirements(&in.Resources, &out.Resources, s); err != nil {
 		return err
 	}
-	out.VolumeMounts = *(*[]v1.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
-	out.VolumeDevices = *(*[]v1.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
-	out.LivenessProbe = (*v1.Probe)(unsafe.Pointer(in.LivenessProbe))
-	out.ReadinessProbe = (*v1.Probe)(unsafe.Pointer(in.ReadinessProbe))
-	out.StartupProbe = (*v1.Probe)(unsafe.Pointer(in.StartupProbe))
-	out.Lifecycle = (*v1.Lifecycle)(unsafe.Pointer(in.Lifecycle))
+	out.VolumeMounts = *(*[]apicorev1.VolumeMount)(unsafe.Pointer(&in.VolumeMounts))
+	out.VolumeDevices = *(*[]apicorev1.VolumeDevice)(unsafe.Pointer(&in.VolumeDevices))
+	out.LivenessProbe = (*apicorev1.Probe)(unsafe.Pointer(in.LivenessProbe))
+	out.ReadinessProbe = (*apicorev1.Probe)(unsafe.Pointer(in.ReadinessProbe))
+	out.StartupProbe = (*apicorev1.Probe)(unsafe.Pointer(in.StartupProbe))
+	out.Lifecycle = (*apicorev1.Lifecycle)(unsafe.Pointer(in.Lifecycle))
 	out.TerminationMessagePath = in.TerminationMessagePath
-	out.TerminationMessagePolicy = v1.TerminationMessagePolicy(in.TerminationMessagePolicy)
-	out.ImagePullPolicy = v1.PullPolicy(in.ImagePullPolicy)
-	out.SecurityContext = (*v1.SecurityContext)(unsafe.Pointer(in.SecurityContext))
+	out.TerminationMessagePolicy = apicorev1.TerminationMessagePolicy(in.TerminationMessagePolicy)
+	out.ImagePullPolicy = apicorev1.PullPolicy(in.ImagePullPolicy)
+	out.SecurityContext = (*apicorev1.SecurityContext)(unsafe.Pointer(in.SecurityContext))
 	out.Stdin = in.Stdin
 	out.StdinOnce = in.StdinOnce
 	out.TTY = in.TTY
@@ -3541,31 +3541,31 @@ func autoConvert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(in
 }
 
 // Convert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon is an autogenerated conversion function.
-func Convert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(in *core.EphemeralContainerCommon, out *v1.EphemeralContainerCommon, s conversion.Scope) error {
+func Convert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(in *pkgapiscore.EphemeralContainerCommon, out *apicorev1.EphemeralContainerCommon, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EphemeralContainerCommon_To_v1_EphemeralContainerCommon(in, out, s)
 }
 
-func autoConvert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(in *v1.EphemeralVolumeSource, out *core.EphemeralVolumeSource, s conversion.Scope) error {
-	out.VolumeClaimTemplate = (*core.PersistentVolumeClaimTemplate)(unsafe.Pointer(in.VolumeClaimTemplate))
+func autoConvert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(in *apicorev1.EphemeralVolumeSource, out *pkgapiscore.EphemeralVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.VolumeClaimTemplate = (*pkgapiscore.PersistentVolumeClaimTemplate)(unsafe.Pointer(in.VolumeClaimTemplate))
 	return nil
 }
 
 // Convert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource is an autogenerated conversion function.
-func Convert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(in *v1.EphemeralVolumeSource, out *core.EphemeralVolumeSource, s conversion.Scope) error {
+func Convert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(in *apicorev1.EphemeralVolumeSource, out *pkgapiscore.EphemeralVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EphemeralVolumeSource_To_core_EphemeralVolumeSource(in, out, s)
 }
 
-func autoConvert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(in *core.EphemeralVolumeSource, out *v1.EphemeralVolumeSource, s conversion.Scope) error {
-	out.VolumeClaimTemplate = (*v1.PersistentVolumeClaimTemplate)(unsafe.Pointer(in.VolumeClaimTemplate))
+func autoConvert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(in *pkgapiscore.EphemeralVolumeSource, out *apicorev1.EphemeralVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.VolumeClaimTemplate = (*apicorev1.PersistentVolumeClaimTemplate)(unsafe.Pointer(in.VolumeClaimTemplate))
 	return nil
 }
 
 // Convert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource is an autogenerated conversion function.
-func Convert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(in *core.EphemeralVolumeSource, out *v1.EphemeralVolumeSource, s conversion.Scope) error {
+func Convert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(in *pkgapiscore.EphemeralVolumeSource, out *apicorev1.EphemeralVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EphemeralVolumeSource_To_v1_EphemeralVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Event_To_core_Event(in *v1.Event, out *core.Event, s conversion.Scope) error {
+func autoConvert_v1_Event_To_core_Event(in *apicorev1.Event, out *pkgapiscore.Event, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_ObjectReference_To_core_ObjectReference(&in.InvolvedObject, &out.InvolvedObject, s); err != nil {
 		return err
@@ -3580,20 +3580,20 @@ func autoConvert_v1_Event_To_core_Event(in *v1.Event, out *core.Event, s convers
 	out.Count = in.Count
 	out.Type = in.Type
 	out.EventTime = in.EventTime
-	out.Series = (*core.EventSeries)(unsafe.Pointer(in.Series))
+	out.Series = (*pkgapiscore.EventSeries)(unsafe.Pointer(in.Series))
 	out.Action = in.Action
-	out.Related = (*core.ObjectReference)(unsafe.Pointer(in.Related))
+	out.Related = (*pkgapiscore.ObjectReference)(unsafe.Pointer(in.Related))
 	out.ReportingController = in.ReportingController
 	out.ReportingInstance = in.ReportingInstance
 	return nil
 }
 
 // Convert_v1_Event_To_core_Event is an autogenerated conversion function.
-func Convert_v1_Event_To_core_Event(in *v1.Event, out *core.Event, s conversion.Scope) error {
+func Convert_v1_Event_To_core_Event(in *apicorev1.Event, out *pkgapiscore.Event, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Event_To_core_Event(in, out, s)
 }
 
-func autoConvert_core_Event_To_v1_Event(in *core.Event, out *v1.Event, s conversion.Scope) error {
+func autoConvert_core_Event_To_v1_Event(in *pkgapiscore.Event, out *apicorev1.Event, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_ObjectReference_To_v1_ObjectReference(&in.InvolvedObject, &out.InvolvedObject, s); err != nil {
 		return err
@@ -3608,106 +3608,106 @@ func autoConvert_core_Event_To_v1_Event(in *core.Event, out *v1.Event, s convers
 	out.Count = in.Count
 	out.Type = in.Type
 	out.EventTime = in.EventTime
-	out.Series = (*v1.EventSeries)(unsafe.Pointer(in.Series))
+	out.Series = (*apicorev1.EventSeries)(unsafe.Pointer(in.Series))
 	out.Action = in.Action
-	out.Related = (*v1.ObjectReference)(unsafe.Pointer(in.Related))
+	out.Related = (*apicorev1.ObjectReference)(unsafe.Pointer(in.Related))
 	out.ReportingController = in.ReportingController
 	out.ReportingInstance = in.ReportingInstance
 	return nil
 }
 
 // Convert_core_Event_To_v1_Event is an autogenerated conversion function.
-func Convert_core_Event_To_v1_Event(in *core.Event, out *v1.Event, s conversion.Scope) error {
+func Convert_core_Event_To_v1_Event(in *pkgapiscore.Event, out *apicorev1.Event, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Event_To_v1_Event(in, out, s)
 }
 
-func autoConvert_v1_EventList_To_core_EventList(in *v1.EventList, out *core.EventList, s conversion.Scope) error {
+func autoConvert_v1_EventList_To_core_EventList(in *apicorev1.EventList, out *pkgapiscore.EventList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.Event)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.Event)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_EventList_To_core_EventList is an autogenerated conversion function.
-func Convert_v1_EventList_To_core_EventList(in *v1.EventList, out *core.EventList, s conversion.Scope) error {
+func Convert_v1_EventList_To_core_EventList(in *apicorev1.EventList, out *pkgapiscore.EventList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EventList_To_core_EventList(in, out, s)
 }
 
-func autoConvert_core_EventList_To_v1_EventList(in *core.EventList, out *v1.EventList, s conversion.Scope) error {
+func autoConvert_core_EventList_To_v1_EventList(in *pkgapiscore.EventList, out *apicorev1.EventList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.Event)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.Event)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_EventList_To_v1_EventList is an autogenerated conversion function.
-func Convert_core_EventList_To_v1_EventList(in *core.EventList, out *v1.EventList, s conversion.Scope) error {
+func Convert_core_EventList_To_v1_EventList(in *pkgapiscore.EventList, out *apicorev1.EventList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EventList_To_v1_EventList(in, out, s)
 }
 
-func autoConvert_v1_EventSeries_To_core_EventSeries(in *v1.EventSeries, out *core.EventSeries, s conversion.Scope) error {
+func autoConvert_v1_EventSeries_To_core_EventSeries(in *apicorev1.EventSeries, out *pkgapiscore.EventSeries, s apimachinerypkgconversion.Scope) error {
 	out.Count = in.Count
 	out.LastObservedTime = in.LastObservedTime
 	return nil
 }
 
 // Convert_v1_EventSeries_To_core_EventSeries is an autogenerated conversion function.
-func Convert_v1_EventSeries_To_core_EventSeries(in *v1.EventSeries, out *core.EventSeries, s conversion.Scope) error {
+func Convert_v1_EventSeries_To_core_EventSeries(in *apicorev1.EventSeries, out *pkgapiscore.EventSeries, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EventSeries_To_core_EventSeries(in, out, s)
 }
 
-func autoConvert_core_EventSeries_To_v1_EventSeries(in *core.EventSeries, out *v1.EventSeries, s conversion.Scope) error {
+func autoConvert_core_EventSeries_To_v1_EventSeries(in *pkgapiscore.EventSeries, out *apicorev1.EventSeries, s apimachinerypkgconversion.Scope) error {
 	out.Count = in.Count
 	out.LastObservedTime = in.LastObservedTime
 	return nil
 }
 
 // Convert_core_EventSeries_To_v1_EventSeries is an autogenerated conversion function.
-func Convert_core_EventSeries_To_v1_EventSeries(in *core.EventSeries, out *v1.EventSeries, s conversion.Scope) error {
+func Convert_core_EventSeries_To_v1_EventSeries(in *pkgapiscore.EventSeries, out *apicorev1.EventSeries, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EventSeries_To_v1_EventSeries(in, out, s)
 }
 
-func autoConvert_v1_EventSource_To_core_EventSource(in *v1.EventSource, out *core.EventSource, s conversion.Scope) error {
+func autoConvert_v1_EventSource_To_core_EventSource(in *apicorev1.EventSource, out *pkgapiscore.EventSource, s apimachinerypkgconversion.Scope) error {
 	out.Component = in.Component
 	out.Host = in.Host
 	return nil
 }
 
 // Convert_v1_EventSource_To_core_EventSource is an autogenerated conversion function.
-func Convert_v1_EventSource_To_core_EventSource(in *v1.EventSource, out *core.EventSource, s conversion.Scope) error {
+func Convert_v1_EventSource_To_core_EventSource(in *apicorev1.EventSource, out *pkgapiscore.EventSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_EventSource_To_core_EventSource(in, out, s)
 }
 
-func autoConvert_core_EventSource_To_v1_EventSource(in *core.EventSource, out *v1.EventSource, s conversion.Scope) error {
+func autoConvert_core_EventSource_To_v1_EventSource(in *pkgapiscore.EventSource, out *apicorev1.EventSource, s apimachinerypkgconversion.Scope) error {
 	out.Component = in.Component
 	out.Host = in.Host
 	return nil
 }
 
 // Convert_core_EventSource_To_v1_EventSource is an autogenerated conversion function.
-func Convert_core_EventSource_To_v1_EventSource(in *core.EventSource, out *v1.EventSource, s conversion.Scope) error {
+func Convert_core_EventSource_To_v1_EventSource(in *pkgapiscore.EventSource, out *apicorev1.EventSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_EventSource_To_v1_EventSource(in, out, s)
 }
 
-func autoConvert_v1_ExecAction_To_core_ExecAction(in *v1.ExecAction, out *core.ExecAction, s conversion.Scope) error {
+func autoConvert_v1_ExecAction_To_core_ExecAction(in *apicorev1.ExecAction, out *pkgapiscore.ExecAction, s apimachinerypkgconversion.Scope) error {
 	out.Command = *(*[]string)(unsafe.Pointer(&in.Command))
 	return nil
 }
 
 // Convert_v1_ExecAction_To_core_ExecAction is an autogenerated conversion function.
-func Convert_v1_ExecAction_To_core_ExecAction(in *v1.ExecAction, out *core.ExecAction, s conversion.Scope) error {
+func Convert_v1_ExecAction_To_core_ExecAction(in *apicorev1.ExecAction, out *pkgapiscore.ExecAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ExecAction_To_core_ExecAction(in, out, s)
 }
 
-func autoConvert_core_ExecAction_To_v1_ExecAction(in *core.ExecAction, out *v1.ExecAction, s conversion.Scope) error {
+func autoConvert_core_ExecAction_To_v1_ExecAction(in *pkgapiscore.ExecAction, out *apicorev1.ExecAction, s apimachinerypkgconversion.Scope) error {
 	out.Command = *(*[]string)(unsafe.Pointer(&in.Command))
 	return nil
 }
 
 // Convert_core_ExecAction_To_v1_ExecAction is an autogenerated conversion function.
-func Convert_core_ExecAction_To_v1_ExecAction(in *core.ExecAction, out *v1.ExecAction, s conversion.Scope) error {
+func Convert_core_ExecAction_To_v1_ExecAction(in *pkgapiscore.ExecAction, out *apicorev1.ExecAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ExecAction_To_v1_ExecAction(in, out, s)
 }
 
-func autoConvert_v1_FCVolumeSource_To_core_FCVolumeSource(in *v1.FCVolumeSource, out *core.FCVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_FCVolumeSource_To_core_FCVolumeSource(in *apicorev1.FCVolumeSource, out *pkgapiscore.FCVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.TargetWWNs = *(*[]string)(unsafe.Pointer(&in.TargetWWNs))
 	out.Lun = (*int32)(unsafe.Pointer(in.Lun))
 	out.FSType = in.FSType
@@ -3717,11 +3717,11 @@ func autoConvert_v1_FCVolumeSource_To_core_FCVolumeSource(in *v1.FCVolumeSource,
 }
 
 // Convert_v1_FCVolumeSource_To_core_FCVolumeSource is an autogenerated conversion function.
-func Convert_v1_FCVolumeSource_To_core_FCVolumeSource(in *v1.FCVolumeSource, out *core.FCVolumeSource, s conversion.Scope) error {
+func Convert_v1_FCVolumeSource_To_core_FCVolumeSource(in *apicorev1.FCVolumeSource, out *pkgapiscore.FCVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_FCVolumeSource_To_core_FCVolumeSource(in, out, s)
 }
 
-func autoConvert_core_FCVolumeSource_To_v1_FCVolumeSource(in *core.FCVolumeSource, out *v1.FCVolumeSource, s conversion.Scope) error {
+func autoConvert_core_FCVolumeSource_To_v1_FCVolumeSource(in *pkgapiscore.FCVolumeSource, out *apicorev1.FCVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.TargetWWNs = *(*[]string)(unsafe.Pointer(&in.TargetWWNs))
 	out.Lun = (*int32)(unsafe.Pointer(in.Lun))
 	out.FSType = in.FSType
@@ -3731,89 +3731,89 @@ func autoConvert_core_FCVolumeSource_To_v1_FCVolumeSource(in *core.FCVolumeSourc
 }
 
 // Convert_core_FCVolumeSource_To_v1_FCVolumeSource is an autogenerated conversion function.
-func Convert_core_FCVolumeSource_To_v1_FCVolumeSource(in *core.FCVolumeSource, out *v1.FCVolumeSource, s conversion.Scope) error {
+func Convert_core_FCVolumeSource_To_v1_FCVolumeSource(in *pkgapiscore.FCVolumeSource, out *apicorev1.FCVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_FCVolumeSource_To_v1_FCVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(in *v1.FlexPersistentVolumeSource, out *core.FlexPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(in *apicorev1.FlexPersistentVolumeSource, out *pkgapiscore.FlexPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.FSType = in.FSType
-	out.SecretRef = (*core.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	out.Options = *(*map[string]string)(unsafe.Pointer(&in.Options))
 	return nil
 }
 
 // Convert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(in *v1.FlexPersistentVolumeSource, out *core.FlexPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(in *apicorev1.FlexPersistentVolumeSource, out *pkgapiscore.FlexPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_FlexPersistentVolumeSource_To_core_FlexPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(in *core.FlexPersistentVolumeSource, out *v1.FlexPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(in *pkgapiscore.FlexPersistentVolumeSource, out *apicorev1.FlexPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.FSType = in.FSType
-	out.SecretRef = (*v1.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	out.Options = *(*map[string]string)(unsafe.Pointer(&in.Options))
 	return nil
 }
 
 // Convert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(in *core.FlexPersistentVolumeSource, out *v1.FlexPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(in *pkgapiscore.FlexPersistentVolumeSource, out *apicorev1.FlexPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_FlexPersistentVolumeSource_To_v1_FlexPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_FlexVolumeSource_To_core_FlexVolumeSource(in *v1.FlexVolumeSource, out *core.FlexVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_FlexVolumeSource_To_core_FlexVolumeSource(in *apicorev1.FlexVolumeSource, out *pkgapiscore.FlexVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.FSType = in.FSType
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	out.Options = *(*map[string]string)(unsafe.Pointer(&in.Options))
 	return nil
 }
 
 // Convert_v1_FlexVolumeSource_To_core_FlexVolumeSource is an autogenerated conversion function.
-func Convert_v1_FlexVolumeSource_To_core_FlexVolumeSource(in *v1.FlexVolumeSource, out *core.FlexVolumeSource, s conversion.Scope) error {
+func Convert_v1_FlexVolumeSource_To_core_FlexVolumeSource(in *apicorev1.FlexVolumeSource, out *pkgapiscore.FlexVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_FlexVolumeSource_To_core_FlexVolumeSource(in, out, s)
 }
 
-func autoConvert_core_FlexVolumeSource_To_v1_FlexVolumeSource(in *core.FlexVolumeSource, out *v1.FlexVolumeSource, s conversion.Scope) error {
+func autoConvert_core_FlexVolumeSource_To_v1_FlexVolumeSource(in *pkgapiscore.FlexVolumeSource, out *apicorev1.FlexVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Driver = in.Driver
 	out.FSType = in.FSType
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	out.Options = *(*map[string]string)(unsafe.Pointer(&in.Options))
 	return nil
 }
 
 // Convert_core_FlexVolumeSource_To_v1_FlexVolumeSource is an autogenerated conversion function.
-func Convert_core_FlexVolumeSource_To_v1_FlexVolumeSource(in *core.FlexVolumeSource, out *v1.FlexVolumeSource, s conversion.Scope) error {
+func Convert_core_FlexVolumeSource_To_v1_FlexVolumeSource(in *pkgapiscore.FlexVolumeSource, out *apicorev1.FlexVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_FlexVolumeSource_To_v1_FlexVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(in *v1.FlockerVolumeSource, out *core.FlockerVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(in *apicorev1.FlockerVolumeSource, out *pkgapiscore.FlockerVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.DatasetName = in.DatasetName
 	out.DatasetUUID = in.DatasetUUID
 	return nil
 }
 
 // Convert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource is an autogenerated conversion function.
-func Convert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(in *v1.FlockerVolumeSource, out *core.FlockerVolumeSource, s conversion.Scope) error {
+func Convert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(in *apicorev1.FlockerVolumeSource, out *pkgapiscore.FlockerVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_FlockerVolumeSource_To_core_FlockerVolumeSource(in, out, s)
 }
 
-func autoConvert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(in *core.FlockerVolumeSource, out *v1.FlockerVolumeSource, s conversion.Scope) error {
+func autoConvert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(in *pkgapiscore.FlockerVolumeSource, out *apicorev1.FlockerVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.DatasetName = in.DatasetName
 	out.DatasetUUID = in.DatasetUUID
 	return nil
 }
 
 // Convert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource is an autogenerated conversion function.
-func Convert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(in *core.FlockerVolumeSource, out *v1.FlockerVolumeSource, s conversion.Scope) error {
+func Convert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(in *pkgapiscore.FlockerVolumeSource, out *apicorev1.FlockerVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_FlockerVolumeSource_To_v1_FlockerVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(in *v1.GCEPersistentDiskVolumeSource, out *core.GCEPersistentDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(in *apicorev1.GCEPersistentDiskVolumeSource, out *pkgapiscore.GCEPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.PDName = in.PDName
 	out.FSType = in.FSType
 	out.Partition = in.Partition
@@ -3822,11 +3822,11 @@ func autoConvert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolum
 }
 
 // Convert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource is an autogenerated conversion function.
-func Convert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(in *v1.GCEPersistentDiskVolumeSource, out *core.GCEPersistentDiskVolumeSource, s conversion.Scope) error {
+func Convert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(in *apicorev1.GCEPersistentDiskVolumeSource, out *pkgapiscore.GCEPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_GCEPersistentDiskVolumeSource_To_core_GCEPersistentDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(in *core.GCEPersistentDiskVolumeSource, out *v1.GCEPersistentDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(in *pkgapiscore.GCEPersistentDiskVolumeSource, out *apicorev1.GCEPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.PDName = in.PDName
 	out.FSType = in.FSType
 	out.Partition = in.Partition
@@ -3835,33 +3835,33 @@ func autoConvert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolum
 }
 
 // Convert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource is an autogenerated conversion function.
-func Convert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(in *core.GCEPersistentDiskVolumeSource, out *v1.GCEPersistentDiskVolumeSource, s conversion.Scope) error {
+func Convert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(in *pkgapiscore.GCEPersistentDiskVolumeSource, out *apicorev1.GCEPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_GCEPersistentDiskVolumeSource_To_v1_GCEPersistentDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_GRPCAction_To_core_GRPCAction(in *v1.GRPCAction, out *core.GRPCAction, s conversion.Scope) error {
+func autoConvert_v1_GRPCAction_To_core_GRPCAction(in *apicorev1.GRPCAction, out *pkgapiscore.GRPCAction, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
 	out.Service = (*string)(unsafe.Pointer(in.Service))
 	return nil
 }
 
 // Convert_v1_GRPCAction_To_core_GRPCAction is an autogenerated conversion function.
-func Convert_v1_GRPCAction_To_core_GRPCAction(in *v1.GRPCAction, out *core.GRPCAction, s conversion.Scope) error {
+func Convert_v1_GRPCAction_To_core_GRPCAction(in *apicorev1.GRPCAction, out *pkgapiscore.GRPCAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_GRPCAction_To_core_GRPCAction(in, out, s)
 }
 
-func autoConvert_core_GRPCAction_To_v1_GRPCAction(in *core.GRPCAction, out *v1.GRPCAction, s conversion.Scope) error {
+func autoConvert_core_GRPCAction_To_v1_GRPCAction(in *pkgapiscore.GRPCAction, out *apicorev1.GRPCAction, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
 	out.Service = (*string)(unsafe.Pointer(in.Service))
 	return nil
 }
 
 // Convert_core_GRPCAction_To_v1_GRPCAction is an autogenerated conversion function.
-func Convert_core_GRPCAction_To_v1_GRPCAction(in *core.GRPCAction, out *v1.GRPCAction, s conversion.Scope) error {
+func Convert_core_GRPCAction_To_v1_GRPCAction(in *pkgapiscore.GRPCAction, out *apicorev1.GRPCAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_GRPCAction_To_v1_GRPCAction(in, out, s)
 }
 
-func autoConvert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(in *v1.GitRepoVolumeSource, out *core.GitRepoVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(in *apicorev1.GitRepoVolumeSource, out *pkgapiscore.GitRepoVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Repository = in.Repository
 	out.Revision = in.Revision
 	out.Directory = in.Directory
@@ -3869,11 +3869,11 @@ func autoConvert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(in *v1.GitRe
 }
 
 // Convert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource is an autogenerated conversion function.
-func Convert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(in *v1.GitRepoVolumeSource, out *core.GitRepoVolumeSource, s conversion.Scope) error {
+func Convert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(in *apicorev1.GitRepoVolumeSource, out *pkgapiscore.GitRepoVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_GitRepoVolumeSource_To_core_GitRepoVolumeSource(in, out, s)
 }
 
-func autoConvert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(in *core.GitRepoVolumeSource, out *v1.GitRepoVolumeSource, s conversion.Scope) error {
+func autoConvert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(in *pkgapiscore.GitRepoVolumeSource, out *apicorev1.GitRepoVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Repository = in.Repository
 	out.Revision = in.Revision
 	out.Directory = in.Directory
@@ -3881,11 +3881,11 @@ func autoConvert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(in *core.Git
 }
 
 // Convert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource is an autogenerated conversion function.
-func Convert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(in *core.GitRepoVolumeSource, out *v1.GitRepoVolumeSource, s conversion.Scope) error {
+func Convert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(in *pkgapiscore.GitRepoVolumeSource, out *apicorev1.GitRepoVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_GitRepoVolumeSource_To_v1_GitRepoVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(in *v1.GlusterfsPersistentVolumeSource, out *core.GlusterfsPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(in *apicorev1.GlusterfsPersistentVolumeSource, out *pkgapiscore.GlusterfsPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.EndpointsName = in.EndpointsName
 	out.Path = in.Path
 	out.ReadOnly = in.ReadOnly
@@ -3894,11 +3894,11 @@ func autoConvert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentV
 }
 
 // Convert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(in *v1.GlusterfsPersistentVolumeSource, out *core.GlusterfsPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(in *apicorev1.GlusterfsPersistentVolumeSource, out *pkgapiscore.GlusterfsPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_GlusterfsPersistentVolumeSource_To_core_GlusterfsPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(in *core.GlusterfsPersistentVolumeSource, out *v1.GlusterfsPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(in *pkgapiscore.GlusterfsPersistentVolumeSource, out *apicorev1.GlusterfsPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.EndpointsName = in.EndpointsName
 	out.Path = in.Path
 	out.ReadOnly = in.ReadOnly
@@ -3907,11 +3907,11 @@ func autoConvert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentV
 }
 
 // Convert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(in *core.GlusterfsPersistentVolumeSource, out *v1.GlusterfsPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(in *pkgapiscore.GlusterfsPersistentVolumeSource, out *apicorev1.GlusterfsPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_GlusterfsPersistentVolumeSource_To_v1_GlusterfsPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(in *v1.GlusterfsVolumeSource, out *core.GlusterfsVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(in *apicorev1.GlusterfsVolumeSource, out *pkgapiscore.GlusterfsVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.EndpointsName = in.EndpointsName
 	out.Path = in.Path
 	out.ReadOnly = in.ReadOnly
@@ -3919,11 +3919,11 @@ func autoConvert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(in *v1.G
 }
 
 // Convert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource is an autogenerated conversion function.
-func Convert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(in *v1.GlusterfsVolumeSource, out *core.GlusterfsVolumeSource, s conversion.Scope) error {
+func Convert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(in *apicorev1.GlusterfsVolumeSource, out *pkgapiscore.GlusterfsVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_GlusterfsVolumeSource_To_core_GlusterfsVolumeSource(in, out, s)
 }
 
-func autoConvert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(in *core.GlusterfsVolumeSource, out *v1.GlusterfsVolumeSource, s conversion.Scope) error {
+func autoConvert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(in *pkgapiscore.GlusterfsVolumeSource, out *apicorev1.GlusterfsVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.EndpointsName = in.EndpointsName
 	out.Path = in.Path
 	out.ReadOnly = in.ReadOnly
@@ -3931,105 +3931,105 @@ func autoConvert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(in *core
 }
 
 // Convert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource is an autogenerated conversion function.
-func Convert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(in *core.GlusterfsVolumeSource, out *v1.GlusterfsVolumeSource, s conversion.Scope) error {
+func Convert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(in *pkgapiscore.GlusterfsVolumeSource, out *apicorev1.GlusterfsVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_GlusterfsVolumeSource_To_v1_GlusterfsVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_HTTPGetAction_To_core_HTTPGetAction(in *v1.HTTPGetAction, out *core.HTTPGetAction, s conversion.Scope) error {
+func autoConvert_v1_HTTPGetAction_To_core_HTTPGetAction(in *apicorev1.HTTPGetAction, out *pkgapiscore.HTTPGetAction, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	out.Port = in.Port
 	out.Host = in.Host
-	out.Scheme = core.URIScheme(in.Scheme)
-	out.HTTPHeaders = *(*[]core.HTTPHeader)(unsafe.Pointer(&in.HTTPHeaders))
+	out.Scheme = pkgapiscore.URIScheme(in.Scheme)
+	out.HTTPHeaders = *(*[]pkgapiscore.HTTPHeader)(unsafe.Pointer(&in.HTTPHeaders))
 	return nil
 }
 
 // Convert_v1_HTTPGetAction_To_core_HTTPGetAction is an autogenerated conversion function.
-func Convert_v1_HTTPGetAction_To_core_HTTPGetAction(in *v1.HTTPGetAction, out *core.HTTPGetAction, s conversion.Scope) error {
+func Convert_v1_HTTPGetAction_To_core_HTTPGetAction(in *apicorev1.HTTPGetAction, out *pkgapiscore.HTTPGetAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_HTTPGetAction_To_core_HTTPGetAction(in, out, s)
 }
 
-func autoConvert_core_HTTPGetAction_To_v1_HTTPGetAction(in *core.HTTPGetAction, out *v1.HTTPGetAction, s conversion.Scope) error {
+func autoConvert_core_HTTPGetAction_To_v1_HTTPGetAction(in *pkgapiscore.HTTPGetAction, out *apicorev1.HTTPGetAction, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	out.Port = in.Port
 	out.Host = in.Host
-	out.Scheme = v1.URIScheme(in.Scheme)
-	out.HTTPHeaders = *(*[]v1.HTTPHeader)(unsafe.Pointer(&in.HTTPHeaders))
+	out.Scheme = apicorev1.URIScheme(in.Scheme)
+	out.HTTPHeaders = *(*[]apicorev1.HTTPHeader)(unsafe.Pointer(&in.HTTPHeaders))
 	return nil
 }
 
 // Convert_core_HTTPGetAction_To_v1_HTTPGetAction is an autogenerated conversion function.
-func Convert_core_HTTPGetAction_To_v1_HTTPGetAction(in *core.HTTPGetAction, out *v1.HTTPGetAction, s conversion.Scope) error {
+func Convert_core_HTTPGetAction_To_v1_HTTPGetAction(in *pkgapiscore.HTTPGetAction, out *apicorev1.HTTPGetAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_HTTPGetAction_To_v1_HTTPGetAction(in, out, s)
 }
 
-func autoConvert_v1_HTTPHeader_To_core_HTTPHeader(in *v1.HTTPHeader, out *core.HTTPHeader, s conversion.Scope) error {
+func autoConvert_v1_HTTPHeader_To_core_HTTPHeader(in *apicorev1.HTTPHeader, out *pkgapiscore.HTTPHeader, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = in.Value
 	return nil
 }
 
 // Convert_v1_HTTPHeader_To_core_HTTPHeader is an autogenerated conversion function.
-func Convert_v1_HTTPHeader_To_core_HTTPHeader(in *v1.HTTPHeader, out *core.HTTPHeader, s conversion.Scope) error {
+func Convert_v1_HTTPHeader_To_core_HTTPHeader(in *apicorev1.HTTPHeader, out *pkgapiscore.HTTPHeader, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_HTTPHeader_To_core_HTTPHeader(in, out, s)
 }
 
-func autoConvert_core_HTTPHeader_To_v1_HTTPHeader(in *core.HTTPHeader, out *v1.HTTPHeader, s conversion.Scope) error {
+func autoConvert_core_HTTPHeader_To_v1_HTTPHeader(in *pkgapiscore.HTTPHeader, out *apicorev1.HTTPHeader, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = in.Value
 	return nil
 }
 
 // Convert_core_HTTPHeader_To_v1_HTTPHeader is an autogenerated conversion function.
-func Convert_core_HTTPHeader_To_v1_HTTPHeader(in *core.HTTPHeader, out *v1.HTTPHeader, s conversion.Scope) error {
+func Convert_core_HTTPHeader_To_v1_HTTPHeader(in *pkgapiscore.HTTPHeader, out *apicorev1.HTTPHeader, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_HTTPHeader_To_v1_HTTPHeader(in, out, s)
 }
 
-func autoConvert_v1_HostAlias_To_core_HostAlias(in *v1.HostAlias, out *core.HostAlias, s conversion.Scope) error {
+func autoConvert_v1_HostAlias_To_core_HostAlias(in *apicorev1.HostAlias, out *pkgapiscore.HostAlias, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	out.Hostnames = *(*[]string)(unsafe.Pointer(&in.Hostnames))
 	return nil
 }
 
 // Convert_v1_HostAlias_To_core_HostAlias is an autogenerated conversion function.
-func Convert_v1_HostAlias_To_core_HostAlias(in *v1.HostAlias, out *core.HostAlias, s conversion.Scope) error {
+func Convert_v1_HostAlias_To_core_HostAlias(in *apicorev1.HostAlias, out *pkgapiscore.HostAlias, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_HostAlias_To_core_HostAlias(in, out, s)
 }
 
-func autoConvert_core_HostAlias_To_v1_HostAlias(in *core.HostAlias, out *v1.HostAlias, s conversion.Scope) error {
+func autoConvert_core_HostAlias_To_v1_HostAlias(in *pkgapiscore.HostAlias, out *apicorev1.HostAlias, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	out.Hostnames = *(*[]string)(unsafe.Pointer(&in.Hostnames))
 	return nil
 }
 
 // Convert_core_HostAlias_To_v1_HostAlias is an autogenerated conversion function.
-func Convert_core_HostAlias_To_v1_HostAlias(in *core.HostAlias, out *v1.HostAlias, s conversion.Scope) error {
+func Convert_core_HostAlias_To_v1_HostAlias(in *pkgapiscore.HostAlias, out *apicorev1.HostAlias, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_HostAlias_To_v1_HostAlias(in, out, s)
 }
 
-func autoConvert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(in *v1.HostPathVolumeSource, out *core.HostPathVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(in *apicorev1.HostPathVolumeSource, out *pkgapiscore.HostPathVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
-	out.Type = (*core.HostPathType)(unsafe.Pointer(in.Type))
+	out.Type = (*pkgapiscore.HostPathType)(unsafe.Pointer(in.Type))
 	return nil
 }
 
 // Convert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource is an autogenerated conversion function.
-func Convert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(in *v1.HostPathVolumeSource, out *core.HostPathVolumeSource, s conversion.Scope) error {
+func Convert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(in *apicorev1.HostPathVolumeSource, out *pkgapiscore.HostPathVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_HostPathVolumeSource_To_core_HostPathVolumeSource(in, out, s)
 }
 
-func autoConvert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(in *core.HostPathVolumeSource, out *v1.HostPathVolumeSource, s conversion.Scope) error {
+func autoConvert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(in *pkgapiscore.HostPathVolumeSource, out *apicorev1.HostPathVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
-	out.Type = (*v1.HostPathType)(unsafe.Pointer(in.Type))
+	out.Type = (*apicorev1.HostPathType)(unsafe.Pointer(in.Type))
 	return nil
 }
 
 // Convert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource is an autogenerated conversion function.
-func Convert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(in *core.HostPathVolumeSource, out *v1.HostPathVolumeSource, s conversion.Scope) error {
+func Convert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(in *pkgapiscore.HostPathVolumeSource, out *apicorev1.HostPathVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_HostPathVolumeSource_To_v1_HostPathVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(in *v1.ISCSIPersistentVolumeSource, out *core.ISCSIPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(in *apicorev1.ISCSIPersistentVolumeSource, out *pkgapiscore.ISCSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.TargetPortal = in.TargetPortal
 	out.IQN = in.IQN
 	out.Lun = in.Lun
@@ -4039,17 +4039,17 @@ func autoConvert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSou
 	out.Portals = *(*[]string)(unsafe.Pointer(&in.Portals))
 	out.DiscoveryCHAPAuth = in.DiscoveryCHAPAuth
 	out.SessionCHAPAuth = in.SessionCHAPAuth
-	out.SecretRef = (*core.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.InitiatorName = (*string)(unsafe.Pointer(in.InitiatorName))
 	return nil
 }
 
 // Convert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(in *v1.ISCSIPersistentVolumeSource, out *core.ISCSIPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(in *apicorev1.ISCSIPersistentVolumeSource, out *pkgapiscore.ISCSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ISCSIPersistentVolumeSource_To_core_ISCSIPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(in *core.ISCSIPersistentVolumeSource, out *v1.ISCSIPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(in *pkgapiscore.ISCSIPersistentVolumeSource, out *apicorev1.ISCSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.TargetPortal = in.TargetPortal
 	out.IQN = in.IQN
 	out.Lun = in.Lun
@@ -4059,17 +4059,17 @@ func autoConvert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSou
 	out.Portals = *(*[]string)(unsafe.Pointer(&in.Portals))
 	out.DiscoveryCHAPAuth = in.DiscoveryCHAPAuth
 	out.SessionCHAPAuth = in.SessionCHAPAuth
-	out.SecretRef = (*v1.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.InitiatorName = (*string)(unsafe.Pointer(in.InitiatorName))
 	return nil
 }
 
 // Convert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(in *core.ISCSIPersistentVolumeSource, out *v1.ISCSIPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(in *pkgapiscore.ISCSIPersistentVolumeSource, out *apicorev1.ISCSIPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ISCSIPersistentVolumeSource_To_v1_ISCSIPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(in *v1.ISCSIVolumeSource, out *core.ISCSIVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(in *apicorev1.ISCSIVolumeSource, out *pkgapiscore.ISCSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.TargetPortal = in.TargetPortal
 	out.IQN = in.IQN
 	out.Lun = in.Lun
@@ -4079,17 +4079,17 @@ func autoConvert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(in *v1.ISCSIVolu
 	out.Portals = *(*[]string)(unsafe.Pointer(&in.Portals))
 	out.DiscoveryCHAPAuth = in.DiscoveryCHAPAuth
 	out.SessionCHAPAuth = in.SessionCHAPAuth
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.InitiatorName = (*string)(unsafe.Pointer(in.InitiatorName))
 	return nil
 }
 
 // Convert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource is an autogenerated conversion function.
-func Convert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(in *v1.ISCSIVolumeSource, out *core.ISCSIVolumeSource, s conversion.Scope) error {
+func Convert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(in *apicorev1.ISCSIVolumeSource, out *pkgapiscore.ISCSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ISCSIVolumeSource_To_core_ISCSIVolumeSource(in, out, s)
 }
 
-func autoConvert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(in *core.ISCSIVolumeSource, out *v1.ISCSIVolumeSource, s conversion.Scope) error {
+func autoConvert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(in *pkgapiscore.ISCSIVolumeSource, out *apicorev1.ISCSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.TargetPortal = in.TargetPortal
 	out.IQN = in.IQN
 	out.Lun = in.Lun
@@ -4099,17 +4099,17 @@ func autoConvert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(in *core.ISCSIVo
 	out.Portals = *(*[]string)(unsafe.Pointer(&in.Portals))
 	out.DiscoveryCHAPAuth = in.DiscoveryCHAPAuth
 	out.SessionCHAPAuth = in.SessionCHAPAuth
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.InitiatorName = (*string)(unsafe.Pointer(in.InitiatorName))
 	return nil
 }
 
 // Convert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource is an autogenerated conversion function.
-func Convert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(in *core.ISCSIVolumeSource, out *v1.ISCSIVolumeSource, s conversion.Scope) error {
+func Convert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(in *pkgapiscore.ISCSIVolumeSource, out *apicorev1.ISCSIVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ISCSIVolumeSource_To_v1_ISCSIVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_KeyToPath_To_core_KeyToPath(in *v1.KeyToPath, out *core.KeyToPath, s conversion.Scope) error {
+func autoConvert_v1_KeyToPath_To_core_KeyToPath(in *apicorev1.KeyToPath, out *pkgapiscore.KeyToPath, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
 	out.Path = in.Path
 	out.Mode = (*int32)(unsafe.Pointer(in.Mode))
@@ -4117,11 +4117,11 @@ func autoConvert_v1_KeyToPath_To_core_KeyToPath(in *v1.KeyToPath, out *core.KeyT
 }
 
 // Convert_v1_KeyToPath_To_core_KeyToPath is an autogenerated conversion function.
-func Convert_v1_KeyToPath_To_core_KeyToPath(in *v1.KeyToPath, out *core.KeyToPath, s conversion.Scope) error {
+func Convert_v1_KeyToPath_To_core_KeyToPath(in *apicorev1.KeyToPath, out *pkgapiscore.KeyToPath, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_KeyToPath_To_core_KeyToPath(in, out, s)
 }
 
-func autoConvert_core_KeyToPath_To_v1_KeyToPath(in *core.KeyToPath, out *v1.KeyToPath, s conversion.Scope) error {
+func autoConvert_core_KeyToPath_To_v1_KeyToPath(in *pkgapiscore.KeyToPath, out *apicorev1.KeyToPath, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
 	out.Path = in.Path
 	out.Mode = (*int32)(unsafe.Pointer(in.Mode))
@@ -4129,57 +4129,57 @@ func autoConvert_core_KeyToPath_To_v1_KeyToPath(in *core.KeyToPath, out *v1.KeyT
 }
 
 // Convert_core_KeyToPath_To_v1_KeyToPath is an autogenerated conversion function.
-func Convert_core_KeyToPath_To_v1_KeyToPath(in *core.KeyToPath, out *v1.KeyToPath, s conversion.Scope) error {
+func Convert_core_KeyToPath_To_v1_KeyToPath(in *pkgapiscore.KeyToPath, out *apicorev1.KeyToPath, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_KeyToPath_To_v1_KeyToPath(in, out, s)
 }
 
-func autoConvert_v1_Lifecycle_To_core_Lifecycle(in *v1.Lifecycle, out *core.Lifecycle, s conversion.Scope) error {
-	out.PostStart = (*core.LifecycleHandler)(unsafe.Pointer(in.PostStart))
-	out.PreStop = (*core.LifecycleHandler)(unsafe.Pointer(in.PreStop))
+func autoConvert_v1_Lifecycle_To_core_Lifecycle(in *apicorev1.Lifecycle, out *pkgapiscore.Lifecycle, s apimachinerypkgconversion.Scope) error {
+	out.PostStart = (*pkgapiscore.LifecycleHandler)(unsafe.Pointer(in.PostStart))
+	out.PreStop = (*pkgapiscore.LifecycleHandler)(unsafe.Pointer(in.PreStop))
 	return nil
 }
 
 // Convert_v1_Lifecycle_To_core_Lifecycle is an autogenerated conversion function.
-func Convert_v1_Lifecycle_To_core_Lifecycle(in *v1.Lifecycle, out *core.Lifecycle, s conversion.Scope) error {
+func Convert_v1_Lifecycle_To_core_Lifecycle(in *apicorev1.Lifecycle, out *pkgapiscore.Lifecycle, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Lifecycle_To_core_Lifecycle(in, out, s)
 }
 
-func autoConvert_core_Lifecycle_To_v1_Lifecycle(in *core.Lifecycle, out *v1.Lifecycle, s conversion.Scope) error {
-	out.PostStart = (*v1.LifecycleHandler)(unsafe.Pointer(in.PostStart))
-	out.PreStop = (*v1.LifecycleHandler)(unsafe.Pointer(in.PreStop))
+func autoConvert_core_Lifecycle_To_v1_Lifecycle(in *pkgapiscore.Lifecycle, out *apicorev1.Lifecycle, s apimachinerypkgconversion.Scope) error {
+	out.PostStart = (*apicorev1.LifecycleHandler)(unsafe.Pointer(in.PostStart))
+	out.PreStop = (*apicorev1.LifecycleHandler)(unsafe.Pointer(in.PreStop))
 	return nil
 }
 
 // Convert_core_Lifecycle_To_v1_Lifecycle is an autogenerated conversion function.
-func Convert_core_Lifecycle_To_v1_Lifecycle(in *core.Lifecycle, out *v1.Lifecycle, s conversion.Scope) error {
+func Convert_core_Lifecycle_To_v1_Lifecycle(in *pkgapiscore.Lifecycle, out *apicorev1.Lifecycle, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Lifecycle_To_v1_Lifecycle(in, out, s)
 }
 
-func autoConvert_v1_LifecycleHandler_To_core_LifecycleHandler(in *v1.LifecycleHandler, out *core.LifecycleHandler, s conversion.Scope) error {
-	out.Exec = (*core.ExecAction)(unsafe.Pointer(in.Exec))
-	out.HTTPGet = (*core.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
-	out.TCPSocket = (*core.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
+func autoConvert_v1_LifecycleHandler_To_core_LifecycleHandler(in *apicorev1.LifecycleHandler, out *pkgapiscore.LifecycleHandler, s apimachinerypkgconversion.Scope) error {
+	out.Exec = (*pkgapiscore.ExecAction)(unsafe.Pointer(in.Exec))
+	out.HTTPGet = (*pkgapiscore.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
+	out.TCPSocket = (*pkgapiscore.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
 	return nil
 }
 
 // Convert_v1_LifecycleHandler_To_core_LifecycleHandler is an autogenerated conversion function.
-func Convert_v1_LifecycleHandler_To_core_LifecycleHandler(in *v1.LifecycleHandler, out *core.LifecycleHandler, s conversion.Scope) error {
+func Convert_v1_LifecycleHandler_To_core_LifecycleHandler(in *apicorev1.LifecycleHandler, out *pkgapiscore.LifecycleHandler, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LifecycleHandler_To_core_LifecycleHandler(in, out, s)
 }
 
-func autoConvert_core_LifecycleHandler_To_v1_LifecycleHandler(in *core.LifecycleHandler, out *v1.LifecycleHandler, s conversion.Scope) error {
-	out.Exec = (*v1.ExecAction)(unsafe.Pointer(in.Exec))
-	out.HTTPGet = (*v1.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
-	out.TCPSocket = (*v1.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
+func autoConvert_core_LifecycleHandler_To_v1_LifecycleHandler(in *pkgapiscore.LifecycleHandler, out *apicorev1.LifecycleHandler, s apimachinerypkgconversion.Scope) error {
+	out.Exec = (*apicorev1.ExecAction)(unsafe.Pointer(in.Exec))
+	out.HTTPGet = (*apicorev1.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
+	out.TCPSocket = (*apicorev1.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
 	return nil
 }
 
 // Convert_core_LifecycleHandler_To_v1_LifecycleHandler is an autogenerated conversion function.
-func Convert_core_LifecycleHandler_To_v1_LifecycleHandler(in *core.LifecycleHandler, out *v1.LifecycleHandler, s conversion.Scope) error {
+func Convert_core_LifecycleHandler_To_v1_LifecycleHandler(in *pkgapiscore.LifecycleHandler, out *apicorev1.LifecycleHandler, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LifecycleHandler_To_v1_LifecycleHandler(in, out, s)
 }
 
-func autoConvert_v1_LimitRange_To_core_LimitRange(in *v1.LimitRange, out *core.LimitRange, s conversion.Scope) error {
+func autoConvert_v1_LimitRange_To_core_LimitRange(in *apicorev1.LimitRange, out *pkgapiscore.LimitRange, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_LimitRangeSpec_To_core_LimitRangeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -4188,11 +4188,11 @@ func autoConvert_v1_LimitRange_To_core_LimitRange(in *v1.LimitRange, out *core.L
 }
 
 // Convert_v1_LimitRange_To_core_LimitRange is an autogenerated conversion function.
-func Convert_v1_LimitRange_To_core_LimitRange(in *v1.LimitRange, out *core.LimitRange, s conversion.Scope) error {
+func Convert_v1_LimitRange_To_core_LimitRange(in *apicorev1.LimitRange, out *pkgapiscore.LimitRange, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LimitRange_To_core_LimitRange(in, out, s)
 }
 
-func autoConvert_core_LimitRange_To_v1_LimitRange(in *core.LimitRange, out *v1.LimitRange, s conversion.Scope) error {
+func autoConvert_core_LimitRange_To_v1_LimitRange(in *pkgapiscore.LimitRange, out *apicorev1.LimitRange, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_LimitRangeSpec_To_v1_LimitRangeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -4201,89 +4201,89 @@ func autoConvert_core_LimitRange_To_v1_LimitRange(in *core.LimitRange, out *v1.L
 }
 
 // Convert_core_LimitRange_To_v1_LimitRange is an autogenerated conversion function.
-func Convert_core_LimitRange_To_v1_LimitRange(in *core.LimitRange, out *v1.LimitRange, s conversion.Scope) error {
+func Convert_core_LimitRange_To_v1_LimitRange(in *pkgapiscore.LimitRange, out *apicorev1.LimitRange, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LimitRange_To_v1_LimitRange(in, out, s)
 }
 
-func autoConvert_v1_LimitRangeItem_To_core_LimitRangeItem(in *v1.LimitRangeItem, out *core.LimitRangeItem, s conversion.Scope) error {
-	out.Type = core.LimitType(in.Type)
-	out.Max = *(*core.ResourceList)(unsafe.Pointer(&in.Max))
-	out.Min = *(*core.ResourceList)(unsafe.Pointer(&in.Min))
-	out.Default = *(*core.ResourceList)(unsafe.Pointer(&in.Default))
-	out.DefaultRequest = *(*core.ResourceList)(unsafe.Pointer(&in.DefaultRequest))
-	out.MaxLimitRequestRatio = *(*core.ResourceList)(unsafe.Pointer(&in.MaxLimitRequestRatio))
+func autoConvert_v1_LimitRangeItem_To_core_LimitRangeItem(in *apicorev1.LimitRangeItem, out *pkgapiscore.LimitRangeItem, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.LimitType(in.Type)
+	out.Max = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Max))
+	out.Min = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Min))
+	out.Default = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Default))
+	out.DefaultRequest = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.DefaultRequest))
+	out.MaxLimitRequestRatio = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.MaxLimitRequestRatio))
 	return nil
 }
 
 // Convert_v1_LimitRangeItem_To_core_LimitRangeItem is an autogenerated conversion function.
-func Convert_v1_LimitRangeItem_To_core_LimitRangeItem(in *v1.LimitRangeItem, out *core.LimitRangeItem, s conversion.Scope) error {
+func Convert_v1_LimitRangeItem_To_core_LimitRangeItem(in *apicorev1.LimitRangeItem, out *pkgapiscore.LimitRangeItem, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LimitRangeItem_To_core_LimitRangeItem(in, out, s)
 }
 
-func autoConvert_core_LimitRangeItem_To_v1_LimitRangeItem(in *core.LimitRangeItem, out *v1.LimitRangeItem, s conversion.Scope) error {
-	out.Type = v1.LimitType(in.Type)
-	out.Max = *(*v1.ResourceList)(unsafe.Pointer(&in.Max))
-	out.Min = *(*v1.ResourceList)(unsafe.Pointer(&in.Min))
-	out.Default = *(*v1.ResourceList)(unsafe.Pointer(&in.Default))
-	out.DefaultRequest = *(*v1.ResourceList)(unsafe.Pointer(&in.DefaultRequest))
-	out.MaxLimitRequestRatio = *(*v1.ResourceList)(unsafe.Pointer(&in.MaxLimitRequestRatio))
+func autoConvert_core_LimitRangeItem_To_v1_LimitRangeItem(in *pkgapiscore.LimitRangeItem, out *apicorev1.LimitRangeItem, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.LimitType(in.Type)
+	out.Max = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Max))
+	out.Min = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Min))
+	out.Default = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Default))
+	out.DefaultRequest = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.DefaultRequest))
+	out.MaxLimitRequestRatio = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.MaxLimitRequestRatio))
 	return nil
 }
 
 // Convert_core_LimitRangeItem_To_v1_LimitRangeItem is an autogenerated conversion function.
-func Convert_core_LimitRangeItem_To_v1_LimitRangeItem(in *core.LimitRangeItem, out *v1.LimitRangeItem, s conversion.Scope) error {
+func Convert_core_LimitRangeItem_To_v1_LimitRangeItem(in *pkgapiscore.LimitRangeItem, out *apicorev1.LimitRangeItem, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LimitRangeItem_To_v1_LimitRangeItem(in, out, s)
 }
 
-func autoConvert_v1_LimitRangeList_To_core_LimitRangeList(in *v1.LimitRangeList, out *core.LimitRangeList, s conversion.Scope) error {
+func autoConvert_v1_LimitRangeList_To_core_LimitRangeList(in *apicorev1.LimitRangeList, out *pkgapiscore.LimitRangeList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.LimitRange)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.LimitRange)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_LimitRangeList_To_core_LimitRangeList is an autogenerated conversion function.
-func Convert_v1_LimitRangeList_To_core_LimitRangeList(in *v1.LimitRangeList, out *core.LimitRangeList, s conversion.Scope) error {
+func Convert_v1_LimitRangeList_To_core_LimitRangeList(in *apicorev1.LimitRangeList, out *pkgapiscore.LimitRangeList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LimitRangeList_To_core_LimitRangeList(in, out, s)
 }
 
-func autoConvert_core_LimitRangeList_To_v1_LimitRangeList(in *core.LimitRangeList, out *v1.LimitRangeList, s conversion.Scope) error {
+func autoConvert_core_LimitRangeList_To_v1_LimitRangeList(in *pkgapiscore.LimitRangeList, out *apicorev1.LimitRangeList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.LimitRange)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.LimitRange)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_LimitRangeList_To_v1_LimitRangeList is an autogenerated conversion function.
-func Convert_core_LimitRangeList_To_v1_LimitRangeList(in *core.LimitRangeList, out *v1.LimitRangeList, s conversion.Scope) error {
+func Convert_core_LimitRangeList_To_v1_LimitRangeList(in *pkgapiscore.LimitRangeList, out *apicorev1.LimitRangeList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LimitRangeList_To_v1_LimitRangeList(in, out, s)
 }
 
-func autoConvert_v1_LimitRangeSpec_To_core_LimitRangeSpec(in *v1.LimitRangeSpec, out *core.LimitRangeSpec, s conversion.Scope) error {
-	out.Limits = *(*[]core.LimitRangeItem)(unsafe.Pointer(&in.Limits))
+func autoConvert_v1_LimitRangeSpec_To_core_LimitRangeSpec(in *apicorev1.LimitRangeSpec, out *pkgapiscore.LimitRangeSpec, s apimachinerypkgconversion.Scope) error {
+	out.Limits = *(*[]pkgapiscore.LimitRangeItem)(unsafe.Pointer(&in.Limits))
 	return nil
 }
 
 // Convert_v1_LimitRangeSpec_To_core_LimitRangeSpec is an autogenerated conversion function.
-func Convert_v1_LimitRangeSpec_To_core_LimitRangeSpec(in *v1.LimitRangeSpec, out *core.LimitRangeSpec, s conversion.Scope) error {
+func Convert_v1_LimitRangeSpec_To_core_LimitRangeSpec(in *apicorev1.LimitRangeSpec, out *pkgapiscore.LimitRangeSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LimitRangeSpec_To_core_LimitRangeSpec(in, out, s)
 }
 
-func autoConvert_core_LimitRangeSpec_To_v1_LimitRangeSpec(in *core.LimitRangeSpec, out *v1.LimitRangeSpec, s conversion.Scope) error {
-	out.Limits = *(*[]v1.LimitRangeItem)(unsafe.Pointer(&in.Limits))
+func autoConvert_core_LimitRangeSpec_To_v1_LimitRangeSpec(in *pkgapiscore.LimitRangeSpec, out *apicorev1.LimitRangeSpec, s apimachinerypkgconversion.Scope) error {
+	out.Limits = *(*[]apicorev1.LimitRangeItem)(unsafe.Pointer(&in.Limits))
 	return nil
 }
 
 // Convert_core_LimitRangeSpec_To_v1_LimitRangeSpec is an autogenerated conversion function.
-func Convert_core_LimitRangeSpec_To_v1_LimitRangeSpec(in *core.LimitRangeSpec, out *v1.LimitRangeSpec, s conversion.Scope) error {
+func Convert_core_LimitRangeSpec_To_v1_LimitRangeSpec(in *pkgapiscore.LimitRangeSpec, out *apicorev1.LimitRangeSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LimitRangeSpec_To_v1_LimitRangeSpec(in, out, s)
 }
 
-func autoConvert_v1_List_To_core_List(in *v1.List, out *core.List, s conversion.Scope) error {
+func autoConvert_v1_List_To_core_List(in *apicorev1.List, out *pkgapiscore.List, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]runtime.Object, len(*in))
+		*out = make([]apimachinerypkgruntime.Object, len(*in))
 		for i := range *in {
-			if err := runtime.Convert_runtime_RawExtension_To_runtime_Object(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := apimachinerypkgruntime.Convert_runtime_RawExtension_To_runtime_Object(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
@@ -4294,17 +4294,17 @@ func autoConvert_v1_List_To_core_List(in *v1.List, out *core.List, s conversion.
 }
 
 // Convert_v1_List_To_core_List is an autogenerated conversion function.
-func Convert_v1_List_To_core_List(in *v1.List, out *core.List, s conversion.Scope) error {
+func Convert_v1_List_To_core_List(in *apicorev1.List, out *pkgapiscore.List, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_List_To_core_List(in, out, s)
 }
 
-func autoConvert_core_List_To_v1_List(in *core.List, out *v1.List, s conversion.Scope) error {
+func autoConvert_core_List_To_v1_List(in *pkgapiscore.List, out *apicorev1.List, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]runtime.RawExtension, len(*in))
+		*out = make([]apimachinerypkgruntime.RawExtension, len(*in))
 		for i := range *in {
-			if err := runtime.Convert_runtime_Object_To_runtime_RawExtension(&(*in)[i], &(*out)[i], s); err != nil {
+			if err := apimachinerypkgruntime.Convert_runtime_Object_To_runtime_RawExtension(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
 			}
 		}
@@ -4315,87 +4315,87 @@ func autoConvert_core_List_To_v1_List(in *core.List, out *v1.List, s conversion.
 }
 
 // Convert_core_List_To_v1_List is an autogenerated conversion function.
-func Convert_core_List_To_v1_List(in *core.List, out *v1.List, s conversion.Scope) error {
+func Convert_core_List_To_v1_List(in *pkgapiscore.List, out *apicorev1.List, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_List_To_v1_List(in, out, s)
 }
 
-func autoConvert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(in *v1.LoadBalancerIngress, out *core.LoadBalancerIngress, s conversion.Scope) error {
+func autoConvert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(in *apicorev1.LoadBalancerIngress, out *pkgapiscore.LoadBalancerIngress, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	out.Hostname = in.Hostname
-	out.Ports = *(*[]core.PortStatus)(unsafe.Pointer(&in.Ports))
+	out.Ports = *(*[]pkgapiscore.PortStatus)(unsafe.Pointer(&in.Ports))
 	return nil
 }
 
 // Convert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress is an autogenerated conversion function.
-func Convert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(in *v1.LoadBalancerIngress, out *core.LoadBalancerIngress, s conversion.Scope) error {
+func Convert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(in *apicorev1.LoadBalancerIngress, out *pkgapiscore.LoadBalancerIngress, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LoadBalancerIngress_To_core_LoadBalancerIngress(in, out, s)
 }
 
-func autoConvert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(in *core.LoadBalancerIngress, out *v1.LoadBalancerIngress, s conversion.Scope) error {
+func autoConvert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(in *pkgapiscore.LoadBalancerIngress, out *apicorev1.LoadBalancerIngress, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	out.Hostname = in.Hostname
-	out.Ports = *(*[]v1.PortStatus)(unsafe.Pointer(&in.Ports))
+	out.Ports = *(*[]apicorev1.PortStatus)(unsafe.Pointer(&in.Ports))
 	return nil
 }
 
 // Convert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress is an autogenerated conversion function.
-func Convert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(in *core.LoadBalancerIngress, out *v1.LoadBalancerIngress, s conversion.Scope) error {
+func Convert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(in *pkgapiscore.LoadBalancerIngress, out *apicorev1.LoadBalancerIngress, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LoadBalancerIngress_To_v1_LoadBalancerIngress(in, out, s)
 }
 
-func autoConvert_v1_LoadBalancerStatus_To_core_LoadBalancerStatus(in *v1.LoadBalancerStatus, out *core.LoadBalancerStatus, s conversion.Scope) error {
-	out.Ingress = *(*[]core.LoadBalancerIngress)(unsafe.Pointer(&in.Ingress))
+func autoConvert_v1_LoadBalancerStatus_To_core_LoadBalancerStatus(in *apicorev1.LoadBalancerStatus, out *pkgapiscore.LoadBalancerStatus, s apimachinerypkgconversion.Scope) error {
+	out.Ingress = *(*[]pkgapiscore.LoadBalancerIngress)(unsafe.Pointer(&in.Ingress))
 	return nil
 }
 
-func autoConvert_core_LoadBalancerStatus_To_v1_LoadBalancerStatus(in *core.LoadBalancerStatus, out *v1.LoadBalancerStatus, s conversion.Scope) error {
-	out.Ingress = *(*[]v1.LoadBalancerIngress)(unsafe.Pointer(&in.Ingress))
+func autoConvert_core_LoadBalancerStatus_To_v1_LoadBalancerStatus(in *pkgapiscore.LoadBalancerStatus, out *apicorev1.LoadBalancerStatus, s apimachinerypkgconversion.Scope) error {
+	out.Ingress = *(*[]apicorev1.LoadBalancerIngress)(unsafe.Pointer(&in.Ingress))
 	return nil
 }
 
-func autoConvert_v1_LocalObjectReference_To_core_LocalObjectReference(in *v1.LocalObjectReference, out *core.LocalObjectReference, s conversion.Scope) error {
+func autoConvert_v1_LocalObjectReference_To_core_LocalObjectReference(in *apicorev1.LocalObjectReference, out *pkgapiscore.LocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	return nil
 }
 
 // Convert_v1_LocalObjectReference_To_core_LocalObjectReference is an autogenerated conversion function.
-func Convert_v1_LocalObjectReference_To_core_LocalObjectReference(in *v1.LocalObjectReference, out *core.LocalObjectReference, s conversion.Scope) error {
+func Convert_v1_LocalObjectReference_To_core_LocalObjectReference(in *apicorev1.LocalObjectReference, out *pkgapiscore.LocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LocalObjectReference_To_core_LocalObjectReference(in, out, s)
 }
 
-func autoConvert_core_LocalObjectReference_To_v1_LocalObjectReference(in *core.LocalObjectReference, out *v1.LocalObjectReference, s conversion.Scope) error {
+func autoConvert_core_LocalObjectReference_To_v1_LocalObjectReference(in *pkgapiscore.LocalObjectReference, out *apicorev1.LocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	return nil
 }
 
 // Convert_core_LocalObjectReference_To_v1_LocalObjectReference is an autogenerated conversion function.
-func Convert_core_LocalObjectReference_To_v1_LocalObjectReference(in *core.LocalObjectReference, out *v1.LocalObjectReference, s conversion.Scope) error {
+func Convert_core_LocalObjectReference_To_v1_LocalObjectReference(in *pkgapiscore.LocalObjectReference, out *apicorev1.LocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LocalObjectReference_To_v1_LocalObjectReference(in, out, s)
 }
 
-func autoConvert_v1_LocalVolumeSource_To_core_LocalVolumeSource(in *v1.LocalVolumeSource, out *core.LocalVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_LocalVolumeSource_To_core_LocalVolumeSource(in *apicorev1.LocalVolumeSource, out *pkgapiscore.LocalVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	out.FSType = (*string)(unsafe.Pointer(in.FSType))
 	return nil
 }
 
 // Convert_v1_LocalVolumeSource_To_core_LocalVolumeSource is an autogenerated conversion function.
-func Convert_v1_LocalVolumeSource_To_core_LocalVolumeSource(in *v1.LocalVolumeSource, out *core.LocalVolumeSource, s conversion.Scope) error {
+func Convert_v1_LocalVolumeSource_To_core_LocalVolumeSource(in *apicorev1.LocalVolumeSource, out *pkgapiscore.LocalVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_LocalVolumeSource_To_core_LocalVolumeSource(in, out, s)
 }
 
-func autoConvert_core_LocalVolumeSource_To_v1_LocalVolumeSource(in *core.LocalVolumeSource, out *v1.LocalVolumeSource, s conversion.Scope) error {
+func autoConvert_core_LocalVolumeSource_To_v1_LocalVolumeSource(in *pkgapiscore.LocalVolumeSource, out *apicorev1.LocalVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	out.FSType = (*string)(unsafe.Pointer(in.FSType))
 	return nil
 }
 
 // Convert_core_LocalVolumeSource_To_v1_LocalVolumeSource is an autogenerated conversion function.
-func Convert_core_LocalVolumeSource_To_v1_LocalVolumeSource(in *core.LocalVolumeSource, out *v1.LocalVolumeSource, s conversion.Scope) error {
+func Convert_core_LocalVolumeSource_To_v1_LocalVolumeSource(in *pkgapiscore.LocalVolumeSource, out *apicorev1.LocalVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_LocalVolumeSource_To_v1_LocalVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_NFSVolumeSource_To_core_NFSVolumeSource(in *v1.NFSVolumeSource, out *core.NFSVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_NFSVolumeSource_To_core_NFSVolumeSource(in *apicorev1.NFSVolumeSource, out *pkgapiscore.NFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Server = in.Server
 	out.Path = in.Path
 	out.ReadOnly = in.ReadOnly
@@ -4403,11 +4403,11 @@ func autoConvert_v1_NFSVolumeSource_To_core_NFSVolumeSource(in *v1.NFSVolumeSour
 }
 
 // Convert_v1_NFSVolumeSource_To_core_NFSVolumeSource is an autogenerated conversion function.
-func Convert_v1_NFSVolumeSource_To_core_NFSVolumeSource(in *v1.NFSVolumeSource, out *core.NFSVolumeSource, s conversion.Scope) error {
+func Convert_v1_NFSVolumeSource_To_core_NFSVolumeSource(in *apicorev1.NFSVolumeSource, out *pkgapiscore.NFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NFSVolumeSource_To_core_NFSVolumeSource(in, out, s)
 }
 
-func autoConvert_core_NFSVolumeSource_To_v1_NFSVolumeSource(in *core.NFSVolumeSource, out *v1.NFSVolumeSource, s conversion.Scope) error {
+func autoConvert_core_NFSVolumeSource_To_v1_NFSVolumeSource(in *pkgapiscore.NFSVolumeSource, out *apicorev1.NFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Server = in.Server
 	out.Path = in.Path
 	out.ReadOnly = in.ReadOnly
@@ -4415,11 +4415,11 @@ func autoConvert_core_NFSVolumeSource_To_v1_NFSVolumeSource(in *core.NFSVolumeSo
 }
 
 // Convert_core_NFSVolumeSource_To_v1_NFSVolumeSource is an autogenerated conversion function.
-func Convert_core_NFSVolumeSource_To_v1_NFSVolumeSource(in *core.NFSVolumeSource, out *v1.NFSVolumeSource, s conversion.Scope) error {
+func Convert_core_NFSVolumeSource_To_v1_NFSVolumeSource(in *pkgapiscore.NFSVolumeSource, out *apicorev1.NFSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NFSVolumeSource_To_v1_NFSVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Namespace_To_core_Namespace(in *v1.Namespace, out *core.Namespace, s conversion.Scope) error {
+func autoConvert_v1_Namespace_To_core_Namespace(in *apicorev1.Namespace, out *pkgapiscore.Namespace, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_NamespaceSpec_To_core_NamespaceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -4431,11 +4431,11 @@ func autoConvert_v1_Namespace_To_core_Namespace(in *v1.Namespace, out *core.Name
 }
 
 // Convert_v1_Namespace_To_core_Namespace is an autogenerated conversion function.
-func Convert_v1_Namespace_To_core_Namespace(in *v1.Namespace, out *core.Namespace, s conversion.Scope) error {
+func Convert_v1_Namespace_To_core_Namespace(in *apicorev1.Namespace, out *pkgapiscore.Namespace, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Namespace_To_core_Namespace(in, out, s)
 }
 
-func autoConvert_core_Namespace_To_v1_Namespace(in *core.Namespace, out *v1.Namespace, s conversion.Scope) error {
+func autoConvert_core_Namespace_To_v1_Namespace(in *pkgapiscore.Namespace, out *apicorev1.Namespace, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_NamespaceSpec_To_v1_NamespaceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -4447,13 +4447,13 @@ func autoConvert_core_Namespace_To_v1_Namespace(in *core.Namespace, out *v1.Name
 }
 
 // Convert_core_Namespace_To_v1_Namespace is an autogenerated conversion function.
-func Convert_core_Namespace_To_v1_Namespace(in *core.Namespace, out *v1.Namespace, s conversion.Scope) error {
+func Convert_core_Namespace_To_v1_Namespace(in *pkgapiscore.Namespace, out *apicorev1.Namespace, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Namespace_To_v1_Namespace(in, out, s)
 }
 
-func autoConvert_v1_NamespaceCondition_To_core_NamespaceCondition(in *v1.NamespaceCondition, out *core.NamespaceCondition, s conversion.Scope) error {
-	out.Type = core.NamespaceConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
+func autoConvert_v1_NamespaceCondition_To_core_NamespaceCondition(in *apicorev1.NamespaceCondition, out *pkgapiscore.NamespaceCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.NamespaceConditionType(in.Type)
+	out.Status = pkgapiscore.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -4461,13 +4461,13 @@ func autoConvert_v1_NamespaceCondition_To_core_NamespaceCondition(in *v1.Namespa
 }
 
 // Convert_v1_NamespaceCondition_To_core_NamespaceCondition is an autogenerated conversion function.
-func Convert_v1_NamespaceCondition_To_core_NamespaceCondition(in *v1.NamespaceCondition, out *core.NamespaceCondition, s conversion.Scope) error {
+func Convert_v1_NamespaceCondition_To_core_NamespaceCondition(in *apicorev1.NamespaceCondition, out *pkgapiscore.NamespaceCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NamespaceCondition_To_core_NamespaceCondition(in, out, s)
 }
 
-func autoConvert_core_NamespaceCondition_To_v1_NamespaceCondition(in *core.NamespaceCondition, out *v1.NamespaceCondition, s conversion.Scope) error {
-	out.Type = v1.NamespaceConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
+func autoConvert_core_NamespaceCondition_To_v1_NamespaceCondition(in *pkgapiscore.NamespaceCondition, out *apicorev1.NamespaceCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.NamespaceConditionType(in.Type)
+	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -4475,75 +4475,75 @@ func autoConvert_core_NamespaceCondition_To_v1_NamespaceCondition(in *core.Names
 }
 
 // Convert_core_NamespaceCondition_To_v1_NamespaceCondition is an autogenerated conversion function.
-func Convert_core_NamespaceCondition_To_v1_NamespaceCondition(in *core.NamespaceCondition, out *v1.NamespaceCondition, s conversion.Scope) error {
+func Convert_core_NamespaceCondition_To_v1_NamespaceCondition(in *pkgapiscore.NamespaceCondition, out *apicorev1.NamespaceCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NamespaceCondition_To_v1_NamespaceCondition(in, out, s)
 }
 
-func autoConvert_v1_NamespaceList_To_core_NamespaceList(in *v1.NamespaceList, out *core.NamespaceList, s conversion.Scope) error {
+func autoConvert_v1_NamespaceList_To_core_NamespaceList(in *apicorev1.NamespaceList, out *pkgapiscore.NamespaceList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.Namespace)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.Namespace)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_NamespaceList_To_core_NamespaceList is an autogenerated conversion function.
-func Convert_v1_NamespaceList_To_core_NamespaceList(in *v1.NamespaceList, out *core.NamespaceList, s conversion.Scope) error {
+func Convert_v1_NamespaceList_To_core_NamespaceList(in *apicorev1.NamespaceList, out *pkgapiscore.NamespaceList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NamespaceList_To_core_NamespaceList(in, out, s)
 }
 
-func autoConvert_core_NamespaceList_To_v1_NamespaceList(in *core.NamespaceList, out *v1.NamespaceList, s conversion.Scope) error {
+func autoConvert_core_NamespaceList_To_v1_NamespaceList(in *pkgapiscore.NamespaceList, out *apicorev1.NamespaceList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.Namespace)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.Namespace)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_NamespaceList_To_v1_NamespaceList is an autogenerated conversion function.
-func Convert_core_NamespaceList_To_v1_NamespaceList(in *core.NamespaceList, out *v1.NamespaceList, s conversion.Scope) error {
+func Convert_core_NamespaceList_To_v1_NamespaceList(in *pkgapiscore.NamespaceList, out *apicorev1.NamespaceList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NamespaceList_To_v1_NamespaceList(in, out, s)
 }
 
-func autoConvert_v1_NamespaceSpec_To_core_NamespaceSpec(in *v1.NamespaceSpec, out *core.NamespaceSpec, s conversion.Scope) error {
-	out.Finalizers = *(*[]core.FinalizerName)(unsafe.Pointer(&in.Finalizers))
+func autoConvert_v1_NamespaceSpec_To_core_NamespaceSpec(in *apicorev1.NamespaceSpec, out *pkgapiscore.NamespaceSpec, s apimachinerypkgconversion.Scope) error {
+	out.Finalizers = *(*[]pkgapiscore.FinalizerName)(unsafe.Pointer(&in.Finalizers))
 	return nil
 }
 
 // Convert_v1_NamespaceSpec_To_core_NamespaceSpec is an autogenerated conversion function.
-func Convert_v1_NamespaceSpec_To_core_NamespaceSpec(in *v1.NamespaceSpec, out *core.NamespaceSpec, s conversion.Scope) error {
+func Convert_v1_NamespaceSpec_To_core_NamespaceSpec(in *apicorev1.NamespaceSpec, out *pkgapiscore.NamespaceSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NamespaceSpec_To_core_NamespaceSpec(in, out, s)
 }
 
-func autoConvert_core_NamespaceSpec_To_v1_NamespaceSpec(in *core.NamespaceSpec, out *v1.NamespaceSpec, s conversion.Scope) error {
-	out.Finalizers = *(*[]v1.FinalizerName)(unsafe.Pointer(&in.Finalizers))
+func autoConvert_core_NamespaceSpec_To_v1_NamespaceSpec(in *pkgapiscore.NamespaceSpec, out *apicorev1.NamespaceSpec, s apimachinerypkgconversion.Scope) error {
+	out.Finalizers = *(*[]apicorev1.FinalizerName)(unsafe.Pointer(&in.Finalizers))
 	return nil
 }
 
 // Convert_core_NamespaceSpec_To_v1_NamespaceSpec is an autogenerated conversion function.
-func Convert_core_NamespaceSpec_To_v1_NamespaceSpec(in *core.NamespaceSpec, out *v1.NamespaceSpec, s conversion.Scope) error {
+func Convert_core_NamespaceSpec_To_v1_NamespaceSpec(in *pkgapiscore.NamespaceSpec, out *apicorev1.NamespaceSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NamespaceSpec_To_v1_NamespaceSpec(in, out, s)
 }
 
-func autoConvert_v1_NamespaceStatus_To_core_NamespaceStatus(in *v1.NamespaceStatus, out *core.NamespaceStatus, s conversion.Scope) error {
-	out.Phase = core.NamespacePhase(in.Phase)
-	out.Conditions = *(*[]core.NamespaceCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_v1_NamespaceStatus_To_core_NamespaceStatus(in *apicorev1.NamespaceStatus, out *pkgapiscore.NamespaceStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = pkgapiscore.NamespacePhase(in.Phase)
+	out.Conditions = *(*[]pkgapiscore.NamespaceCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_v1_NamespaceStatus_To_core_NamespaceStatus is an autogenerated conversion function.
-func Convert_v1_NamespaceStatus_To_core_NamespaceStatus(in *v1.NamespaceStatus, out *core.NamespaceStatus, s conversion.Scope) error {
+func Convert_v1_NamespaceStatus_To_core_NamespaceStatus(in *apicorev1.NamespaceStatus, out *pkgapiscore.NamespaceStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NamespaceStatus_To_core_NamespaceStatus(in, out, s)
 }
 
-func autoConvert_core_NamespaceStatus_To_v1_NamespaceStatus(in *core.NamespaceStatus, out *v1.NamespaceStatus, s conversion.Scope) error {
-	out.Phase = v1.NamespacePhase(in.Phase)
-	out.Conditions = *(*[]v1.NamespaceCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_core_NamespaceStatus_To_v1_NamespaceStatus(in *pkgapiscore.NamespaceStatus, out *apicorev1.NamespaceStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = apicorev1.NamespacePhase(in.Phase)
+	out.Conditions = *(*[]apicorev1.NamespaceCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_core_NamespaceStatus_To_v1_NamespaceStatus is an autogenerated conversion function.
-func Convert_core_NamespaceStatus_To_v1_NamespaceStatus(in *core.NamespaceStatus, out *v1.NamespaceStatus, s conversion.Scope) error {
+func Convert_core_NamespaceStatus_To_v1_NamespaceStatus(in *pkgapiscore.NamespaceStatus, out *apicorev1.NamespaceStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NamespaceStatus_To_v1_NamespaceStatus(in, out, s)
 }
 
-func autoConvert_v1_Node_To_core_Node(in *v1.Node, out *core.Node, s conversion.Scope) error {
+func autoConvert_v1_Node_To_core_Node(in *apicorev1.Node, out *pkgapiscore.Node, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_NodeSpec_To_core_NodeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -4555,11 +4555,11 @@ func autoConvert_v1_Node_To_core_Node(in *v1.Node, out *core.Node, s conversion.
 }
 
 // Convert_v1_Node_To_core_Node is an autogenerated conversion function.
-func Convert_v1_Node_To_core_Node(in *v1.Node, out *core.Node, s conversion.Scope) error {
+func Convert_v1_Node_To_core_Node(in *apicorev1.Node, out *pkgapiscore.Node, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Node_To_core_Node(in, out, s)
 }
 
-func autoConvert_core_Node_To_v1_Node(in *core.Node, out *v1.Node, s conversion.Scope) error {
+func autoConvert_core_Node_To_v1_Node(in *pkgapiscore.Node, out *apicorev1.Node, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_NodeSpec_To_v1_NodeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -4571,57 +4571,57 @@ func autoConvert_core_Node_To_v1_Node(in *core.Node, out *v1.Node, s conversion.
 }
 
 // Convert_core_Node_To_v1_Node is an autogenerated conversion function.
-func Convert_core_Node_To_v1_Node(in *core.Node, out *v1.Node, s conversion.Scope) error {
+func Convert_core_Node_To_v1_Node(in *pkgapiscore.Node, out *apicorev1.Node, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Node_To_v1_Node(in, out, s)
 }
 
-func autoConvert_v1_NodeAddress_To_core_NodeAddress(in *v1.NodeAddress, out *core.NodeAddress, s conversion.Scope) error {
-	out.Type = core.NodeAddressType(in.Type)
+func autoConvert_v1_NodeAddress_To_core_NodeAddress(in *apicorev1.NodeAddress, out *pkgapiscore.NodeAddress, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.NodeAddressType(in.Type)
 	out.Address = in.Address
 	return nil
 }
 
 // Convert_v1_NodeAddress_To_core_NodeAddress is an autogenerated conversion function.
-func Convert_v1_NodeAddress_To_core_NodeAddress(in *v1.NodeAddress, out *core.NodeAddress, s conversion.Scope) error {
+func Convert_v1_NodeAddress_To_core_NodeAddress(in *apicorev1.NodeAddress, out *pkgapiscore.NodeAddress, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeAddress_To_core_NodeAddress(in, out, s)
 }
 
-func autoConvert_core_NodeAddress_To_v1_NodeAddress(in *core.NodeAddress, out *v1.NodeAddress, s conversion.Scope) error {
-	out.Type = v1.NodeAddressType(in.Type)
+func autoConvert_core_NodeAddress_To_v1_NodeAddress(in *pkgapiscore.NodeAddress, out *apicorev1.NodeAddress, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.NodeAddressType(in.Type)
 	out.Address = in.Address
 	return nil
 }
 
 // Convert_core_NodeAddress_To_v1_NodeAddress is an autogenerated conversion function.
-func Convert_core_NodeAddress_To_v1_NodeAddress(in *core.NodeAddress, out *v1.NodeAddress, s conversion.Scope) error {
+func Convert_core_NodeAddress_To_v1_NodeAddress(in *pkgapiscore.NodeAddress, out *apicorev1.NodeAddress, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeAddress_To_v1_NodeAddress(in, out, s)
 }
 
-func autoConvert_v1_NodeAffinity_To_core_NodeAffinity(in *v1.NodeAffinity, out *core.NodeAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = (*core.NodeSelector)(unsafe.Pointer(in.RequiredDuringSchedulingIgnoredDuringExecution))
-	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]core.PreferredSchedulingTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
+func autoConvert_v1_NodeAffinity_To_core_NodeAffinity(in *apicorev1.NodeAffinity, out *pkgapiscore.NodeAffinity, s apimachinerypkgconversion.Scope) error {
+	out.RequiredDuringSchedulingIgnoredDuringExecution = (*pkgapiscore.NodeSelector)(unsafe.Pointer(in.RequiredDuringSchedulingIgnoredDuringExecution))
+	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]pkgapiscore.PreferredSchedulingTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
 	return nil
 }
 
 // Convert_v1_NodeAffinity_To_core_NodeAffinity is an autogenerated conversion function.
-func Convert_v1_NodeAffinity_To_core_NodeAffinity(in *v1.NodeAffinity, out *core.NodeAffinity, s conversion.Scope) error {
+func Convert_v1_NodeAffinity_To_core_NodeAffinity(in *apicorev1.NodeAffinity, out *pkgapiscore.NodeAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeAffinity_To_core_NodeAffinity(in, out, s)
 }
 
-func autoConvert_core_NodeAffinity_To_v1_NodeAffinity(in *core.NodeAffinity, out *v1.NodeAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = (*v1.NodeSelector)(unsafe.Pointer(in.RequiredDuringSchedulingIgnoredDuringExecution))
-	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]v1.PreferredSchedulingTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
+func autoConvert_core_NodeAffinity_To_v1_NodeAffinity(in *pkgapiscore.NodeAffinity, out *apicorev1.NodeAffinity, s apimachinerypkgconversion.Scope) error {
+	out.RequiredDuringSchedulingIgnoredDuringExecution = (*apicorev1.NodeSelector)(unsafe.Pointer(in.RequiredDuringSchedulingIgnoredDuringExecution))
+	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]apicorev1.PreferredSchedulingTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
 	return nil
 }
 
 // Convert_core_NodeAffinity_To_v1_NodeAffinity is an autogenerated conversion function.
-func Convert_core_NodeAffinity_To_v1_NodeAffinity(in *core.NodeAffinity, out *v1.NodeAffinity, s conversion.Scope) error {
+func Convert_core_NodeAffinity_To_v1_NodeAffinity(in *pkgapiscore.NodeAffinity, out *apicorev1.NodeAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeAffinity_To_v1_NodeAffinity(in, out, s)
 }
 
-func autoConvert_v1_NodeCondition_To_core_NodeCondition(in *v1.NodeCondition, out *core.NodeCondition, s conversion.Scope) error {
-	out.Type = core.NodeConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
+func autoConvert_v1_NodeCondition_To_core_NodeCondition(in *apicorev1.NodeCondition, out *pkgapiscore.NodeCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.NodeConditionType(in.Type)
+	out.Status = pkgapiscore.ConditionStatus(in.Status)
 	out.LastHeartbeatTime = in.LastHeartbeatTime
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -4630,13 +4630,13 @@ func autoConvert_v1_NodeCondition_To_core_NodeCondition(in *v1.NodeCondition, ou
 }
 
 // Convert_v1_NodeCondition_To_core_NodeCondition is an autogenerated conversion function.
-func Convert_v1_NodeCondition_To_core_NodeCondition(in *v1.NodeCondition, out *core.NodeCondition, s conversion.Scope) error {
+func Convert_v1_NodeCondition_To_core_NodeCondition(in *apicorev1.NodeCondition, out *pkgapiscore.NodeCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeCondition_To_core_NodeCondition(in, out, s)
 }
 
-func autoConvert_core_NodeCondition_To_v1_NodeCondition(in *core.NodeCondition, out *v1.NodeCondition, s conversion.Scope) error {
-	out.Type = v1.NodeConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
+func autoConvert_core_NodeCondition_To_v1_NodeCondition(in *pkgapiscore.NodeCondition, out *apicorev1.NodeCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.NodeConditionType(in.Type)
+	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.LastHeartbeatTime = in.LastHeartbeatTime
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -4645,57 +4645,57 @@ func autoConvert_core_NodeCondition_To_v1_NodeCondition(in *core.NodeCondition, 
 }
 
 // Convert_core_NodeCondition_To_v1_NodeCondition is an autogenerated conversion function.
-func Convert_core_NodeCondition_To_v1_NodeCondition(in *core.NodeCondition, out *v1.NodeCondition, s conversion.Scope) error {
+func Convert_core_NodeCondition_To_v1_NodeCondition(in *pkgapiscore.NodeCondition, out *apicorev1.NodeCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeCondition_To_v1_NodeCondition(in, out, s)
 }
 
-func autoConvert_v1_NodeConfigSource_To_core_NodeConfigSource(in *v1.NodeConfigSource, out *core.NodeConfigSource, s conversion.Scope) error {
-	out.ConfigMap = (*core.ConfigMapNodeConfigSource)(unsafe.Pointer(in.ConfigMap))
+func autoConvert_v1_NodeConfigSource_To_core_NodeConfigSource(in *apicorev1.NodeConfigSource, out *pkgapiscore.NodeConfigSource, s apimachinerypkgconversion.Scope) error {
+	out.ConfigMap = (*pkgapiscore.ConfigMapNodeConfigSource)(unsafe.Pointer(in.ConfigMap))
 	return nil
 }
 
 // Convert_v1_NodeConfigSource_To_core_NodeConfigSource is an autogenerated conversion function.
-func Convert_v1_NodeConfigSource_To_core_NodeConfigSource(in *v1.NodeConfigSource, out *core.NodeConfigSource, s conversion.Scope) error {
+func Convert_v1_NodeConfigSource_To_core_NodeConfigSource(in *apicorev1.NodeConfigSource, out *pkgapiscore.NodeConfigSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeConfigSource_To_core_NodeConfigSource(in, out, s)
 }
 
-func autoConvert_core_NodeConfigSource_To_v1_NodeConfigSource(in *core.NodeConfigSource, out *v1.NodeConfigSource, s conversion.Scope) error {
-	out.ConfigMap = (*v1.ConfigMapNodeConfigSource)(unsafe.Pointer(in.ConfigMap))
+func autoConvert_core_NodeConfigSource_To_v1_NodeConfigSource(in *pkgapiscore.NodeConfigSource, out *apicorev1.NodeConfigSource, s apimachinerypkgconversion.Scope) error {
+	out.ConfigMap = (*apicorev1.ConfigMapNodeConfigSource)(unsafe.Pointer(in.ConfigMap))
 	return nil
 }
 
 // Convert_core_NodeConfigSource_To_v1_NodeConfigSource is an autogenerated conversion function.
-func Convert_core_NodeConfigSource_To_v1_NodeConfigSource(in *core.NodeConfigSource, out *v1.NodeConfigSource, s conversion.Scope) error {
+func Convert_core_NodeConfigSource_To_v1_NodeConfigSource(in *pkgapiscore.NodeConfigSource, out *apicorev1.NodeConfigSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeConfigSource_To_v1_NodeConfigSource(in, out, s)
 }
 
-func autoConvert_v1_NodeConfigStatus_To_core_NodeConfigStatus(in *v1.NodeConfigStatus, out *core.NodeConfigStatus, s conversion.Scope) error {
-	out.Assigned = (*core.NodeConfigSource)(unsafe.Pointer(in.Assigned))
-	out.Active = (*core.NodeConfigSource)(unsafe.Pointer(in.Active))
-	out.LastKnownGood = (*core.NodeConfigSource)(unsafe.Pointer(in.LastKnownGood))
+func autoConvert_v1_NodeConfigStatus_To_core_NodeConfigStatus(in *apicorev1.NodeConfigStatus, out *pkgapiscore.NodeConfigStatus, s apimachinerypkgconversion.Scope) error {
+	out.Assigned = (*pkgapiscore.NodeConfigSource)(unsafe.Pointer(in.Assigned))
+	out.Active = (*pkgapiscore.NodeConfigSource)(unsafe.Pointer(in.Active))
+	out.LastKnownGood = (*pkgapiscore.NodeConfigSource)(unsafe.Pointer(in.LastKnownGood))
 	out.Error = in.Error
 	return nil
 }
 
 // Convert_v1_NodeConfigStatus_To_core_NodeConfigStatus is an autogenerated conversion function.
-func Convert_v1_NodeConfigStatus_To_core_NodeConfigStatus(in *v1.NodeConfigStatus, out *core.NodeConfigStatus, s conversion.Scope) error {
+func Convert_v1_NodeConfigStatus_To_core_NodeConfigStatus(in *apicorev1.NodeConfigStatus, out *pkgapiscore.NodeConfigStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeConfigStatus_To_core_NodeConfigStatus(in, out, s)
 }
 
-func autoConvert_core_NodeConfigStatus_To_v1_NodeConfigStatus(in *core.NodeConfigStatus, out *v1.NodeConfigStatus, s conversion.Scope) error {
-	out.Assigned = (*v1.NodeConfigSource)(unsafe.Pointer(in.Assigned))
-	out.Active = (*v1.NodeConfigSource)(unsafe.Pointer(in.Active))
-	out.LastKnownGood = (*v1.NodeConfigSource)(unsafe.Pointer(in.LastKnownGood))
+func autoConvert_core_NodeConfigStatus_To_v1_NodeConfigStatus(in *pkgapiscore.NodeConfigStatus, out *apicorev1.NodeConfigStatus, s apimachinerypkgconversion.Scope) error {
+	out.Assigned = (*apicorev1.NodeConfigSource)(unsafe.Pointer(in.Assigned))
+	out.Active = (*apicorev1.NodeConfigSource)(unsafe.Pointer(in.Active))
+	out.LastKnownGood = (*apicorev1.NodeConfigSource)(unsafe.Pointer(in.LastKnownGood))
 	out.Error = in.Error
 	return nil
 }
 
 // Convert_core_NodeConfigStatus_To_v1_NodeConfigStatus is an autogenerated conversion function.
-func Convert_core_NodeConfigStatus_To_v1_NodeConfigStatus(in *core.NodeConfigStatus, out *v1.NodeConfigStatus, s conversion.Scope) error {
+func Convert_core_NodeConfigStatus_To_v1_NodeConfigStatus(in *pkgapiscore.NodeConfigStatus, out *apicorev1.NodeConfigStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeConfigStatus_To_v1_NodeConfigStatus(in, out, s)
 }
 
-func autoConvert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(in *v1.NodeDaemonEndpoints, out *core.NodeDaemonEndpoints, s conversion.Scope) error {
+func autoConvert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(in *apicorev1.NodeDaemonEndpoints, out *pkgapiscore.NodeDaemonEndpoints, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_DaemonEndpoint_To_core_DaemonEndpoint(&in.KubeletEndpoint, &out.KubeletEndpoint, s); err != nil {
 		return err
 	}
@@ -4703,11 +4703,11 @@ func autoConvert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(in *v1.NodeD
 }
 
 // Convert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints is an autogenerated conversion function.
-func Convert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(in *v1.NodeDaemonEndpoints, out *core.NodeDaemonEndpoints, s conversion.Scope) error {
+func Convert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(in *apicorev1.NodeDaemonEndpoints, out *pkgapiscore.NodeDaemonEndpoints, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(in, out, s)
 }
 
-func autoConvert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(in *core.NodeDaemonEndpoints, out *v1.NodeDaemonEndpoints, s conversion.Scope) error {
+func autoConvert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(in *pkgapiscore.NodeDaemonEndpoints, out *apicorev1.NodeDaemonEndpoints, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_DaemonEndpoint_To_v1_DaemonEndpoint(&in.KubeletEndpoint, &out.KubeletEndpoint, s); err != nil {
 		return err
 	}
@@ -4715,15 +4715,15 @@ func autoConvert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(in *core.Nod
 }
 
 // Convert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints is an autogenerated conversion function.
-func Convert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(in *core.NodeDaemonEndpoints, out *v1.NodeDaemonEndpoints, s conversion.Scope) error {
+func Convert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(in *pkgapiscore.NodeDaemonEndpoints, out *apicorev1.NodeDaemonEndpoints, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(in, out, s)
 }
 
-func autoConvert_v1_NodeList_To_core_NodeList(in *v1.NodeList, out *core.NodeList, s conversion.Scope) error {
+func autoConvert_v1_NodeList_To_core_NodeList(in *apicorev1.NodeList, out *pkgapiscore.NodeList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.Node, len(*in))
+		*out = make([]pkgapiscore.Node, len(*in))
 		for i := range *in {
 			if err := Convert_v1_Node_To_core_Node(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -4736,15 +4736,15 @@ func autoConvert_v1_NodeList_To_core_NodeList(in *v1.NodeList, out *core.NodeLis
 }
 
 // Convert_v1_NodeList_To_core_NodeList is an autogenerated conversion function.
-func Convert_v1_NodeList_To_core_NodeList(in *v1.NodeList, out *core.NodeList, s conversion.Scope) error {
+func Convert_v1_NodeList_To_core_NodeList(in *apicorev1.NodeList, out *pkgapiscore.NodeList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeList_To_core_NodeList(in, out, s)
 }
 
-func autoConvert_core_NodeList_To_v1_NodeList(in *core.NodeList, out *v1.NodeList, s conversion.Scope) error {
+func autoConvert_core_NodeList_To_v1_NodeList(in *pkgapiscore.NodeList, out *apicorev1.NodeList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.Node, len(*in))
+		*out = make([]apicorev1.Node, len(*in))
 		for i := range *in {
 			if err := Convert_core_Node_To_v1_Node(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -4757,35 +4757,35 @@ func autoConvert_core_NodeList_To_v1_NodeList(in *core.NodeList, out *v1.NodeLis
 }
 
 // Convert_core_NodeList_To_v1_NodeList is an autogenerated conversion function.
-func Convert_core_NodeList_To_v1_NodeList(in *core.NodeList, out *v1.NodeList, s conversion.Scope) error {
+func Convert_core_NodeList_To_v1_NodeList(in *pkgapiscore.NodeList, out *apicorev1.NodeList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeList_To_v1_NodeList(in, out, s)
 }
 
-func autoConvert_v1_NodeProxyOptions_To_core_NodeProxyOptions(in *v1.NodeProxyOptions, out *core.NodeProxyOptions, s conversion.Scope) error {
+func autoConvert_v1_NodeProxyOptions_To_core_NodeProxyOptions(in *apicorev1.NodeProxyOptions, out *pkgapiscore.NodeProxyOptions, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	return nil
 }
 
 // Convert_v1_NodeProxyOptions_To_core_NodeProxyOptions is an autogenerated conversion function.
-func Convert_v1_NodeProxyOptions_To_core_NodeProxyOptions(in *v1.NodeProxyOptions, out *core.NodeProxyOptions, s conversion.Scope) error {
+func Convert_v1_NodeProxyOptions_To_core_NodeProxyOptions(in *apicorev1.NodeProxyOptions, out *pkgapiscore.NodeProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeProxyOptions_To_core_NodeProxyOptions(in, out, s)
 }
 
-func autoConvert_core_NodeProxyOptions_To_v1_NodeProxyOptions(in *core.NodeProxyOptions, out *v1.NodeProxyOptions, s conversion.Scope) error {
+func autoConvert_core_NodeProxyOptions_To_v1_NodeProxyOptions(in *pkgapiscore.NodeProxyOptions, out *apicorev1.NodeProxyOptions, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	return nil
 }
 
 // Convert_core_NodeProxyOptions_To_v1_NodeProxyOptions is an autogenerated conversion function.
-func Convert_core_NodeProxyOptions_To_v1_NodeProxyOptions(in *core.NodeProxyOptions, out *v1.NodeProxyOptions, s conversion.Scope) error {
+func Convert_core_NodeProxyOptions_To_v1_NodeProxyOptions(in *pkgapiscore.NodeProxyOptions, out *apicorev1.NodeProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeProxyOptions_To_v1_NodeProxyOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_NodeProxyOptions(in *url.Values, out *v1.NodeProxyOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_NodeProxyOptions(in *url.Values, out *apicorev1.NodeProxyOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["path"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_string(&values, &out.Path, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_string(&values, &out.Path, s); err != nil {
 			return err
 		}
 	} else {
@@ -4795,166 +4795,166 @@ func autoConvert_url_Values_To_v1_NodeProxyOptions(in *url.Values, out *v1.NodeP
 }
 
 // Convert_url_Values_To_v1_NodeProxyOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_NodeProxyOptions(in *url.Values, out *v1.NodeProxyOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_NodeProxyOptions(in *url.Values, out *apicorev1.NodeProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_NodeProxyOptions(in, out, s)
 }
 
-func autoConvert_v1_NodeResources_To_core_NodeResources(in *v1.NodeResources, out *core.NodeResources, s conversion.Scope) error {
-	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
+func autoConvert_v1_NodeResources_To_core_NodeResources(in *apicorev1.NodeResources, out *pkgapiscore.NodeResources, s apimachinerypkgconversion.Scope) error {
+	out.Capacity = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Capacity))
 	return nil
 }
 
 // Convert_v1_NodeResources_To_core_NodeResources is an autogenerated conversion function.
-func Convert_v1_NodeResources_To_core_NodeResources(in *v1.NodeResources, out *core.NodeResources, s conversion.Scope) error {
+func Convert_v1_NodeResources_To_core_NodeResources(in *apicorev1.NodeResources, out *pkgapiscore.NodeResources, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeResources_To_core_NodeResources(in, out, s)
 }
 
-func autoConvert_core_NodeResources_To_v1_NodeResources(in *core.NodeResources, out *v1.NodeResources, s conversion.Scope) error {
-	out.Capacity = *(*v1.ResourceList)(unsafe.Pointer(&in.Capacity))
+func autoConvert_core_NodeResources_To_v1_NodeResources(in *pkgapiscore.NodeResources, out *apicorev1.NodeResources, s apimachinerypkgconversion.Scope) error {
+	out.Capacity = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Capacity))
 	return nil
 }
 
 // Convert_core_NodeResources_To_v1_NodeResources is an autogenerated conversion function.
-func Convert_core_NodeResources_To_v1_NodeResources(in *core.NodeResources, out *v1.NodeResources, s conversion.Scope) error {
+func Convert_core_NodeResources_To_v1_NodeResources(in *pkgapiscore.NodeResources, out *apicorev1.NodeResources, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeResources_To_v1_NodeResources(in, out, s)
 }
 
-func autoConvert_v1_NodeSelector_To_core_NodeSelector(in *v1.NodeSelector, out *core.NodeSelector, s conversion.Scope) error {
-	out.NodeSelectorTerms = *(*[]core.NodeSelectorTerm)(unsafe.Pointer(&in.NodeSelectorTerms))
+func autoConvert_v1_NodeSelector_To_core_NodeSelector(in *apicorev1.NodeSelector, out *pkgapiscore.NodeSelector, s apimachinerypkgconversion.Scope) error {
+	out.NodeSelectorTerms = *(*[]pkgapiscore.NodeSelectorTerm)(unsafe.Pointer(&in.NodeSelectorTerms))
 	return nil
 }
 
 // Convert_v1_NodeSelector_To_core_NodeSelector is an autogenerated conversion function.
-func Convert_v1_NodeSelector_To_core_NodeSelector(in *v1.NodeSelector, out *core.NodeSelector, s conversion.Scope) error {
+func Convert_v1_NodeSelector_To_core_NodeSelector(in *apicorev1.NodeSelector, out *pkgapiscore.NodeSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeSelector_To_core_NodeSelector(in, out, s)
 }
 
-func autoConvert_core_NodeSelector_To_v1_NodeSelector(in *core.NodeSelector, out *v1.NodeSelector, s conversion.Scope) error {
-	out.NodeSelectorTerms = *(*[]v1.NodeSelectorTerm)(unsafe.Pointer(&in.NodeSelectorTerms))
+func autoConvert_core_NodeSelector_To_v1_NodeSelector(in *pkgapiscore.NodeSelector, out *apicorev1.NodeSelector, s apimachinerypkgconversion.Scope) error {
+	out.NodeSelectorTerms = *(*[]apicorev1.NodeSelectorTerm)(unsafe.Pointer(&in.NodeSelectorTerms))
 	return nil
 }
 
 // Convert_core_NodeSelector_To_v1_NodeSelector is an autogenerated conversion function.
-func Convert_core_NodeSelector_To_v1_NodeSelector(in *core.NodeSelector, out *v1.NodeSelector, s conversion.Scope) error {
+func Convert_core_NodeSelector_To_v1_NodeSelector(in *pkgapiscore.NodeSelector, out *apicorev1.NodeSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeSelector_To_v1_NodeSelector(in, out, s)
 }
 
-func autoConvert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in *v1.NodeSelectorRequirement, out *core.NodeSelectorRequirement, s conversion.Scope) error {
+func autoConvert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in *apicorev1.NodeSelectorRequirement, out *pkgapiscore.NodeSelectorRequirement, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
-	out.Operator = core.NodeSelectorOperator(in.Operator)
+	out.Operator = pkgapiscore.NodeSelectorOperator(in.Operator)
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement is an autogenerated conversion function.
-func Convert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in *v1.NodeSelectorRequirement, out *core.NodeSelectorRequirement, s conversion.Scope) error {
+func Convert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in *apicorev1.NodeSelectorRequirement, out *pkgapiscore.NodeSelectorRequirement, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeSelectorRequirement_To_core_NodeSelectorRequirement(in, out, s)
 }
 
-func autoConvert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(in *core.NodeSelectorRequirement, out *v1.NodeSelectorRequirement, s conversion.Scope) error {
+func autoConvert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(in *pkgapiscore.NodeSelectorRequirement, out *apicorev1.NodeSelectorRequirement, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
-	out.Operator = v1.NodeSelectorOperator(in.Operator)
+	out.Operator = apicorev1.NodeSelectorOperator(in.Operator)
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement is an autogenerated conversion function.
-func Convert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(in *core.NodeSelectorRequirement, out *v1.NodeSelectorRequirement, s conversion.Scope) error {
+func Convert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(in *pkgapiscore.NodeSelectorRequirement, out *apicorev1.NodeSelectorRequirement, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeSelectorRequirement_To_v1_NodeSelectorRequirement(in, out, s)
 }
 
-func autoConvert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(in *v1.NodeSelectorTerm, out *core.NodeSelectorTerm, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]core.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
-	out.MatchFields = *(*[]core.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchFields))
+func autoConvert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(in *apicorev1.NodeSelectorTerm, out *pkgapiscore.NodeSelectorTerm, s apimachinerypkgconversion.Scope) error {
+	out.MatchExpressions = *(*[]pkgapiscore.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+	out.MatchFields = *(*[]pkgapiscore.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchFields))
 	return nil
 }
 
 // Convert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm is an autogenerated conversion function.
-func Convert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(in *v1.NodeSelectorTerm, out *core.NodeSelectorTerm, s conversion.Scope) error {
+func Convert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(in *apicorev1.NodeSelectorTerm, out *pkgapiscore.NodeSelectorTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(in, out, s)
 }
 
-func autoConvert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(in *core.NodeSelectorTerm, out *v1.NodeSelectorTerm, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]v1.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
-	out.MatchFields = *(*[]v1.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchFields))
+func autoConvert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(in *pkgapiscore.NodeSelectorTerm, out *apicorev1.NodeSelectorTerm, s apimachinerypkgconversion.Scope) error {
+	out.MatchExpressions = *(*[]apicorev1.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+	out.MatchFields = *(*[]apicorev1.NodeSelectorRequirement)(unsafe.Pointer(&in.MatchFields))
 	return nil
 }
 
 // Convert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm is an autogenerated conversion function.
-func Convert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(in *core.NodeSelectorTerm, out *v1.NodeSelectorTerm, s conversion.Scope) error {
+func Convert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(in *pkgapiscore.NodeSelectorTerm, out *apicorev1.NodeSelectorTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(in, out, s)
 }
 
-func autoConvert_v1_NodeSpec_To_core_NodeSpec(in *v1.NodeSpec, out *core.NodeSpec, s conversion.Scope) error {
+func autoConvert_v1_NodeSpec_To_core_NodeSpec(in *apicorev1.NodeSpec, out *pkgapiscore.NodeSpec, s apimachinerypkgconversion.Scope) error {
 	// WARNING: in.PodCIDR requires manual conversion: does not exist in peer-type
 	out.PodCIDRs = *(*[]string)(unsafe.Pointer(&in.PodCIDRs))
 	out.ProviderID = in.ProviderID
 	out.Unschedulable = in.Unschedulable
-	out.Taints = *(*[]core.Taint)(unsafe.Pointer(&in.Taints))
-	out.ConfigSource = (*core.NodeConfigSource)(unsafe.Pointer(in.ConfigSource))
+	out.Taints = *(*[]pkgapiscore.Taint)(unsafe.Pointer(&in.Taints))
+	out.ConfigSource = (*pkgapiscore.NodeConfigSource)(unsafe.Pointer(in.ConfigSource))
 	out.DoNotUseExternalID = in.DoNotUseExternalID
 	return nil
 }
 
-func autoConvert_core_NodeSpec_To_v1_NodeSpec(in *core.NodeSpec, out *v1.NodeSpec, s conversion.Scope) error {
+func autoConvert_core_NodeSpec_To_v1_NodeSpec(in *pkgapiscore.NodeSpec, out *apicorev1.NodeSpec, s apimachinerypkgconversion.Scope) error {
 	out.PodCIDRs = *(*[]string)(unsafe.Pointer(&in.PodCIDRs))
 	out.ProviderID = in.ProviderID
 	out.Unschedulable = in.Unschedulable
-	out.Taints = *(*[]v1.Taint)(unsafe.Pointer(&in.Taints))
-	out.ConfigSource = (*v1.NodeConfigSource)(unsafe.Pointer(in.ConfigSource))
+	out.Taints = *(*[]apicorev1.Taint)(unsafe.Pointer(&in.Taints))
+	out.ConfigSource = (*apicorev1.NodeConfigSource)(unsafe.Pointer(in.ConfigSource))
 	out.DoNotUseExternalID = in.DoNotUseExternalID
 	return nil
 }
 
-func autoConvert_v1_NodeStatus_To_core_NodeStatus(in *v1.NodeStatus, out *core.NodeStatus, s conversion.Scope) error {
-	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Allocatable = *(*core.ResourceList)(unsafe.Pointer(&in.Allocatable))
-	out.Phase = core.NodePhase(in.Phase)
-	out.Conditions = *(*[]core.NodeCondition)(unsafe.Pointer(&in.Conditions))
-	out.Addresses = *(*[]core.NodeAddress)(unsafe.Pointer(&in.Addresses))
+func autoConvert_v1_NodeStatus_To_core_NodeStatus(in *apicorev1.NodeStatus, out *pkgapiscore.NodeStatus, s apimachinerypkgconversion.Scope) error {
+	out.Capacity = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Allocatable = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Allocatable))
+	out.Phase = pkgapiscore.NodePhase(in.Phase)
+	out.Conditions = *(*[]pkgapiscore.NodeCondition)(unsafe.Pointer(&in.Conditions))
+	out.Addresses = *(*[]pkgapiscore.NodeAddress)(unsafe.Pointer(&in.Addresses))
 	if err := Convert_v1_NodeDaemonEndpoints_To_core_NodeDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
 		return err
 	}
 	if err := Convert_v1_NodeSystemInfo_To_core_NodeSystemInfo(&in.NodeInfo, &out.NodeInfo, s); err != nil {
 		return err
 	}
-	out.Images = *(*[]core.ContainerImage)(unsafe.Pointer(&in.Images))
-	out.VolumesInUse = *(*[]core.UniqueVolumeName)(unsafe.Pointer(&in.VolumesInUse))
-	out.VolumesAttached = *(*[]core.AttachedVolume)(unsafe.Pointer(&in.VolumesAttached))
-	out.Config = (*core.NodeConfigStatus)(unsafe.Pointer(in.Config))
+	out.Images = *(*[]pkgapiscore.ContainerImage)(unsafe.Pointer(&in.Images))
+	out.VolumesInUse = *(*[]pkgapiscore.UniqueVolumeName)(unsafe.Pointer(&in.VolumesInUse))
+	out.VolumesAttached = *(*[]pkgapiscore.AttachedVolume)(unsafe.Pointer(&in.VolumesAttached))
+	out.Config = (*pkgapiscore.NodeConfigStatus)(unsafe.Pointer(in.Config))
 	return nil
 }
 
 // Convert_v1_NodeStatus_To_core_NodeStatus is an autogenerated conversion function.
-func Convert_v1_NodeStatus_To_core_NodeStatus(in *v1.NodeStatus, out *core.NodeStatus, s conversion.Scope) error {
+func Convert_v1_NodeStatus_To_core_NodeStatus(in *apicorev1.NodeStatus, out *pkgapiscore.NodeStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeStatus_To_core_NodeStatus(in, out, s)
 }
 
-func autoConvert_core_NodeStatus_To_v1_NodeStatus(in *core.NodeStatus, out *v1.NodeStatus, s conversion.Scope) error {
-	out.Capacity = *(*v1.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Allocatable = *(*v1.ResourceList)(unsafe.Pointer(&in.Allocatable))
-	out.Phase = v1.NodePhase(in.Phase)
-	out.Conditions = *(*[]v1.NodeCondition)(unsafe.Pointer(&in.Conditions))
-	out.Addresses = *(*[]v1.NodeAddress)(unsafe.Pointer(&in.Addresses))
+func autoConvert_core_NodeStatus_To_v1_NodeStatus(in *pkgapiscore.NodeStatus, out *apicorev1.NodeStatus, s apimachinerypkgconversion.Scope) error {
+	out.Capacity = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Allocatable = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Allocatable))
+	out.Phase = apicorev1.NodePhase(in.Phase)
+	out.Conditions = *(*[]apicorev1.NodeCondition)(unsafe.Pointer(&in.Conditions))
+	out.Addresses = *(*[]apicorev1.NodeAddress)(unsafe.Pointer(&in.Addresses))
 	if err := Convert_core_NodeDaemonEndpoints_To_v1_NodeDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
 		return err
 	}
 	if err := Convert_core_NodeSystemInfo_To_v1_NodeSystemInfo(&in.NodeInfo, &out.NodeInfo, s); err != nil {
 		return err
 	}
-	out.Images = *(*[]v1.ContainerImage)(unsafe.Pointer(&in.Images))
-	out.VolumesInUse = *(*[]v1.UniqueVolumeName)(unsafe.Pointer(&in.VolumesInUse))
-	out.VolumesAttached = *(*[]v1.AttachedVolume)(unsafe.Pointer(&in.VolumesAttached))
-	out.Config = (*v1.NodeConfigStatus)(unsafe.Pointer(in.Config))
+	out.Images = *(*[]apicorev1.ContainerImage)(unsafe.Pointer(&in.Images))
+	out.VolumesInUse = *(*[]apicorev1.UniqueVolumeName)(unsafe.Pointer(&in.VolumesInUse))
+	out.VolumesAttached = *(*[]apicorev1.AttachedVolume)(unsafe.Pointer(&in.VolumesAttached))
+	out.Config = (*apicorev1.NodeConfigStatus)(unsafe.Pointer(in.Config))
 	return nil
 }
 
 // Convert_core_NodeStatus_To_v1_NodeStatus is an autogenerated conversion function.
-func Convert_core_NodeStatus_To_v1_NodeStatus(in *core.NodeStatus, out *v1.NodeStatus, s conversion.Scope) error {
+func Convert_core_NodeStatus_To_v1_NodeStatus(in *pkgapiscore.NodeStatus, out *apicorev1.NodeStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeStatus_To_v1_NodeStatus(in, out, s)
 }
 
-func autoConvert_v1_NodeSystemInfo_To_core_NodeSystemInfo(in *v1.NodeSystemInfo, out *core.NodeSystemInfo, s conversion.Scope) error {
+func autoConvert_v1_NodeSystemInfo_To_core_NodeSystemInfo(in *apicorev1.NodeSystemInfo, out *pkgapiscore.NodeSystemInfo, s apimachinerypkgconversion.Scope) error {
 	out.MachineID = in.MachineID
 	out.SystemUUID = in.SystemUUID
 	out.BootID = in.BootID
@@ -4969,11 +4969,11 @@ func autoConvert_v1_NodeSystemInfo_To_core_NodeSystemInfo(in *v1.NodeSystemInfo,
 }
 
 // Convert_v1_NodeSystemInfo_To_core_NodeSystemInfo is an autogenerated conversion function.
-func Convert_v1_NodeSystemInfo_To_core_NodeSystemInfo(in *v1.NodeSystemInfo, out *core.NodeSystemInfo, s conversion.Scope) error {
+func Convert_v1_NodeSystemInfo_To_core_NodeSystemInfo(in *apicorev1.NodeSystemInfo, out *pkgapiscore.NodeSystemInfo, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_NodeSystemInfo_To_core_NodeSystemInfo(in, out, s)
 }
 
-func autoConvert_core_NodeSystemInfo_To_v1_NodeSystemInfo(in *core.NodeSystemInfo, out *v1.NodeSystemInfo, s conversion.Scope) error {
+func autoConvert_core_NodeSystemInfo_To_v1_NodeSystemInfo(in *pkgapiscore.NodeSystemInfo, out *apicorev1.NodeSystemInfo, s apimachinerypkgconversion.Scope) error {
 	out.MachineID = in.MachineID
 	out.SystemUUID = in.SystemUUID
 	out.BootID = in.BootID
@@ -4988,37 +4988,37 @@ func autoConvert_core_NodeSystemInfo_To_v1_NodeSystemInfo(in *core.NodeSystemInf
 }
 
 // Convert_core_NodeSystemInfo_To_v1_NodeSystemInfo is an autogenerated conversion function.
-func Convert_core_NodeSystemInfo_To_v1_NodeSystemInfo(in *core.NodeSystemInfo, out *v1.NodeSystemInfo, s conversion.Scope) error {
+func Convert_core_NodeSystemInfo_To_v1_NodeSystemInfo(in *pkgapiscore.NodeSystemInfo, out *apicorev1.NodeSystemInfo, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_NodeSystemInfo_To_v1_NodeSystemInfo(in, out, s)
 }
 
-func autoConvert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(in *v1.ObjectFieldSelector, out *core.ObjectFieldSelector, s conversion.Scope) error {
+func autoConvert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(in *apicorev1.ObjectFieldSelector, out *pkgapiscore.ObjectFieldSelector, s apimachinerypkgconversion.Scope) error {
 	out.APIVersion = in.APIVersion
 	out.FieldPath = in.FieldPath
 	return nil
 }
 
 // Convert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector is an autogenerated conversion function.
-func Convert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(in *v1.ObjectFieldSelector, out *core.ObjectFieldSelector, s conversion.Scope) error {
+func Convert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(in *apicorev1.ObjectFieldSelector, out *pkgapiscore.ObjectFieldSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ObjectFieldSelector_To_core_ObjectFieldSelector(in, out, s)
 }
 
-func autoConvert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(in *core.ObjectFieldSelector, out *v1.ObjectFieldSelector, s conversion.Scope) error {
+func autoConvert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(in *pkgapiscore.ObjectFieldSelector, out *apicorev1.ObjectFieldSelector, s apimachinerypkgconversion.Scope) error {
 	out.APIVersion = in.APIVersion
 	out.FieldPath = in.FieldPath
 	return nil
 }
 
 // Convert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector is an autogenerated conversion function.
-func Convert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(in *core.ObjectFieldSelector, out *v1.ObjectFieldSelector, s conversion.Scope) error {
+func Convert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(in *pkgapiscore.ObjectFieldSelector, out *apicorev1.ObjectFieldSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ObjectFieldSelector_To_v1_ObjectFieldSelector(in, out, s)
 }
 
-func autoConvert_v1_ObjectReference_To_core_ObjectReference(in *v1.ObjectReference, out *core.ObjectReference, s conversion.Scope) error {
+func autoConvert_v1_ObjectReference_To_core_ObjectReference(in *apicorev1.ObjectReference, out *pkgapiscore.ObjectReference, s apimachinerypkgconversion.Scope) error {
 	out.Kind = in.Kind
 	out.Namespace = in.Namespace
 	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	out.UID = apimachinerypkgtypes.UID(in.UID)
 	out.APIVersion = in.APIVersion
 	out.ResourceVersion = in.ResourceVersion
 	out.FieldPath = in.FieldPath
@@ -5026,15 +5026,15 @@ func autoConvert_v1_ObjectReference_To_core_ObjectReference(in *v1.ObjectReferen
 }
 
 // Convert_v1_ObjectReference_To_core_ObjectReference is an autogenerated conversion function.
-func Convert_v1_ObjectReference_To_core_ObjectReference(in *v1.ObjectReference, out *core.ObjectReference, s conversion.Scope) error {
+func Convert_v1_ObjectReference_To_core_ObjectReference(in *apicorev1.ObjectReference, out *pkgapiscore.ObjectReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ObjectReference_To_core_ObjectReference(in, out, s)
 }
 
-func autoConvert_core_ObjectReference_To_v1_ObjectReference(in *core.ObjectReference, out *v1.ObjectReference, s conversion.Scope) error {
+func autoConvert_core_ObjectReference_To_v1_ObjectReference(in *pkgapiscore.ObjectReference, out *apicorev1.ObjectReference, s apimachinerypkgconversion.Scope) error {
 	out.Kind = in.Kind
 	out.Namespace = in.Namespace
 	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	out.UID = apimachinerypkgtypes.UID(in.UID)
 	out.APIVersion = in.APIVersion
 	out.ResourceVersion = in.ResourceVersion
 	out.FieldPath = in.FieldPath
@@ -5042,11 +5042,11 @@ func autoConvert_core_ObjectReference_To_v1_ObjectReference(in *core.ObjectRefer
 }
 
 // Convert_core_ObjectReference_To_v1_ObjectReference is an autogenerated conversion function.
-func Convert_core_ObjectReference_To_v1_ObjectReference(in *core.ObjectReference, out *v1.ObjectReference, s conversion.Scope) error {
+func Convert_core_ObjectReference_To_v1_ObjectReference(in *pkgapiscore.ObjectReference, out *apicorev1.ObjectReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ObjectReference_To_v1_ObjectReference(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolume_To_core_PersistentVolume(in *v1.PersistentVolume, out *core.PersistentVolume, s conversion.Scope) error {
+func autoConvert_v1_PersistentVolume_To_core_PersistentVolume(in *apicorev1.PersistentVolume, out *pkgapiscore.PersistentVolume, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PersistentVolumeSpec_To_core_PersistentVolumeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5058,11 +5058,11 @@ func autoConvert_v1_PersistentVolume_To_core_PersistentVolume(in *v1.PersistentV
 }
 
 // Convert_v1_PersistentVolume_To_core_PersistentVolume is an autogenerated conversion function.
-func Convert_v1_PersistentVolume_To_core_PersistentVolume(in *v1.PersistentVolume, out *core.PersistentVolume, s conversion.Scope) error {
+func Convert_v1_PersistentVolume_To_core_PersistentVolume(in *apicorev1.PersistentVolume, out *pkgapiscore.PersistentVolume, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolume_To_core_PersistentVolume(in, out, s)
 }
 
-func autoConvert_core_PersistentVolume_To_v1_PersistentVolume(in *core.PersistentVolume, out *v1.PersistentVolume, s conversion.Scope) error {
+func autoConvert_core_PersistentVolume_To_v1_PersistentVolume(in *pkgapiscore.PersistentVolume, out *apicorev1.PersistentVolume, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PersistentVolumeSpec_To_v1_PersistentVolumeSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5074,11 +5074,11 @@ func autoConvert_core_PersistentVolume_To_v1_PersistentVolume(in *core.Persisten
 }
 
 // Convert_core_PersistentVolume_To_v1_PersistentVolume is an autogenerated conversion function.
-func Convert_core_PersistentVolume_To_v1_PersistentVolume(in *core.PersistentVolume, out *v1.PersistentVolume, s conversion.Scope) error {
+func Convert_core_PersistentVolume_To_v1_PersistentVolume(in *pkgapiscore.PersistentVolume, out *apicorev1.PersistentVolume, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolume_To_v1_PersistentVolume(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(in *v1.PersistentVolumeClaim, out *core.PersistentVolumeClaim, s conversion.Scope) error {
+func autoConvert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(in *apicorev1.PersistentVolumeClaim, out *pkgapiscore.PersistentVolumeClaim, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5090,11 +5090,11 @@ func autoConvert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(in *v1.P
 }
 
 // Convert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(in *v1.PersistentVolumeClaim, out *core.PersistentVolumeClaim, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(in *apicorev1.PersistentVolumeClaim, out *pkgapiscore.PersistentVolumeClaim, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaim_To_core_PersistentVolumeClaim(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(in *core.PersistentVolumeClaim, out *v1.PersistentVolumeClaim, s conversion.Scope) error {
+func autoConvert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(in *pkgapiscore.PersistentVolumeClaim, out *apicorev1.PersistentVolumeClaim, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5106,13 +5106,13 @@ func autoConvert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(in *core
 }
 
 // Convert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(in *core.PersistentVolumeClaim, out *v1.PersistentVolumeClaim, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(in *pkgapiscore.PersistentVolumeClaim, out *apicorev1.PersistentVolumeClaim, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaim_To_v1_PersistentVolumeClaim(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(in *v1.PersistentVolumeClaimCondition, out *core.PersistentVolumeClaimCondition, s conversion.Scope) error {
-	out.Type = core.PersistentVolumeClaimConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
+func autoConvert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(in *apicorev1.PersistentVolumeClaimCondition, out *pkgapiscore.PersistentVolumeClaimCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.PersistentVolumeClaimConditionType(in.Type)
+	out.Status = pkgapiscore.ConditionStatus(in.Status)
 	out.LastProbeTime = in.LastProbeTime
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -5121,13 +5121,13 @@ func autoConvert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaim
 }
 
 // Convert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(in *v1.PersistentVolumeClaimCondition, out *core.PersistentVolumeClaimCondition, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(in *apicorev1.PersistentVolumeClaimCondition, out *pkgapiscore.PersistentVolumeClaimCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaimCondition_To_core_PersistentVolumeClaimCondition(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(in *core.PersistentVolumeClaimCondition, out *v1.PersistentVolumeClaimCondition, s conversion.Scope) error {
-	out.Type = v1.PersistentVolumeClaimConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
+func autoConvert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(in *pkgapiscore.PersistentVolumeClaimCondition, out *apicorev1.PersistentVolumeClaimCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.PersistentVolumeClaimConditionType(in.Type)
+	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.LastProbeTime = in.LastProbeTime
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -5136,101 +5136,101 @@ func autoConvert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaim
 }
 
 // Convert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(in *core.PersistentVolumeClaimCondition, out *v1.PersistentVolumeClaimCondition, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(in *pkgapiscore.PersistentVolumeClaimCondition, out *apicorev1.PersistentVolumeClaimCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaimCondition_To_v1_PersistentVolumeClaimCondition(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(in *v1.PersistentVolumeClaimList, out *core.PersistentVolumeClaimList, s conversion.Scope) error {
+func autoConvert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(in *apicorev1.PersistentVolumeClaimList, out *pkgapiscore.PersistentVolumeClaimList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.PersistentVolumeClaim)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.PersistentVolumeClaim)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(in *v1.PersistentVolumeClaimList, out *core.PersistentVolumeClaimList, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(in *apicorev1.PersistentVolumeClaimList, out *pkgapiscore.PersistentVolumeClaimList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaimList_To_core_PersistentVolumeClaimList(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(in *core.PersistentVolumeClaimList, out *v1.PersistentVolumeClaimList, s conversion.Scope) error {
+func autoConvert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(in *pkgapiscore.PersistentVolumeClaimList, out *apicorev1.PersistentVolumeClaimList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.PersistentVolumeClaim)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.PersistentVolumeClaim)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(in *core.PersistentVolumeClaimList, out *v1.PersistentVolumeClaimList, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(in *pkgapiscore.PersistentVolumeClaimList, out *apicorev1.PersistentVolumeClaimList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaimList_To_v1_PersistentVolumeClaimList(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(in *v1.PersistentVolumeClaimSpec, out *core.PersistentVolumeClaimSpec, s conversion.Scope) error {
-	out.AccessModes = *(*[]core.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
-	out.Selector = (*metav1.LabelSelector)(unsafe.Pointer(in.Selector))
+func autoConvert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(in *apicorev1.PersistentVolumeClaimSpec, out *pkgapiscore.PersistentVolumeClaimSpec, s apimachinerypkgconversion.Scope) error {
+	out.AccessModes = *(*[]pkgapiscore.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
+	out.Selector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.Selector))
 	if err := Convert_v1_ResourceRequirements_To_core_ResourceRequirements(&in.Resources, &out.Resources, s); err != nil {
 		return err
 	}
 	out.VolumeName = in.VolumeName
 	out.StorageClassName = (*string)(unsafe.Pointer(in.StorageClassName))
-	out.VolumeMode = (*core.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
-	out.DataSource = (*core.TypedLocalObjectReference)(unsafe.Pointer(in.DataSource))
-	out.DataSourceRef = (*core.TypedLocalObjectReference)(unsafe.Pointer(in.DataSourceRef))
+	out.VolumeMode = (*pkgapiscore.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
+	out.DataSource = (*pkgapiscore.TypedLocalObjectReference)(unsafe.Pointer(in.DataSource))
+	out.DataSourceRef = (*pkgapiscore.TypedLocalObjectReference)(unsafe.Pointer(in.DataSourceRef))
 	return nil
 }
 
 // Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(in *v1.PersistentVolumeClaimSpec, out *core.PersistentVolumeClaimSpec, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(in *apicorev1.PersistentVolumeClaimSpec, out *pkgapiscore.PersistentVolumeClaimSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(in *core.PersistentVolumeClaimSpec, out *v1.PersistentVolumeClaimSpec, s conversion.Scope) error {
-	out.AccessModes = *(*[]v1.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
-	out.Selector = (*metav1.LabelSelector)(unsafe.Pointer(in.Selector))
+func autoConvert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(in *pkgapiscore.PersistentVolumeClaimSpec, out *apicorev1.PersistentVolumeClaimSpec, s apimachinerypkgconversion.Scope) error {
+	out.AccessModes = *(*[]apicorev1.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
+	out.Selector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.Selector))
 	if err := Convert_core_ResourceRequirements_To_v1_ResourceRequirements(&in.Resources, &out.Resources, s); err != nil {
 		return err
 	}
 	out.VolumeName = in.VolumeName
 	out.StorageClassName = (*string)(unsafe.Pointer(in.StorageClassName))
-	out.VolumeMode = (*v1.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
-	out.DataSource = (*v1.TypedLocalObjectReference)(unsafe.Pointer(in.DataSource))
-	out.DataSourceRef = (*v1.TypedLocalObjectReference)(unsafe.Pointer(in.DataSourceRef))
+	out.VolumeMode = (*apicorev1.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
+	out.DataSource = (*apicorev1.TypedLocalObjectReference)(unsafe.Pointer(in.DataSource))
+	out.DataSourceRef = (*apicorev1.TypedLocalObjectReference)(unsafe.Pointer(in.DataSourceRef))
 	return nil
 }
 
 // Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(in *core.PersistentVolumeClaimSpec, out *v1.PersistentVolumeClaimSpec, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(in *pkgapiscore.PersistentVolumeClaimSpec, out *apicorev1.PersistentVolumeClaimSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(in *v1.PersistentVolumeClaimStatus, out *core.PersistentVolumeClaimStatus, s conversion.Scope) error {
-	out.Phase = core.PersistentVolumeClaimPhase(in.Phase)
-	out.AccessModes = *(*[]core.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
-	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Conditions = *(*[]core.PersistentVolumeClaimCondition)(unsafe.Pointer(&in.Conditions))
-	out.AllocatedResources = *(*core.ResourceList)(unsafe.Pointer(&in.AllocatedResources))
-	out.ResizeStatus = (*core.PersistentVolumeClaimResizeStatus)(unsafe.Pointer(in.ResizeStatus))
+func autoConvert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(in *apicorev1.PersistentVolumeClaimStatus, out *pkgapiscore.PersistentVolumeClaimStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = pkgapiscore.PersistentVolumeClaimPhase(in.Phase)
+	out.AccessModes = *(*[]pkgapiscore.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
+	out.Capacity = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Conditions = *(*[]pkgapiscore.PersistentVolumeClaimCondition)(unsafe.Pointer(&in.Conditions))
+	out.AllocatedResources = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.AllocatedResources))
+	out.ResizeStatus = (*pkgapiscore.PersistentVolumeClaimResizeStatus)(unsafe.Pointer(in.ResizeStatus))
 	return nil
 }
 
 // Convert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(in *v1.PersistentVolumeClaimStatus, out *core.PersistentVolumeClaimStatus, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(in *apicorev1.PersistentVolumeClaimStatus, out *pkgapiscore.PersistentVolumeClaimStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaimStatus_To_core_PersistentVolumeClaimStatus(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(in *core.PersistentVolumeClaimStatus, out *v1.PersistentVolumeClaimStatus, s conversion.Scope) error {
-	out.Phase = v1.PersistentVolumeClaimPhase(in.Phase)
-	out.AccessModes = *(*[]v1.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
-	out.Capacity = *(*v1.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Conditions = *(*[]v1.PersistentVolumeClaimCondition)(unsafe.Pointer(&in.Conditions))
-	out.AllocatedResources = *(*v1.ResourceList)(unsafe.Pointer(&in.AllocatedResources))
-	out.ResizeStatus = (*v1.PersistentVolumeClaimResizeStatus)(unsafe.Pointer(in.ResizeStatus))
+func autoConvert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(in *pkgapiscore.PersistentVolumeClaimStatus, out *apicorev1.PersistentVolumeClaimStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = apicorev1.PersistentVolumeClaimPhase(in.Phase)
+	out.AccessModes = *(*[]apicorev1.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
+	out.Capacity = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Capacity))
+	out.Conditions = *(*[]apicorev1.PersistentVolumeClaimCondition)(unsafe.Pointer(&in.Conditions))
+	out.AllocatedResources = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.AllocatedResources))
+	out.ResizeStatus = (*apicorev1.PersistentVolumeClaimResizeStatus)(unsafe.Pointer(in.ResizeStatus))
 	return nil
 }
 
 // Convert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(in *core.PersistentVolumeClaimStatus, out *v1.PersistentVolumeClaimStatus, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(in *pkgapiscore.PersistentVolumeClaimStatus, out *apicorev1.PersistentVolumeClaimStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaimStatus_To_v1_PersistentVolumeClaimStatus(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(in *v1.PersistentVolumeClaimTemplate, out *core.PersistentVolumeClaimTemplate, s conversion.Scope) error {
+func autoConvert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(in *apicorev1.PersistentVolumeClaimTemplate, out *pkgapiscore.PersistentVolumeClaimTemplate, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PersistentVolumeClaimSpec_To_core_PersistentVolumeClaimSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5239,11 +5239,11 @@ func autoConvert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimT
 }
 
 // Convert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(in *v1.PersistentVolumeClaimTemplate, out *core.PersistentVolumeClaimTemplate, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(in *apicorev1.PersistentVolumeClaimTemplate, out *pkgapiscore.PersistentVolumeClaimTemplate, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaimTemplate_To_core_PersistentVolumeClaimTemplate(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(in *core.PersistentVolumeClaimTemplate, out *v1.PersistentVolumeClaimTemplate, s conversion.Scope) error {
+func autoConvert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(in *pkgapiscore.PersistentVolumeClaimTemplate, out *apicorev1.PersistentVolumeClaimTemplate, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PersistentVolumeClaimSpec_To_v1_PersistentVolumeClaimSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5252,37 +5252,37 @@ func autoConvert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimT
 }
 
 // Convert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(in *core.PersistentVolumeClaimTemplate, out *v1.PersistentVolumeClaimTemplate, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(in *pkgapiscore.PersistentVolumeClaimTemplate, out *apicorev1.PersistentVolumeClaimTemplate, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaimTemplate_To_v1_PersistentVolumeClaimTemplate(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(in *v1.PersistentVolumeClaimVolumeSource, out *core.PersistentVolumeClaimVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(in *apicorev1.PersistentVolumeClaimVolumeSource, out *pkgapiscore.PersistentVolumeClaimVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.ClaimName = in.ClaimName
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(in *v1.PersistentVolumeClaimVolumeSource, out *core.PersistentVolumeClaimVolumeSource, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(in *apicorev1.PersistentVolumeClaimVolumeSource, out *pkgapiscore.PersistentVolumeClaimVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeClaimVolumeSource_To_core_PersistentVolumeClaimVolumeSource(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(in *core.PersistentVolumeClaimVolumeSource, out *v1.PersistentVolumeClaimVolumeSource, s conversion.Scope) error {
+func autoConvert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(in *pkgapiscore.PersistentVolumeClaimVolumeSource, out *apicorev1.PersistentVolumeClaimVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.ClaimName = in.ClaimName
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource is an autogenerated conversion function.
-func Convert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(in *core.PersistentVolumeClaimVolumeSource, out *v1.PersistentVolumeClaimVolumeSource, s conversion.Scope) error {
+func Convert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(in *pkgapiscore.PersistentVolumeClaimVolumeSource, out *apicorev1.PersistentVolumeClaimVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeClaimVolumeSource_To_v1_PersistentVolumeClaimVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeList_To_core_PersistentVolumeList(in *v1.PersistentVolumeList, out *core.PersistentVolumeList, s conversion.Scope) error {
+func autoConvert_v1_PersistentVolumeList_To_core_PersistentVolumeList(in *apicorev1.PersistentVolumeList, out *pkgapiscore.PersistentVolumeList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.PersistentVolume, len(*in))
+		*out = make([]pkgapiscore.PersistentVolume, len(*in))
 		for i := range *in {
 			if err := Convert_v1_PersistentVolume_To_core_PersistentVolume(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -5295,15 +5295,15 @@ func autoConvert_v1_PersistentVolumeList_To_core_PersistentVolumeList(in *v1.Per
 }
 
 // Convert_v1_PersistentVolumeList_To_core_PersistentVolumeList is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeList_To_core_PersistentVolumeList(in *v1.PersistentVolumeList, out *core.PersistentVolumeList, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeList_To_core_PersistentVolumeList(in *apicorev1.PersistentVolumeList, out *pkgapiscore.PersistentVolumeList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeList_To_core_PersistentVolumeList(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeList_To_v1_PersistentVolumeList(in *core.PersistentVolumeList, out *v1.PersistentVolumeList, s conversion.Scope) error {
+func autoConvert_core_PersistentVolumeList_To_v1_PersistentVolumeList(in *pkgapiscore.PersistentVolumeList, out *apicorev1.PersistentVolumeList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.PersistentVolume, len(*in))
+		*out = make([]apicorev1.PersistentVolume, len(*in))
 		for i := range *in {
 			if err := Convert_core_PersistentVolume_To_v1_PersistentVolume(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -5316,149 +5316,149 @@ func autoConvert_core_PersistentVolumeList_To_v1_PersistentVolumeList(in *core.P
 }
 
 // Convert_core_PersistentVolumeList_To_v1_PersistentVolumeList is an autogenerated conversion function.
-func Convert_core_PersistentVolumeList_To_v1_PersistentVolumeList(in *core.PersistentVolumeList, out *v1.PersistentVolumeList, s conversion.Scope) error {
+func Convert_core_PersistentVolumeList_To_v1_PersistentVolumeList(in *pkgapiscore.PersistentVolumeList, out *apicorev1.PersistentVolumeList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeList_To_v1_PersistentVolumeList(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(in *v1.PersistentVolumeSource, out *core.PersistentVolumeSource, s conversion.Scope) error {
-	out.GCEPersistentDisk = (*core.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
-	out.AWSElasticBlockStore = (*core.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
-	out.HostPath = (*core.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
-	out.Glusterfs = (*core.GlusterfsPersistentVolumeSource)(unsafe.Pointer(in.Glusterfs))
-	out.NFS = (*core.NFSVolumeSource)(unsafe.Pointer(in.NFS))
-	out.RBD = (*core.RBDPersistentVolumeSource)(unsafe.Pointer(in.RBD))
-	out.ISCSI = (*core.ISCSIPersistentVolumeSource)(unsafe.Pointer(in.ISCSI))
-	out.Cinder = (*core.CinderPersistentVolumeSource)(unsafe.Pointer(in.Cinder))
-	out.CephFS = (*core.CephFSPersistentVolumeSource)(unsafe.Pointer(in.CephFS))
-	out.FC = (*core.FCVolumeSource)(unsafe.Pointer(in.FC))
-	out.Flocker = (*core.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
-	out.FlexVolume = (*core.FlexPersistentVolumeSource)(unsafe.Pointer(in.FlexVolume))
-	out.AzureFile = (*core.AzureFilePersistentVolumeSource)(unsafe.Pointer(in.AzureFile))
-	out.VsphereVolume = (*core.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
-	out.Quobyte = (*core.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
-	out.AzureDisk = (*core.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
-	out.PhotonPersistentDisk = (*core.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
-	out.PortworxVolume = (*core.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
-	out.ScaleIO = (*core.ScaleIOPersistentVolumeSource)(unsafe.Pointer(in.ScaleIO))
-	out.Local = (*core.LocalVolumeSource)(unsafe.Pointer(in.Local))
-	out.StorageOS = (*core.StorageOSPersistentVolumeSource)(unsafe.Pointer(in.StorageOS))
-	out.CSI = (*core.CSIPersistentVolumeSource)(unsafe.Pointer(in.CSI))
+func autoConvert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(in *apicorev1.PersistentVolumeSource, out *pkgapiscore.PersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.GCEPersistentDisk = (*pkgapiscore.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
+	out.AWSElasticBlockStore = (*pkgapiscore.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
+	out.HostPath = (*pkgapiscore.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
+	out.Glusterfs = (*pkgapiscore.GlusterfsPersistentVolumeSource)(unsafe.Pointer(in.Glusterfs))
+	out.NFS = (*pkgapiscore.NFSVolumeSource)(unsafe.Pointer(in.NFS))
+	out.RBD = (*pkgapiscore.RBDPersistentVolumeSource)(unsafe.Pointer(in.RBD))
+	out.ISCSI = (*pkgapiscore.ISCSIPersistentVolumeSource)(unsafe.Pointer(in.ISCSI))
+	out.Cinder = (*pkgapiscore.CinderPersistentVolumeSource)(unsafe.Pointer(in.Cinder))
+	out.CephFS = (*pkgapiscore.CephFSPersistentVolumeSource)(unsafe.Pointer(in.CephFS))
+	out.FC = (*pkgapiscore.FCVolumeSource)(unsafe.Pointer(in.FC))
+	out.Flocker = (*pkgapiscore.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
+	out.FlexVolume = (*pkgapiscore.FlexPersistentVolumeSource)(unsafe.Pointer(in.FlexVolume))
+	out.AzureFile = (*pkgapiscore.AzureFilePersistentVolumeSource)(unsafe.Pointer(in.AzureFile))
+	out.VsphereVolume = (*pkgapiscore.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
+	out.Quobyte = (*pkgapiscore.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
+	out.AzureDisk = (*pkgapiscore.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
+	out.PhotonPersistentDisk = (*pkgapiscore.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
+	out.PortworxVolume = (*pkgapiscore.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
+	out.ScaleIO = (*pkgapiscore.ScaleIOPersistentVolumeSource)(unsafe.Pointer(in.ScaleIO))
+	out.Local = (*pkgapiscore.LocalVolumeSource)(unsafe.Pointer(in.Local))
+	out.StorageOS = (*pkgapiscore.StorageOSPersistentVolumeSource)(unsafe.Pointer(in.StorageOS))
+	out.CSI = (*pkgapiscore.CSIPersistentVolumeSource)(unsafe.Pointer(in.CSI))
 	return nil
 }
 
 // Convert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(in *v1.PersistentVolumeSource, out *core.PersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(in *apicorev1.PersistentVolumeSource, out *pkgapiscore.PersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(in *core.PersistentVolumeSource, out *v1.PersistentVolumeSource, s conversion.Scope) error {
-	out.GCEPersistentDisk = (*v1.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
-	out.AWSElasticBlockStore = (*v1.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
-	out.HostPath = (*v1.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
-	out.Glusterfs = (*v1.GlusterfsPersistentVolumeSource)(unsafe.Pointer(in.Glusterfs))
-	out.NFS = (*v1.NFSVolumeSource)(unsafe.Pointer(in.NFS))
-	out.RBD = (*v1.RBDPersistentVolumeSource)(unsafe.Pointer(in.RBD))
-	out.Quobyte = (*v1.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
-	out.ISCSI = (*v1.ISCSIPersistentVolumeSource)(unsafe.Pointer(in.ISCSI))
-	out.FlexVolume = (*v1.FlexPersistentVolumeSource)(unsafe.Pointer(in.FlexVolume))
-	out.Cinder = (*v1.CinderPersistentVolumeSource)(unsafe.Pointer(in.Cinder))
-	out.CephFS = (*v1.CephFSPersistentVolumeSource)(unsafe.Pointer(in.CephFS))
-	out.FC = (*v1.FCVolumeSource)(unsafe.Pointer(in.FC))
-	out.Flocker = (*v1.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
-	out.AzureFile = (*v1.AzureFilePersistentVolumeSource)(unsafe.Pointer(in.AzureFile))
-	out.VsphereVolume = (*v1.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
-	out.AzureDisk = (*v1.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
-	out.PhotonPersistentDisk = (*v1.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
-	out.PortworxVolume = (*v1.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
-	out.ScaleIO = (*v1.ScaleIOPersistentVolumeSource)(unsafe.Pointer(in.ScaleIO))
-	out.Local = (*v1.LocalVolumeSource)(unsafe.Pointer(in.Local))
-	out.StorageOS = (*v1.StorageOSPersistentVolumeSource)(unsafe.Pointer(in.StorageOS))
-	out.CSI = (*v1.CSIPersistentVolumeSource)(unsafe.Pointer(in.CSI))
+func autoConvert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(in *pkgapiscore.PersistentVolumeSource, out *apicorev1.PersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.GCEPersistentDisk = (*apicorev1.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
+	out.AWSElasticBlockStore = (*apicorev1.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
+	out.HostPath = (*apicorev1.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
+	out.Glusterfs = (*apicorev1.GlusterfsPersistentVolumeSource)(unsafe.Pointer(in.Glusterfs))
+	out.NFS = (*apicorev1.NFSVolumeSource)(unsafe.Pointer(in.NFS))
+	out.RBD = (*apicorev1.RBDPersistentVolumeSource)(unsafe.Pointer(in.RBD))
+	out.Quobyte = (*apicorev1.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
+	out.ISCSI = (*apicorev1.ISCSIPersistentVolumeSource)(unsafe.Pointer(in.ISCSI))
+	out.FlexVolume = (*apicorev1.FlexPersistentVolumeSource)(unsafe.Pointer(in.FlexVolume))
+	out.Cinder = (*apicorev1.CinderPersistentVolumeSource)(unsafe.Pointer(in.Cinder))
+	out.CephFS = (*apicorev1.CephFSPersistentVolumeSource)(unsafe.Pointer(in.CephFS))
+	out.FC = (*apicorev1.FCVolumeSource)(unsafe.Pointer(in.FC))
+	out.Flocker = (*apicorev1.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
+	out.AzureFile = (*apicorev1.AzureFilePersistentVolumeSource)(unsafe.Pointer(in.AzureFile))
+	out.VsphereVolume = (*apicorev1.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
+	out.AzureDisk = (*apicorev1.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
+	out.PhotonPersistentDisk = (*apicorev1.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
+	out.PortworxVolume = (*apicorev1.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
+	out.ScaleIO = (*apicorev1.ScaleIOPersistentVolumeSource)(unsafe.Pointer(in.ScaleIO))
+	out.Local = (*apicorev1.LocalVolumeSource)(unsafe.Pointer(in.Local))
+	out.StorageOS = (*apicorev1.StorageOSPersistentVolumeSource)(unsafe.Pointer(in.StorageOS))
+	out.CSI = (*apicorev1.CSIPersistentVolumeSource)(unsafe.Pointer(in.CSI))
 	return nil
 }
 
 // Convert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(in *core.PersistentVolumeSource, out *v1.PersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(in *pkgapiscore.PersistentVolumeSource, out *apicorev1.PersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_PersistentVolumeSpec_To_core_PersistentVolumeSpec(in *v1.PersistentVolumeSpec, out *core.PersistentVolumeSpec, s conversion.Scope) error {
-	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
+func autoConvert_v1_PersistentVolumeSpec_To_core_PersistentVolumeSpec(in *apicorev1.PersistentVolumeSpec, out *pkgapiscore.PersistentVolumeSpec, s apimachinerypkgconversion.Scope) error {
+	out.Capacity = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Capacity))
 	if err := Convert_v1_PersistentVolumeSource_To_core_PersistentVolumeSource(&in.PersistentVolumeSource, &out.PersistentVolumeSource, s); err != nil {
 		return err
 	}
-	out.AccessModes = *(*[]core.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
-	out.ClaimRef = (*core.ObjectReference)(unsafe.Pointer(in.ClaimRef))
-	out.PersistentVolumeReclaimPolicy = core.PersistentVolumeReclaimPolicy(in.PersistentVolumeReclaimPolicy)
+	out.AccessModes = *(*[]pkgapiscore.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
+	out.ClaimRef = (*pkgapiscore.ObjectReference)(unsafe.Pointer(in.ClaimRef))
+	out.PersistentVolumeReclaimPolicy = pkgapiscore.PersistentVolumeReclaimPolicy(in.PersistentVolumeReclaimPolicy)
 	out.StorageClassName = in.StorageClassName
 	out.MountOptions = *(*[]string)(unsafe.Pointer(&in.MountOptions))
-	out.VolumeMode = (*core.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
-	out.NodeAffinity = (*core.VolumeNodeAffinity)(unsafe.Pointer(in.NodeAffinity))
+	out.VolumeMode = (*pkgapiscore.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
+	out.NodeAffinity = (*pkgapiscore.VolumeNodeAffinity)(unsafe.Pointer(in.NodeAffinity))
 	return nil
 }
 
-func autoConvert_core_PersistentVolumeSpec_To_v1_PersistentVolumeSpec(in *core.PersistentVolumeSpec, out *v1.PersistentVolumeSpec, s conversion.Scope) error {
-	out.Capacity = *(*v1.ResourceList)(unsafe.Pointer(&in.Capacity))
+func autoConvert_core_PersistentVolumeSpec_To_v1_PersistentVolumeSpec(in *pkgapiscore.PersistentVolumeSpec, out *apicorev1.PersistentVolumeSpec, s apimachinerypkgconversion.Scope) error {
+	out.Capacity = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Capacity))
 	if err := Convert_core_PersistentVolumeSource_To_v1_PersistentVolumeSource(&in.PersistentVolumeSource, &out.PersistentVolumeSource, s); err != nil {
 		return err
 	}
-	out.AccessModes = *(*[]v1.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
-	out.ClaimRef = (*v1.ObjectReference)(unsafe.Pointer(in.ClaimRef))
-	out.PersistentVolumeReclaimPolicy = v1.PersistentVolumeReclaimPolicy(in.PersistentVolumeReclaimPolicy)
+	out.AccessModes = *(*[]apicorev1.PersistentVolumeAccessMode)(unsafe.Pointer(&in.AccessModes))
+	out.ClaimRef = (*apicorev1.ObjectReference)(unsafe.Pointer(in.ClaimRef))
+	out.PersistentVolumeReclaimPolicy = apicorev1.PersistentVolumeReclaimPolicy(in.PersistentVolumeReclaimPolicy)
 	out.StorageClassName = in.StorageClassName
 	out.MountOptions = *(*[]string)(unsafe.Pointer(&in.MountOptions))
-	out.VolumeMode = (*v1.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
-	out.NodeAffinity = (*v1.VolumeNodeAffinity)(unsafe.Pointer(in.NodeAffinity))
+	out.VolumeMode = (*apicorev1.PersistentVolumeMode)(unsafe.Pointer(in.VolumeMode))
+	out.NodeAffinity = (*apicorev1.VolumeNodeAffinity)(unsafe.Pointer(in.NodeAffinity))
 	return nil
 }
 
-func autoConvert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(in *v1.PersistentVolumeStatus, out *core.PersistentVolumeStatus, s conversion.Scope) error {
-	out.Phase = core.PersistentVolumePhase(in.Phase)
+func autoConvert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(in *apicorev1.PersistentVolumeStatus, out *pkgapiscore.PersistentVolumeStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = pkgapiscore.PersistentVolumePhase(in.Phase)
 	out.Message = in.Message
 	out.Reason = in.Reason
 	return nil
 }
 
 // Convert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus is an autogenerated conversion function.
-func Convert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(in *v1.PersistentVolumeStatus, out *core.PersistentVolumeStatus, s conversion.Scope) error {
+func Convert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(in *apicorev1.PersistentVolumeStatus, out *pkgapiscore.PersistentVolumeStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PersistentVolumeStatus_To_core_PersistentVolumeStatus(in, out, s)
 }
 
-func autoConvert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(in *core.PersistentVolumeStatus, out *v1.PersistentVolumeStatus, s conversion.Scope) error {
-	out.Phase = v1.PersistentVolumePhase(in.Phase)
+func autoConvert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(in *pkgapiscore.PersistentVolumeStatus, out *apicorev1.PersistentVolumeStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = apicorev1.PersistentVolumePhase(in.Phase)
 	out.Message = in.Message
 	out.Reason = in.Reason
 	return nil
 }
 
 // Convert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus is an autogenerated conversion function.
-func Convert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(in *core.PersistentVolumeStatus, out *v1.PersistentVolumeStatus, s conversion.Scope) error {
+func Convert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(in *pkgapiscore.PersistentVolumeStatus, out *apicorev1.PersistentVolumeStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PersistentVolumeStatus_To_v1_PersistentVolumeStatus(in, out, s)
 }
 
-func autoConvert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(in *v1.PhotonPersistentDiskVolumeSource, out *core.PhotonPersistentDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(in *apicorev1.PhotonPersistentDiskVolumeSource, out *pkgapiscore.PhotonPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.PdID = in.PdID
 	out.FSType = in.FSType
 	return nil
 }
 
 // Convert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource is an autogenerated conversion function.
-func Convert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(in *v1.PhotonPersistentDiskVolumeSource, out *core.PhotonPersistentDiskVolumeSource, s conversion.Scope) error {
+func Convert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(in *apicorev1.PhotonPersistentDiskVolumeSource, out *pkgapiscore.PhotonPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PhotonPersistentDiskVolumeSource_To_core_PhotonPersistentDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(in *core.PhotonPersistentDiskVolumeSource, out *v1.PhotonPersistentDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(in *pkgapiscore.PhotonPersistentDiskVolumeSource, out *apicorev1.PhotonPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.PdID = in.PdID
 	out.FSType = in.FSType
 	return nil
 }
 
 // Convert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource is an autogenerated conversion function.
-func Convert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(in *core.PhotonPersistentDiskVolumeSource, out *v1.PhotonPersistentDiskVolumeSource, s conversion.Scope) error {
+func Convert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(in *pkgapiscore.PhotonPersistentDiskVolumeSource, out *apicorev1.PhotonPersistentDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PhotonPersistentDiskVolumeSource_To_v1_PhotonPersistentDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Pod_To_core_Pod(in *v1.Pod, out *core.Pod, s conversion.Scope) error {
+func autoConvert_v1_Pod_To_core_Pod(in *apicorev1.Pod, out *pkgapiscore.Pod, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodSpec_To_core_PodSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5469,7 +5469,7 @@ func autoConvert_v1_Pod_To_core_Pod(in *v1.Pod, out *core.Pod, s conversion.Scop
 	return nil
 }
 
-func autoConvert_core_Pod_To_v1_Pod(in *core.Pod, out *v1.Pod, s conversion.Scope) error {
+func autoConvert_core_Pod_To_v1_Pod(in *pkgapiscore.Pod, out *apicorev1.Pod, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PodSpec_To_v1_PodSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -5480,77 +5480,77 @@ func autoConvert_core_Pod_To_v1_Pod(in *core.Pod, out *v1.Pod, s conversion.Scop
 	return nil
 }
 
-func autoConvert_v1_PodAffinity_To_core_PodAffinity(in *v1.PodAffinity, out *core.PodAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]core.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
-	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]core.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
+func autoConvert_v1_PodAffinity_To_core_PodAffinity(in *apicorev1.PodAffinity, out *pkgapiscore.PodAffinity, s apimachinerypkgconversion.Scope) error {
+	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]pkgapiscore.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
+	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]pkgapiscore.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
 	return nil
 }
 
 // Convert_v1_PodAffinity_To_core_PodAffinity is an autogenerated conversion function.
-func Convert_v1_PodAffinity_To_core_PodAffinity(in *v1.PodAffinity, out *core.PodAffinity, s conversion.Scope) error {
+func Convert_v1_PodAffinity_To_core_PodAffinity(in *apicorev1.PodAffinity, out *pkgapiscore.PodAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodAffinity_To_core_PodAffinity(in, out, s)
 }
 
-func autoConvert_core_PodAffinity_To_v1_PodAffinity(in *core.PodAffinity, out *v1.PodAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]v1.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
-	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]v1.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
+func autoConvert_core_PodAffinity_To_v1_PodAffinity(in *pkgapiscore.PodAffinity, out *apicorev1.PodAffinity, s apimachinerypkgconversion.Scope) error {
+	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]apicorev1.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
+	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]apicorev1.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
 	return nil
 }
 
 // Convert_core_PodAffinity_To_v1_PodAffinity is an autogenerated conversion function.
-func Convert_core_PodAffinity_To_v1_PodAffinity(in *core.PodAffinity, out *v1.PodAffinity, s conversion.Scope) error {
+func Convert_core_PodAffinity_To_v1_PodAffinity(in *pkgapiscore.PodAffinity, out *apicorev1.PodAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodAffinity_To_v1_PodAffinity(in, out, s)
 }
 
-func autoConvert_v1_PodAffinityTerm_To_core_PodAffinityTerm(in *v1.PodAffinityTerm, out *core.PodAffinityTerm, s conversion.Scope) error {
-	out.LabelSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
+func autoConvert_v1_PodAffinityTerm_To_core_PodAffinityTerm(in *apicorev1.PodAffinityTerm, out *pkgapiscore.PodAffinityTerm, s apimachinerypkgconversion.Scope) error {
+	out.LabelSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	out.TopologyKey = in.TopologyKey
-	out.NamespaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
+	out.NamespaceSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
 	return nil
 }
 
 // Convert_v1_PodAffinityTerm_To_core_PodAffinityTerm is an autogenerated conversion function.
-func Convert_v1_PodAffinityTerm_To_core_PodAffinityTerm(in *v1.PodAffinityTerm, out *core.PodAffinityTerm, s conversion.Scope) error {
+func Convert_v1_PodAffinityTerm_To_core_PodAffinityTerm(in *apicorev1.PodAffinityTerm, out *pkgapiscore.PodAffinityTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodAffinityTerm_To_core_PodAffinityTerm(in, out, s)
 }
 
-func autoConvert_core_PodAffinityTerm_To_v1_PodAffinityTerm(in *core.PodAffinityTerm, out *v1.PodAffinityTerm, s conversion.Scope) error {
-	out.LabelSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
+func autoConvert_core_PodAffinityTerm_To_v1_PodAffinityTerm(in *pkgapiscore.PodAffinityTerm, out *apicorev1.PodAffinityTerm, s apimachinerypkgconversion.Scope) error {
+	out.LabelSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
 	out.Namespaces = *(*[]string)(unsafe.Pointer(&in.Namespaces))
 	out.TopologyKey = in.TopologyKey
-	out.NamespaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
+	out.NamespaceSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.NamespaceSelector))
 	return nil
 }
 
 // Convert_core_PodAffinityTerm_To_v1_PodAffinityTerm is an autogenerated conversion function.
-func Convert_core_PodAffinityTerm_To_v1_PodAffinityTerm(in *core.PodAffinityTerm, out *v1.PodAffinityTerm, s conversion.Scope) error {
+func Convert_core_PodAffinityTerm_To_v1_PodAffinityTerm(in *pkgapiscore.PodAffinityTerm, out *apicorev1.PodAffinityTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodAffinityTerm_To_v1_PodAffinityTerm(in, out, s)
 }
 
-func autoConvert_v1_PodAntiAffinity_To_core_PodAntiAffinity(in *v1.PodAntiAffinity, out *core.PodAntiAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]core.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
-	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]core.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
+func autoConvert_v1_PodAntiAffinity_To_core_PodAntiAffinity(in *apicorev1.PodAntiAffinity, out *pkgapiscore.PodAntiAffinity, s apimachinerypkgconversion.Scope) error {
+	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]pkgapiscore.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
+	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]pkgapiscore.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
 	return nil
 }
 
 // Convert_v1_PodAntiAffinity_To_core_PodAntiAffinity is an autogenerated conversion function.
-func Convert_v1_PodAntiAffinity_To_core_PodAntiAffinity(in *v1.PodAntiAffinity, out *core.PodAntiAffinity, s conversion.Scope) error {
+func Convert_v1_PodAntiAffinity_To_core_PodAntiAffinity(in *apicorev1.PodAntiAffinity, out *pkgapiscore.PodAntiAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodAntiAffinity_To_core_PodAntiAffinity(in, out, s)
 }
 
-func autoConvert_core_PodAntiAffinity_To_v1_PodAntiAffinity(in *core.PodAntiAffinity, out *v1.PodAntiAffinity, s conversion.Scope) error {
-	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]v1.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
-	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]v1.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
+func autoConvert_core_PodAntiAffinity_To_v1_PodAntiAffinity(in *pkgapiscore.PodAntiAffinity, out *apicorev1.PodAntiAffinity, s apimachinerypkgconversion.Scope) error {
+	out.RequiredDuringSchedulingIgnoredDuringExecution = *(*[]apicorev1.PodAffinityTerm)(unsafe.Pointer(&in.RequiredDuringSchedulingIgnoredDuringExecution))
+	out.PreferredDuringSchedulingIgnoredDuringExecution = *(*[]apicorev1.WeightedPodAffinityTerm)(unsafe.Pointer(&in.PreferredDuringSchedulingIgnoredDuringExecution))
 	return nil
 }
 
 // Convert_core_PodAntiAffinity_To_v1_PodAntiAffinity is an autogenerated conversion function.
-func Convert_core_PodAntiAffinity_To_v1_PodAntiAffinity(in *core.PodAntiAffinity, out *v1.PodAntiAffinity, s conversion.Scope) error {
+func Convert_core_PodAntiAffinity_To_v1_PodAntiAffinity(in *pkgapiscore.PodAntiAffinity, out *apicorev1.PodAntiAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodAntiAffinity_To_v1_PodAntiAffinity(in, out, s)
 }
 
-func autoConvert_v1_PodAttachOptions_To_core_PodAttachOptions(in *v1.PodAttachOptions, out *core.PodAttachOptions, s conversion.Scope) error {
+func autoConvert_v1_PodAttachOptions_To_core_PodAttachOptions(in *apicorev1.PodAttachOptions, out *pkgapiscore.PodAttachOptions, s apimachinerypkgconversion.Scope) error {
 	out.Stdin = in.Stdin
 	out.Stdout = in.Stdout
 	out.Stderr = in.Stderr
@@ -5560,11 +5560,11 @@ func autoConvert_v1_PodAttachOptions_To_core_PodAttachOptions(in *v1.PodAttachOp
 }
 
 // Convert_v1_PodAttachOptions_To_core_PodAttachOptions is an autogenerated conversion function.
-func Convert_v1_PodAttachOptions_To_core_PodAttachOptions(in *v1.PodAttachOptions, out *core.PodAttachOptions, s conversion.Scope) error {
+func Convert_v1_PodAttachOptions_To_core_PodAttachOptions(in *apicorev1.PodAttachOptions, out *pkgapiscore.PodAttachOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodAttachOptions_To_core_PodAttachOptions(in, out, s)
 }
 
-func autoConvert_core_PodAttachOptions_To_v1_PodAttachOptions(in *core.PodAttachOptions, out *v1.PodAttachOptions, s conversion.Scope) error {
+func autoConvert_core_PodAttachOptions_To_v1_PodAttachOptions(in *pkgapiscore.PodAttachOptions, out *apicorev1.PodAttachOptions, s apimachinerypkgconversion.Scope) error {
 	out.Stdin = in.Stdin
 	out.Stdout = in.Stdout
 	out.Stderr = in.Stderr
@@ -5574,43 +5574,43 @@ func autoConvert_core_PodAttachOptions_To_v1_PodAttachOptions(in *core.PodAttach
 }
 
 // Convert_core_PodAttachOptions_To_v1_PodAttachOptions is an autogenerated conversion function.
-func Convert_core_PodAttachOptions_To_v1_PodAttachOptions(in *core.PodAttachOptions, out *v1.PodAttachOptions, s conversion.Scope) error {
+func Convert_core_PodAttachOptions_To_v1_PodAttachOptions(in *pkgapiscore.PodAttachOptions, out *apicorev1.PodAttachOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodAttachOptions_To_v1_PodAttachOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_PodAttachOptions(in *url.Values, out *v1.PodAttachOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_PodAttachOptions(in *url.Values, out *apicorev1.PodAttachOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["stdin"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Stdin, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Stdin, s); err != nil {
 			return err
 		}
 	} else {
 		out.Stdin = false
 	}
 	if values, ok := map[string][]string(*in)["stdout"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Stdout, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Stdout, s); err != nil {
 			return err
 		}
 	} else {
 		out.Stdout = false
 	}
 	if values, ok := map[string][]string(*in)["stderr"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Stderr, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Stderr, s); err != nil {
 			return err
 		}
 	} else {
 		out.Stderr = false
 	}
 	if values, ok := map[string][]string(*in)["tty"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.TTY, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.TTY, s); err != nil {
 			return err
 		}
 	} else {
 		out.TTY = false
 	}
 	if values, ok := map[string][]string(*in)["container"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
 			return err
 		}
 	} else {
@@ -5620,13 +5620,13 @@ func autoConvert_url_Values_To_v1_PodAttachOptions(in *url.Values, out *v1.PodAt
 }
 
 // Convert_url_Values_To_v1_PodAttachOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_PodAttachOptions(in *url.Values, out *v1.PodAttachOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_PodAttachOptions(in *url.Values, out *apicorev1.PodAttachOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_PodAttachOptions(in, out, s)
 }
 
-func autoConvert_v1_PodCondition_To_core_PodCondition(in *v1.PodCondition, out *core.PodCondition, s conversion.Scope) error {
-	out.Type = core.PodConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
+func autoConvert_v1_PodCondition_To_core_PodCondition(in *apicorev1.PodCondition, out *pkgapiscore.PodCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.PodConditionType(in.Type)
+	out.Status = pkgapiscore.ConditionStatus(in.Status)
 	out.LastProbeTime = in.LastProbeTime
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -5635,13 +5635,13 @@ func autoConvert_v1_PodCondition_To_core_PodCondition(in *v1.PodCondition, out *
 }
 
 // Convert_v1_PodCondition_To_core_PodCondition is an autogenerated conversion function.
-func Convert_v1_PodCondition_To_core_PodCondition(in *v1.PodCondition, out *core.PodCondition, s conversion.Scope) error {
+func Convert_v1_PodCondition_To_core_PodCondition(in *apicorev1.PodCondition, out *pkgapiscore.PodCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodCondition_To_core_PodCondition(in, out, s)
 }
 
-func autoConvert_core_PodCondition_To_v1_PodCondition(in *core.PodCondition, out *v1.PodCondition, s conversion.Scope) error {
-	out.Type = v1.PodConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
+func autoConvert_core_PodCondition_To_v1_PodCondition(in *pkgapiscore.PodCondition, out *apicorev1.PodCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.PodConditionType(in.Type)
+	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.LastProbeTime = in.LastProbeTime
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
@@ -5650,57 +5650,57 @@ func autoConvert_core_PodCondition_To_v1_PodCondition(in *core.PodCondition, out
 }
 
 // Convert_core_PodCondition_To_v1_PodCondition is an autogenerated conversion function.
-func Convert_core_PodCondition_To_v1_PodCondition(in *core.PodCondition, out *v1.PodCondition, s conversion.Scope) error {
+func Convert_core_PodCondition_To_v1_PodCondition(in *pkgapiscore.PodCondition, out *apicorev1.PodCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodCondition_To_v1_PodCondition(in, out, s)
 }
 
-func autoConvert_v1_PodDNSConfig_To_core_PodDNSConfig(in *v1.PodDNSConfig, out *core.PodDNSConfig, s conversion.Scope) error {
+func autoConvert_v1_PodDNSConfig_To_core_PodDNSConfig(in *apicorev1.PodDNSConfig, out *pkgapiscore.PodDNSConfig, s apimachinerypkgconversion.Scope) error {
 	out.Nameservers = *(*[]string)(unsafe.Pointer(&in.Nameservers))
 	out.Searches = *(*[]string)(unsafe.Pointer(&in.Searches))
-	out.Options = *(*[]core.PodDNSConfigOption)(unsafe.Pointer(&in.Options))
+	out.Options = *(*[]pkgapiscore.PodDNSConfigOption)(unsafe.Pointer(&in.Options))
 	return nil
 }
 
 // Convert_v1_PodDNSConfig_To_core_PodDNSConfig is an autogenerated conversion function.
-func Convert_v1_PodDNSConfig_To_core_PodDNSConfig(in *v1.PodDNSConfig, out *core.PodDNSConfig, s conversion.Scope) error {
+func Convert_v1_PodDNSConfig_To_core_PodDNSConfig(in *apicorev1.PodDNSConfig, out *pkgapiscore.PodDNSConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodDNSConfig_To_core_PodDNSConfig(in, out, s)
 }
 
-func autoConvert_core_PodDNSConfig_To_v1_PodDNSConfig(in *core.PodDNSConfig, out *v1.PodDNSConfig, s conversion.Scope) error {
+func autoConvert_core_PodDNSConfig_To_v1_PodDNSConfig(in *pkgapiscore.PodDNSConfig, out *apicorev1.PodDNSConfig, s apimachinerypkgconversion.Scope) error {
 	out.Nameservers = *(*[]string)(unsafe.Pointer(&in.Nameservers))
 	out.Searches = *(*[]string)(unsafe.Pointer(&in.Searches))
-	out.Options = *(*[]v1.PodDNSConfigOption)(unsafe.Pointer(&in.Options))
+	out.Options = *(*[]apicorev1.PodDNSConfigOption)(unsafe.Pointer(&in.Options))
 	return nil
 }
 
 // Convert_core_PodDNSConfig_To_v1_PodDNSConfig is an autogenerated conversion function.
-func Convert_core_PodDNSConfig_To_v1_PodDNSConfig(in *core.PodDNSConfig, out *v1.PodDNSConfig, s conversion.Scope) error {
+func Convert_core_PodDNSConfig_To_v1_PodDNSConfig(in *pkgapiscore.PodDNSConfig, out *apicorev1.PodDNSConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodDNSConfig_To_v1_PodDNSConfig(in, out, s)
 }
 
-func autoConvert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(in *v1.PodDNSConfigOption, out *core.PodDNSConfigOption, s conversion.Scope) error {
+func autoConvert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(in *apicorev1.PodDNSConfigOption, out *pkgapiscore.PodDNSConfigOption, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = (*string)(unsafe.Pointer(in.Value))
 	return nil
 }
 
 // Convert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption is an autogenerated conversion function.
-func Convert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(in *v1.PodDNSConfigOption, out *core.PodDNSConfigOption, s conversion.Scope) error {
+func Convert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(in *apicorev1.PodDNSConfigOption, out *pkgapiscore.PodDNSConfigOption, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodDNSConfigOption_To_core_PodDNSConfigOption(in, out, s)
 }
 
-func autoConvert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(in *core.PodDNSConfigOption, out *v1.PodDNSConfigOption, s conversion.Scope) error {
+func autoConvert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(in *pkgapiscore.PodDNSConfigOption, out *apicorev1.PodDNSConfigOption, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = (*string)(unsafe.Pointer(in.Value))
 	return nil
 }
 
 // Convert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption is an autogenerated conversion function.
-func Convert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(in *core.PodDNSConfigOption, out *v1.PodDNSConfigOption, s conversion.Scope) error {
+func Convert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(in *pkgapiscore.PodDNSConfigOption, out *apicorev1.PodDNSConfigOption, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodDNSConfigOption_To_v1_PodDNSConfigOption(in, out, s)
 }
 
-func autoConvert_v1_PodExecOptions_To_core_PodExecOptions(in *v1.PodExecOptions, out *core.PodExecOptions, s conversion.Scope) error {
+func autoConvert_v1_PodExecOptions_To_core_PodExecOptions(in *apicorev1.PodExecOptions, out *pkgapiscore.PodExecOptions, s apimachinerypkgconversion.Scope) error {
 	out.Stdin = in.Stdin
 	out.Stdout = in.Stdout
 	out.Stderr = in.Stderr
@@ -5711,11 +5711,11 @@ func autoConvert_v1_PodExecOptions_To_core_PodExecOptions(in *v1.PodExecOptions,
 }
 
 // Convert_v1_PodExecOptions_To_core_PodExecOptions is an autogenerated conversion function.
-func Convert_v1_PodExecOptions_To_core_PodExecOptions(in *v1.PodExecOptions, out *core.PodExecOptions, s conversion.Scope) error {
+func Convert_v1_PodExecOptions_To_core_PodExecOptions(in *apicorev1.PodExecOptions, out *pkgapiscore.PodExecOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodExecOptions_To_core_PodExecOptions(in, out, s)
 }
 
-func autoConvert_core_PodExecOptions_To_v1_PodExecOptions(in *core.PodExecOptions, out *v1.PodExecOptions, s conversion.Scope) error {
+func autoConvert_core_PodExecOptions_To_v1_PodExecOptions(in *pkgapiscore.PodExecOptions, out *apicorev1.PodExecOptions, s apimachinerypkgconversion.Scope) error {
 	out.Stdin = in.Stdin
 	out.Stdout = in.Stdout
 	out.Stderr = in.Stderr
@@ -5726,43 +5726,43 @@ func autoConvert_core_PodExecOptions_To_v1_PodExecOptions(in *core.PodExecOption
 }
 
 // Convert_core_PodExecOptions_To_v1_PodExecOptions is an autogenerated conversion function.
-func Convert_core_PodExecOptions_To_v1_PodExecOptions(in *core.PodExecOptions, out *v1.PodExecOptions, s conversion.Scope) error {
+func Convert_core_PodExecOptions_To_v1_PodExecOptions(in *pkgapiscore.PodExecOptions, out *apicorev1.PodExecOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodExecOptions_To_v1_PodExecOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_PodExecOptions(in *url.Values, out *v1.PodExecOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_PodExecOptions(in *url.Values, out *apicorev1.PodExecOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["stdin"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Stdin, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Stdin, s); err != nil {
 			return err
 		}
 	} else {
 		out.Stdin = false
 	}
 	if values, ok := map[string][]string(*in)["stdout"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Stdout, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Stdout, s); err != nil {
 			return err
 		}
 	} else {
 		out.Stdout = false
 	}
 	if values, ok := map[string][]string(*in)["stderr"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Stderr, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Stderr, s); err != nil {
 			return err
 		}
 	} else {
 		out.Stderr = false
 	}
 	if values, ok := map[string][]string(*in)["tty"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.TTY, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.TTY, s); err != nil {
 			return err
 		}
 	} else {
 		out.TTY = false
 	}
 	if values, ok := map[string][]string(*in)["container"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
 			return err
 		}
 	} else {
@@ -5777,35 +5777,35 @@ func autoConvert_url_Values_To_v1_PodExecOptions(in *url.Values, out *v1.PodExec
 }
 
 // Convert_url_Values_To_v1_PodExecOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_PodExecOptions(in *url.Values, out *v1.PodExecOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_PodExecOptions(in *url.Values, out *apicorev1.PodExecOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_PodExecOptions(in, out, s)
 }
 
-func autoConvert_v1_PodIP_To_core_PodIP(in *v1.PodIP, out *core.PodIP, s conversion.Scope) error {
+func autoConvert_v1_PodIP_To_core_PodIP(in *apicorev1.PodIP, out *pkgapiscore.PodIP, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	return nil
 }
 
 // Convert_v1_PodIP_To_core_PodIP is an autogenerated conversion function.
-func Convert_v1_PodIP_To_core_PodIP(in *v1.PodIP, out *core.PodIP, s conversion.Scope) error {
+func Convert_v1_PodIP_To_core_PodIP(in *apicorev1.PodIP, out *pkgapiscore.PodIP, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodIP_To_core_PodIP(in, out, s)
 }
 
-func autoConvert_core_PodIP_To_v1_PodIP(in *core.PodIP, out *v1.PodIP, s conversion.Scope) error {
+func autoConvert_core_PodIP_To_v1_PodIP(in *pkgapiscore.PodIP, out *apicorev1.PodIP, s apimachinerypkgconversion.Scope) error {
 	out.IP = in.IP
 	return nil
 }
 
 // Convert_core_PodIP_To_v1_PodIP is an autogenerated conversion function.
-func Convert_core_PodIP_To_v1_PodIP(in *core.PodIP, out *v1.PodIP, s conversion.Scope) error {
+func Convert_core_PodIP_To_v1_PodIP(in *pkgapiscore.PodIP, out *apicorev1.PodIP, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodIP_To_v1_PodIP(in, out, s)
 }
 
-func autoConvert_v1_PodList_To_core_PodList(in *v1.PodList, out *core.PodList, s conversion.Scope) error {
+func autoConvert_v1_PodList_To_core_PodList(in *apicorev1.PodList, out *pkgapiscore.PodList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.Pod, len(*in))
+		*out = make([]pkgapiscore.Pod, len(*in))
 		for i := range *in {
 			if err := Convert_v1_Pod_To_core_Pod(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -5818,15 +5818,15 @@ func autoConvert_v1_PodList_To_core_PodList(in *v1.PodList, out *core.PodList, s
 }
 
 // Convert_v1_PodList_To_core_PodList is an autogenerated conversion function.
-func Convert_v1_PodList_To_core_PodList(in *v1.PodList, out *core.PodList, s conversion.Scope) error {
+func Convert_v1_PodList_To_core_PodList(in *apicorev1.PodList, out *pkgapiscore.PodList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodList_To_core_PodList(in, out, s)
 }
 
-func autoConvert_core_PodList_To_v1_PodList(in *core.PodList, out *v1.PodList, s conversion.Scope) error {
+func autoConvert_core_PodList_To_v1_PodList(in *pkgapiscore.PodList, out *apicorev1.PodList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.Pod, len(*in))
+		*out = make([]apicorev1.Pod, len(*in))
 		for i := range *in {
 			if err := Convert_core_Pod_To_v1_Pod(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -5839,16 +5839,16 @@ func autoConvert_core_PodList_To_v1_PodList(in *core.PodList, out *v1.PodList, s
 }
 
 // Convert_core_PodList_To_v1_PodList is an autogenerated conversion function.
-func Convert_core_PodList_To_v1_PodList(in *core.PodList, out *v1.PodList, s conversion.Scope) error {
+func Convert_core_PodList_To_v1_PodList(in *pkgapiscore.PodList, out *apicorev1.PodList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodList_To_v1_PodList(in, out, s)
 }
 
-func autoConvert_v1_PodLogOptions_To_core_PodLogOptions(in *v1.PodLogOptions, out *core.PodLogOptions, s conversion.Scope) error {
+func autoConvert_v1_PodLogOptions_To_core_PodLogOptions(in *apicorev1.PodLogOptions, out *pkgapiscore.PodLogOptions, s apimachinerypkgconversion.Scope) error {
 	out.Container = in.Container
 	out.Follow = in.Follow
 	out.Previous = in.Previous
 	out.SinceSeconds = (*int64)(unsafe.Pointer(in.SinceSeconds))
-	out.SinceTime = (*metav1.Time)(unsafe.Pointer(in.SinceTime))
+	out.SinceTime = (*apismetav1.Time)(unsafe.Pointer(in.SinceTime))
 	out.Timestamps = in.Timestamps
 	out.TailLines = (*int64)(unsafe.Pointer(in.TailLines))
 	out.LimitBytes = (*int64)(unsafe.Pointer(in.LimitBytes))
@@ -5857,16 +5857,16 @@ func autoConvert_v1_PodLogOptions_To_core_PodLogOptions(in *v1.PodLogOptions, ou
 }
 
 // Convert_v1_PodLogOptions_To_core_PodLogOptions is an autogenerated conversion function.
-func Convert_v1_PodLogOptions_To_core_PodLogOptions(in *v1.PodLogOptions, out *core.PodLogOptions, s conversion.Scope) error {
+func Convert_v1_PodLogOptions_To_core_PodLogOptions(in *apicorev1.PodLogOptions, out *pkgapiscore.PodLogOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodLogOptions_To_core_PodLogOptions(in, out, s)
 }
 
-func autoConvert_core_PodLogOptions_To_v1_PodLogOptions(in *core.PodLogOptions, out *v1.PodLogOptions, s conversion.Scope) error {
+func autoConvert_core_PodLogOptions_To_v1_PodLogOptions(in *pkgapiscore.PodLogOptions, out *apicorev1.PodLogOptions, s apimachinerypkgconversion.Scope) error {
 	out.Container = in.Container
 	out.Follow = in.Follow
 	out.Previous = in.Previous
 	out.SinceSeconds = (*int64)(unsafe.Pointer(in.SinceSeconds))
-	out.SinceTime = (*metav1.Time)(unsafe.Pointer(in.SinceTime))
+	out.SinceTime = (*apismetav1.Time)(unsafe.Pointer(in.SinceTime))
 	out.Timestamps = in.Timestamps
 	out.TailLines = (*int64)(unsafe.Pointer(in.TailLines))
 	out.LimitBytes = (*int64)(unsafe.Pointer(in.LimitBytes))
@@ -5875,71 +5875,71 @@ func autoConvert_core_PodLogOptions_To_v1_PodLogOptions(in *core.PodLogOptions, 
 }
 
 // Convert_core_PodLogOptions_To_v1_PodLogOptions is an autogenerated conversion function.
-func Convert_core_PodLogOptions_To_v1_PodLogOptions(in *core.PodLogOptions, out *v1.PodLogOptions, s conversion.Scope) error {
+func Convert_core_PodLogOptions_To_v1_PodLogOptions(in *pkgapiscore.PodLogOptions, out *apicorev1.PodLogOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodLogOptions_To_v1_PodLogOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_PodLogOptions(in *url.Values, out *v1.PodLogOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_PodLogOptions(in *url.Values, out *apicorev1.PodLogOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["container"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_string(&values, &out.Container, s); err != nil {
 			return err
 		}
 	} else {
 		out.Container = ""
 	}
 	if values, ok := map[string][]string(*in)["follow"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Follow, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Follow, s); err != nil {
 			return err
 		}
 	} else {
 		out.Follow = false
 	}
 	if values, ok := map[string][]string(*in)["previous"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Previous, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Previous, s); err != nil {
 			return err
 		}
 	} else {
 		out.Previous = false
 	}
 	if values, ok := map[string][]string(*in)["sinceSeconds"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.SinceSeconds, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_Pointer_int64(&values, &out.SinceSeconds, s); err != nil {
 			return err
 		}
 	} else {
 		out.SinceSeconds = nil
 	}
 	if values, ok := map[string][]string(*in)["sinceTime"]; ok && len(values) > 0 {
-		if err := metav1.Convert_Slice_string_To_Pointer_v1_Time(&values, &out.SinceTime, s); err != nil {
+		if err := apismetav1.Convert_Slice_string_To_Pointer_v1_Time(&values, &out.SinceTime, s); err != nil {
 			return err
 		}
 	} else {
 		out.SinceTime = nil
 	}
 	if values, ok := map[string][]string(*in)["timestamps"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.Timestamps, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.Timestamps, s); err != nil {
 			return err
 		}
 	} else {
 		out.Timestamps = false
 	}
 	if values, ok := map[string][]string(*in)["tailLines"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.TailLines, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_Pointer_int64(&values, &out.TailLines, s); err != nil {
 			return err
 		}
 	} else {
 		out.TailLines = nil
 	}
 	if values, ok := map[string][]string(*in)["limitBytes"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_Pointer_int64(&values, &out.LimitBytes, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_Pointer_int64(&values, &out.LimitBytes, s); err != nil {
 			return err
 		}
 	} else {
 		out.LimitBytes = nil
 	}
 	if values, ok := map[string][]string(*in)["insecureSkipTLSVerifyBackend"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_bool(&values, &out.InsecureSkipTLSVerifyBackend, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_bool(&values, &out.InsecureSkipTLSVerifyBackend, s); err != nil {
 			return err
 		}
 	} else {
@@ -5949,55 +5949,55 @@ func autoConvert_url_Values_To_v1_PodLogOptions(in *url.Values, out *v1.PodLogOp
 }
 
 // Convert_url_Values_To_v1_PodLogOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_PodLogOptions(in *url.Values, out *v1.PodLogOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_PodLogOptions(in *url.Values, out *apicorev1.PodLogOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_PodLogOptions(in, out, s)
 }
 
-func autoConvert_v1_PodOS_To_core_PodOS(in *v1.PodOS, out *core.PodOS, s conversion.Scope) error {
-	out.Name = core.OSName(in.Name)
+func autoConvert_v1_PodOS_To_core_PodOS(in *apicorev1.PodOS, out *pkgapiscore.PodOS, s apimachinerypkgconversion.Scope) error {
+	out.Name = pkgapiscore.OSName(in.Name)
 	return nil
 }
 
 // Convert_v1_PodOS_To_core_PodOS is an autogenerated conversion function.
-func Convert_v1_PodOS_To_core_PodOS(in *v1.PodOS, out *core.PodOS, s conversion.Scope) error {
+func Convert_v1_PodOS_To_core_PodOS(in *apicorev1.PodOS, out *pkgapiscore.PodOS, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodOS_To_core_PodOS(in, out, s)
 }
 
-func autoConvert_core_PodOS_To_v1_PodOS(in *core.PodOS, out *v1.PodOS, s conversion.Scope) error {
-	out.Name = v1.OSName(in.Name)
+func autoConvert_core_PodOS_To_v1_PodOS(in *pkgapiscore.PodOS, out *apicorev1.PodOS, s apimachinerypkgconversion.Scope) error {
+	out.Name = apicorev1.OSName(in.Name)
 	return nil
 }
 
 // Convert_core_PodOS_To_v1_PodOS is an autogenerated conversion function.
-func Convert_core_PodOS_To_v1_PodOS(in *core.PodOS, out *v1.PodOS, s conversion.Scope) error {
+func Convert_core_PodOS_To_v1_PodOS(in *pkgapiscore.PodOS, out *apicorev1.PodOS, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodOS_To_v1_PodOS(in, out, s)
 }
 
-func autoConvert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(in *v1.PodPortForwardOptions, out *core.PodPortForwardOptions, s conversion.Scope) error {
+func autoConvert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(in *apicorev1.PodPortForwardOptions, out *pkgapiscore.PodPortForwardOptions, s apimachinerypkgconversion.Scope) error {
 	out.Ports = *(*[]int32)(unsafe.Pointer(&in.Ports))
 	return nil
 }
 
 // Convert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions is an autogenerated conversion function.
-func Convert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(in *v1.PodPortForwardOptions, out *core.PodPortForwardOptions, s conversion.Scope) error {
+func Convert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(in *apicorev1.PodPortForwardOptions, out *pkgapiscore.PodPortForwardOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodPortForwardOptions_To_core_PodPortForwardOptions(in, out, s)
 }
 
-func autoConvert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(in *core.PodPortForwardOptions, out *v1.PodPortForwardOptions, s conversion.Scope) error {
+func autoConvert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(in *pkgapiscore.PodPortForwardOptions, out *apicorev1.PodPortForwardOptions, s apimachinerypkgconversion.Scope) error {
 	out.Ports = *(*[]int32)(unsafe.Pointer(&in.Ports))
 	return nil
 }
 
 // Convert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions is an autogenerated conversion function.
-func Convert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(in *core.PodPortForwardOptions, out *v1.PodPortForwardOptions, s conversion.Scope) error {
+func Convert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(in *pkgapiscore.PodPortForwardOptions, out *apicorev1.PodPortForwardOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodPortForwardOptions_To_v1_PodPortForwardOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_PodPortForwardOptions(in *url.Values, out *v1.PodPortForwardOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_PodPortForwardOptions(in *url.Values, out *apicorev1.PodPortForwardOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["ports"]; ok && len(values) > 0 {
-		if err := metav1.Convert_Slice_string_To_Slice_int32(&values, &out.Ports, s); err != nil {
+		if err := apismetav1.Convert_Slice_string_To_Slice_int32(&values, &out.Ports, s); err != nil {
 			return err
 		}
 	} else {
@@ -6007,35 +6007,35 @@ func autoConvert_url_Values_To_v1_PodPortForwardOptions(in *url.Values, out *v1.
 }
 
 // Convert_url_Values_To_v1_PodPortForwardOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_PodPortForwardOptions(in *url.Values, out *v1.PodPortForwardOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_PodPortForwardOptions(in *url.Values, out *apicorev1.PodPortForwardOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_PodPortForwardOptions(in, out, s)
 }
 
-func autoConvert_v1_PodProxyOptions_To_core_PodProxyOptions(in *v1.PodProxyOptions, out *core.PodProxyOptions, s conversion.Scope) error {
+func autoConvert_v1_PodProxyOptions_To_core_PodProxyOptions(in *apicorev1.PodProxyOptions, out *pkgapiscore.PodProxyOptions, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	return nil
 }
 
 // Convert_v1_PodProxyOptions_To_core_PodProxyOptions is an autogenerated conversion function.
-func Convert_v1_PodProxyOptions_To_core_PodProxyOptions(in *v1.PodProxyOptions, out *core.PodProxyOptions, s conversion.Scope) error {
+func Convert_v1_PodProxyOptions_To_core_PodProxyOptions(in *apicorev1.PodProxyOptions, out *pkgapiscore.PodProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodProxyOptions_To_core_PodProxyOptions(in, out, s)
 }
 
-func autoConvert_core_PodProxyOptions_To_v1_PodProxyOptions(in *core.PodProxyOptions, out *v1.PodProxyOptions, s conversion.Scope) error {
+func autoConvert_core_PodProxyOptions_To_v1_PodProxyOptions(in *pkgapiscore.PodProxyOptions, out *apicorev1.PodProxyOptions, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	return nil
 }
 
 // Convert_core_PodProxyOptions_To_v1_PodProxyOptions is an autogenerated conversion function.
-func Convert_core_PodProxyOptions_To_v1_PodProxyOptions(in *core.PodProxyOptions, out *v1.PodProxyOptions, s conversion.Scope) error {
+func Convert_core_PodProxyOptions_To_v1_PodProxyOptions(in *pkgapiscore.PodProxyOptions, out *apicorev1.PodProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodProxyOptions_To_v1_PodProxyOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_PodProxyOptions(in *url.Values, out *v1.PodProxyOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_PodProxyOptions(in *url.Values, out *apicorev1.PodProxyOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["path"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_string(&values, &out.Path, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_string(&values, &out.Path, s); err != nil {
 			return err
 		}
 	} else {
@@ -6045,97 +6045,97 @@ func autoConvert_url_Values_To_v1_PodProxyOptions(in *url.Values, out *v1.PodPro
 }
 
 // Convert_url_Values_To_v1_PodProxyOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_PodProxyOptions(in *url.Values, out *v1.PodProxyOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_PodProxyOptions(in *url.Values, out *apicorev1.PodProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_PodProxyOptions(in, out, s)
 }
 
-func autoConvert_v1_PodReadinessGate_To_core_PodReadinessGate(in *v1.PodReadinessGate, out *core.PodReadinessGate, s conversion.Scope) error {
-	out.ConditionType = core.PodConditionType(in.ConditionType)
+func autoConvert_v1_PodReadinessGate_To_core_PodReadinessGate(in *apicorev1.PodReadinessGate, out *pkgapiscore.PodReadinessGate, s apimachinerypkgconversion.Scope) error {
+	out.ConditionType = pkgapiscore.PodConditionType(in.ConditionType)
 	return nil
 }
 
 // Convert_v1_PodReadinessGate_To_core_PodReadinessGate is an autogenerated conversion function.
-func Convert_v1_PodReadinessGate_To_core_PodReadinessGate(in *v1.PodReadinessGate, out *core.PodReadinessGate, s conversion.Scope) error {
+func Convert_v1_PodReadinessGate_To_core_PodReadinessGate(in *apicorev1.PodReadinessGate, out *pkgapiscore.PodReadinessGate, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodReadinessGate_To_core_PodReadinessGate(in, out, s)
 }
 
-func autoConvert_core_PodReadinessGate_To_v1_PodReadinessGate(in *core.PodReadinessGate, out *v1.PodReadinessGate, s conversion.Scope) error {
-	out.ConditionType = v1.PodConditionType(in.ConditionType)
+func autoConvert_core_PodReadinessGate_To_v1_PodReadinessGate(in *pkgapiscore.PodReadinessGate, out *apicorev1.PodReadinessGate, s apimachinerypkgconversion.Scope) error {
+	out.ConditionType = apicorev1.PodConditionType(in.ConditionType)
 	return nil
 }
 
 // Convert_core_PodReadinessGate_To_v1_PodReadinessGate is an autogenerated conversion function.
-func Convert_core_PodReadinessGate_To_v1_PodReadinessGate(in *core.PodReadinessGate, out *v1.PodReadinessGate, s conversion.Scope) error {
+func Convert_core_PodReadinessGate_To_v1_PodReadinessGate(in *pkgapiscore.PodReadinessGate, out *apicorev1.PodReadinessGate, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodReadinessGate_To_v1_PodReadinessGate(in, out, s)
 }
 
-func autoConvert_v1_PodSecurityContext_To_core_PodSecurityContext(in *v1.PodSecurityContext, out *core.PodSecurityContext, s conversion.Scope) error {
-	out.SELinuxOptions = (*core.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
-	out.WindowsOptions = (*core.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
+func autoConvert_v1_PodSecurityContext_To_core_PodSecurityContext(in *apicorev1.PodSecurityContext, out *pkgapiscore.PodSecurityContext, s apimachinerypkgconversion.Scope) error {
+	out.SELinuxOptions = (*pkgapiscore.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
+	out.WindowsOptions = (*pkgapiscore.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
 	out.RunAsUser = (*int64)(unsafe.Pointer(in.RunAsUser))
 	out.RunAsGroup = (*int64)(unsafe.Pointer(in.RunAsGroup))
 	out.RunAsNonRoot = (*bool)(unsafe.Pointer(in.RunAsNonRoot))
 	out.SupplementalGroups = *(*[]int64)(unsafe.Pointer(&in.SupplementalGroups))
 	out.FSGroup = (*int64)(unsafe.Pointer(in.FSGroup))
-	out.Sysctls = *(*[]core.Sysctl)(unsafe.Pointer(&in.Sysctls))
-	out.FSGroupChangePolicy = (*core.PodFSGroupChangePolicy)(unsafe.Pointer(in.FSGroupChangePolicy))
-	out.SeccompProfile = (*core.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
+	out.Sysctls = *(*[]pkgapiscore.Sysctl)(unsafe.Pointer(&in.Sysctls))
+	out.FSGroupChangePolicy = (*pkgapiscore.PodFSGroupChangePolicy)(unsafe.Pointer(in.FSGroupChangePolicy))
+	out.SeccompProfile = (*pkgapiscore.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
 	return nil
 }
 
 // Convert_v1_PodSecurityContext_To_core_PodSecurityContext is an autogenerated conversion function.
-func Convert_v1_PodSecurityContext_To_core_PodSecurityContext(in *v1.PodSecurityContext, out *core.PodSecurityContext, s conversion.Scope) error {
+func Convert_v1_PodSecurityContext_To_core_PodSecurityContext(in *apicorev1.PodSecurityContext, out *pkgapiscore.PodSecurityContext, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodSecurityContext_To_core_PodSecurityContext(in, out, s)
 }
 
-func autoConvert_core_PodSecurityContext_To_v1_PodSecurityContext(in *core.PodSecurityContext, out *v1.PodSecurityContext, s conversion.Scope) error {
+func autoConvert_core_PodSecurityContext_To_v1_PodSecurityContext(in *pkgapiscore.PodSecurityContext, out *apicorev1.PodSecurityContext, s apimachinerypkgconversion.Scope) error {
 	// INFO: in.HostNetwork opted out of conversion generation
 	// INFO: in.HostPID opted out of conversion generation
 	// INFO: in.HostIPC opted out of conversion generation
 	// INFO: in.ShareProcessNamespace opted out of conversion generation
 	// INFO: in.HostUsers opted out of conversion generation
-	out.SELinuxOptions = (*v1.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
-	out.WindowsOptions = (*v1.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
+	out.SELinuxOptions = (*apicorev1.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
+	out.WindowsOptions = (*apicorev1.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
 	out.RunAsUser = (*int64)(unsafe.Pointer(in.RunAsUser))
 	out.RunAsGroup = (*int64)(unsafe.Pointer(in.RunAsGroup))
 	out.RunAsNonRoot = (*bool)(unsafe.Pointer(in.RunAsNonRoot))
 	out.SupplementalGroups = *(*[]int64)(unsafe.Pointer(&in.SupplementalGroups))
 	out.FSGroup = (*int64)(unsafe.Pointer(in.FSGroup))
-	out.FSGroupChangePolicy = (*v1.PodFSGroupChangePolicy)(unsafe.Pointer(in.FSGroupChangePolicy))
-	out.Sysctls = *(*[]v1.Sysctl)(unsafe.Pointer(&in.Sysctls))
-	out.SeccompProfile = (*v1.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
+	out.FSGroupChangePolicy = (*apicorev1.PodFSGroupChangePolicy)(unsafe.Pointer(in.FSGroupChangePolicy))
+	out.Sysctls = *(*[]apicorev1.Sysctl)(unsafe.Pointer(&in.Sysctls))
+	out.SeccompProfile = (*apicorev1.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
 	return nil
 }
 
 // Convert_core_PodSecurityContext_To_v1_PodSecurityContext is an autogenerated conversion function.
-func Convert_core_PodSecurityContext_To_v1_PodSecurityContext(in *core.PodSecurityContext, out *v1.PodSecurityContext, s conversion.Scope) error {
+func Convert_core_PodSecurityContext_To_v1_PodSecurityContext(in *pkgapiscore.PodSecurityContext, out *apicorev1.PodSecurityContext, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodSecurityContext_To_v1_PodSecurityContext(in, out, s)
 }
 
-func autoConvert_v1_PodSignature_To_core_PodSignature(in *v1.PodSignature, out *core.PodSignature, s conversion.Scope) error {
-	out.PodController = (*metav1.OwnerReference)(unsafe.Pointer(in.PodController))
+func autoConvert_v1_PodSignature_To_core_PodSignature(in *apicorev1.PodSignature, out *pkgapiscore.PodSignature, s apimachinerypkgconversion.Scope) error {
+	out.PodController = (*apismetav1.OwnerReference)(unsafe.Pointer(in.PodController))
 	return nil
 }
 
 // Convert_v1_PodSignature_To_core_PodSignature is an autogenerated conversion function.
-func Convert_v1_PodSignature_To_core_PodSignature(in *v1.PodSignature, out *core.PodSignature, s conversion.Scope) error {
+func Convert_v1_PodSignature_To_core_PodSignature(in *apicorev1.PodSignature, out *pkgapiscore.PodSignature, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodSignature_To_core_PodSignature(in, out, s)
 }
 
-func autoConvert_core_PodSignature_To_v1_PodSignature(in *core.PodSignature, out *v1.PodSignature, s conversion.Scope) error {
-	out.PodController = (*metav1.OwnerReference)(unsafe.Pointer(in.PodController))
+func autoConvert_core_PodSignature_To_v1_PodSignature(in *pkgapiscore.PodSignature, out *apicorev1.PodSignature, s apimachinerypkgconversion.Scope) error {
+	out.PodController = (*apismetav1.OwnerReference)(unsafe.Pointer(in.PodController))
 	return nil
 }
 
 // Convert_core_PodSignature_To_v1_PodSignature is an autogenerated conversion function.
-func Convert_core_PodSignature_To_v1_PodSignature(in *core.PodSignature, out *v1.PodSignature, s conversion.Scope) error {
+func Convert_core_PodSignature_To_v1_PodSignature(in *pkgapiscore.PodSignature, out *apicorev1.PodSignature, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodSignature_To_v1_PodSignature(in, out, s)
 }
 
-func autoConvert_v1_PodSpec_To_core_PodSpec(in *v1.PodSpec, out *core.PodSpec, s conversion.Scope) error {
+func autoConvert_v1_PodSpec_To_core_PodSpec(in *apicorev1.PodSpec, out *pkgapiscore.PodSpec, s apimachinerypkgconversion.Scope) error {
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes
-		*out = make([]core.Volume, len(*in))
+		*out = make([]pkgapiscore.Volume, len(*in))
 		for i := range *in {
 			if err := Convert_v1_Volume_To_core_Volume(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6144,13 +6144,13 @@ func autoConvert_v1_PodSpec_To_core_PodSpec(in *v1.PodSpec, out *core.PodSpec, s
 	} else {
 		out.Volumes = nil
 	}
-	out.InitContainers = *(*[]core.Container)(unsafe.Pointer(&in.InitContainers))
-	out.Containers = *(*[]core.Container)(unsafe.Pointer(&in.Containers))
-	out.EphemeralContainers = *(*[]core.EphemeralContainer)(unsafe.Pointer(&in.EphemeralContainers))
-	out.RestartPolicy = core.RestartPolicy(in.RestartPolicy)
+	out.InitContainers = *(*[]pkgapiscore.Container)(unsafe.Pointer(&in.InitContainers))
+	out.Containers = *(*[]pkgapiscore.Container)(unsafe.Pointer(&in.Containers))
+	out.EphemeralContainers = *(*[]pkgapiscore.EphemeralContainer)(unsafe.Pointer(&in.EphemeralContainers))
+	out.RestartPolicy = pkgapiscore.RestartPolicy(in.RestartPolicy)
 	out.TerminationGracePeriodSeconds = (*int64)(unsafe.Pointer(in.TerminationGracePeriodSeconds))
 	out.ActiveDeadlineSeconds = (*int64)(unsafe.Pointer(in.ActiveDeadlineSeconds))
-	out.DNSPolicy = core.DNSPolicy(in.DNSPolicy)
+	out.DNSPolicy = pkgapiscore.DNSPolicy(in.DNSPolicy)
 	out.NodeSelector = *(*map[string]string)(unsafe.Pointer(&in.NodeSelector))
 	out.ServiceAccountName = in.ServiceAccountName
 	// INFO: in.DeprecatedServiceAccount opted out of conversion generation
@@ -6162,39 +6162,39 @@ func autoConvert_v1_PodSpec_To_core_PodSpec(in *v1.PodSpec, out *core.PodSpec, s
 	// INFO: in.ShareProcessNamespace opted out of conversion generation
 	if in.SecurityContext != nil {
 		in, out := &in.SecurityContext, &out.SecurityContext
-		*out = new(core.PodSecurityContext)
+		*out = new(pkgapiscore.PodSecurityContext)
 		if err := Convert_v1_PodSecurityContext_To_core_PodSecurityContext(*in, *out, s); err != nil {
 			return err
 		}
 	} else {
 		out.SecurityContext = nil
 	}
-	out.ImagePullSecrets = *(*[]core.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
+	out.ImagePullSecrets = *(*[]pkgapiscore.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
 	out.Hostname = in.Hostname
 	out.Subdomain = in.Subdomain
-	out.Affinity = (*core.Affinity)(unsafe.Pointer(in.Affinity))
+	out.Affinity = (*pkgapiscore.Affinity)(unsafe.Pointer(in.Affinity))
 	out.SchedulerName = in.SchedulerName
-	out.Tolerations = *(*[]core.Toleration)(unsafe.Pointer(&in.Tolerations))
-	out.HostAliases = *(*[]core.HostAlias)(unsafe.Pointer(&in.HostAliases))
+	out.Tolerations = *(*[]pkgapiscore.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.HostAliases = *(*[]pkgapiscore.HostAlias)(unsafe.Pointer(&in.HostAliases))
 	out.PriorityClassName = in.PriorityClassName
 	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.DNSConfig = (*core.PodDNSConfig)(unsafe.Pointer(in.DNSConfig))
-	out.ReadinessGates = *(*[]core.PodReadinessGate)(unsafe.Pointer(&in.ReadinessGates))
+	out.DNSConfig = (*pkgapiscore.PodDNSConfig)(unsafe.Pointer(in.DNSConfig))
+	out.ReadinessGates = *(*[]pkgapiscore.PodReadinessGate)(unsafe.Pointer(&in.ReadinessGates))
 	out.RuntimeClassName = (*string)(unsafe.Pointer(in.RuntimeClassName))
 	out.EnableServiceLinks = (*bool)(unsafe.Pointer(in.EnableServiceLinks))
-	out.PreemptionPolicy = (*core.PreemptionPolicy)(unsafe.Pointer(in.PreemptionPolicy))
-	out.Overhead = *(*core.ResourceList)(unsafe.Pointer(&in.Overhead))
-	out.TopologySpreadConstraints = *(*[]core.TopologySpreadConstraint)(unsafe.Pointer(&in.TopologySpreadConstraints))
+	out.PreemptionPolicy = (*pkgapiscore.PreemptionPolicy)(unsafe.Pointer(in.PreemptionPolicy))
+	out.Overhead = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Overhead))
+	out.TopologySpreadConstraints = *(*[]pkgapiscore.TopologySpreadConstraint)(unsafe.Pointer(&in.TopologySpreadConstraints))
 	out.SetHostnameAsFQDN = (*bool)(unsafe.Pointer(in.SetHostnameAsFQDN))
-	out.OS = (*core.PodOS)(unsafe.Pointer(in.OS))
+	out.OS = (*pkgapiscore.PodOS)(unsafe.Pointer(in.OS))
 	// INFO: in.HostUsers opted out of conversion generation
 	return nil
 }
 
-func autoConvert_core_PodSpec_To_v1_PodSpec(in *core.PodSpec, out *v1.PodSpec, s conversion.Scope) error {
+func autoConvert_core_PodSpec_To_v1_PodSpec(in *pkgapiscore.PodSpec, out *apicorev1.PodSpec, s apimachinerypkgconversion.Scope) error {
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes
-		*out = make([]v1.Volume, len(*in))
+		*out = make([]apicorev1.Volume, len(*in))
 		for i := range *in {
 			if err := Convert_core_Volume_To_v1_Volume(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6203,81 +6203,81 @@ func autoConvert_core_PodSpec_To_v1_PodSpec(in *core.PodSpec, out *v1.PodSpec, s
 	} else {
 		out.Volumes = nil
 	}
-	out.InitContainers = *(*[]v1.Container)(unsafe.Pointer(&in.InitContainers))
-	out.Containers = *(*[]v1.Container)(unsafe.Pointer(&in.Containers))
-	out.EphemeralContainers = *(*[]v1.EphemeralContainer)(unsafe.Pointer(&in.EphemeralContainers))
-	out.RestartPolicy = v1.RestartPolicy(in.RestartPolicy)
+	out.InitContainers = *(*[]apicorev1.Container)(unsafe.Pointer(&in.InitContainers))
+	out.Containers = *(*[]apicorev1.Container)(unsafe.Pointer(&in.Containers))
+	out.EphemeralContainers = *(*[]apicorev1.EphemeralContainer)(unsafe.Pointer(&in.EphemeralContainers))
+	out.RestartPolicy = apicorev1.RestartPolicy(in.RestartPolicy)
 	out.TerminationGracePeriodSeconds = (*int64)(unsafe.Pointer(in.TerminationGracePeriodSeconds))
 	out.ActiveDeadlineSeconds = (*int64)(unsafe.Pointer(in.ActiveDeadlineSeconds))
-	out.DNSPolicy = v1.DNSPolicy(in.DNSPolicy)
+	out.DNSPolicy = apicorev1.DNSPolicy(in.DNSPolicy)
 	out.NodeSelector = *(*map[string]string)(unsafe.Pointer(&in.NodeSelector))
 	out.ServiceAccountName = in.ServiceAccountName
 	out.AutomountServiceAccountToken = (*bool)(unsafe.Pointer(in.AutomountServiceAccountToken))
 	out.NodeName = in.NodeName
 	if in.SecurityContext != nil {
 		in, out := &in.SecurityContext, &out.SecurityContext
-		*out = new(v1.PodSecurityContext)
+		*out = new(apicorev1.PodSecurityContext)
 		if err := Convert_core_PodSecurityContext_To_v1_PodSecurityContext(*in, *out, s); err != nil {
 			return err
 		}
 	} else {
 		out.SecurityContext = nil
 	}
-	out.ImagePullSecrets = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
+	out.ImagePullSecrets = *(*[]apicorev1.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
 	out.Hostname = in.Hostname
 	out.Subdomain = in.Subdomain
 	out.SetHostnameAsFQDN = (*bool)(unsafe.Pointer(in.SetHostnameAsFQDN))
-	out.Affinity = (*v1.Affinity)(unsafe.Pointer(in.Affinity))
+	out.Affinity = (*apicorev1.Affinity)(unsafe.Pointer(in.Affinity))
 	out.SchedulerName = in.SchedulerName
-	out.Tolerations = *(*[]v1.Toleration)(unsafe.Pointer(&in.Tolerations))
-	out.HostAliases = *(*[]v1.HostAlias)(unsafe.Pointer(&in.HostAliases))
+	out.Tolerations = *(*[]apicorev1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	out.HostAliases = *(*[]apicorev1.HostAlias)(unsafe.Pointer(&in.HostAliases))
 	out.PriorityClassName = in.PriorityClassName
 	out.Priority = (*int32)(unsafe.Pointer(in.Priority))
-	out.PreemptionPolicy = (*v1.PreemptionPolicy)(unsafe.Pointer(in.PreemptionPolicy))
-	out.DNSConfig = (*v1.PodDNSConfig)(unsafe.Pointer(in.DNSConfig))
-	out.ReadinessGates = *(*[]v1.PodReadinessGate)(unsafe.Pointer(&in.ReadinessGates))
+	out.PreemptionPolicy = (*apicorev1.PreemptionPolicy)(unsafe.Pointer(in.PreemptionPolicy))
+	out.DNSConfig = (*apicorev1.PodDNSConfig)(unsafe.Pointer(in.DNSConfig))
+	out.ReadinessGates = *(*[]apicorev1.PodReadinessGate)(unsafe.Pointer(&in.ReadinessGates))
 	out.RuntimeClassName = (*string)(unsafe.Pointer(in.RuntimeClassName))
-	out.Overhead = *(*v1.ResourceList)(unsafe.Pointer(&in.Overhead))
+	out.Overhead = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Overhead))
 	out.EnableServiceLinks = (*bool)(unsafe.Pointer(in.EnableServiceLinks))
-	out.TopologySpreadConstraints = *(*[]v1.TopologySpreadConstraint)(unsafe.Pointer(&in.TopologySpreadConstraints))
-	out.OS = (*v1.PodOS)(unsafe.Pointer(in.OS))
+	out.TopologySpreadConstraints = *(*[]apicorev1.TopologySpreadConstraint)(unsafe.Pointer(&in.TopologySpreadConstraints))
+	out.OS = (*apicorev1.PodOS)(unsafe.Pointer(in.OS))
 	return nil
 }
 
-func autoConvert_v1_PodStatus_To_core_PodStatus(in *v1.PodStatus, out *core.PodStatus, s conversion.Scope) error {
-	out.Phase = core.PodPhase(in.Phase)
-	out.Conditions = *(*[]core.PodCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_v1_PodStatus_To_core_PodStatus(in *apicorev1.PodStatus, out *pkgapiscore.PodStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = pkgapiscore.PodPhase(in.Phase)
+	out.Conditions = *(*[]pkgapiscore.PodCondition)(unsafe.Pointer(&in.Conditions))
 	out.Message = in.Message
 	out.Reason = in.Reason
 	out.NominatedNodeName = in.NominatedNodeName
 	out.HostIP = in.HostIP
 	// WARNING: in.PodIP requires manual conversion: does not exist in peer-type
-	out.PodIPs = *(*[]core.PodIP)(unsafe.Pointer(&in.PodIPs))
-	out.StartTime = (*metav1.Time)(unsafe.Pointer(in.StartTime))
-	out.InitContainerStatuses = *(*[]core.ContainerStatus)(unsafe.Pointer(&in.InitContainerStatuses))
-	out.ContainerStatuses = *(*[]core.ContainerStatus)(unsafe.Pointer(&in.ContainerStatuses))
-	out.QOSClass = core.PodQOSClass(in.QOSClass)
-	out.EphemeralContainerStatuses = *(*[]core.ContainerStatus)(unsafe.Pointer(&in.EphemeralContainerStatuses))
+	out.PodIPs = *(*[]pkgapiscore.PodIP)(unsafe.Pointer(&in.PodIPs))
+	out.StartTime = (*apismetav1.Time)(unsafe.Pointer(in.StartTime))
+	out.InitContainerStatuses = *(*[]pkgapiscore.ContainerStatus)(unsafe.Pointer(&in.InitContainerStatuses))
+	out.ContainerStatuses = *(*[]pkgapiscore.ContainerStatus)(unsafe.Pointer(&in.ContainerStatuses))
+	out.QOSClass = pkgapiscore.PodQOSClass(in.QOSClass)
+	out.EphemeralContainerStatuses = *(*[]pkgapiscore.ContainerStatus)(unsafe.Pointer(&in.EphemeralContainerStatuses))
 	return nil
 }
 
-func autoConvert_core_PodStatus_To_v1_PodStatus(in *core.PodStatus, out *v1.PodStatus, s conversion.Scope) error {
-	out.Phase = v1.PodPhase(in.Phase)
-	out.Conditions = *(*[]v1.PodCondition)(unsafe.Pointer(&in.Conditions))
+func autoConvert_core_PodStatus_To_v1_PodStatus(in *pkgapiscore.PodStatus, out *apicorev1.PodStatus, s apimachinerypkgconversion.Scope) error {
+	out.Phase = apicorev1.PodPhase(in.Phase)
+	out.Conditions = *(*[]apicorev1.PodCondition)(unsafe.Pointer(&in.Conditions))
 	out.Message = in.Message
 	out.Reason = in.Reason
 	out.NominatedNodeName = in.NominatedNodeName
 	out.HostIP = in.HostIP
-	out.PodIPs = *(*[]v1.PodIP)(unsafe.Pointer(&in.PodIPs))
-	out.StartTime = (*metav1.Time)(unsafe.Pointer(in.StartTime))
-	out.QOSClass = v1.PodQOSClass(in.QOSClass)
-	out.InitContainerStatuses = *(*[]v1.ContainerStatus)(unsafe.Pointer(&in.InitContainerStatuses))
-	out.ContainerStatuses = *(*[]v1.ContainerStatus)(unsafe.Pointer(&in.ContainerStatuses))
-	out.EphemeralContainerStatuses = *(*[]v1.ContainerStatus)(unsafe.Pointer(&in.EphemeralContainerStatuses))
+	out.PodIPs = *(*[]apicorev1.PodIP)(unsafe.Pointer(&in.PodIPs))
+	out.StartTime = (*apismetav1.Time)(unsafe.Pointer(in.StartTime))
+	out.QOSClass = apicorev1.PodQOSClass(in.QOSClass)
+	out.InitContainerStatuses = *(*[]apicorev1.ContainerStatus)(unsafe.Pointer(&in.InitContainerStatuses))
+	out.ContainerStatuses = *(*[]apicorev1.ContainerStatus)(unsafe.Pointer(&in.ContainerStatuses))
+	out.EphemeralContainerStatuses = *(*[]apicorev1.ContainerStatus)(unsafe.Pointer(&in.EphemeralContainerStatuses))
 	return nil
 }
 
-func autoConvert_v1_PodStatusResult_To_core_PodStatusResult(in *v1.PodStatusResult, out *core.PodStatusResult, s conversion.Scope) error {
+func autoConvert_v1_PodStatusResult_To_core_PodStatusResult(in *apicorev1.PodStatusResult, out *pkgapiscore.PodStatusResult, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodStatus_To_core_PodStatus(&in.Status, &out.Status, s); err != nil {
 		return err
@@ -6286,11 +6286,11 @@ func autoConvert_v1_PodStatusResult_To_core_PodStatusResult(in *v1.PodStatusResu
 }
 
 // Convert_v1_PodStatusResult_To_core_PodStatusResult is an autogenerated conversion function.
-func Convert_v1_PodStatusResult_To_core_PodStatusResult(in *v1.PodStatusResult, out *core.PodStatusResult, s conversion.Scope) error {
+func Convert_v1_PodStatusResult_To_core_PodStatusResult(in *apicorev1.PodStatusResult, out *pkgapiscore.PodStatusResult, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodStatusResult_To_core_PodStatusResult(in, out, s)
 }
 
-func autoConvert_core_PodStatusResult_To_v1_PodStatusResult(in *core.PodStatusResult, out *v1.PodStatusResult, s conversion.Scope) error {
+func autoConvert_core_PodStatusResult_To_v1_PodStatusResult(in *pkgapiscore.PodStatusResult, out *apicorev1.PodStatusResult, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PodStatus_To_v1_PodStatus(&in.Status, &out.Status, s); err != nil {
 		return err
@@ -6299,11 +6299,11 @@ func autoConvert_core_PodStatusResult_To_v1_PodStatusResult(in *core.PodStatusRe
 }
 
 // Convert_core_PodStatusResult_To_v1_PodStatusResult is an autogenerated conversion function.
-func Convert_core_PodStatusResult_To_v1_PodStatusResult(in *core.PodStatusResult, out *v1.PodStatusResult, s conversion.Scope) error {
+func Convert_core_PodStatusResult_To_v1_PodStatusResult(in *pkgapiscore.PodStatusResult, out *apicorev1.PodStatusResult, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodStatusResult_To_v1_PodStatusResult(in, out, s)
 }
 
-func autoConvert_v1_PodTemplate_To_core_PodTemplate(in *v1.PodTemplate, out *core.PodTemplate, s conversion.Scope) error {
+func autoConvert_v1_PodTemplate_To_core_PodTemplate(in *apicorev1.PodTemplate, out *pkgapiscore.PodTemplate, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodTemplateSpec_To_core_PodTemplateSpec(&in.Template, &out.Template, s); err != nil {
 		return err
@@ -6312,11 +6312,11 @@ func autoConvert_v1_PodTemplate_To_core_PodTemplate(in *v1.PodTemplate, out *cor
 }
 
 // Convert_v1_PodTemplate_To_core_PodTemplate is an autogenerated conversion function.
-func Convert_v1_PodTemplate_To_core_PodTemplate(in *v1.PodTemplate, out *core.PodTemplate, s conversion.Scope) error {
+func Convert_v1_PodTemplate_To_core_PodTemplate(in *apicorev1.PodTemplate, out *pkgapiscore.PodTemplate, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodTemplate_To_core_PodTemplate(in, out, s)
 }
 
-func autoConvert_core_PodTemplate_To_v1_PodTemplate(in *core.PodTemplate, out *v1.PodTemplate, s conversion.Scope) error {
+func autoConvert_core_PodTemplate_To_v1_PodTemplate(in *pkgapiscore.PodTemplate, out *apicorev1.PodTemplate, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PodTemplateSpec_To_v1_PodTemplateSpec(&in.Template, &out.Template, s); err != nil {
 		return err
@@ -6325,15 +6325,15 @@ func autoConvert_core_PodTemplate_To_v1_PodTemplate(in *core.PodTemplate, out *v
 }
 
 // Convert_core_PodTemplate_To_v1_PodTemplate is an autogenerated conversion function.
-func Convert_core_PodTemplate_To_v1_PodTemplate(in *core.PodTemplate, out *v1.PodTemplate, s conversion.Scope) error {
+func Convert_core_PodTemplate_To_v1_PodTemplate(in *pkgapiscore.PodTemplate, out *apicorev1.PodTemplate, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodTemplate_To_v1_PodTemplate(in, out, s)
 }
 
-func autoConvert_v1_PodTemplateList_To_core_PodTemplateList(in *v1.PodTemplateList, out *core.PodTemplateList, s conversion.Scope) error {
+func autoConvert_v1_PodTemplateList_To_core_PodTemplateList(in *apicorev1.PodTemplateList, out *pkgapiscore.PodTemplateList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.PodTemplate, len(*in))
+		*out = make([]pkgapiscore.PodTemplate, len(*in))
 		for i := range *in {
 			if err := Convert_v1_PodTemplate_To_core_PodTemplate(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6346,15 +6346,15 @@ func autoConvert_v1_PodTemplateList_To_core_PodTemplateList(in *v1.PodTemplateLi
 }
 
 // Convert_v1_PodTemplateList_To_core_PodTemplateList is an autogenerated conversion function.
-func Convert_v1_PodTemplateList_To_core_PodTemplateList(in *v1.PodTemplateList, out *core.PodTemplateList, s conversion.Scope) error {
+func Convert_v1_PodTemplateList_To_core_PodTemplateList(in *apicorev1.PodTemplateList, out *pkgapiscore.PodTemplateList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PodTemplateList_To_core_PodTemplateList(in, out, s)
 }
 
-func autoConvert_core_PodTemplateList_To_v1_PodTemplateList(in *core.PodTemplateList, out *v1.PodTemplateList, s conversion.Scope) error {
+func autoConvert_core_PodTemplateList_To_v1_PodTemplateList(in *pkgapiscore.PodTemplateList, out *apicorev1.PodTemplateList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.PodTemplate, len(*in))
+		*out = make([]apicorev1.PodTemplate, len(*in))
 		for i := range *in {
 			if err := Convert_core_PodTemplate_To_v1_PodTemplate(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6367,11 +6367,11 @@ func autoConvert_core_PodTemplateList_To_v1_PodTemplateList(in *core.PodTemplate
 }
 
 // Convert_core_PodTemplateList_To_v1_PodTemplateList is an autogenerated conversion function.
-func Convert_core_PodTemplateList_To_v1_PodTemplateList(in *core.PodTemplateList, out *v1.PodTemplateList, s conversion.Scope) error {
+func Convert_core_PodTemplateList_To_v1_PodTemplateList(in *pkgapiscore.PodTemplateList, out *apicorev1.PodTemplateList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PodTemplateList_To_v1_PodTemplateList(in, out, s)
 }
 
-func autoConvert_v1_PodTemplateSpec_To_core_PodTemplateSpec(in *v1.PodTemplateSpec, out *core.PodTemplateSpec, s conversion.Scope) error {
+func autoConvert_v1_PodTemplateSpec_To_core_PodTemplateSpec(in *apicorev1.PodTemplateSpec, out *pkgapiscore.PodTemplateSpec, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_PodSpec_To_core_PodSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -6379,7 +6379,7 @@ func autoConvert_v1_PodTemplateSpec_To_core_PodTemplateSpec(in *v1.PodTemplateSp
 	return nil
 }
 
-func autoConvert_core_PodTemplateSpec_To_v1_PodTemplateSpec(in *core.PodTemplateSpec, out *v1.PodTemplateSpec, s conversion.Scope) error {
+func autoConvert_core_PodTemplateSpec_To_v1_PodTemplateSpec(in *pkgapiscore.PodTemplateSpec, out *apicorev1.PodTemplateSpec, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_PodSpec_To_v1_PodSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -6387,31 +6387,31 @@ func autoConvert_core_PodTemplateSpec_To_v1_PodTemplateSpec(in *core.PodTemplate
 	return nil
 }
 
-func autoConvert_v1_PortStatus_To_core_PortStatus(in *v1.PortStatus, out *core.PortStatus, s conversion.Scope) error {
+func autoConvert_v1_PortStatus_To_core_PortStatus(in *apicorev1.PortStatus, out *pkgapiscore.PortStatus, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = pkgapiscore.Protocol(in.Protocol)
 	out.Error = (*string)(unsafe.Pointer(in.Error))
 	return nil
 }
 
 // Convert_v1_PortStatus_To_core_PortStatus is an autogenerated conversion function.
-func Convert_v1_PortStatus_To_core_PortStatus(in *v1.PortStatus, out *core.PortStatus, s conversion.Scope) error {
+func Convert_v1_PortStatus_To_core_PortStatus(in *apicorev1.PortStatus, out *pkgapiscore.PortStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PortStatus_To_core_PortStatus(in, out, s)
 }
 
-func autoConvert_core_PortStatus_To_v1_PortStatus(in *core.PortStatus, out *v1.PortStatus, s conversion.Scope) error {
+func autoConvert_core_PortStatus_To_v1_PortStatus(in *pkgapiscore.PortStatus, out *apicorev1.PortStatus, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = apicorev1.Protocol(in.Protocol)
 	out.Error = (*string)(unsafe.Pointer(in.Error))
 	return nil
 }
 
 // Convert_core_PortStatus_To_v1_PortStatus is an autogenerated conversion function.
-func Convert_core_PortStatus_To_v1_PortStatus(in *core.PortStatus, out *v1.PortStatus, s conversion.Scope) error {
+func Convert_core_PortStatus_To_v1_PortStatus(in *pkgapiscore.PortStatus, out *apicorev1.PortStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PortStatus_To_v1_PortStatus(in, out, s)
 }
 
-func autoConvert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(in *v1.PortworxVolumeSource, out *core.PortworxVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(in *apicorev1.PortworxVolumeSource, out *pkgapiscore.PortworxVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
@@ -6419,11 +6419,11 @@ func autoConvert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(in *v1.Por
 }
 
 // Convert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource is an autogenerated conversion function.
-func Convert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(in *v1.PortworxVolumeSource, out *core.PortworxVolumeSource, s conversion.Scope) error {
+func Convert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(in *apicorev1.PortworxVolumeSource, out *pkgapiscore.PortworxVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PortworxVolumeSource_To_core_PortworxVolumeSource(in, out, s)
 }
 
-func autoConvert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(in *core.PortworxVolumeSource, out *v1.PortworxVolumeSource, s conversion.Scope) error {
+func autoConvert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(in *pkgapiscore.PortworxVolumeSource, out *apicorev1.PortworxVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeID = in.VolumeID
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
@@ -6431,31 +6431,31 @@ func autoConvert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(in *core.P
 }
 
 // Convert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource is an autogenerated conversion function.
-func Convert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(in *core.PortworxVolumeSource, out *v1.PortworxVolumeSource, s conversion.Scope) error {
+func Convert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(in *pkgapiscore.PortworxVolumeSource, out *apicorev1.PortworxVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PortworxVolumeSource_To_v1_PortworxVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Preconditions_To_core_Preconditions(in *v1.Preconditions, out *core.Preconditions, s conversion.Scope) error {
-	out.UID = (*types.UID)(unsafe.Pointer(in.UID))
+func autoConvert_v1_Preconditions_To_core_Preconditions(in *apicorev1.Preconditions, out *pkgapiscore.Preconditions, s apimachinerypkgconversion.Scope) error {
+	out.UID = (*apimachinerypkgtypes.UID)(unsafe.Pointer(in.UID))
 	return nil
 }
 
 // Convert_v1_Preconditions_To_core_Preconditions is an autogenerated conversion function.
-func Convert_v1_Preconditions_To_core_Preconditions(in *v1.Preconditions, out *core.Preconditions, s conversion.Scope) error {
+func Convert_v1_Preconditions_To_core_Preconditions(in *apicorev1.Preconditions, out *pkgapiscore.Preconditions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Preconditions_To_core_Preconditions(in, out, s)
 }
 
-func autoConvert_core_Preconditions_To_v1_Preconditions(in *core.Preconditions, out *v1.Preconditions, s conversion.Scope) error {
-	out.UID = (*types.UID)(unsafe.Pointer(in.UID))
+func autoConvert_core_Preconditions_To_v1_Preconditions(in *pkgapiscore.Preconditions, out *apicorev1.Preconditions, s apimachinerypkgconversion.Scope) error {
+	out.UID = (*apimachinerypkgtypes.UID)(unsafe.Pointer(in.UID))
 	return nil
 }
 
 // Convert_core_Preconditions_To_v1_Preconditions is an autogenerated conversion function.
-func Convert_core_Preconditions_To_v1_Preconditions(in *core.Preconditions, out *v1.Preconditions, s conversion.Scope) error {
+func Convert_core_Preconditions_To_v1_Preconditions(in *pkgapiscore.Preconditions, out *apicorev1.Preconditions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Preconditions_To_v1_Preconditions(in, out, s)
 }
 
-func autoConvert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(in *v1.PreferAvoidPodsEntry, out *core.PreferAvoidPodsEntry, s conversion.Scope) error {
+func autoConvert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(in *apicorev1.PreferAvoidPodsEntry, out *pkgapiscore.PreferAvoidPodsEntry, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_PodSignature_To_core_PodSignature(&in.PodSignature, &out.PodSignature, s); err != nil {
 		return err
 	}
@@ -6466,11 +6466,11 @@ func autoConvert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(in *v1.Pre
 }
 
 // Convert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry is an autogenerated conversion function.
-func Convert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(in *v1.PreferAvoidPodsEntry, out *core.PreferAvoidPodsEntry, s conversion.Scope) error {
+func Convert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(in *apicorev1.PreferAvoidPodsEntry, out *pkgapiscore.PreferAvoidPodsEntry, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PreferAvoidPodsEntry_To_core_PreferAvoidPodsEntry(in, out, s)
 }
 
-func autoConvert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(in *core.PreferAvoidPodsEntry, out *v1.PreferAvoidPodsEntry, s conversion.Scope) error {
+func autoConvert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(in *pkgapiscore.PreferAvoidPodsEntry, out *apicorev1.PreferAvoidPodsEntry, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_PodSignature_To_v1_PodSignature(&in.PodSignature, &out.PodSignature, s); err != nil {
 		return err
 	}
@@ -6481,11 +6481,11 @@ func autoConvert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(in *core.P
 }
 
 // Convert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry is an autogenerated conversion function.
-func Convert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(in *core.PreferAvoidPodsEntry, out *v1.PreferAvoidPodsEntry, s conversion.Scope) error {
+func Convert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(in *pkgapiscore.PreferAvoidPodsEntry, out *apicorev1.PreferAvoidPodsEntry, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PreferAvoidPodsEntry_To_v1_PreferAvoidPodsEntry(in, out, s)
 }
 
-func autoConvert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(in *v1.PreferredSchedulingTerm, out *core.PreferredSchedulingTerm, s conversion.Scope) error {
+func autoConvert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(in *apicorev1.PreferredSchedulingTerm, out *pkgapiscore.PreferredSchedulingTerm, s apimachinerypkgconversion.Scope) error {
 	out.Weight = in.Weight
 	if err := Convert_v1_NodeSelectorTerm_To_core_NodeSelectorTerm(&in.Preference, &out.Preference, s); err != nil {
 		return err
@@ -6494,11 +6494,11 @@ func autoConvert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(in *
 }
 
 // Convert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm is an autogenerated conversion function.
-func Convert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(in *v1.PreferredSchedulingTerm, out *core.PreferredSchedulingTerm, s conversion.Scope) error {
+func Convert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(in *apicorev1.PreferredSchedulingTerm, out *pkgapiscore.PreferredSchedulingTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_PreferredSchedulingTerm_To_core_PreferredSchedulingTerm(in, out, s)
 }
 
-func autoConvert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(in *core.PreferredSchedulingTerm, out *v1.PreferredSchedulingTerm, s conversion.Scope) error {
+func autoConvert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(in *pkgapiscore.PreferredSchedulingTerm, out *apicorev1.PreferredSchedulingTerm, s apimachinerypkgconversion.Scope) error {
 	out.Weight = in.Weight
 	if err := Convert_core_NodeSelectorTerm_To_v1_NodeSelectorTerm(&in.Preference, &out.Preference, s); err != nil {
 		return err
@@ -6507,11 +6507,11 @@ func autoConvert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(in *
 }
 
 // Convert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm is an autogenerated conversion function.
-func Convert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(in *core.PreferredSchedulingTerm, out *v1.PreferredSchedulingTerm, s conversion.Scope) error {
+func Convert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(in *pkgapiscore.PreferredSchedulingTerm, out *apicorev1.PreferredSchedulingTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_PreferredSchedulingTerm_To_v1_PreferredSchedulingTerm(in, out, s)
 }
 
-func autoConvert_v1_Probe_To_core_Probe(in *v1.Probe, out *core.Probe, s conversion.Scope) error {
+func autoConvert_v1_Probe_To_core_Probe(in *apicorev1.Probe, out *pkgapiscore.Probe, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_ProbeHandler_To_core_ProbeHandler(&in.ProbeHandler, &out.ProbeHandler, s); err != nil {
 		return err
 	}
@@ -6525,11 +6525,11 @@ func autoConvert_v1_Probe_To_core_Probe(in *v1.Probe, out *core.Probe, s convers
 }
 
 // Convert_v1_Probe_To_core_Probe is an autogenerated conversion function.
-func Convert_v1_Probe_To_core_Probe(in *v1.Probe, out *core.Probe, s conversion.Scope) error {
+func Convert_v1_Probe_To_core_Probe(in *apicorev1.Probe, out *pkgapiscore.Probe, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Probe_To_core_Probe(in, out, s)
 }
 
-func autoConvert_core_Probe_To_v1_Probe(in *core.Probe, out *v1.Probe, s conversion.Scope) error {
+func autoConvert_core_Probe_To_v1_Probe(in *pkgapiscore.Probe, out *apicorev1.Probe, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_ProbeHandler_To_v1_ProbeHandler(&in.ProbeHandler, &out.ProbeHandler, s); err != nil {
 		return err
 	}
@@ -6543,40 +6543,40 @@ func autoConvert_core_Probe_To_v1_Probe(in *core.Probe, out *v1.Probe, s convers
 }
 
 // Convert_core_Probe_To_v1_Probe is an autogenerated conversion function.
-func Convert_core_Probe_To_v1_Probe(in *core.Probe, out *v1.Probe, s conversion.Scope) error {
+func Convert_core_Probe_To_v1_Probe(in *pkgapiscore.Probe, out *apicorev1.Probe, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Probe_To_v1_Probe(in, out, s)
 }
 
-func autoConvert_v1_ProbeHandler_To_core_ProbeHandler(in *v1.ProbeHandler, out *core.ProbeHandler, s conversion.Scope) error {
-	out.Exec = (*core.ExecAction)(unsafe.Pointer(in.Exec))
-	out.HTTPGet = (*core.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
-	out.TCPSocket = (*core.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
-	out.GRPC = (*core.GRPCAction)(unsafe.Pointer(in.GRPC))
+func autoConvert_v1_ProbeHandler_To_core_ProbeHandler(in *apicorev1.ProbeHandler, out *pkgapiscore.ProbeHandler, s apimachinerypkgconversion.Scope) error {
+	out.Exec = (*pkgapiscore.ExecAction)(unsafe.Pointer(in.Exec))
+	out.HTTPGet = (*pkgapiscore.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
+	out.TCPSocket = (*pkgapiscore.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
+	out.GRPC = (*pkgapiscore.GRPCAction)(unsafe.Pointer(in.GRPC))
 	return nil
 }
 
 // Convert_v1_ProbeHandler_To_core_ProbeHandler is an autogenerated conversion function.
-func Convert_v1_ProbeHandler_To_core_ProbeHandler(in *v1.ProbeHandler, out *core.ProbeHandler, s conversion.Scope) error {
+func Convert_v1_ProbeHandler_To_core_ProbeHandler(in *apicorev1.ProbeHandler, out *pkgapiscore.ProbeHandler, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ProbeHandler_To_core_ProbeHandler(in, out, s)
 }
 
-func autoConvert_core_ProbeHandler_To_v1_ProbeHandler(in *core.ProbeHandler, out *v1.ProbeHandler, s conversion.Scope) error {
-	out.Exec = (*v1.ExecAction)(unsafe.Pointer(in.Exec))
-	out.HTTPGet = (*v1.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
-	out.TCPSocket = (*v1.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
-	out.GRPC = (*v1.GRPCAction)(unsafe.Pointer(in.GRPC))
+func autoConvert_core_ProbeHandler_To_v1_ProbeHandler(in *pkgapiscore.ProbeHandler, out *apicorev1.ProbeHandler, s apimachinerypkgconversion.Scope) error {
+	out.Exec = (*apicorev1.ExecAction)(unsafe.Pointer(in.Exec))
+	out.HTTPGet = (*apicorev1.HTTPGetAction)(unsafe.Pointer(in.HTTPGet))
+	out.TCPSocket = (*apicorev1.TCPSocketAction)(unsafe.Pointer(in.TCPSocket))
+	out.GRPC = (*apicorev1.GRPCAction)(unsafe.Pointer(in.GRPC))
 	return nil
 }
 
 // Convert_core_ProbeHandler_To_v1_ProbeHandler is an autogenerated conversion function.
-func Convert_core_ProbeHandler_To_v1_ProbeHandler(in *core.ProbeHandler, out *v1.ProbeHandler, s conversion.Scope) error {
+func Convert_core_ProbeHandler_To_v1_ProbeHandler(in *pkgapiscore.ProbeHandler, out *apicorev1.ProbeHandler, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ProbeHandler_To_v1_ProbeHandler(in, out, s)
 }
 
-func autoConvert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(in *v1.ProjectedVolumeSource, out *core.ProjectedVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(in *apicorev1.ProjectedVolumeSource, out *pkgapiscore.ProjectedVolumeSource, s apimachinerypkgconversion.Scope) error {
 	if in.Sources != nil {
 		in, out := &in.Sources, &out.Sources
-		*out = make([]core.VolumeProjection, len(*in))
+		*out = make([]pkgapiscore.VolumeProjection, len(*in))
 		for i := range *in {
 			if err := Convert_v1_VolumeProjection_To_core_VolumeProjection(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6590,14 +6590,14 @@ func autoConvert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(in *v1.P
 }
 
 // Convert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource is an autogenerated conversion function.
-func Convert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(in *v1.ProjectedVolumeSource, out *core.ProjectedVolumeSource, s conversion.Scope) error {
+func Convert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(in *apicorev1.ProjectedVolumeSource, out *pkgapiscore.ProjectedVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(in, out, s)
 }
 
-func autoConvert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(in *core.ProjectedVolumeSource, out *v1.ProjectedVolumeSource, s conversion.Scope) error {
+func autoConvert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(in *pkgapiscore.ProjectedVolumeSource, out *apicorev1.ProjectedVolumeSource, s apimachinerypkgconversion.Scope) error {
 	if in.Sources != nil {
 		in, out := &in.Sources, &out.Sources
-		*out = make([]v1.VolumeProjection, len(*in))
+		*out = make([]apicorev1.VolumeProjection, len(*in))
 		for i := range *in {
 			if err := Convert_core_VolumeProjection_To_v1_VolumeProjection(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6611,11 +6611,11 @@ func autoConvert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(in *core
 }
 
 // Convert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource is an autogenerated conversion function.
-func Convert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(in *core.ProjectedVolumeSource, out *v1.ProjectedVolumeSource, s conversion.Scope) error {
+func Convert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(in *pkgapiscore.ProjectedVolumeSource, out *apicorev1.ProjectedVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(in *v1.QuobyteVolumeSource, out *core.QuobyteVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(in *apicorev1.QuobyteVolumeSource, out *pkgapiscore.QuobyteVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Registry = in.Registry
 	out.Volume = in.Volume
 	out.ReadOnly = in.ReadOnly
@@ -6626,11 +6626,11 @@ func autoConvert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(in *v1.Quoby
 }
 
 // Convert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource is an autogenerated conversion function.
-func Convert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(in *v1.QuobyteVolumeSource, out *core.QuobyteVolumeSource, s conversion.Scope) error {
+func Convert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(in *apicorev1.QuobyteVolumeSource, out *pkgapiscore.QuobyteVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_QuobyteVolumeSource_To_core_QuobyteVolumeSource(in, out, s)
 }
 
-func autoConvert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(in *core.QuobyteVolumeSource, out *v1.QuobyteVolumeSource, s conversion.Scope) error {
+func autoConvert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(in *pkgapiscore.QuobyteVolumeSource, out *apicorev1.QuobyteVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Registry = in.Registry
 	out.Volume = in.Volume
 	out.ReadOnly = in.ReadOnly
@@ -6641,79 +6641,79 @@ func autoConvert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(in *core.Quo
 }
 
 // Convert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource is an autogenerated conversion function.
-func Convert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(in *core.QuobyteVolumeSource, out *v1.QuobyteVolumeSource, s conversion.Scope) error {
+func Convert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(in *pkgapiscore.QuobyteVolumeSource, out *apicorev1.QuobyteVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_QuobyteVolumeSource_To_v1_QuobyteVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(in *v1.RBDPersistentVolumeSource, out *core.RBDPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(in *apicorev1.RBDPersistentVolumeSource, out *pkgapiscore.RBDPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.CephMonitors = *(*[]string)(unsafe.Pointer(&in.CephMonitors))
 	out.RBDImage = in.RBDImage
 	out.FSType = in.FSType
 	out.RBDPool = in.RBDPool
 	out.RadosUser = in.RadosUser
 	out.Keyring = in.Keyring
-	out.SecretRef = (*core.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(in *v1.RBDPersistentVolumeSource, out *core.RBDPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(in *apicorev1.RBDPersistentVolumeSource, out *pkgapiscore.RBDPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_RBDPersistentVolumeSource_To_core_RBDPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(in *core.RBDPersistentVolumeSource, out *v1.RBDPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(in *pkgapiscore.RBDPersistentVolumeSource, out *apicorev1.RBDPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.CephMonitors = *(*[]string)(unsafe.Pointer(&in.CephMonitors))
 	out.RBDImage = in.RBDImage
 	out.FSType = in.FSType
 	out.RBDPool = in.RBDPool
 	out.RadosUser = in.RadosUser
 	out.Keyring = in.Keyring
-	out.SecretRef = (*v1.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(in *core.RBDPersistentVolumeSource, out *v1.RBDPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(in *pkgapiscore.RBDPersistentVolumeSource, out *apicorev1.RBDPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_RBDPersistentVolumeSource_To_v1_RBDPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_RBDVolumeSource_To_core_RBDVolumeSource(in *v1.RBDVolumeSource, out *core.RBDVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_RBDVolumeSource_To_core_RBDVolumeSource(in *apicorev1.RBDVolumeSource, out *pkgapiscore.RBDVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.CephMonitors = *(*[]string)(unsafe.Pointer(&in.CephMonitors))
 	out.RBDImage = in.RBDImage
 	out.FSType = in.FSType
 	out.RBDPool = in.RBDPool
 	out.RadosUser = in.RadosUser
 	out.Keyring = in.Keyring
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_v1_RBDVolumeSource_To_core_RBDVolumeSource is an autogenerated conversion function.
-func Convert_v1_RBDVolumeSource_To_core_RBDVolumeSource(in *v1.RBDVolumeSource, out *core.RBDVolumeSource, s conversion.Scope) error {
+func Convert_v1_RBDVolumeSource_To_core_RBDVolumeSource(in *apicorev1.RBDVolumeSource, out *pkgapiscore.RBDVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_RBDVolumeSource_To_core_RBDVolumeSource(in, out, s)
 }
 
-func autoConvert_core_RBDVolumeSource_To_v1_RBDVolumeSource(in *core.RBDVolumeSource, out *v1.RBDVolumeSource, s conversion.Scope) error {
+func autoConvert_core_RBDVolumeSource_To_v1_RBDVolumeSource(in *pkgapiscore.RBDVolumeSource, out *apicorev1.RBDVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.CephMonitors = *(*[]string)(unsafe.Pointer(&in.CephMonitors))
 	out.RBDImage = in.RBDImage
 	out.FSType = in.FSType
 	out.RBDPool = in.RBDPool
 	out.RadosUser = in.RadosUser
 	out.Keyring = in.Keyring
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.ReadOnly = in.ReadOnly
 	return nil
 }
 
 // Convert_core_RBDVolumeSource_To_v1_RBDVolumeSource is an autogenerated conversion function.
-func Convert_core_RBDVolumeSource_To_v1_RBDVolumeSource(in *core.RBDVolumeSource, out *v1.RBDVolumeSource, s conversion.Scope) error {
+func Convert_core_RBDVolumeSource_To_v1_RBDVolumeSource(in *pkgapiscore.RBDVolumeSource, out *apicorev1.RBDVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_RBDVolumeSource_To_v1_RBDVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_RangeAllocation_To_core_RangeAllocation(in *v1.RangeAllocation, out *core.RangeAllocation, s conversion.Scope) error {
+func autoConvert_v1_RangeAllocation_To_core_RangeAllocation(in *apicorev1.RangeAllocation, out *pkgapiscore.RangeAllocation, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Range = in.Range
 	out.Data = *(*[]byte)(unsafe.Pointer(&in.Data))
@@ -6721,11 +6721,11 @@ func autoConvert_v1_RangeAllocation_To_core_RangeAllocation(in *v1.RangeAllocati
 }
 
 // Convert_v1_RangeAllocation_To_core_RangeAllocation is an autogenerated conversion function.
-func Convert_v1_RangeAllocation_To_core_RangeAllocation(in *v1.RangeAllocation, out *core.RangeAllocation, s conversion.Scope) error {
+func Convert_v1_RangeAllocation_To_core_RangeAllocation(in *apicorev1.RangeAllocation, out *pkgapiscore.RangeAllocation, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_RangeAllocation_To_core_RangeAllocation(in, out, s)
 }
 
-func autoConvert_core_RangeAllocation_To_v1_RangeAllocation(in *core.RangeAllocation, out *v1.RangeAllocation, s conversion.Scope) error {
+func autoConvert_core_RangeAllocation_To_v1_RangeAllocation(in *pkgapiscore.RangeAllocation, out *apicorev1.RangeAllocation, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Range = in.Range
 	out.Data = *(*[]byte)(unsafe.Pointer(&in.Data))
@@ -6733,11 +6733,11 @@ func autoConvert_core_RangeAllocation_To_v1_RangeAllocation(in *core.RangeAlloca
 }
 
 // Convert_core_RangeAllocation_To_v1_RangeAllocation is an autogenerated conversion function.
-func Convert_core_RangeAllocation_To_v1_RangeAllocation(in *core.RangeAllocation, out *v1.RangeAllocation, s conversion.Scope) error {
+func Convert_core_RangeAllocation_To_v1_RangeAllocation(in *pkgapiscore.RangeAllocation, out *apicorev1.RangeAllocation, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_RangeAllocation_To_v1_RangeAllocation(in, out, s)
 }
 
-func autoConvert_v1_ReplicationController_To_core_ReplicationController(in *v1.ReplicationController, out *core.ReplicationController, s conversion.Scope) error {
+func autoConvert_v1_ReplicationController_To_core_ReplicationController(in *apicorev1.ReplicationController, out *pkgapiscore.ReplicationController, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_ReplicationControllerSpec_To_core_ReplicationControllerSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -6749,11 +6749,11 @@ func autoConvert_v1_ReplicationController_To_core_ReplicationController(in *v1.R
 }
 
 // Convert_v1_ReplicationController_To_core_ReplicationController is an autogenerated conversion function.
-func Convert_v1_ReplicationController_To_core_ReplicationController(in *v1.ReplicationController, out *core.ReplicationController, s conversion.Scope) error {
+func Convert_v1_ReplicationController_To_core_ReplicationController(in *apicorev1.ReplicationController, out *pkgapiscore.ReplicationController, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ReplicationController_To_core_ReplicationController(in, out, s)
 }
 
-func autoConvert_core_ReplicationController_To_v1_ReplicationController(in *core.ReplicationController, out *v1.ReplicationController, s conversion.Scope) error {
+func autoConvert_core_ReplicationController_To_v1_ReplicationController(in *pkgapiscore.ReplicationController, out *apicorev1.ReplicationController, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_ReplicationControllerSpec_To_v1_ReplicationControllerSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -6765,13 +6765,13 @@ func autoConvert_core_ReplicationController_To_v1_ReplicationController(in *core
 }
 
 // Convert_core_ReplicationController_To_v1_ReplicationController is an autogenerated conversion function.
-func Convert_core_ReplicationController_To_v1_ReplicationController(in *core.ReplicationController, out *v1.ReplicationController, s conversion.Scope) error {
+func Convert_core_ReplicationController_To_v1_ReplicationController(in *pkgapiscore.ReplicationController, out *apicorev1.ReplicationController, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ReplicationController_To_v1_ReplicationController(in, out, s)
 }
 
-func autoConvert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(in *v1.ReplicationControllerCondition, out *core.ReplicationControllerCondition, s conversion.Scope) error {
-	out.Type = core.ReplicationControllerConditionType(in.Type)
-	out.Status = core.ConditionStatus(in.Status)
+func autoConvert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(in *apicorev1.ReplicationControllerCondition, out *pkgapiscore.ReplicationControllerCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.ReplicationControllerConditionType(in.Type)
+	out.Status = pkgapiscore.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -6779,13 +6779,13 @@ func autoConvert_v1_ReplicationControllerCondition_To_core_ReplicationController
 }
 
 // Convert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition is an autogenerated conversion function.
-func Convert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(in *v1.ReplicationControllerCondition, out *core.ReplicationControllerCondition, s conversion.Scope) error {
+func Convert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(in *apicorev1.ReplicationControllerCondition, out *pkgapiscore.ReplicationControllerCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ReplicationControllerCondition_To_core_ReplicationControllerCondition(in, out, s)
 }
 
-func autoConvert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(in *core.ReplicationControllerCondition, out *v1.ReplicationControllerCondition, s conversion.Scope) error {
-	out.Type = v1.ReplicationControllerConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
+func autoConvert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(in *pkgapiscore.ReplicationControllerCondition, out *apicorev1.ReplicationControllerCondition, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.ReplicationControllerConditionType(in.Type)
+	out.Status = apicorev1.ConditionStatus(in.Status)
 	out.LastTransitionTime = in.LastTransitionTime
 	out.Reason = in.Reason
 	out.Message = in.Message
@@ -6793,15 +6793,15 @@ func autoConvert_core_ReplicationControllerCondition_To_v1_ReplicationController
 }
 
 // Convert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition is an autogenerated conversion function.
-func Convert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(in *core.ReplicationControllerCondition, out *v1.ReplicationControllerCondition, s conversion.Scope) error {
+func Convert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(in *pkgapiscore.ReplicationControllerCondition, out *apicorev1.ReplicationControllerCondition, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ReplicationControllerCondition_To_v1_ReplicationControllerCondition(in, out, s)
 }
 
-func autoConvert_v1_ReplicationControllerList_To_core_ReplicationControllerList(in *v1.ReplicationControllerList, out *core.ReplicationControllerList, s conversion.Scope) error {
+func autoConvert_v1_ReplicationControllerList_To_core_ReplicationControllerList(in *apicorev1.ReplicationControllerList, out *pkgapiscore.ReplicationControllerList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.ReplicationController, len(*in))
+		*out = make([]pkgapiscore.ReplicationController, len(*in))
 		for i := range *in {
 			if err := Convert_v1_ReplicationController_To_core_ReplicationController(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6814,15 +6814,15 @@ func autoConvert_v1_ReplicationControllerList_To_core_ReplicationControllerList(
 }
 
 // Convert_v1_ReplicationControllerList_To_core_ReplicationControllerList is an autogenerated conversion function.
-func Convert_v1_ReplicationControllerList_To_core_ReplicationControllerList(in *v1.ReplicationControllerList, out *core.ReplicationControllerList, s conversion.Scope) error {
+func Convert_v1_ReplicationControllerList_To_core_ReplicationControllerList(in *apicorev1.ReplicationControllerList, out *pkgapiscore.ReplicationControllerList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ReplicationControllerList_To_core_ReplicationControllerList(in, out, s)
 }
 
-func autoConvert_core_ReplicationControllerList_To_v1_ReplicationControllerList(in *core.ReplicationControllerList, out *v1.ReplicationControllerList, s conversion.Scope) error {
+func autoConvert_core_ReplicationControllerList_To_v1_ReplicationControllerList(in *pkgapiscore.ReplicationControllerList, out *apicorev1.ReplicationControllerList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.ReplicationController, len(*in))
+		*out = make([]apicorev1.ReplicationController, len(*in))
 		for i := range *in {
 			if err := Convert_core_ReplicationController_To_v1_ReplicationController(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -6835,19 +6835,19 @@ func autoConvert_core_ReplicationControllerList_To_v1_ReplicationControllerList(
 }
 
 // Convert_core_ReplicationControllerList_To_v1_ReplicationControllerList is an autogenerated conversion function.
-func Convert_core_ReplicationControllerList_To_v1_ReplicationControllerList(in *core.ReplicationControllerList, out *v1.ReplicationControllerList, s conversion.Scope) error {
+func Convert_core_ReplicationControllerList_To_v1_ReplicationControllerList(in *pkgapiscore.ReplicationControllerList, out *apicorev1.ReplicationControllerList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ReplicationControllerList_To_v1_ReplicationControllerList(in, out, s)
 }
 
-func autoConvert_v1_ReplicationControllerSpec_To_core_ReplicationControllerSpec(in *v1.ReplicationControllerSpec, out *core.ReplicationControllerSpec, s conversion.Scope) error {
-	if err := metav1.Convert_Pointer_int32_To_int32(&in.Replicas, &out.Replicas, s); err != nil {
+func autoConvert_v1_ReplicationControllerSpec_To_core_ReplicationControllerSpec(in *apicorev1.ReplicationControllerSpec, out *pkgapiscore.ReplicationControllerSpec, s apimachinerypkgconversion.Scope) error {
+	if err := apismetav1.Convert_Pointer_int32_To_int32(&in.Replicas, &out.Replicas, s); err != nil {
 		return err
 	}
 	out.MinReadySeconds = in.MinReadySeconds
 	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
 	if in.Template != nil {
 		in, out := &in.Template, &out.Template
-		*out = new(core.PodTemplateSpec)
+		*out = new(pkgapiscore.PodTemplateSpec)
 		if err := Convert_v1_PodTemplateSpec_To_core_PodTemplateSpec(*in, *out, s); err != nil {
 			return err
 		}
@@ -6857,15 +6857,15 @@ func autoConvert_v1_ReplicationControllerSpec_To_core_ReplicationControllerSpec(
 	return nil
 }
 
-func autoConvert_core_ReplicationControllerSpec_To_v1_ReplicationControllerSpec(in *core.ReplicationControllerSpec, out *v1.ReplicationControllerSpec, s conversion.Scope) error {
-	if err := metav1.Convert_int32_To_Pointer_int32(&in.Replicas, &out.Replicas, s); err != nil {
+func autoConvert_core_ReplicationControllerSpec_To_v1_ReplicationControllerSpec(in *pkgapiscore.ReplicationControllerSpec, out *apicorev1.ReplicationControllerSpec, s apimachinerypkgconversion.Scope) error {
+	if err := apismetav1.Convert_int32_To_Pointer_int32(&in.Replicas, &out.Replicas, s); err != nil {
 		return err
 	}
 	out.MinReadySeconds = in.MinReadySeconds
 	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
 	if in.Template != nil {
 		in, out := &in.Template, &out.Template
-		*out = new(v1.PodTemplateSpec)
+		*out = new(apicorev1.PodTemplateSpec)
 		if err := Convert_core_PodTemplateSpec_To_v1_PodTemplateSpec(*in, *out, s); err != nil {
 			return err
 		}
@@ -6875,37 +6875,37 @@ func autoConvert_core_ReplicationControllerSpec_To_v1_ReplicationControllerSpec(
 	return nil
 }
 
-func autoConvert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(in *v1.ReplicationControllerStatus, out *core.ReplicationControllerStatus, s conversion.Scope) error {
+func autoConvert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(in *apicorev1.ReplicationControllerStatus, out *pkgapiscore.ReplicationControllerStatus, s apimachinerypkgconversion.Scope) error {
 	out.Replicas = in.Replicas
 	out.FullyLabeledReplicas = in.FullyLabeledReplicas
 	out.ReadyReplicas = in.ReadyReplicas
 	out.AvailableReplicas = in.AvailableReplicas
 	out.ObservedGeneration = in.ObservedGeneration
-	out.Conditions = *(*[]core.ReplicationControllerCondition)(unsafe.Pointer(&in.Conditions))
+	out.Conditions = *(*[]pkgapiscore.ReplicationControllerCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus is an autogenerated conversion function.
-func Convert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(in *v1.ReplicationControllerStatus, out *core.ReplicationControllerStatus, s conversion.Scope) error {
+func Convert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(in *apicorev1.ReplicationControllerStatus, out *pkgapiscore.ReplicationControllerStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ReplicationControllerStatus_To_core_ReplicationControllerStatus(in, out, s)
 }
 
-func autoConvert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(in *core.ReplicationControllerStatus, out *v1.ReplicationControllerStatus, s conversion.Scope) error {
+func autoConvert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(in *pkgapiscore.ReplicationControllerStatus, out *apicorev1.ReplicationControllerStatus, s apimachinerypkgconversion.Scope) error {
 	out.Replicas = in.Replicas
 	out.FullyLabeledReplicas = in.FullyLabeledReplicas
 	out.ReadyReplicas = in.ReadyReplicas
 	out.AvailableReplicas = in.AvailableReplicas
 	out.ObservedGeneration = in.ObservedGeneration
-	out.Conditions = *(*[]v1.ReplicationControllerCondition)(unsafe.Pointer(&in.Conditions))
+	out.Conditions = *(*[]apicorev1.ReplicationControllerCondition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus is an autogenerated conversion function.
-func Convert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(in *core.ReplicationControllerStatus, out *v1.ReplicationControllerStatus, s conversion.Scope) error {
+func Convert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(in *pkgapiscore.ReplicationControllerStatus, out *apicorev1.ReplicationControllerStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ReplicationControllerStatus_To_v1_ReplicationControllerStatus(in, out, s)
 }
 
-func autoConvert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(in *v1.ResourceFieldSelector, out *core.ResourceFieldSelector, s conversion.Scope) error {
+func autoConvert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(in *apicorev1.ResourceFieldSelector, out *pkgapiscore.ResourceFieldSelector, s apimachinerypkgconversion.Scope) error {
 	out.ContainerName = in.ContainerName
 	out.Resource = in.Resource
 	out.Divisor = in.Divisor
@@ -6913,11 +6913,11 @@ func autoConvert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(in *v1.R
 }
 
 // Convert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector is an autogenerated conversion function.
-func Convert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(in *v1.ResourceFieldSelector, out *core.ResourceFieldSelector, s conversion.Scope) error {
+func Convert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(in *apicorev1.ResourceFieldSelector, out *pkgapiscore.ResourceFieldSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ResourceFieldSelector_To_core_ResourceFieldSelector(in, out, s)
 }
 
-func autoConvert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(in *core.ResourceFieldSelector, out *v1.ResourceFieldSelector, s conversion.Scope) error {
+func autoConvert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(in *pkgapiscore.ResourceFieldSelector, out *apicorev1.ResourceFieldSelector, s apimachinerypkgconversion.Scope) error {
 	out.ContainerName = in.ContainerName
 	out.Resource = in.Resource
 	out.Divisor = in.Divisor
@@ -6925,11 +6925,11 @@ func autoConvert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(in *core
 }
 
 // Convert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector is an autogenerated conversion function.
-func Convert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(in *core.ResourceFieldSelector, out *v1.ResourceFieldSelector, s conversion.Scope) error {
+func Convert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(in *pkgapiscore.ResourceFieldSelector, out *apicorev1.ResourceFieldSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ResourceFieldSelector_To_v1_ResourceFieldSelector(in, out, s)
 }
 
-func autoConvert_v1_ResourceQuota_To_core_ResourceQuota(in *v1.ResourceQuota, out *core.ResourceQuota, s conversion.Scope) error {
+func autoConvert_v1_ResourceQuota_To_core_ResourceQuota(in *apicorev1.ResourceQuota, out *pkgapiscore.ResourceQuota, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -6941,11 +6941,11 @@ func autoConvert_v1_ResourceQuota_To_core_ResourceQuota(in *v1.ResourceQuota, ou
 }
 
 // Convert_v1_ResourceQuota_To_core_ResourceQuota is an autogenerated conversion function.
-func Convert_v1_ResourceQuota_To_core_ResourceQuota(in *v1.ResourceQuota, out *core.ResourceQuota, s conversion.Scope) error {
+func Convert_v1_ResourceQuota_To_core_ResourceQuota(in *apicorev1.ResourceQuota, out *pkgapiscore.ResourceQuota, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ResourceQuota_To_core_ResourceQuota(in, out, s)
 }
 
-func autoConvert_core_ResourceQuota_To_v1_ResourceQuota(in *core.ResourceQuota, out *v1.ResourceQuota, s conversion.Scope) error {
+func autoConvert_core_ResourceQuota_To_v1_ResourceQuota(in *pkgapiscore.ResourceQuota, out *apicorev1.ResourceQuota, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -6957,101 +6957,101 @@ func autoConvert_core_ResourceQuota_To_v1_ResourceQuota(in *core.ResourceQuota, 
 }
 
 // Convert_core_ResourceQuota_To_v1_ResourceQuota is an autogenerated conversion function.
-func Convert_core_ResourceQuota_To_v1_ResourceQuota(in *core.ResourceQuota, out *v1.ResourceQuota, s conversion.Scope) error {
+func Convert_core_ResourceQuota_To_v1_ResourceQuota(in *pkgapiscore.ResourceQuota, out *apicorev1.ResourceQuota, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ResourceQuota_To_v1_ResourceQuota(in, out, s)
 }
 
-func autoConvert_v1_ResourceQuotaList_To_core_ResourceQuotaList(in *v1.ResourceQuotaList, out *core.ResourceQuotaList, s conversion.Scope) error {
+func autoConvert_v1_ResourceQuotaList_To_core_ResourceQuotaList(in *apicorev1.ResourceQuotaList, out *pkgapiscore.ResourceQuotaList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.ResourceQuota)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.ResourceQuota)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_ResourceQuotaList_To_core_ResourceQuotaList is an autogenerated conversion function.
-func Convert_v1_ResourceQuotaList_To_core_ResourceQuotaList(in *v1.ResourceQuotaList, out *core.ResourceQuotaList, s conversion.Scope) error {
+func Convert_v1_ResourceQuotaList_To_core_ResourceQuotaList(in *apicorev1.ResourceQuotaList, out *pkgapiscore.ResourceQuotaList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ResourceQuotaList_To_core_ResourceQuotaList(in, out, s)
 }
 
-func autoConvert_core_ResourceQuotaList_To_v1_ResourceQuotaList(in *core.ResourceQuotaList, out *v1.ResourceQuotaList, s conversion.Scope) error {
+func autoConvert_core_ResourceQuotaList_To_v1_ResourceQuotaList(in *pkgapiscore.ResourceQuotaList, out *apicorev1.ResourceQuotaList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.ResourceQuota)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.ResourceQuota)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_ResourceQuotaList_To_v1_ResourceQuotaList is an autogenerated conversion function.
-func Convert_core_ResourceQuotaList_To_v1_ResourceQuotaList(in *core.ResourceQuotaList, out *v1.ResourceQuotaList, s conversion.Scope) error {
+func Convert_core_ResourceQuotaList_To_v1_ResourceQuotaList(in *pkgapiscore.ResourceQuotaList, out *apicorev1.ResourceQuotaList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ResourceQuotaList_To_v1_ResourceQuotaList(in, out, s)
 }
 
-func autoConvert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *v1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
-	out.Hard = *(*core.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Scopes = *(*[]core.ResourceQuotaScope)(unsafe.Pointer(&in.Scopes))
-	out.ScopeSelector = (*core.ScopeSelector)(unsafe.Pointer(in.ScopeSelector))
+func autoConvert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *apicorev1.ResourceQuotaSpec, out *pkgapiscore.ResourceQuotaSpec, s apimachinerypkgconversion.Scope) error {
+	out.Hard = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Hard))
+	out.Scopes = *(*[]pkgapiscore.ResourceQuotaScope)(unsafe.Pointer(&in.Scopes))
+	out.ScopeSelector = (*pkgapiscore.ScopeSelector)(unsafe.Pointer(in.ScopeSelector))
 	return nil
 }
 
 // Convert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec is an autogenerated conversion function.
-func Convert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *v1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
+func Convert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *apicorev1.ResourceQuotaSpec, out *pkgapiscore.ResourceQuotaSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in, out, s)
 }
 
-func autoConvert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *v1.ResourceQuotaSpec, s conversion.Scope) error {
-	out.Hard = *(*v1.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Scopes = *(*[]v1.ResourceQuotaScope)(unsafe.Pointer(&in.Scopes))
-	out.ScopeSelector = (*v1.ScopeSelector)(unsafe.Pointer(in.ScopeSelector))
+func autoConvert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(in *pkgapiscore.ResourceQuotaSpec, out *apicorev1.ResourceQuotaSpec, s apimachinerypkgconversion.Scope) error {
+	out.Hard = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Hard))
+	out.Scopes = *(*[]apicorev1.ResourceQuotaScope)(unsafe.Pointer(&in.Scopes))
+	out.ScopeSelector = (*apicorev1.ScopeSelector)(unsafe.Pointer(in.ScopeSelector))
 	return nil
 }
 
 // Convert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec is an autogenerated conversion function.
-func Convert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *v1.ResourceQuotaSpec, s conversion.Scope) error {
+func Convert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(in *pkgapiscore.ResourceQuotaSpec, out *apicorev1.ResourceQuotaSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ResourceQuotaSpec_To_v1_ResourceQuotaSpec(in, out, s)
 }
 
-func autoConvert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *v1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
-	out.Hard = *(*core.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Used = *(*core.ResourceList)(unsafe.Pointer(&in.Used))
+func autoConvert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *apicorev1.ResourceQuotaStatus, out *pkgapiscore.ResourceQuotaStatus, s apimachinerypkgconversion.Scope) error {
+	out.Hard = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Hard))
+	out.Used = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
 // Convert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus is an autogenerated conversion function.
-func Convert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *v1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
+func Convert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *apicorev1.ResourceQuotaStatus, out *pkgapiscore.ResourceQuotaStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in, out, s)
 }
 
-func autoConvert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *v1.ResourceQuotaStatus, s conversion.Scope) error {
-	out.Hard = *(*v1.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Used = *(*v1.ResourceList)(unsafe.Pointer(&in.Used))
+func autoConvert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(in *pkgapiscore.ResourceQuotaStatus, out *apicorev1.ResourceQuotaStatus, s apimachinerypkgconversion.Scope) error {
+	out.Hard = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Hard))
+	out.Used = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Used))
 	return nil
 }
 
 // Convert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus is an autogenerated conversion function.
-func Convert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *v1.ResourceQuotaStatus, s conversion.Scope) error {
+func Convert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(in *pkgapiscore.ResourceQuotaStatus, out *apicorev1.ResourceQuotaStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ResourceQuotaStatus_To_v1_ResourceQuotaStatus(in, out, s)
 }
 
-func autoConvert_v1_ResourceRequirements_To_core_ResourceRequirements(in *v1.ResourceRequirements, out *core.ResourceRequirements, s conversion.Scope) error {
-	out.Limits = *(*core.ResourceList)(unsafe.Pointer(&in.Limits))
-	out.Requests = *(*core.ResourceList)(unsafe.Pointer(&in.Requests))
+func autoConvert_v1_ResourceRequirements_To_core_ResourceRequirements(in *apicorev1.ResourceRequirements, out *pkgapiscore.ResourceRequirements, s apimachinerypkgconversion.Scope) error {
+	out.Limits = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Limits))
+	out.Requests = *(*pkgapiscore.ResourceList)(unsafe.Pointer(&in.Requests))
 	return nil
 }
 
 // Convert_v1_ResourceRequirements_To_core_ResourceRequirements is an autogenerated conversion function.
-func Convert_v1_ResourceRequirements_To_core_ResourceRequirements(in *v1.ResourceRequirements, out *core.ResourceRequirements, s conversion.Scope) error {
+func Convert_v1_ResourceRequirements_To_core_ResourceRequirements(in *apicorev1.ResourceRequirements, out *pkgapiscore.ResourceRequirements, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ResourceRequirements_To_core_ResourceRequirements(in, out, s)
 }
 
-func autoConvert_core_ResourceRequirements_To_v1_ResourceRequirements(in *core.ResourceRequirements, out *v1.ResourceRequirements, s conversion.Scope) error {
-	out.Limits = *(*v1.ResourceList)(unsafe.Pointer(&in.Limits))
-	out.Requests = *(*v1.ResourceList)(unsafe.Pointer(&in.Requests))
+func autoConvert_core_ResourceRequirements_To_v1_ResourceRequirements(in *pkgapiscore.ResourceRequirements, out *apicorev1.ResourceRequirements, s apimachinerypkgconversion.Scope) error {
+	out.Limits = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Limits))
+	out.Requests = *(*apicorev1.ResourceList)(unsafe.Pointer(&in.Requests))
 	return nil
 }
 
 // Convert_core_ResourceRequirements_To_v1_ResourceRequirements is an autogenerated conversion function.
-func Convert_core_ResourceRequirements_To_v1_ResourceRequirements(in *core.ResourceRequirements, out *v1.ResourceRequirements, s conversion.Scope) error {
+func Convert_core_ResourceRequirements_To_v1_ResourceRequirements(in *pkgapiscore.ResourceRequirements, out *apicorev1.ResourceRequirements, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ResourceRequirements_To_v1_ResourceRequirements(in, out, s)
 }
 
-func autoConvert_v1_SELinuxOptions_To_core_SELinuxOptions(in *v1.SELinuxOptions, out *core.SELinuxOptions, s conversion.Scope) error {
+func autoConvert_v1_SELinuxOptions_To_core_SELinuxOptions(in *apicorev1.SELinuxOptions, out *pkgapiscore.SELinuxOptions, s apimachinerypkgconversion.Scope) error {
 	out.User = in.User
 	out.Role = in.Role
 	out.Type = in.Type
@@ -7060,11 +7060,11 @@ func autoConvert_v1_SELinuxOptions_To_core_SELinuxOptions(in *v1.SELinuxOptions,
 }
 
 // Convert_v1_SELinuxOptions_To_core_SELinuxOptions is an autogenerated conversion function.
-func Convert_v1_SELinuxOptions_To_core_SELinuxOptions(in *v1.SELinuxOptions, out *core.SELinuxOptions, s conversion.Scope) error {
+func Convert_v1_SELinuxOptions_To_core_SELinuxOptions(in *apicorev1.SELinuxOptions, out *pkgapiscore.SELinuxOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SELinuxOptions_To_core_SELinuxOptions(in, out, s)
 }
 
-func autoConvert_core_SELinuxOptions_To_v1_SELinuxOptions(in *core.SELinuxOptions, out *v1.SELinuxOptions, s conversion.Scope) error {
+func autoConvert_core_SELinuxOptions_To_v1_SELinuxOptions(in *pkgapiscore.SELinuxOptions, out *apicorev1.SELinuxOptions, s apimachinerypkgconversion.Scope) error {
 	out.User = in.User
 	out.Role = in.Role
 	out.Type = in.Type
@@ -7073,14 +7073,14 @@ func autoConvert_core_SELinuxOptions_To_v1_SELinuxOptions(in *core.SELinuxOption
 }
 
 // Convert_core_SELinuxOptions_To_v1_SELinuxOptions is an autogenerated conversion function.
-func Convert_core_SELinuxOptions_To_v1_SELinuxOptions(in *core.SELinuxOptions, out *v1.SELinuxOptions, s conversion.Scope) error {
+func Convert_core_SELinuxOptions_To_v1_SELinuxOptions(in *pkgapiscore.SELinuxOptions, out *apicorev1.SELinuxOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SELinuxOptions_To_v1_SELinuxOptions(in, out, s)
 }
 
-func autoConvert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(in *v1.ScaleIOPersistentVolumeSource, out *core.ScaleIOPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(in *apicorev1.ScaleIOPersistentVolumeSource, out *pkgapiscore.ScaleIOPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Gateway = in.Gateway
 	out.System = in.System
-	out.SecretRef = (*core.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.SSLEnabled = in.SSLEnabled
 	out.ProtectionDomain = in.ProtectionDomain
 	out.StoragePool = in.StoragePool
@@ -7092,14 +7092,14 @@ func autoConvert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolum
 }
 
 // Convert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(in *v1.ScaleIOPersistentVolumeSource, out *core.ScaleIOPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(in *apicorev1.ScaleIOPersistentVolumeSource, out *pkgapiscore.ScaleIOPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ScaleIOPersistentVolumeSource_To_core_ScaleIOPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(in *core.ScaleIOPersistentVolumeSource, out *v1.ScaleIOPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(in *pkgapiscore.ScaleIOPersistentVolumeSource, out *apicorev1.ScaleIOPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Gateway = in.Gateway
 	out.System = in.System
-	out.SecretRef = (*v1.SecretReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.SecretReference)(unsafe.Pointer(in.SecretRef))
 	out.SSLEnabled = in.SSLEnabled
 	out.ProtectionDomain = in.ProtectionDomain
 	out.StoragePool = in.StoragePool
@@ -7111,14 +7111,14 @@ func autoConvert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolum
 }
 
 // Convert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(in *core.ScaleIOPersistentVolumeSource, out *v1.ScaleIOPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(in *pkgapiscore.ScaleIOPersistentVolumeSource, out *apicorev1.ScaleIOPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ScaleIOPersistentVolumeSource_To_v1_ScaleIOPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(in *v1.ScaleIOVolumeSource, out *core.ScaleIOVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(in *apicorev1.ScaleIOVolumeSource, out *pkgapiscore.ScaleIOVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Gateway = in.Gateway
 	out.System = in.System
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.SSLEnabled = in.SSLEnabled
 	out.ProtectionDomain = in.ProtectionDomain
 	out.StoragePool = in.StoragePool
@@ -7130,14 +7130,14 @@ func autoConvert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(in *v1.Scale
 }
 
 // Convert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource is an autogenerated conversion function.
-func Convert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(in *v1.ScaleIOVolumeSource, out *core.ScaleIOVolumeSource, s conversion.Scope) error {
+func Convert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(in *apicorev1.ScaleIOVolumeSource, out *pkgapiscore.ScaleIOVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ScaleIOVolumeSource_To_core_ScaleIOVolumeSource(in, out, s)
 }
 
-func autoConvert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(in *core.ScaleIOVolumeSource, out *v1.ScaleIOVolumeSource, s conversion.Scope) error {
+func autoConvert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(in *pkgapiscore.ScaleIOVolumeSource, out *apicorev1.ScaleIOVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.Gateway = in.Gateway
 	out.System = in.System
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	out.SSLEnabled = in.SSLEnabled
 	out.ProtectionDomain = in.ProtectionDomain
 	out.StoragePool = in.StoragePool
@@ -7149,99 +7149,99 @@ func autoConvert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(in *core.Sca
 }
 
 // Convert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource is an autogenerated conversion function.
-func Convert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(in *core.ScaleIOVolumeSource, out *v1.ScaleIOVolumeSource, s conversion.Scope) error {
+func Convert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(in *pkgapiscore.ScaleIOVolumeSource, out *apicorev1.ScaleIOVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ScaleIOVolumeSource_To_v1_ScaleIOVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_ScopeSelector_To_core_ScopeSelector(in *v1.ScopeSelector, out *core.ScopeSelector, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]core.ScopedResourceSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+func autoConvert_v1_ScopeSelector_To_core_ScopeSelector(in *apicorev1.ScopeSelector, out *pkgapiscore.ScopeSelector, s apimachinerypkgconversion.Scope) error {
+	out.MatchExpressions = *(*[]pkgapiscore.ScopedResourceSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
 	return nil
 }
 
 // Convert_v1_ScopeSelector_To_core_ScopeSelector is an autogenerated conversion function.
-func Convert_v1_ScopeSelector_To_core_ScopeSelector(in *v1.ScopeSelector, out *core.ScopeSelector, s conversion.Scope) error {
+func Convert_v1_ScopeSelector_To_core_ScopeSelector(in *apicorev1.ScopeSelector, out *pkgapiscore.ScopeSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ScopeSelector_To_core_ScopeSelector(in, out, s)
 }
 
-func autoConvert_core_ScopeSelector_To_v1_ScopeSelector(in *core.ScopeSelector, out *v1.ScopeSelector, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]v1.ScopedResourceSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+func autoConvert_core_ScopeSelector_To_v1_ScopeSelector(in *pkgapiscore.ScopeSelector, out *apicorev1.ScopeSelector, s apimachinerypkgconversion.Scope) error {
+	out.MatchExpressions = *(*[]apicorev1.ScopedResourceSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
 	return nil
 }
 
 // Convert_core_ScopeSelector_To_v1_ScopeSelector is an autogenerated conversion function.
-func Convert_core_ScopeSelector_To_v1_ScopeSelector(in *core.ScopeSelector, out *v1.ScopeSelector, s conversion.Scope) error {
+func Convert_core_ScopeSelector_To_v1_ScopeSelector(in *pkgapiscore.ScopeSelector, out *apicorev1.ScopeSelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ScopeSelector_To_v1_ScopeSelector(in, out, s)
 }
 
-func autoConvert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(in *v1.ScopedResourceSelectorRequirement, out *core.ScopedResourceSelectorRequirement, s conversion.Scope) error {
-	out.ScopeName = core.ResourceQuotaScope(in.ScopeName)
-	out.Operator = core.ScopeSelectorOperator(in.Operator)
+func autoConvert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(in *apicorev1.ScopedResourceSelectorRequirement, out *pkgapiscore.ScopedResourceSelectorRequirement, s apimachinerypkgconversion.Scope) error {
+	out.ScopeName = pkgapiscore.ResourceQuotaScope(in.ScopeName)
+	out.Operator = pkgapiscore.ScopeSelectorOperator(in.Operator)
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement is an autogenerated conversion function.
-func Convert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(in *v1.ScopedResourceSelectorRequirement, out *core.ScopedResourceSelectorRequirement, s conversion.Scope) error {
+func Convert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(in *apicorev1.ScopedResourceSelectorRequirement, out *pkgapiscore.ScopedResourceSelectorRequirement, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ScopedResourceSelectorRequirement_To_core_ScopedResourceSelectorRequirement(in, out, s)
 }
 
-func autoConvert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(in *core.ScopedResourceSelectorRequirement, out *v1.ScopedResourceSelectorRequirement, s conversion.Scope) error {
-	out.ScopeName = v1.ResourceQuotaScope(in.ScopeName)
-	out.Operator = v1.ScopeSelectorOperator(in.Operator)
+func autoConvert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(in *pkgapiscore.ScopedResourceSelectorRequirement, out *apicorev1.ScopedResourceSelectorRequirement, s apimachinerypkgconversion.Scope) error {
+	out.ScopeName = apicorev1.ResourceQuotaScope(in.ScopeName)
+	out.Operator = apicorev1.ScopeSelectorOperator(in.Operator)
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement is an autogenerated conversion function.
-func Convert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(in *core.ScopedResourceSelectorRequirement, out *v1.ScopedResourceSelectorRequirement, s conversion.Scope) error {
+func Convert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(in *pkgapiscore.ScopedResourceSelectorRequirement, out *apicorev1.ScopedResourceSelectorRequirement, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ScopedResourceSelectorRequirement_To_v1_ScopedResourceSelectorRequirement(in, out, s)
 }
 
-func autoConvert_v1_SeccompProfile_To_core_SeccompProfile(in *v1.SeccompProfile, out *core.SeccompProfile, s conversion.Scope) error {
-	out.Type = core.SeccompProfileType(in.Type)
+func autoConvert_v1_SeccompProfile_To_core_SeccompProfile(in *apicorev1.SeccompProfile, out *pkgapiscore.SeccompProfile, s apimachinerypkgconversion.Scope) error {
+	out.Type = pkgapiscore.SeccompProfileType(in.Type)
 	out.LocalhostProfile = (*string)(unsafe.Pointer(in.LocalhostProfile))
 	return nil
 }
 
 // Convert_v1_SeccompProfile_To_core_SeccompProfile is an autogenerated conversion function.
-func Convert_v1_SeccompProfile_To_core_SeccompProfile(in *v1.SeccompProfile, out *core.SeccompProfile, s conversion.Scope) error {
+func Convert_v1_SeccompProfile_To_core_SeccompProfile(in *apicorev1.SeccompProfile, out *pkgapiscore.SeccompProfile, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SeccompProfile_To_core_SeccompProfile(in, out, s)
 }
 
-func autoConvert_core_SeccompProfile_To_v1_SeccompProfile(in *core.SeccompProfile, out *v1.SeccompProfile, s conversion.Scope) error {
-	out.Type = v1.SeccompProfileType(in.Type)
+func autoConvert_core_SeccompProfile_To_v1_SeccompProfile(in *pkgapiscore.SeccompProfile, out *apicorev1.SeccompProfile, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.SeccompProfileType(in.Type)
 	out.LocalhostProfile = (*string)(unsafe.Pointer(in.LocalhostProfile))
 	return nil
 }
 
 // Convert_core_SeccompProfile_To_v1_SeccompProfile is an autogenerated conversion function.
-func Convert_core_SeccompProfile_To_v1_SeccompProfile(in *core.SeccompProfile, out *v1.SeccompProfile, s conversion.Scope) error {
+func Convert_core_SeccompProfile_To_v1_SeccompProfile(in *pkgapiscore.SeccompProfile, out *apicorev1.SeccompProfile, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SeccompProfile_To_v1_SeccompProfile(in, out, s)
 }
 
-func autoConvert_v1_Secret_To_core_Secret(in *v1.Secret, out *core.Secret, s conversion.Scope) error {
+func autoConvert_v1_Secret_To_core_Secret(in *apicorev1.Secret, out *pkgapiscore.Secret, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Immutable = (*bool)(unsafe.Pointer(in.Immutable))
 	out.Data = *(*map[string][]byte)(unsafe.Pointer(&in.Data))
 	// INFO: in.StringData opted out of conversion generation
-	out.Type = core.SecretType(in.Type)
+	out.Type = pkgapiscore.SecretType(in.Type)
 	return nil
 }
 
-func autoConvert_core_Secret_To_v1_Secret(in *core.Secret, out *v1.Secret, s conversion.Scope) error {
+func autoConvert_core_Secret_To_v1_Secret(in *pkgapiscore.Secret, out *apicorev1.Secret, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	out.Immutable = (*bool)(unsafe.Pointer(in.Immutable))
 	out.Data = *(*map[string][]byte)(unsafe.Pointer(&in.Data))
-	out.Type = v1.SecretType(in.Type)
+	out.Type = apicorev1.SecretType(in.Type)
 	return nil
 }
 
 // Convert_core_Secret_To_v1_Secret is an autogenerated conversion function.
-func Convert_core_Secret_To_v1_Secret(in *core.Secret, out *v1.Secret, s conversion.Scope) error {
+func Convert_core_Secret_To_v1_Secret(in *pkgapiscore.Secret, out *apicorev1.Secret, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Secret_To_v1_Secret(in, out, s)
 }
 
-func autoConvert_v1_SecretEnvSource_To_core_SecretEnvSource(in *v1.SecretEnvSource, out *core.SecretEnvSource, s conversion.Scope) error {
+func autoConvert_v1_SecretEnvSource_To_core_SecretEnvSource(in *apicorev1.SecretEnvSource, out *pkgapiscore.SecretEnvSource, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -7250,11 +7250,11 @@ func autoConvert_v1_SecretEnvSource_To_core_SecretEnvSource(in *v1.SecretEnvSour
 }
 
 // Convert_v1_SecretEnvSource_To_core_SecretEnvSource is an autogenerated conversion function.
-func Convert_v1_SecretEnvSource_To_core_SecretEnvSource(in *v1.SecretEnvSource, out *core.SecretEnvSource, s conversion.Scope) error {
+func Convert_v1_SecretEnvSource_To_core_SecretEnvSource(in *apicorev1.SecretEnvSource, out *pkgapiscore.SecretEnvSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecretEnvSource_To_core_SecretEnvSource(in, out, s)
 }
 
-func autoConvert_core_SecretEnvSource_To_v1_SecretEnvSource(in *core.SecretEnvSource, out *v1.SecretEnvSource, s conversion.Scope) error {
+func autoConvert_core_SecretEnvSource_To_v1_SecretEnvSource(in *pkgapiscore.SecretEnvSource, out *apicorev1.SecretEnvSource, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -7263,11 +7263,11 @@ func autoConvert_core_SecretEnvSource_To_v1_SecretEnvSource(in *core.SecretEnvSo
 }
 
 // Convert_core_SecretEnvSource_To_v1_SecretEnvSource is an autogenerated conversion function.
-func Convert_core_SecretEnvSource_To_v1_SecretEnvSource(in *core.SecretEnvSource, out *v1.SecretEnvSource, s conversion.Scope) error {
+func Convert_core_SecretEnvSource_To_v1_SecretEnvSource(in *pkgapiscore.SecretEnvSource, out *apicorev1.SecretEnvSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecretEnvSource_To_v1_SecretEnvSource(in, out, s)
 }
 
-func autoConvert_v1_SecretKeySelector_To_core_SecretKeySelector(in *v1.SecretKeySelector, out *core.SecretKeySelector, s conversion.Scope) error {
+func autoConvert_v1_SecretKeySelector_To_core_SecretKeySelector(in *apicorev1.SecretKeySelector, out *pkgapiscore.SecretKeySelector, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -7277,11 +7277,11 @@ func autoConvert_v1_SecretKeySelector_To_core_SecretKeySelector(in *v1.SecretKey
 }
 
 // Convert_v1_SecretKeySelector_To_core_SecretKeySelector is an autogenerated conversion function.
-func Convert_v1_SecretKeySelector_To_core_SecretKeySelector(in *v1.SecretKeySelector, out *core.SecretKeySelector, s conversion.Scope) error {
+func Convert_v1_SecretKeySelector_To_core_SecretKeySelector(in *apicorev1.SecretKeySelector, out *pkgapiscore.SecretKeySelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecretKeySelector_To_core_SecretKeySelector(in, out, s)
 }
 
-func autoConvert_core_SecretKeySelector_To_v1_SecretKeySelector(in *core.SecretKeySelector, out *v1.SecretKeySelector, s conversion.Scope) error {
+func autoConvert_core_SecretKeySelector_To_v1_SecretKeySelector(in *pkgapiscore.SecretKeySelector, out *apicorev1.SecretKeySelector, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
@@ -7291,15 +7291,15 @@ func autoConvert_core_SecretKeySelector_To_v1_SecretKeySelector(in *core.SecretK
 }
 
 // Convert_core_SecretKeySelector_To_v1_SecretKeySelector is an autogenerated conversion function.
-func Convert_core_SecretKeySelector_To_v1_SecretKeySelector(in *core.SecretKeySelector, out *v1.SecretKeySelector, s conversion.Scope) error {
+func Convert_core_SecretKeySelector_To_v1_SecretKeySelector(in *pkgapiscore.SecretKeySelector, out *apicorev1.SecretKeySelector, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecretKeySelector_To_v1_SecretKeySelector(in, out, s)
 }
 
-func autoConvert_v1_SecretList_To_core_SecretList(in *v1.SecretList, out *core.SecretList, s conversion.Scope) error {
+func autoConvert_v1_SecretList_To_core_SecretList(in *apicorev1.SecretList, out *pkgapiscore.SecretList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.Secret, len(*in))
+		*out = make([]pkgapiscore.Secret, len(*in))
 		for i := range *in {
 			if err := Convert_v1_Secret_To_core_Secret(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -7312,15 +7312,15 @@ func autoConvert_v1_SecretList_To_core_SecretList(in *v1.SecretList, out *core.S
 }
 
 // Convert_v1_SecretList_To_core_SecretList is an autogenerated conversion function.
-func Convert_v1_SecretList_To_core_SecretList(in *v1.SecretList, out *core.SecretList, s conversion.Scope) error {
+func Convert_v1_SecretList_To_core_SecretList(in *apicorev1.SecretList, out *pkgapiscore.SecretList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecretList_To_core_SecretList(in, out, s)
 }
 
-func autoConvert_core_SecretList_To_v1_SecretList(in *core.SecretList, out *v1.SecretList, s conversion.Scope) error {
+func autoConvert_core_SecretList_To_v1_SecretList(in *pkgapiscore.SecretList, out *apicorev1.SecretList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.Secret, len(*in))
+		*out = make([]apicorev1.Secret, len(*in))
 		for i := range *in {
 			if err := Convert_core_Secret_To_v1_Secret(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -7333,127 +7333,127 @@ func autoConvert_core_SecretList_To_v1_SecretList(in *core.SecretList, out *v1.S
 }
 
 // Convert_core_SecretList_To_v1_SecretList is an autogenerated conversion function.
-func Convert_core_SecretList_To_v1_SecretList(in *core.SecretList, out *v1.SecretList, s conversion.Scope) error {
+func Convert_core_SecretList_To_v1_SecretList(in *pkgapiscore.SecretList, out *apicorev1.SecretList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecretList_To_v1_SecretList(in, out, s)
 }
 
-func autoConvert_v1_SecretProjection_To_core_SecretProjection(in *v1.SecretProjection, out *core.SecretProjection, s conversion.Scope) error {
+func autoConvert_v1_SecretProjection_To_core_SecretProjection(in *apicorev1.SecretProjection, out *pkgapiscore.SecretProjection, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LocalObjectReference_To_core_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
-	out.Items = *(*[]core.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_v1_SecretProjection_To_core_SecretProjection is an autogenerated conversion function.
-func Convert_v1_SecretProjection_To_core_SecretProjection(in *v1.SecretProjection, out *core.SecretProjection, s conversion.Scope) error {
+func Convert_v1_SecretProjection_To_core_SecretProjection(in *apicorev1.SecretProjection, out *pkgapiscore.SecretProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecretProjection_To_core_SecretProjection(in, out, s)
 }
 
-func autoConvert_core_SecretProjection_To_v1_SecretProjection(in *core.SecretProjection, out *v1.SecretProjection, s conversion.Scope) error {
+func autoConvert_core_SecretProjection_To_v1_SecretProjection(in *pkgapiscore.SecretProjection, out *apicorev1.SecretProjection, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LocalObjectReference_To_v1_LocalObjectReference(&in.LocalObjectReference, &out.LocalObjectReference, s); err != nil {
 		return err
 	}
-	out.Items = *(*[]v1.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_core_SecretProjection_To_v1_SecretProjection is an autogenerated conversion function.
-func Convert_core_SecretProjection_To_v1_SecretProjection(in *core.SecretProjection, out *v1.SecretProjection, s conversion.Scope) error {
+func Convert_core_SecretProjection_To_v1_SecretProjection(in *pkgapiscore.SecretProjection, out *apicorev1.SecretProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecretProjection_To_v1_SecretProjection(in, out, s)
 }
 
-func autoConvert_v1_SecretReference_To_core_SecretReference(in *v1.SecretReference, out *core.SecretReference, s conversion.Scope) error {
+func autoConvert_v1_SecretReference_To_core_SecretReference(in *apicorev1.SecretReference, out *pkgapiscore.SecretReference, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Namespace = in.Namespace
 	return nil
 }
 
 // Convert_v1_SecretReference_To_core_SecretReference is an autogenerated conversion function.
-func Convert_v1_SecretReference_To_core_SecretReference(in *v1.SecretReference, out *core.SecretReference, s conversion.Scope) error {
+func Convert_v1_SecretReference_To_core_SecretReference(in *apicorev1.SecretReference, out *pkgapiscore.SecretReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecretReference_To_core_SecretReference(in, out, s)
 }
 
-func autoConvert_core_SecretReference_To_v1_SecretReference(in *core.SecretReference, out *v1.SecretReference, s conversion.Scope) error {
+func autoConvert_core_SecretReference_To_v1_SecretReference(in *pkgapiscore.SecretReference, out *apicorev1.SecretReference, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Namespace = in.Namespace
 	return nil
 }
 
 // Convert_core_SecretReference_To_v1_SecretReference is an autogenerated conversion function.
-func Convert_core_SecretReference_To_v1_SecretReference(in *core.SecretReference, out *v1.SecretReference, s conversion.Scope) error {
+func Convert_core_SecretReference_To_v1_SecretReference(in *pkgapiscore.SecretReference, out *apicorev1.SecretReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecretReference_To_v1_SecretReference(in, out, s)
 }
 
-func autoConvert_v1_SecretVolumeSource_To_core_SecretVolumeSource(in *v1.SecretVolumeSource, out *core.SecretVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_SecretVolumeSource_To_core_SecretVolumeSource(in *apicorev1.SecretVolumeSource, out *pkgapiscore.SecretVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.SecretName = in.SecretName
-	out.Items = *(*[]core.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.DefaultMode = (*int32)(unsafe.Pointer(in.DefaultMode))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_v1_SecretVolumeSource_To_core_SecretVolumeSource is an autogenerated conversion function.
-func Convert_v1_SecretVolumeSource_To_core_SecretVolumeSource(in *v1.SecretVolumeSource, out *core.SecretVolumeSource, s conversion.Scope) error {
+func Convert_v1_SecretVolumeSource_To_core_SecretVolumeSource(in *apicorev1.SecretVolumeSource, out *pkgapiscore.SecretVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecretVolumeSource_To_core_SecretVolumeSource(in, out, s)
 }
 
-func autoConvert_core_SecretVolumeSource_To_v1_SecretVolumeSource(in *core.SecretVolumeSource, out *v1.SecretVolumeSource, s conversion.Scope) error {
+func autoConvert_core_SecretVolumeSource_To_v1_SecretVolumeSource(in *pkgapiscore.SecretVolumeSource, out *apicorev1.SecretVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.SecretName = in.SecretName
-	out.Items = *(*[]v1.KeyToPath)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.KeyToPath)(unsafe.Pointer(&in.Items))
 	out.DefaultMode = (*int32)(unsafe.Pointer(in.DefaultMode))
 	out.Optional = (*bool)(unsafe.Pointer(in.Optional))
 	return nil
 }
 
 // Convert_core_SecretVolumeSource_To_v1_SecretVolumeSource is an autogenerated conversion function.
-func Convert_core_SecretVolumeSource_To_v1_SecretVolumeSource(in *core.SecretVolumeSource, out *v1.SecretVolumeSource, s conversion.Scope) error {
+func Convert_core_SecretVolumeSource_To_v1_SecretVolumeSource(in *pkgapiscore.SecretVolumeSource, out *apicorev1.SecretVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecretVolumeSource_To_v1_SecretVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_SecurityContext_To_core_SecurityContext(in *v1.SecurityContext, out *core.SecurityContext, s conversion.Scope) error {
-	out.Capabilities = (*core.Capabilities)(unsafe.Pointer(in.Capabilities))
+func autoConvert_v1_SecurityContext_To_core_SecurityContext(in *apicorev1.SecurityContext, out *pkgapiscore.SecurityContext, s apimachinerypkgconversion.Scope) error {
+	out.Capabilities = (*pkgapiscore.Capabilities)(unsafe.Pointer(in.Capabilities))
 	out.Privileged = (*bool)(unsafe.Pointer(in.Privileged))
-	out.SELinuxOptions = (*core.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
-	out.WindowsOptions = (*core.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
+	out.SELinuxOptions = (*pkgapiscore.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
+	out.WindowsOptions = (*pkgapiscore.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
 	out.RunAsUser = (*int64)(unsafe.Pointer(in.RunAsUser))
 	out.RunAsGroup = (*int64)(unsafe.Pointer(in.RunAsGroup))
 	out.RunAsNonRoot = (*bool)(unsafe.Pointer(in.RunAsNonRoot))
 	out.ReadOnlyRootFilesystem = (*bool)(unsafe.Pointer(in.ReadOnlyRootFilesystem))
 	out.AllowPrivilegeEscalation = (*bool)(unsafe.Pointer(in.AllowPrivilegeEscalation))
-	out.ProcMount = (*core.ProcMountType)(unsafe.Pointer(in.ProcMount))
-	out.SeccompProfile = (*core.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
+	out.ProcMount = (*pkgapiscore.ProcMountType)(unsafe.Pointer(in.ProcMount))
+	out.SeccompProfile = (*pkgapiscore.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
 	return nil
 }
 
 // Convert_v1_SecurityContext_To_core_SecurityContext is an autogenerated conversion function.
-func Convert_v1_SecurityContext_To_core_SecurityContext(in *v1.SecurityContext, out *core.SecurityContext, s conversion.Scope) error {
+func Convert_v1_SecurityContext_To_core_SecurityContext(in *apicorev1.SecurityContext, out *pkgapiscore.SecurityContext, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SecurityContext_To_core_SecurityContext(in, out, s)
 }
 
-func autoConvert_core_SecurityContext_To_v1_SecurityContext(in *core.SecurityContext, out *v1.SecurityContext, s conversion.Scope) error {
-	out.Capabilities = (*v1.Capabilities)(unsafe.Pointer(in.Capabilities))
+func autoConvert_core_SecurityContext_To_v1_SecurityContext(in *pkgapiscore.SecurityContext, out *apicorev1.SecurityContext, s apimachinerypkgconversion.Scope) error {
+	out.Capabilities = (*apicorev1.Capabilities)(unsafe.Pointer(in.Capabilities))
 	out.Privileged = (*bool)(unsafe.Pointer(in.Privileged))
-	out.SELinuxOptions = (*v1.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
-	out.WindowsOptions = (*v1.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
+	out.SELinuxOptions = (*apicorev1.SELinuxOptions)(unsafe.Pointer(in.SELinuxOptions))
+	out.WindowsOptions = (*apicorev1.WindowsSecurityContextOptions)(unsafe.Pointer(in.WindowsOptions))
 	out.RunAsUser = (*int64)(unsafe.Pointer(in.RunAsUser))
 	out.RunAsGroup = (*int64)(unsafe.Pointer(in.RunAsGroup))
 	out.RunAsNonRoot = (*bool)(unsafe.Pointer(in.RunAsNonRoot))
 	out.ReadOnlyRootFilesystem = (*bool)(unsafe.Pointer(in.ReadOnlyRootFilesystem))
 	out.AllowPrivilegeEscalation = (*bool)(unsafe.Pointer(in.AllowPrivilegeEscalation))
-	out.ProcMount = (*v1.ProcMountType)(unsafe.Pointer(in.ProcMount))
-	out.SeccompProfile = (*v1.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
+	out.ProcMount = (*apicorev1.ProcMountType)(unsafe.Pointer(in.ProcMount))
+	out.SeccompProfile = (*apicorev1.SeccompProfile)(unsafe.Pointer(in.SeccompProfile))
 	return nil
 }
 
 // Convert_core_SecurityContext_To_v1_SecurityContext is an autogenerated conversion function.
-func Convert_core_SecurityContext_To_v1_SecurityContext(in *core.SecurityContext, out *v1.SecurityContext, s conversion.Scope) error {
+func Convert_core_SecurityContext_To_v1_SecurityContext(in *pkgapiscore.SecurityContext, out *apicorev1.SecurityContext, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SecurityContext_To_v1_SecurityContext(in, out, s)
 }
 
-func autoConvert_v1_SerializedReference_To_core_SerializedReference(in *v1.SerializedReference, out *core.SerializedReference, s conversion.Scope) error {
+func autoConvert_v1_SerializedReference_To_core_SerializedReference(in *apicorev1.SerializedReference, out *pkgapiscore.SerializedReference, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_ObjectReference_To_core_ObjectReference(&in.Reference, &out.Reference, s); err != nil {
 		return err
 	}
@@ -7461,11 +7461,11 @@ func autoConvert_v1_SerializedReference_To_core_SerializedReference(in *v1.Seria
 }
 
 // Convert_v1_SerializedReference_To_core_SerializedReference is an autogenerated conversion function.
-func Convert_v1_SerializedReference_To_core_SerializedReference(in *v1.SerializedReference, out *core.SerializedReference, s conversion.Scope) error {
+func Convert_v1_SerializedReference_To_core_SerializedReference(in *apicorev1.SerializedReference, out *pkgapiscore.SerializedReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SerializedReference_To_core_SerializedReference(in, out, s)
 }
 
-func autoConvert_core_SerializedReference_To_v1_SerializedReference(in *core.SerializedReference, out *v1.SerializedReference, s conversion.Scope) error {
+func autoConvert_core_SerializedReference_To_v1_SerializedReference(in *pkgapiscore.SerializedReference, out *apicorev1.SerializedReference, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_ObjectReference_To_v1_ObjectReference(&in.Reference, &out.Reference, s); err != nil {
 		return err
 	}
@@ -7473,11 +7473,11 @@ func autoConvert_core_SerializedReference_To_v1_SerializedReference(in *core.Ser
 }
 
 // Convert_core_SerializedReference_To_v1_SerializedReference is an autogenerated conversion function.
-func Convert_core_SerializedReference_To_v1_SerializedReference(in *core.SerializedReference, out *v1.SerializedReference, s conversion.Scope) error {
+func Convert_core_SerializedReference_To_v1_SerializedReference(in *pkgapiscore.SerializedReference, out *apicorev1.SerializedReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SerializedReference_To_v1_SerializedReference(in, out, s)
 }
 
-func autoConvert_v1_Service_To_core_Service(in *v1.Service, out *core.Service, s conversion.Scope) error {
+func autoConvert_v1_Service_To_core_Service(in *apicorev1.Service, out *pkgapiscore.Service, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_v1_ServiceSpec_To_core_ServiceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -7489,11 +7489,11 @@ func autoConvert_v1_Service_To_core_Service(in *v1.Service, out *core.Service, s
 }
 
 // Convert_v1_Service_To_core_Service is an autogenerated conversion function.
-func Convert_v1_Service_To_core_Service(in *v1.Service, out *core.Service, s conversion.Scope) error {
+func Convert_v1_Service_To_core_Service(in *apicorev1.Service, out *pkgapiscore.Service, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Service_To_core_Service(in, out, s)
 }
 
-func autoConvert_core_Service_To_v1_Service(in *core.Service, out *v1.Service, s conversion.Scope) error {
+func autoConvert_core_Service_To_v1_Service(in *pkgapiscore.Service, out *apicorev1.Service, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
 	if err := Convert_core_ServiceSpec_To_v1_ServiceSpec(&in.Spec, &out.Spec, s); err != nil {
 		return err
@@ -7505,61 +7505,61 @@ func autoConvert_core_Service_To_v1_Service(in *core.Service, out *v1.Service, s
 }
 
 // Convert_core_Service_To_v1_Service is an autogenerated conversion function.
-func Convert_core_Service_To_v1_Service(in *core.Service, out *v1.Service, s conversion.Scope) error {
+func Convert_core_Service_To_v1_Service(in *pkgapiscore.Service, out *apicorev1.Service, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Service_To_v1_Service(in, out, s)
 }
 
-func autoConvert_v1_ServiceAccount_To_core_ServiceAccount(in *v1.ServiceAccount, out *core.ServiceAccount, s conversion.Scope) error {
+func autoConvert_v1_ServiceAccount_To_core_ServiceAccount(in *apicorev1.ServiceAccount, out *pkgapiscore.ServiceAccount, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Secrets = *(*[]core.ObjectReference)(unsafe.Pointer(&in.Secrets))
-	out.ImagePullSecrets = *(*[]core.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
+	out.Secrets = *(*[]pkgapiscore.ObjectReference)(unsafe.Pointer(&in.Secrets))
+	out.ImagePullSecrets = *(*[]pkgapiscore.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
 	out.AutomountServiceAccountToken = (*bool)(unsafe.Pointer(in.AutomountServiceAccountToken))
 	return nil
 }
 
 // Convert_v1_ServiceAccount_To_core_ServiceAccount is an autogenerated conversion function.
-func Convert_v1_ServiceAccount_To_core_ServiceAccount(in *v1.ServiceAccount, out *core.ServiceAccount, s conversion.Scope) error {
+func Convert_v1_ServiceAccount_To_core_ServiceAccount(in *apicorev1.ServiceAccount, out *pkgapiscore.ServiceAccount, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceAccount_To_core_ServiceAccount(in, out, s)
 }
 
-func autoConvert_core_ServiceAccount_To_v1_ServiceAccount(in *core.ServiceAccount, out *v1.ServiceAccount, s conversion.Scope) error {
+func autoConvert_core_ServiceAccount_To_v1_ServiceAccount(in *pkgapiscore.ServiceAccount, out *apicorev1.ServiceAccount, s apimachinerypkgconversion.Scope) error {
 	out.ObjectMeta = in.ObjectMeta
-	out.Secrets = *(*[]v1.ObjectReference)(unsafe.Pointer(&in.Secrets))
-	out.ImagePullSecrets = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
+	out.Secrets = *(*[]apicorev1.ObjectReference)(unsafe.Pointer(&in.Secrets))
+	out.ImagePullSecrets = *(*[]apicorev1.LocalObjectReference)(unsafe.Pointer(&in.ImagePullSecrets))
 	out.AutomountServiceAccountToken = (*bool)(unsafe.Pointer(in.AutomountServiceAccountToken))
 	return nil
 }
 
 // Convert_core_ServiceAccount_To_v1_ServiceAccount is an autogenerated conversion function.
-func Convert_core_ServiceAccount_To_v1_ServiceAccount(in *core.ServiceAccount, out *v1.ServiceAccount, s conversion.Scope) error {
+func Convert_core_ServiceAccount_To_v1_ServiceAccount(in *pkgapiscore.ServiceAccount, out *apicorev1.ServiceAccount, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceAccount_To_v1_ServiceAccount(in, out, s)
 }
 
-func autoConvert_v1_ServiceAccountList_To_core_ServiceAccountList(in *v1.ServiceAccountList, out *core.ServiceAccountList, s conversion.Scope) error {
+func autoConvert_v1_ServiceAccountList_To_core_ServiceAccountList(in *apicorev1.ServiceAccountList, out *pkgapiscore.ServiceAccountList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.ServiceAccount)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]pkgapiscore.ServiceAccount)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_v1_ServiceAccountList_To_core_ServiceAccountList is an autogenerated conversion function.
-func Convert_v1_ServiceAccountList_To_core_ServiceAccountList(in *v1.ServiceAccountList, out *core.ServiceAccountList, s conversion.Scope) error {
+func Convert_v1_ServiceAccountList_To_core_ServiceAccountList(in *apicorev1.ServiceAccountList, out *pkgapiscore.ServiceAccountList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceAccountList_To_core_ServiceAccountList(in, out, s)
 }
 
-func autoConvert_core_ServiceAccountList_To_v1_ServiceAccountList(in *core.ServiceAccountList, out *v1.ServiceAccountList, s conversion.Scope) error {
+func autoConvert_core_ServiceAccountList_To_v1_ServiceAccountList(in *pkgapiscore.ServiceAccountList, out *apicorev1.ServiceAccountList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]v1.ServiceAccount)(unsafe.Pointer(&in.Items))
+	out.Items = *(*[]apicorev1.ServiceAccount)(unsafe.Pointer(&in.Items))
 	return nil
 }
 
 // Convert_core_ServiceAccountList_To_v1_ServiceAccountList is an autogenerated conversion function.
-func Convert_core_ServiceAccountList_To_v1_ServiceAccountList(in *core.ServiceAccountList, out *v1.ServiceAccountList, s conversion.Scope) error {
+func Convert_core_ServiceAccountList_To_v1_ServiceAccountList(in *pkgapiscore.ServiceAccountList, out *apicorev1.ServiceAccountList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceAccountList_To_v1_ServiceAccountList(in, out, s)
 }
 
-func autoConvert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(in *v1.ServiceAccountTokenProjection, out *core.ServiceAccountTokenProjection, s conversion.Scope) error {
+func autoConvert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(in *apicorev1.ServiceAccountTokenProjection, out *pkgapiscore.ServiceAccountTokenProjection, s apimachinerypkgconversion.Scope) error {
 	out.Audience = in.Audience
-	if err := metav1.Convert_Pointer_int64_To_int64(&in.ExpirationSeconds, &out.ExpirationSeconds, s); err != nil {
+	if err := apismetav1.Convert_Pointer_int64_To_int64(&in.ExpirationSeconds, &out.ExpirationSeconds, s); err != nil {
 		return err
 	}
 	out.Path = in.Path
@@ -7567,13 +7567,13 @@ func autoConvert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenPro
 }
 
 // Convert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection is an autogenerated conversion function.
-func Convert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(in *v1.ServiceAccountTokenProjection, out *core.ServiceAccountTokenProjection, s conversion.Scope) error {
+func Convert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(in *apicorev1.ServiceAccountTokenProjection, out *pkgapiscore.ServiceAccountTokenProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(in, out, s)
 }
 
-func autoConvert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(in *core.ServiceAccountTokenProjection, out *v1.ServiceAccountTokenProjection, s conversion.Scope) error {
+func autoConvert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(in *pkgapiscore.ServiceAccountTokenProjection, out *apicorev1.ServiceAccountTokenProjection, s apimachinerypkgconversion.Scope) error {
 	out.Audience = in.Audience
-	if err := metav1.Convert_int64_To_Pointer_int64(&in.ExpirationSeconds, &out.ExpirationSeconds, s); err != nil {
+	if err := apismetav1.Convert_int64_To_Pointer_int64(&in.ExpirationSeconds, &out.ExpirationSeconds, s); err != nil {
 		return err
 	}
 	out.Path = in.Path
@@ -7581,15 +7581,15 @@ func autoConvert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenPro
 }
 
 // Convert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection is an autogenerated conversion function.
-func Convert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(in *core.ServiceAccountTokenProjection, out *v1.ServiceAccountTokenProjection, s conversion.Scope) error {
+func Convert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(in *pkgapiscore.ServiceAccountTokenProjection, out *apicorev1.ServiceAccountTokenProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(in, out, s)
 }
 
-func autoConvert_v1_ServiceList_To_core_ServiceList(in *v1.ServiceList, out *core.ServiceList, s conversion.Scope) error {
+func autoConvert_v1_ServiceList_To_core_ServiceList(in *apicorev1.ServiceList, out *pkgapiscore.ServiceList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]core.Service, len(*in))
+		*out = make([]pkgapiscore.Service, len(*in))
 		for i := range *in {
 			if err := Convert_v1_Service_To_core_Service(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -7602,15 +7602,15 @@ func autoConvert_v1_ServiceList_To_core_ServiceList(in *v1.ServiceList, out *cor
 }
 
 // Convert_v1_ServiceList_To_core_ServiceList is an autogenerated conversion function.
-func Convert_v1_ServiceList_To_core_ServiceList(in *v1.ServiceList, out *core.ServiceList, s conversion.Scope) error {
+func Convert_v1_ServiceList_To_core_ServiceList(in *apicorev1.ServiceList, out *pkgapiscore.ServiceList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceList_To_core_ServiceList(in, out, s)
 }
 
-func autoConvert_core_ServiceList_To_v1_ServiceList(in *core.ServiceList, out *v1.ServiceList, s conversion.Scope) error {
+func autoConvert_core_ServiceList_To_v1_ServiceList(in *pkgapiscore.ServiceList, out *apicorev1.ServiceList, s apimachinerypkgconversion.Scope) error {
 	out.ListMeta = in.ListMeta
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1.Service, len(*in))
+		*out = make([]apicorev1.Service, len(*in))
 		for i := range *in {
 			if err := Convert_core_Service_To_v1_Service(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -7623,13 +7623,13 @@ func autoConvert_core_ServiceList_To_v1_ServiceList(in *core.ServiceList, out *v
 }
 
 // Convert_core_ServiceList_To_v1_ServiceList is an autogenerated conversion function.
-func Convert_core_ServiceList_To_v1_ServiceList(in *core.ServiceList, out *v1.ServiceList, s conversion.Scope) error {
+func Convert_core_ServiceList_To_v1_ServiceList(in *pkgapiscore.ServiceList, out *apicorev1.ServiceList, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceList_To_v1_ServiceList(in, out, s)
 }
 
-func autoConvert_v1_ServicePort_To_core_ServicePort(in *v1.ServicePort, out *core.ServicePort, s conversion.Scope) error {
+func autoConvert_v1_ServicePort_To_core_ServicePort(in *apicorev1.ServicePort, out *pkgapiscore.ServicePort, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
-	out.Protocol = core.Protocol(in.Protocol)
+	out.Protocol = pkgapiscore.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	out.Port = in.Port
 	out.TargetPort = in.TargetPort
@@ -7638,13 +7638,13 @@ func autoConvert_v1_ServicePort_To_core_ServicePort(in *v1.ServicePort, out *cor
 }
 
 // Convert_v1_ServicePort_To_core_ServicePort is an autogenerated conversion function.
-func Convert_v1_ServicePort_To_core_ServicePort(in *v1.ServicePort, out *core.ServicePort, s conversion.Scope) error {
+func Convert_v1_ServicePort_To_core_ServicePort(in *apicorev1.ServicePort, out *pkgapiscore.ServicePort, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServicePort_To_core_ServicePort(in, out, s)
 }
 
-func autoConvert_core_ServicePort_To_v1_ServicePort(in *core.ServicePort, out *v1.ServicePort, s conversion.Scope) error {
+func autoConvert_core_ServicePort_To_v1_ServicePort(in *pkgapiscore.ServicePort, out *apicorev1.ServicePort, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
-	out.Protocol = v1.Protocol(in.Protocol)
+	out.Protocol = apicorev1.Protocol(in.Protocol)
 	out.AppProtocol = (*string)(unsafe.Pointer(in.AppProtocol))
 	out.Port = in.Port
 	out.TargetPort = in.TargetPort
@@ -7653,35 +7653,35 @@ func autoConvert_core_ServicePort_To_v1_ServicePort(in *core.ServicePort, out *v
 }
 
 // Convert_core_ServicePort_To_v1_ServicePort is an autogenerated conversion function.
-func Convert_core_ServicePort_To_v1_ServicePort(in *core.ServicePort, out *v1.ServicePort, s conversion.Scope) error {
+func Convert_core_ServicePort_To_v1_ServicePort(in *pkgapiscore.ServicePort, out *apicorev1.ServicePort, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServicePort_To_v1_ServicePort(in, out, s)
 }
 
-func autoConvert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(in *v1.ServiceProxyOptions, out *core.ServiceProxyOptions, s conversion.Scope) error {
+func autoConvert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(in *apicorev1.ServiceProxyOptions, out *pkgapiscore.ServiceProxyOptions, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	return nil
 }
 
 // Convert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions is an autogenerated conversion function.
-func Convert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(in *v1.ServiceProxyOptions, out *core.ServiceProxyOptions, s conversion.Scope) error {
+func Convert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(in *apicorev1.ServiceProxyOptions, out *pkgapiscore.ServiceProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceProxyOptions_To_core_ServiceProxyOptions(in, out, s)
 }
 
-func autoConvert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(in *core.ServiceProxyOptions, out *v1.ServiceProxyOptions, s conversion.Scope) error {
+func autoConvert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(in *pkgapiscore.ServiceProxyOptions, out *apicorev1.ServiceProxyOptions, s apimachinerypkgconversion.Scope) error {
 	out.Path = in.Path
 	return nil
 }
 
 // Convert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions is an autogenerated conversion function.
-func Convert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(in *core.ServiceProxyOptions, out *v1.ServiceProxyOptions, s conversion.Scope) error {
+func Convert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(in *pkgapiscore.ServiceProxyOptions, out *apicorev1.ServiceProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceProxyOptions_To_v1_ServiceProxyOptions(in, out, s)
 }
 
-func autoConvert_url_Values_To_v1_ServiceProxyOptions(in *url.Values, out *v1.ServiceProxyOptions, s conversion.Scope) error {
+func autoConvert_url_Values_To_v1_ServiceProxyOptions(in *url.Values, out *apicorev1.ServiceProxyOptions, s apimachinerypkgconversion.Scope) error {
 	// WARNING: Field TypeMeta does not have json tag, skipping.
 
 	if values, ok := map[string][]string(*in)["path"]; ok && len(values) > 0 {
-		if err := runtime.Convert_Slice_string_To_string(&values, &out.Path, s); err != nil {
+		if err := apimachinerypkgruntime.Convert_Slice_string_To_string(&values, &out.Path, s); err != nil {
 			return err
 		}
 	} else {
@@ -7691,343 +7691,343 @@ func autoConvert_url_Values_To_v1_ServiceProxyOptions(in *url.Values, out *v1.Se
 }
 
 // Convert_url_Values_To_v1_ServiceProxyOptions is an autogenerated conversion function.
-func Convert_url_Values_To_v1_ServiceProxyOptions(in *url.Values, out *v1.ServiceProxyOptions, s conversion.Scope) error {
+func Convert_url_Values_To_v1_ServiceProxyOptions(in *url.Values, out *apicorev1.ServiceProxyOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_url_Values_To_v1_ServiceProxyOptions(in, out, s)
 }
 
-func autoConvert_v1_ServiceSpec_To_core_ServiceSpec(in *v1.ServiceSpec, out *core.ServiceSpec, s conversion.Scope) error {
-	out.Ports = *(*[]core.ServicePort)(unsafe.Pointer(&in.Ports))
+func autoConvert_v1_ServiceSpec_To_core_ServiceSpec(in *apicorev1.ServiceSpec, out *pkgapiscore.ServiceSpec, s apimachinerypkgconversion.Scope) error {
+	out.Ports = *(*[]pkgapiscore.ServicePort)(unsafe.Pointer(&in.Ports))
 	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
 	out.ClusterIP = in.ClusterIP
 	out.ClusterIPs = *(*[]string)(unsafe.Pointer(&in.ClusterIPs))
-	out.Type = core.ServiceType(in.Type)
+	out.Type = pkgapiscore.ServiceType(in.Type)
 	out.ExternalIPs = *(*[]string)(unsafe.Pointer(&in.ExternalIPs))
-	out.SessionAffinity = core.ServiceAffinity(in.SessionAffinity)
+	out.SessionAffinity = pkgapiscore.ServiceAffinity(in.SessionAffinity)
 	out.LoadBalancerIP = in.LoadBalancerIP
 	out.LoadBalancerSourceRanges = *(*[]string)(unsafe.Pointer(&in.LoadBalancerSourceRanges))
 	out.ExternalName = in.ExternalName
-	out.ExternalTrafficPolicy = core.ServiceExternalTrafficPolicyType(in.ExternalTrafficPolicy)
+	out.ExternalTrafficPolicy = pkgapiscore.ServiceExternalTrafficPolicyType(in.ExternalTrafficPolicy)
 	out.HealthCheckNodePort = in.HealthCheckNodePort
 	out.PublishNotReadyAddresses = in.PublishNotReadyAddresses
-	out.SessionAffinityConfig = (*core.SessionAffinityConfig)(unsafe.Pointer(in.SessionAffinityConfig))
-	out.IPFamilies = *(*[]core.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPFamilyPolicy = (*core.IPFamilyPolicy)(unsafe.Pointer(in.IPFamilyPolicy))
+	out.SessionAffinityConfig = (*pkgapiscore.SessionAffinityConfig)(unsafe.Pointer(in.SessionAffinityConfig))
+	out.IPFamilies = *(*[]pkgapiscore.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPFamilyPolicy = (*pkgapiscore.IPFamilyPolicy)(unsafe.Pointer(in.IPFamilyPolicy))
 	out.AllocateLoadBalancerNodePorts = (*bool)(unsafe.Pointer(in.AllocateLoadBalancerNodePorts))
 	out.LoadBalancerClass = (*string)(unsafe.Pointer(in.LoadBalancerClass))
-	out.InternalTrafficPolicy = (*core.ServiceInternalTrafficPolicyType)(unsafe.Pointer(in.InternalTrafficPolicy))
+	out.InternalTrafficPolicy = (*pkgapiscore.ServiceInternalTrafficPolicyType)(unsafe.Pointer(in.InternalTrafficPolicy))
 	return nil
 }
 
 // Convert_v1_ServiceSpec_To_core_ServiceSpec is an autogenerated conversion function.
-func Convert_v1_ServiceSpec_To_core_ServiceSpec(in *v1.ServiceSpec, out *core.ServiceSpec, s conversion.Scope) error {
+func Convert_v1_ServiceSpec_To_core_ServiceSpec(in *apicorev1.ServiceSpec, out *pkgapiscore.ServiceSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceSpec_To_core_ServiceSpec(in, out, s)
 }
 
-func autoConvert_core_ServiceSpec_To_v1_ServiceSpec(in *core.ServiceSpec, out *v1.ServiceSpec, s conversion.Scope) error {
-	out.Type = v1.ServiceType(in.Type)
-	out.Ports = *(*[]v1.ServicePort)(unsafe.Pointer(&in.Ports))
+func autoConvert_core_ServiceSpec_To_v1_ServiceSpec(in *pkgapiscore.ServiceSpec, out *apicorev1.ServiceSpec, s apimachinerypkgconversion.Scope) error {
+	out.Type = apicorev1.ServiceType(in.Type)
+	out.Ports = *(*[]apicorev1.ServicePort)(unsafe.Pointer(&in.Ports))
 	out.Selector = *(*map[string]string)(unsafe.Pointer(&in.Selector))
 	out.ClusterIP = in.ClusterIP
 	out.ClusterIPs = *(*[]string)(unsafe.Pointer(&in.ClusterIPs))
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPFamilyPolicy = (*v1.IPFamilyPolicy)(unsafe.Pointer(in.IPFamilyPolicy))
+	out.IPFamilies = *(*[]apicorev1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
+	out.IPFamilyPolicy = (*apicorev1.IPFamilyPolicy)(unsafe.Pointer(in.IPFamilyPolicy))
 	out.ExternalName = in.ExternalName
 	out.ExternalIPs = *(*[]string)(unsafe.Pointer(&in.ExternalIPs))
 	out.LoadBalancerIP = in.LoadBalancerIP
-	out.SessionAffinity = v1.ServiceAffinity(in.SessionAffinity)
-	out.SessionAffinityConfig = (*v1.SessionAffinityConfig)(unsafe.Pointer(in.SessionAffinityConfig))
+	out.SessionAffinity = apicorev1.ServiceAffinity(in.SessionAffinity)
+	out.SessionAffinityConfig = (*apicorev1.SessionAffinityConfig)(unsafe.Pointer(in.SessionAffinityConfig))
 	out.LoadBalancerSourceRanges = *(*[]string)(unsafe.Pointer(&in.LoadBalancerSourceRanges))
-	out.ExternalTrafficPolicy = v1.ServiceExternalTrafficPolicyType(in.ExternalTrafficPolicy)
+	out.ExternalTrafficPolicy = apicorev1.ServiceExternalTrafficPolicyType(in.ExternalTrafficPolicy)
 	out.HealthCheckNodePort = in.HealthCheckNodePort
 	out.PublishNotReadyAddresses = in.PublishNotReadyAddresses
 	out.AllocateLoadBalancerNodePorts = (*bool)(unsafe.Pointer(in.AllocateLoadBalancerNodePorts))
 	out.LoadBalancerClass = (*string)(unsafe.Pointer(in.LoadBalancerClass))
-	out.InternalTrafficPolicy = (*v1.ServiceInternalTrafficPolicyType)(unsafe.Pointer(in.InternalTrafficPolicy))
+	out.InternalTrafficPolicy = (*apicorev1.ServiceInternalTrafficPolicyType)(unsafe.Pointer(in.InternalTrafficPolicy))
 	return nil
 }
 
 // Convert_core_ServiceSpec_To_v1_ServiceSpec is an autogenerated conversion function.
-func Convert_core_ServiceSpec_To_v1_ServiceSpec(in *core.ServiceSpec, out *v1.ServiceSpec, s conversion.Scope) error {
+func Convert_core_ServiceSpec_To_v1_ServiceSpec(in *pkgapiscore.ServiceSpec, out *apicorev1.ServiceSpec, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceSpec_To_v1_ServiceSpec(in, out, s)
 }
 
-func autoConvert_v1_ServiceStatus_To_core_ServiceStatus(in *v1.ServiceStatus, out *core.ServiceStatus, s conversion.Scope) error {
+func autoConvert_v1_ServiceStatus_To_core_ServiceStatus(in *apicorev1.ServiceStatus, out *pkgapiscore.ServiceStatus, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_v1_LoadBalancerStatus_To_core_LoadBalancerStatus(&in.LoadBalancer, &out.LoadBalancer, s); err != nil {
 		return err
 	}
-	out.Conditions = *(*[]metav1.Condition)(unsafe.Pointer(&in.Conditions))
+	out.Conditions = *(*[]apismetav1.Condition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_v1_ServiceStatus_To_core_ServiceStatus is an autogenerated conversion function.
-func Convert_v1_ServiceStatus_To_core_ServiceStatus(in *v1.ServiceStatus, out *core.ServiceStatus, s conversion.Scope) error {
+func Convert_v1_ServiceStatus_To_core_ServiceStatus(in *apicorev1.ServiceStatus, out *pkgapiscore.ServiceStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_ServiceStatus_To_core_ServiceStatus(in, out, s)
 }
 
-func autoConvert_core_ServiceStatus_To_v1_ServiceStatus(in *core.ServiceStatus, out *v1.ServiceStatus, s conversion.Scope) error {
+func autoConvert_core_ServiceStatus_To_v1_ServiceStatus(in *pkgapiscore.ServiceStatus, out *apicorev1.ServiceStatus, s apimachinerypkgconversion.Scope) error {
 	if err := Convert_core_LoadBalancerStatus_To_v1_LoadBalancerStatus(&in.LoadBalancer, &out.LoadBalancer, s); err != nil {
 		return err
 	}
-	out.Conditions = *(*[]metav1.Condition)(unsafe.Pointer(&in.Conditions))
+	out.Conditions = *(*[]apismetav1.Condition)(unsafe.Pointer(&in.Conditions))
 	return nil
 }
 
 // Convert_core_ServiceStatus_To_v1_ServiceStatus is an autogenerated conversion function.
-func Convert_core_ServiceStatus_To_v1_ServiceStatus(in *core.ServiceStatus, out *v1.ServiceStatus, s conversion.Scope) error {
+func Convert_core_ServiceStatus_To_v1_ServiceStatus(in *pkgapiscore.ServiceStatus, out *apicorev1.ServiceStatus, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_ServiceStatus_To_v1_ServiceStatus(in, out, s)
 }
 
-func autoConvert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(in *v1.SessionAffinityConfig, out *core.SessionAffinityConfig, s conversion.Scope) error {
-	out.ClientIP = (*core.ClientIPConfig)(unsafe.Pointer(in.ClientIP))
+func autoConvert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(in *apicorev1.SessionAffinityConfig, out *pkgapiscore.SessionAffinityConfig, s apimachinerypkgconversion.Scope) error {
+	out.ClientIP = (*pkgapiscore.ClientIPConfig)(unsafe.Pointer(in.ClientIP))
 	return nil
 }
 
 // Convert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig is an autogenerated conversion function.
-func Convert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(in *v1.SessionAffinityConfig, out *core.SessionAffinityConfig, s conversion.Scope) error {
+func Convert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(in *apicorev1.SessionAffinityConfig, out *pkgapiscore.SessionAffinityConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_SessionAffinityConfig_To_core_SessionAffinityConfig(in, out, s)
 }
 
-func autoConvert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(in *core.SessionAffinityConfig, out *v1.SessionAffinityConfig, s conversion.Scope) error {
-	out.ClientIP = (*v1.ClientIPConfig)(unsafe.Pointer(in.ClientIP))
+func autoConvert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(in *pkgapiscore.SessionAffinityConfig, out *apicorev1.SessionAffinityConfig, s apimachinerypkgconversion.Scope) error {
+	out.ClientIP = (*apicorev1.ClientIPConfig)(unsafe.Pointer(in.ClientIP))
 	return nil
 }
 
 // Convert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig is an autogenerated conversion function.
-func Convert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(in *core.SessionAffinityConfig, out *v1.SessionAffinityConfig, s conversion.Scope) error {
+func Convert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(in *pkgapiscore.SessionAffinityConfig, out *apicorev1.SessionAffinityConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_SessionAffinityConfig_To_v1_SessionAffinityConfig(in, out, s)
 }
 
-func autoConvert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(in *v1.StorageOSPersistentVolumeSource, out *core.StorageOSPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(in *apicorev1.StorageOSPersistentVolumeSource, out *pkgapiscore.StorageOSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeName = in.VolumeName
 	out.VolumeNamespace = in.VolumeNamespace
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*core.ObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.ObjectReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource is an autogenerated conversion function.
-func Convert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(in *v1.StorageOSPersistentVolumeSource, out *core.StorageOSPersistentVolumeSource, s conversion.Scope) error {
+func Convert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(in *apicorev1.StorageOSPersistentVolumeSource, out *pkgapiscore.StorageOSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_StorageOSPersistentVolumeSource_To_core_StorageOSPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(in *core.StorageOSPersistentVolumeSource, out *v1.StorageOSPersistentVolumeSource, s conversion.Scope) error {
+func autoConvert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(in *pkgapiscore.StorageOSPersistentVolumeSource, out *apicorev1.StorageOSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeName = in.VolumeName
 	out.VolumeNamespace = in.VolumeNamespace
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*v1.ObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.ObjectReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource is an autogenerated conversion function.
-func Convert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(in *core.StorageOSPersistentVolumeSource, out *v1.StorageOSPersistentVolumeSource, s conversion.Scope) error {
+func Convert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(in *pkgapiscore.StorageOSPersistentVolumeSource, out *apicorev1.StorageOSPersistentVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_StorageOSPersistentVolumeSource_To_v1_StorageOSPersistentVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(in *v1.StorageOSVolumeSource, out *core.StorageOSVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(in *apicorev1.StorageOSVolumeSource, out *pkgapiscore.StorageOSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeName = in.VolumeName
 	out.VolumeNamespace = in.VolumeNamespace
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*core.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*pkgapiscore.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource is an autogenerated conversion function.
-func Convert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(in *v1.StorageOSVolumeSource, out *core.StorageOSVolumeSource, s conversion.Scope) error {
+func Convert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(in *apicorev1.StorageOSVolumeSource, out *pkgapiscore.StorageOSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_StorageOSVolumeSource_To_core_StorageOSVolumeSource(in, out, s)
 }
 
-func autoConvert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(in *core.StorageOSVolumeSource, out *v1.StorageOSVolumeSource, s conversion.Scope) error {
+func autoConvert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(in *pkgapiscore.StorageOSVolumeSource, out *apicorev1.StorageOSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumeName = in.VolumeName
 	out.VolumeNamespace = in.VolumeNamespace
 	out.FSType = in.FSType
 	out.ReadOnly = in.ReadOnly
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
+	out.SecretRef = (*apicorev1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
 	return nil
 }
 
 // Convert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource is an autogenerated conversion function.
-func Convert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(in *core.StorageOSVolumeSource, out *v1.StorageOSVolumeSource, s conversion.Scope) error {
+func Convert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(in *pkgapiscore.StorageOSVolumeSource, out *apicorev1.StorageOSVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_StorageOSVolumeSource_To_v1_StorageOSVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_Sysctl_To_core_Sysctl(in *v1.Sysctl, out *core.Sysctl, s conversion.Scope) error {
+func autoConvert_v1_Sysctl_To_core_Sysctl(in *apicorev1.Sysctl, out *pkgapiscore.Sysctl, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = in.Value
 	return nil
 }
 
 // Convert_v1_Sysctl_To_core_Sysctl is an autogenerated conversion function.
-func Convert_v1_Sysctl_To_core_Sysctl(in *v1.Sysctl, out *core.Sysctl, s conversion.Scope) error {
+func Convert_v1_Sysctl_To_core_Sysctl(in *apicorev1.Sysctl, out *pkgapiscore.Sysctl, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Sysctl_To_core_Sysctl(in, out, s)
 }
 
-func autoConvert_core_Sysctl_To_v1_Sysctl(in *core.Sysctl, out *v1.Sysctl, s conversion.Scope) error {
+func autoConvert_core_Sysctl_To_v1_Sysctl(in *pkgapiscore.Sysctl, out *apicorev1.Sysctl, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Value = in.Value
 	return nil
 }
 
 // Convert_core_Sysctl_To_v1_Sysctl is an autogenerated conversion function.
-func Convert_core_Sysctl_To_v1_Sysctl(in *core.Sysctl, out *v1.Sysctl, s conversion.Scope) error {
+func Convert_core_Sysctl_To_v1_Sysctl(in *pkgapiscore.Sysctl, out *apicorev1.Sysctl, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Sysctl_To_v1_Sysctl(in, out, s)
 }
 
-func autoConvert_v1_TCPSocketAction_To_core_TCPSocketAction(in *v1.TCPSocketAction, out *core.TCPSocketAction, s conversion.Scope) error {
+func autoConvert_v1_TCPSocketAction_To_core_TCPSocketAction(in *apicorev1.TCPSocketAction, out *pkgapiscore.TCPSocketAction, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
 	out.Host = in.Host
 	return nil
 }
 
 // Convert_v1_TCPSocketAction_To_core_TCPSocketAction is an autogenerated conversion function.
-func Convert_v1_TCPSocketAction_To_core_TCPSocketAction(in *v1.TCPSocketAction, out *core.TCPSocketAction, s conversion.Scope) error {
+func Convert_v1_TCPSocketAction_To_core_TCPSocketAction(in *apicorev1.TCPSocketAction, out *pkgapiscore.TCPSocketAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_TCPSocketAction_To_core_TCPSocketAction(in, out, s)
 }
 
-func autoConvert_core_TCPSocketAction_To_v1_TCPSocketAction(in *core.TCPSocketAction, out *v1.TCPSocketAction, s conversion.Scope) error {
+func autoConvert_core_TCPSocketAction_To_v1_TCPSocketAction(in *pkgapiscore.TCPSocketAction, out *apicorev1.TCPSocketAction, s apimachinerypkgconversion.Scope) error {
 	out.Port = in.Port
 	out.Host = in.Host
 	return nil
 }
 
 // Convert_core_TCPSocketAction_To_v1_TCPSocketAction is an autogenerated conversion function.
-func Convert_core_TCPSocketAction_To_v1_TCPSocketAction(in *core.TCPSocketAction, out *v1.TCPSocketAction, s conversion.Scope) error {
+func Convert_core_TCPSocketAction_To_v1_TCPSocketAction(in *pkgapiscore.TCPSocketAction, out *apicorev1.TCPSocketAction, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_TCPSocketAction_To_v1_TCPSocketAction(in, out, s)
 }
 
-func autoConvert_v1_Taint_To_core_Taint(in *v1.Taint, out *core.Taint, s conversion.Scope) error {
+func autoConvert_v1_Taint_To_core_Taint(in *apicorev1.Taint, out *pkgapiscore.Taint, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
 	out.Value = in.Value
-	out.Effect = core.TaintEffect(in.Effect)
-	out.TimeAdded = (*metav1.Time)(unsafe.Pointer(in.TimeAdded))
+	out.Effect = pkgapiscore.TaintEffect(in.Effect)
+	out.TimeAdded = (*apismetav1.Time)(unsafe.Pointer(in.TimeAdded))
 	return nil
 }
 
 // Convert_v1_Taint_To_core_Taint is an autogenerated conversion function.
-func Convert_v1_Taint_To_core_Taint(in *v1.Taint, out *core.Taint, s conversion.Scope) error {
+func Convert_v1_Taint_To_core_Taint(in *apicorev1.Taint, out *pkgapiscore.Taint, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Taint_To_core_Taint(in, out, s)
 }
 
-func autoConvert_core_Taint_To_v1_Taint(in *core.Taint, out *v1.Taint, s conversion.Scope) error {
+func autoConvert_core_Taint_To_v1_Taint(in *pkgapiscore.Taint, out *apicorev1.Taint, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
 	out.Value = in.Value
-	out.Effect = v1.TaintEffect(in.Effect)
-	out.TimeAdded = (*metav1.Time)(unsafe.Pointer(in.TimeAdded))
+	out.Effect = apicorev1.TaintEffect(in.Effect)
+	out.TimeAdded = (*apismetav1.Time)(unsafe.Pointer(in.TimeAdded))
 	return nil
 }
 
 // Convert_core_Taint_To_v1_Taint is an autogenerated conversion function.
-func Convert_core_Taint_To_v1_Taint(in *core.Taint, out *v1.Taint, s conversion.Scope) error {
+func Convert_core_Taint_To_v1_Taint(in *pkgapiscore.Taint, out *apicorev1.Taint, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Taint_To_v1_Taint(in, out, s)
 }
 
-func autoConvert_v1_Toleration_To_core_Toleration(in *v1.Toleration, out *core.Toleration, s conversion.Scope) error {
+func autoConvert_v1_Toleration_To_core_Toleration(in *apicorev1.Toleration, out *pkgapiscore.Toleration, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
-	out.Operator = core.TolerationOperator(in.Operator)
+	out.Operator = pkgapiscore.TolerationOperator(in.Operator)
 	out.Value = in.Value
-	out.Effect = core.TaintEffect(in.Effect)
+	out.Effect = pkgapiscore.TaintEffect(in.Effect)
 	out.TolerationSeconds = (*int64)(unsafe.Pointer(in.TolerationSeconds))
 	return nil
 }
 
 // Convert_v1_Toleration_To_core_Toleration is an autogenerated conversion function.
-func Convert_v1_Toleration_To_core_Toleration(in *v1.Toleration, out *core.Toleration, s conversion.Scope) error {
+func Convert_v1_Toleration_To_core_Toleration(in *apicorev1.Toleration, out *pkgapiscore.Toleration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_Toleration_To_core_Toleration(in, out, s)
 }
 
-func autoConvert_core_Toleration_To_v1_Toleration(in *core.Toleration, out *v1.Toleration, s conversion.Scope) error {
+func autoConvert_core_Toleration_To_v1_Toleration(in *pkgapiscore.Toleration, out *apicorev1.Toleration, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
-	out.Operator = v1.TolerationOperator(in.Operator)
+	out.Operator = apicorev1.TolerationOperator(in.Operator)
 	out.Value = in.Value
-	out.Effect = v1.TaintEffect(in.Effect)
+	out.Effect = apicorev1.TaintEffect(in.Effect)
 	out.TolerationSeconds = (*int64)(unsafe.Pointer(in.TolerationSeconds))
 	return nil
 }
 
 // Convert_core_Toleration_To_v1_Toleration is an autogenerated conversion function.
-func Convert_core_Toleration_To_v1_Toleration(in *core.Toleration, out *v1.Toleration, s conversion.Scope) error {
+func Convert_core_Toleration_To_v1_Toleration(in *pkgapiscore.Toleration, out *apicorev1.Toleration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_Toleration_To_v1_Toleration(in, out, s)
 }
 
-func autoConvert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(in *v1.TopologySelectorLabelRequirement, out *core.TopologySelectorLabelRequirement, s conversion.Scope) error {
+func autoConvert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(in *apicorev1.TopologySelectorLabelRequirement, out *pkgapiscore.TopologySelectorLabelRequirement, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement is an autogenerated conversion function.
-func Convert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(in *v1.TopologySelectorLabelRequirement, out *core.TopologySelectorLabelRequirement, s conversion.Scope) error {
+func Convert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(in *apicorev1.TopologySelectorLabelRequirement, out *pkgapiscore.TopologySelectorLabelRequirement, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_TopologySelectorLabelRequirement_To_core_TopologySelectorLabelRequirement(in, out, s)
 }
 
-func autoConvert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(in *core.TopologySelectorLabelRequirement, out *v1.TopologySelectorLabelRequirement, s conversion.Scope) error {
+func autoConvert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(in *pkgapiscore.TopologySelectorLabelRequirement, out *apicorev1.TopologySelectorLabelRequirement, s apimachinerypkgconversion.Scope) error {
 	out.Key = in.Key
 	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
 	return nil
 }
 
 // Convert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement is an autogenerated conversion function.
-func Convert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(in *core.TopologySelectorLabelRequirement, out *v1.TopologySelectorLabelRequirement, s conversion.Scope) error {
+func Convert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(in *pkgapiscore.TopologySelectorLabelRequirement, out *apicorev1.TopologySelectorLabelRequirement, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_TopologySelectorLabelRequirement_To_v1_TopologySelectorLabelRequirement(in, out, s)
 }
 
-func autoConvert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(in *v1.TopologySelectorTerm, out *core.TopologySelectorTerm, s conversion.Scope) error {
-	out.MatchLabelExpressions = *(*[]core.TopologySelectorLabelRequirement)(unsafe.Pointer(&in.MatchLabelExpressions))
+func autoConvert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(in *apicorev1.TopologySelectorTerm, out *pkgapiscore.TopologySelectorTerm, s apimachinerypkgconversion.Scope) error {
+	out.MatchLabelExpressions = *(*[]pkgapiscore.TopologySelectorLabelRequirement)(unsafe.Pointer(&in.MatchLabelExpressions))
 	return nil
 }
 
 // Convert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm is an autogenerated conversion function.
-func Convert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(in *v1.TopologySelectorTerm, out *core.TopologySelectorTerm, s conversion.Scope) error {
+func Convert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(in *apicorev1.TopologySelectorTerm, out *pkgapiscore.TopologySelectorTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_TopologySelectorTerm_To_core_TopologySelectorTerm(in, out, s)
 }
 
-func autoConvert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(in *core.TopologySelectorTerm, out *v1.TopologySelectorTerm, s conversion.Scope) error {
-	out.MatchLabelExpressions = *(*[]v1.TopologySelectorLabelRequirement)(unsafe.Pointer(&in.MatchLabelExpressions))
+func autoConvert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(in *pkgapiscore.TopologySelectorTerm, out *apicorev1.TopologySelectorTerm, s apimachinerypkgconversion.Scope) error {
+	out.MatchLabelExpressions = *(*[]apicorev1.TopologySelectorLabelRequirement)(unsafe.Pointer(&in.MatchLabelExpressions))
 	return nil
 }
 
 // Convert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm is an autogenerated conversion function.
-func Convert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(in *core.TopologySelectorTerm, out *v1.TopologySelectorTerm, s conversion.Scope) error {
+func Convert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(in *pkgapiscore.TopologySelectorTerm, out *apicorev1.TopologySelectorTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_TopologySelectorTerm_To_v1_TopologySelectorTerm(in, out, s)
 }
 
-func autoConvert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(in *v1.TopologySpreadConstraint, out *core.TopologySpreadConstraint, s conversion.Scope) error {
+func autoConvert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(in *apicorev1.TopologySpreadConstraint, out *pkgapiscore.TopologySpreadConstraint, s apimachinerypkgconversion.Scope) error {
 	out.MaxSkew = in.MaxSkew
 	out.TopologyKey = in.TopologyKey
-	out.WhenUnsatisfiable = core.UnsatisfiableConstraintAction(in.WhenUnsatisfiable)
-	out.LabelSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
+	out.WhenUnsatisfiable = pkgapiscore.UnsatisfiableConstraintAction(in.WhenUnsatisfiable)
+	out.LabelSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
 	out.MinDomains = (*int32)(unsafe.Pointer(in.MinDomains))
-	out.NodeAffinityPolicy = (*core.NodeInclusionPolicy)(unsafe.Pointer(in.NodeAffinityPolicy))
-	out.NodeTaintsPolicy = (*core.NodeInclusionPolicy)(unsafe.Pointer(in.NodeTaintsPolicy))
+	out.NodeAffinityPolicy = (*pkgapiscore.NodeInclusionPolicy)(unsafe.Pointer(in.NodeAffinityPolicy))
+	out.NodeTaintsPolicy = (*pkgapiscore.NodeInclusionPolicy)(unsafe.Pointer(in.NodeTaintsPolicy))
 	out.MatchLabelKeys = *(*[]string)(unsafe.Pointer(&in.MatchLabelKeys))
 	return nil
 }
 
 // Convert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint is an autogenerated conversion function.
-func Convert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(in *v1.TopologySpreadConstraint, out *core.TopologySpreadConstraint, s conversion.Scope) error {
+func Convert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(in *apicorev1.TopologySpreadConstraint, out *pkgapiscore.TopologySpreadConstraint, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_TopologySpreadConstraint_To_core_TopologySpreadConstraint(in, out, s)
 }
 
-func autoConvert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(in *core.TopologySpreadConstraint, out *v1.TopologySpreadConstraint, s conversion.Scope) error {
+func autoConvert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(in *pkgapiscore.TopologySpreadConstraint, out *apicorev1.TopologySpreadConstraint, s apimachinerypkgconversion.Scope) error {
 	out.MaxSkew = in.MaxSkew
 	out.TopologyKey = in.TopologyKey
-	out.WhenUnsatisfiable = v1.UnsatisfiableConstraintAction(in.WhenUnsatisfiable)
-	out.LabelSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
+	out.WhenUnsatisfiable = apicorev1.UnsatisfiableConstraintAction(in.WhenUnsatisfiable)
+	out.LabelSelector = (*apismetav1.LabelSelector)(unsafe.Pointer(in.LabelSelector))
 	out.MinDomains = (*int32)(unsafe.Pointer(in.MinDomains))
-	out.NodeAffinityPolicy = (*v1.NodeInclusionPolicy)(unsafe.Pointer(in.NodeAffinityPolicy))
-	out.NodeTaintsPolicy = (*v1.NodeInclusionPolicy)(unsafe.Pointer(in.NodeTaintsPolicy))
+	out.NodeAffinityPolicy = (*apicorev1.NodeInclusionPolicy)(unsafe.Pointer(in.NodeAffinityPolicy))
+	out.NodeTaintsPolicy = (*apicorev1.NodeInclusionPolicy)(unsafe.Pointer(in.NodeTaintsPolicy))
 	out.MatchLabelKeys = *(*[]string)(unsafe.Pointer(&in.MatchLabelKeys))
 	return nil
 }
 
 // Convert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint is an autogenerated conversion function.
-func Convert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(in *core.TopologySpreadConstraint, out *v1.TopologySpreadConstraint, s conversion.Scope) error {
+func Convert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(in *pkgapiscore.TopologySpreadConstraint, out *apicorev1.TopologySpreadConstraint, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_TopologySpreadConstraint_To_v1_TopologySpreadConstraint(in, out, s)
 }
 
-func autoConvert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(in *v1.TypedLocalObjectReference, out *core.TypedLocalObjectReference, s conversion.Scope) error {
+func autoConvert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(in *apicorev1.TypedLocalObjectReference, out *pkgapiscore.TypedLocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	out.APIGroup = (*string)(unsafe.Pointer(in.APIGroup))
 	out.Kind = in.Kind
 	out.Name = in.Name
@@ -8035,11 +8035,11 @@ func autoConvert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(
 }
 
 // Convert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference is an autogenerated conversion function.
-func Convert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(in *v1.TypedLocalObjectReference, out *core.TypedLocalObjectReference, s conversion.Scope) error {
+func Convert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(in *apicorev1.TypedLocalObjectReference, out *pkgapiscore.TypedLocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_TypedLocalObjectReference_To_core_TypedLocalObjectReference(in, out, s)
 }
 
-func autoConvert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(in *core.TypedLocalObjectReference, out *v1.TypedLocalObjectReference, s conversion.Scope) error {
+func autoConvert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(in *pkgapiscore.TypedLocalObjectReference, out *apicorev1.TypedLocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	out.APIGroup = (*string)(unsafe.Pointer(in.APIGroup))
 	out.Kind = in.Kind
 	out.Name = in.Name
@@ -8047,11 +8047,11 @@ func autoConvert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(
 }
 
 // Convert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference is an autogenerated conversion function.
-func Convert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(in *core.TypedLocalObjectReference, out *v1.TypedLocalObjectReference, s conversion.Scope) error {
+func Convert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(in *pkgapiscore.TypedLocalObjectReference, out *apicorev1.TypedLocalObjectReference, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_TypedLocalObjectReference_To_v1_TypedLocalObjectReference(in, out, s)
 }
 
-func autoConvert_v1_Volume_To_core_Volume(in *v1.Volume, out *core.Volume, s conversion.Scope) error {
+func autoConvert_v1_Volume_To_core_Volume(in *apicorev1.Volume, out *pkgapiscore.Volume, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_v1_VolumeSource_To_core_VolumeSource(&in.VolumeSource, &out.VolumeSource, s); err != nil {
 		return err
@@ -8059,7 +8059,7 @@ func autoConvert_v1_Volume_To_core_Volume(in *v1.Volume, out *core.Volume, s con
 	return nil
 }
 
-func autoConvert_core_Volume_To_v1_Volume(in *core.Volume, out *v1.Volume, s conversion.Scope) error {
+func autoConvert_core_Volume_To_v1_Volume(in *pkgapiscore.Volume, out *apicorev1.Volume, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_core_VolumeSource_To_v1_VolumeSource(&in.VolumeSource, &out.VolumeSource, s); err != nil {
 		return err
@@ -8067,85 +8067,85 @@ func autoConvert_core_Volume_To_v1_Volume(in *core.Volume, out *v1.Volume, s con
 	return nil
 }
 
-func autoConvert_v1_VolumeDevice_To_core_VolumeDevice(in *v1.VolumeDevice, out *core.VolumeDevice, s conversion.Scope) error {
+func autoConvert_v1_VolumeDevice_To_core_VolumeDevice(in *apicorev1.VolumeDevice, out *pkgapiscore.VolumeDevice, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.DevicePath = in.DevicePath
 	return nil
 }
 
 // Convert_v1_VolumeDevice_To_core_VolumeDevice is an autogenerated conversion function.
-func Convert_v1_VolumeDevice_To_core_VolumeDevice(in *v1.VolumeDevice, out *core.VolumeDevice, s conversion.Scope) error {
+func Convert_v1_VolumeDevice_To_core_VolumeDevice(in *apicorev1.VolumeDevice, out *pkgapiscore.VolumeDevice, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_VolumeDevice_To_core_VolumeDevice(in, out, s)
 }
 
-func autoConvert_core_VolumeDevice_To_v1_VolumeDevice(in *core.VolumeDevice, out *v1.VolumeDevice, s conversion.Scope) error {
+func autoConvert_core_VolumeDevice_To_v1_VolumeDevice(in *pkgapiscore.VolumeDevice, out *apicorev1.VolumeDevice, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.DevicePath = in.DevicePath
 	return nil
 }
 
 // Convert_core_VolumeDevice_To_v1_VolumeDevice is an autogenerated conversion function.
-func Convert_core_VolumeDevice_To_v1_VolumeDevice(in *core.VolumeDevice, out *v1.VolumeDevice, s conversion.Scope) error {
+func Convert_core_VolumeDevice_To_v1_VolumeDevice(in *pkgapiscore.VolumeDevice, out *apicorev1.VolumeDevice, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_VolumeDevice_To_v1_VolumeDevice(in, out, s)
 }
 
-func autoConvert_v1_VolumeMount_To_core_VolumeMount(in *v1.VolumeMount, out *core.VolumeMount, s conversion.Scope) error {
+func autoConvert_v1_VolumeMount_To_core_VolumeMount(in *apicorev1.VolumeMount, out *pkgapiscore.VolumeMount, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.ReadOnly = in.ReadOnly
 	out.MountPath = in.MountPath
 	out.SubPath = in.SubPath
-	out.MountPropagation = (*core.MountPropagationMode)(unsafe.Pointer(in.MountPropagation))
+	out.MountPropagation = (*pkgapiscore.MountPropagationMode)(unsafe.Pointer(in.MountPropagation))
 	out.SubPathExpr = in.SubPathExpr
 	return nil
 }
 
 // Convert_v1_VolumeMount_To_core_VolumeMount is an autogenerated conversion function.
-func Convert_v1_VolumeMount_To_core_VolumeMount(in *v1.VolumeMount, out *core.VolumeMount, s conversion.Scope) error {
+func Convert_v1_VolumeMount_To_core_VolumeMount(in *apicorev1.VolumeMount, out *pkgapiscore.VolumeMount, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_VolumeMount_To_core_VolumeMount(in, out, s)
 }
 
-func autoConvert_core_VolumeMount_To_v1_VolumeMount(in *core.VolumeMount, out *v1.VolumeMount, s conversion.Scope) error {
+func autoConvert_core_VolumeMount_To_v1_VolumeMount(in *pkgapiscore.VolumeMount, out *apicorev1.VolumeMount, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.ReadOnly = in.ReadOnly
 	out.MountPath = in.MountPath
 	out.SubPath = in.SubPath
-	out.MountPropagation = (*v1.MountPropagationMode)(unsafe.Pointer(in.MountPropagation))
+	out.MountPropagation = (*apicorev1.MountPropagationMode)(unsafe.Pointer(in.MountPropagation))
 	out.SubPathExpr = in.SubPathExpr
 	return nil
 }
 
 // Convert_core_VolumeMount_To_v1_VolumeMount is an autogenerated conversion function.
-func Convert_core_VolumeMount_To_v1_VolumeMount(in *core.VolumeMount, out *v1.VolumeMount, s conversion.Scope) error {
+func Convert_core_VolumeMount_To_v1_VolumeMount(in *pkgapiscore.VolumeMount, out *apicorev1.VolumeMount, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_VolumeMount_To_v1_VolumeMount(in, out, s)
 }
 
-func autoConvert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(in *v1.VolumeNodeAffinity, out *core.VolumeNodeAffinity, s conversion.Scope) error {
-	out.Required = (*core.NodeSelector)(unsafe.Pointer(in.Required))
+func autoConvert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(in *apicorev1.VolumeNodeAffinity, out *pkgapiscore.VolumeNodeAffinity, s apimachinerypkgconversion.Scope) error {
+	out.Required = (*pkgapiscore.NodeSelector)(unsafe.Pointer(in.Required))
 	return nil
 }
 
 // Convert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity is an autogenerated conversion function.
-func Convert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(in *v1.VolumeNodeAffinity, out *core.VolumeNodeAffinity, s conversion.Scope) error {
+func Convert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(in *apicorev1.VolumeNodeAffinity, out *pkgapiscore.VolumeNodeAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_VolumeNodeAffinity_To_core_VolumeNodeAffinity(in, out, s)
 }
 
-func autoConvert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(in *core.VolumeNodeAffinity, out *v1.VolumeNodeAffinity, s conversion.Scope) error {
-	out.Required = (*v1.NodeSelector)(unsafe.Pointer(in.Required))
+func autoConvert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(in *pkgapiscore.VolumeNodeAffinity, out *apicorev1.VolumeNodeAffinity, s apimachinerypkgconversion.Scope) error {
+	out.Required = (*apicorev1.NodeSelector)(unsafe.Pointer(in.Required))
 	return nil
 }
 
 // Convert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity is an autogenerated conversion function.
-func Convert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(in *core.VolumeNodeAffinity, out *v1.VolumeNodeAffinity, s conversion.Scope) error {
+func Convert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(in *pkgapiscore.VolumeNodeAffinity, out *apicorev1.VolumeNodeAffinity, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_VolumeNodeAffinity_To_v1_VolumeNodeAffinity(in, out, s)
 }
 
-func autoConvert_v1_VolumeProjection_To_core_VolumeProjection(in *v1.VolumeProjection, out *core.VolumeProjection, s conversion.Scope) error {
-	out.Secret = (*core.SecretProjection)(unsafe.Pointer(in.Secret))
-	out.DownwardAPI = (*core.DownwardAPIProjection)(unsafe.Pointer(in.DownwardAPI))
-	out.ConfigMap = (*core.ConfigMapProjection)(unsafe.Pointer(in.ConfigMap))
+func autoConvert_v1_VolumeProjection_To_core_VolumeProjection(in *apicorev1.VolumeProjection, out *pkgapiscore.VolumeProjection, s apimachinerypkgconversion.Scope) error {
+	out.Secret = (*pkgapiscore.SecretProjection)(unsafe.Pointer(in.Secret))
+	out.DownwardAPI = (*pkgapiscore.DownwardAPIProjection)(unsafe.Pointer(in.DownwardAPI))
+	out.ConfigMap = (*pkgapiscore.ConfigMapProjection)(unsafe.Pointer(in.ConfigMap))
 	if in.ServiceAccountToken != nil {
 		in, out := &in.ServiceAccountToken, &out.ServiceAccountToken
-		*out = new(core.ServiceAccountTokenProjection)
+		*out = new(pkgapiscore.ServiceAccountTokenProjection)
 		if err := Convert_v1_ServiceAccountTokenProjection_To_core_ServiceAccountTokenProjection(*in, *out, s); err != nil {
 			return err
 		}
@@ -8156,17 +8156,17 @@ func autoConvert_v1_VolumeProjection_To_core_VolumeProjection(in *v1.VolumeProje
 }
 
 // Convert_v1_VolumeProjection_To_core_VolumeProjection is an autogenerated conversion function.
-func Convert_v1_VolumeProjection_To_core_VolumeProjection(in *v1.VolumeProjection, out *core.VolumeProjection, s conversion.Scope) error {
+func Convert_v1_VolumeProjection_To_core_VolumeProjection(in *apicorev1.VolumeProjection, out *pkgapiscore.VolumeProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_VolumeProjection_To_core_VolumeProjection(in, out, s)
 }
 
-func autoConvert_core_VolumeProjection_To_v1_VolumeProjection(in *core.VolumeProjection, out *v1.VolumeProjection, s conversion.Scope) error {
-	out.Secret = (*v1.SecretProjection)(unsafe.Pointer(in.Secret))
-	out.DownwardAPI = (*v1.DownwardAPIProjection)(unsafe.Pointer(in.DownwardAPI))
-	out.ConfigMap = (*v1.ConfigMapProjection)(unsafe.Pointer(in.ConfigMap))
+func autoConvert_core_VolumeProjection_To_v1_VolumeProjection(in *pkgapiscore.VolumeProjection, out *apicorev1.VolumeProjection, s apimachinerypkgconversion.Scope) error {
+	out.Secret = (*apicorev1.SecretProjection)(unsafe.Pointer(in.Secret))
+	out.DownwardAPI = (*apicorev1.DownwardAPIProjection)(unsafe.Pointer(in.DownwardAPI))
+	out.ConfigMap = (*apicorev1.ConfigMapProjection)(unsafe.Pointer(in.ConfigMap))
 	if in.ServiceAccountToken != nil {
 		in, out := &in.ServiceAccountToken, &out.ServiceAccountToken
-		*out = new(v1.ServiceAccountTokenProjection)
+		*out = new(apicorev1.ServiceAccountTokenProjection)
 		if err := Convert_core_ServiceAccountTokenProjection_To_v1_ServiceAccountTokenProjection(*in, *out, s); err != nil {
 			return err
 		}
@@ -8177,103 +8177,103 @@ func autoConvert_core_VolumeProjection_To_v1_VolumeProjection(in *core.VolumePro
 }
 
 // Convert_core_VolumeProjection_To_v1_VolumeProjection is an autogenerated conversion function.
-func Convert_core_VolumeProjection_To_v1_VolumeProjection(in *core.VolumeProjection, out *v1.VolumeProjection, s conversion.Scope) error {
+func Convert_core_VolumeProjection_To_v1_VolumeProjection(in *pkgapiscore.VolumeProjection, out *apicorev1.VolumeProjection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_VolumeProjection_To_v1_VolumeProjection(in, out, s)
 }
 
-func autoConvert_v1_VolumeSource_To_core_VolumeSource(in *v1.VolumeSource, out *core.VolumeSource, s conversion.Scope) error {
-	out.HostPath = (*core.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
-	out.EmptyDir = (*core.EmptyDirVolumeSource)(unsafe.Pointer(in.EmptyDir))
-	out.GCEPersistentDisk = (*core.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
-	out.AWSElasticBlockStore = (*core.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
-	out.GitRepo = (*core.GitRepoVolumeSource)(unsafe.Pointer(in.GitRepo))
-	out.Secret = (*core.SecretVolumeSource)(unsafe.Pointer(in.Secret))
-	out.NFS = (*core.NFSVolumeSource)(unsafe.Pointer(in.NFS))
-	out.ISCSI = (*core.ISCSIVolumeSource)(unsafe.Pointer(in.ISCSI))
-	out.Glusterfs = (*core.GlusterfsVolumeSource)(unsafe.Pointer(in.Glusterfs))
-	out.PersistentVolumeClaim = (*core.PersistentVolumeClaimVolumeSource)(unsafe.Pointer(in.PersistentVolumeClaim))
-	out.RBD = (*core.RBDVolumeSource)(unsafe.Pointer(in.RBD))
-	out.FlexVolume = (*core.FlexVolumeSource)(unsafe.Pointer(in.FlexVolume))
-	out.Cinder = (*core.CinderVolumeSource)(unsafe.Pointer(in.Cinder))
-	out.CephFS = (*core.CephFSVolumeSource)(unsafe.Pointer(in.CephFS))
-	out.Flocker = (*core.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
-	out.DownwardAPI = (*core.DownwardAPIVolumeSource)(unsafe.Pointer(in.DownwardAPI))
-	out.FC = (*core.FCVolumeSource)(unsafe.Pointer(in.FC))
-	out.AzureFile = (*core.AzureFileVolumeSource)(unsafe.Pointer(in.AzureFile))
-	out.ConfigMap = (*core.ConfigMapVolumeSource)(unsafe.Pointer(in.ConfigMap))
-	out.VsphereVolume = (*core.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
-	out.Quobyte = (*core.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
-	out.AzureDisk = (*core.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
-	out.PhotonPersistentDisk = (*core.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
+func autoConvert_v1_VolumeSource_To_core_VolumeSource(in *apicorev1.VolumeSource, out *pkgapiscore.VolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.HostPath = (*pkgapiscore.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
+	out.EmptyDir = (*pkgapiscore.EmptyDirVolumeSource)(unsafe.Pointer(in.EmptyDir))
+	out.GCEPersistentDisk = (*pkgapiscore.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
+	out.AWSElasticBlockStore = (*pkgapiscore.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
+	out.GitRepo = (*pkgapiscore.GitRepoVolumeSource)(unsafe.Pointer(in.GitRepo))
+	out.Secret = (*pkgapiscore.SecretVolumeSource)(unsafe.Pointer(in.Secret))
+	out.NFS = (*pkgapiscore.NFSVolumeSource)(unsafe.Pointer(in.NFS))
+	out.ISCSI = (*pkgapiscore.ISCSIVolumeSource)(unsafe.Pointer(in.ISCSI))
+	out.Glusterfs = (*pkgapiscore.GlusterfsVolumeSource)(unsafe.Pointer(in.Glusterfs))
+	out.PersistentVolumeClaim = (*pkgapiscore.PersistentVolumeClaimVolumeSource)(unsafe.Pointer(in.PersistentVolumeClaim))
+	out.RBD = (*pkgapiscore.RBDVolumeSource)(unsafe.Pointer(in.RBD))
+	out.FlexVolume = (*pkgapiscore.FlexVolumeSource)(unsafe.Pointer(in.FlexVolume))
+	out.Cinder = (*pkgapiscore.CinderVolumeSource)(unsafe.Pointer(in.Cinder))
+	out.CephFS = (*pkgapiscore.CephFSVolumeSource)(unsafe.Pointer(in.CephFS))
+	out.Flocker = (*pkgapiscore.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
+	out.DownwardAPI = (*pkgapiscore.DownwardAPIVolumeSource)(unsafe.Pointer(in.DownwardAPI))
+	out.FC = (*pkgapiscore.FCVolumeSource)(unsafe.Pointer(in.FC))
+	out.AzureFile = (*pkgapiscore.AzureFileVolumeSource)(unsafe.Pointer(in.AzureFile))
+	out.ConfigMap = (*pkgapiscore.ConfigMapVolumeSource)(unsafe.Pointer(in.ConfigMap))
+	out.VsphereVolume = (*pkgapiscore.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
+	out.Quobyte = (*pkgapiscore.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
+	out.AzureDisk = (*pkgapiscore.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
+	out.PhotonPersistentDisk = (*pkgapiscore.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
 	if in.Projected != nil {
 		in, out := &in.Projected, &out.Projected
-		*out = new(core.ProjectedVolumeSource)
+		*out = new(pkgapiscore.ProjectedVolumeSource)
 		if err := Convert_v1_ProjectedVolumeSource_To_core_ProjectedVolumeSource(*in, *out, s); err != nil {
 			return err
 		}
 	} else {
 		out.Projected = nil
 	}
-	out.PortworxVolume = (*core.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
-	out.ScaleIO = (*core.ScaleIOVolumeSource)(unsafe.Pointer(in.ScaleIO))
-	out.StorageOS = (*core.StorageOSVolumeSource)(unsafe.Pointer(in.StorageOS))
-	out.CSI = (*core.CSIVolumeSource)(unsafe.Pointer(in.CSI))
-	out.Ephemeral = (*core.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	out.PortworxVolume = (*pkgapiscore.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
+	out.ScaleIO = (*pkgapiscore.ScaleIOVolumeSource)(unsafe.Pointer(in.ScaleIO))
+	out.StorageOS = (*pkgapiscore.StorageOSVolumeSource)(unsafe.Pointer(in.StorageOS))
+	out.CSI = (*pkgapiscore.CSIVolumeSource)(unsafe.Pointer(in.CSI))
+	out.Ephemeral = (*pkgapiscore.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 
 // Convert_v1_VolumeSource_To_core_VolumeSource is an autogenerated conversion function.
-func Convert_v1_VolumeSource_To_core_VolumeSource(in *v1.VolumeSource, out *core.VolumeSource, s conversion.Scope) error {
+func Convert_v1_VolumeSource_To_core_VolumeSource(in *apicorev1.VolumeSource, out *pkgapiscore.VolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_VolumeSource_To_core_VolumeSource(in, out, s)
 }
 
-func autoConvert_core_VolumeSource_To_v1_VolumeSource(in *core.VolumeSource, out *v1.VolumeSource, s conversion.Scope) error {
-	out.HostPath = (*v1.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
-	out.EmptyDir = (*v1.EmptyDirVolumeSource)(unsafe.Pointer(in.EmptyDir))
-	out.GCEPersistentDisk = (*v1.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
-	out.AWSElasticBlockStore = (*v1.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
-	out.GitRepo = (*v1.GitRepoVolumeSource)(unsafe.Pointer(in.GitRepo))
-	out.Secret = (*v1.SecretVolumeSource)(unsafe.Pointer(in.Secret))
-	out.NFS = (*v1.NFSVolumeSource)(unsafe.Pointer(in.NFS))
-	out.ISCSI = (*v1.ISCSIVolumeSource)(unsafe.Pointer(in.ISCSI))
-	out.Glusterfs = (*v1.GlusterfsVolumeSource)(unsafe.Pointer(in.Glusterfs))
-	out.PersistentVolumeClaim = (*v1.PersistentVolumeClaimVolumeSource)(unsafe.Pointer(in.PersistentVolumeClaim))
-	out.RBD = (*v1.RBDVolumeSource)(unsafe.Pointer(in.RBD))
-	out.Quobyte = (*v1.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
-	out.FlexVolume = (*v1.FlexVolumeSource)(unsafe.Pointer(in.FlexVolume))
-	out.Cinder = (*v1.CinderVolumeSource)(unsafe.Pointer(in.Cinder))
-	out.CephFS = (*v1.CephFSVolumeSource)(unsafe.Pointer(in.CephFS))
-	out.Flocker = (*v1.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
-	out.DownwardAPI = (*v1.DownwardAPIVolumeSource)(unsafe.Pointer(in.DownwardAPI))
-	out.FC = (*v1.FCVolumeSource)(unsafe.Pointer(in.FC))
-	out.AzureFile = (*v1.AzureFileVolumeSource)(unsafe.Pointer(in.AzureFile))
-	out.ConfigMap = (*v1.ConfigMapVolumeSource)(unsafe.Pointer(in.ConfigMap))
-	out.VsphereVolume = (*v1.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
-	out.AzureDisk = (*v1.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
-	out.PhotonPersistentDisk = (*v1.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
+func autoConvert_core_VolumeSource_To_v1_VolumeSource(in *pkgapiscore.VolumeSource, out *apicorev1.VolumeSource, s apimachinerypkgconversion.Scope) error {
+	out.HostPath = (*apicorev1.HostPathVolumeSource)(unsafe.Pointer(in.HostPath))
+	out.EmptyDir = (*apicorev1.EmptyDirVolumeSource)(unsafe.Pointer(in.EmptyDir))
+	out.GCEPersistentDisk = (*apicorev1.GCEPersistentDiskVolumeSource)(unsafe.Pointer(in.GCEPersistentDisk))
+	out.AWSElasticBlockStore = (*apicorev1.AWSElasticBlockStoreVolumeSource)(unsafe.Pointer(in.AWSElasticBlockStore))
+	out.GitRepo = (*apicorev1.GitRepoVolumeSource)(unsafe.Pointer(in.GitRepo))
+	out.Secret = (*apicorev1.SecretVolumeSource)(unsafe.Pointer(in.Secret))
+	out.NFS = (*apicorev1.NFSVolumeSource)(unsafe.Pointer(in.NFS))
+	out.ISCSI = (*apicorev1.ISCSIVolumeSource)(unsafe.Pointer(in.ISCSI))
+	out.Glusterfs = (*apicorev1.GlusterfsVolumeSource)(unsafe.Pointer(in.Glusterfs))
+	out.PersistentVolumeClaim = (*apicorev1.PersistentVolumeClaimVolumeSource)(unsafe.Pointer(in.PersistentVolumeClaim))
+	out.RBD = (*apicorev1.RBDVolumeSource)(unsafe.Pointer(in.RBD))
+	out.Quobyte = (*apicorev1.QuobyteVolumeSource)(unsafe.Pointer(in.Quobyte))
+	out.FlexVolume = (*apicorev1.FlexVolumeSource)(unsafe.Pointer(in.FlexVolume))
+	out.Cinder = (*apicorev1.CinderVolumeSource)(unsafe.Pointer(in.Cinder))
+	out.CephFS = (*apicorev1.CephFSVolumeSource)(unsafe.Pointer(in.CephFS))
+	out.Flocker = (*apicorev1.FlockerVolumeSource)(unsafe.Pointer(in.Flocker))
+	out.DownwardAPI = (*apicorev1.DownwardAPIVolumeSource)(unsafe.Pointer(in.DownwardAPI))
+	out.FC = (*apicorev1.FCVolumeSource)(unsafe.Pointer(in.FC))
+	out.AzureFile = (*apicorev1.AzureFileVolumeSource)(unsafe.Pointer(in.AzureFile))
+	out.ConfigMap = (*apicorev1.ConfigMapVolumeSource)(unsafe.Pointer(in.ConfigMap))
+	out.VsphereVolume = (*apicorev1.VsphereVirtualDiskVolumeSource)(unsafe.Pointer(in.VsphereVolume))
+	out.AzureDisk = (*apicorev1.AzureDiskVolumeSource)(unsafe.Pointer(in.AzureDisk))
+	out.PhotonPersistentDisk = (*apicorev1.PhotonPersistentDiskVolumeSource)(unsafe.Pointer(in.PhotonPersistentDisk))
 	if in.Projected != nil {
 		in, out := &in.Projected, &out.Projected
-		*out = new(v1.ProjectedVolumeSource)
+		*out = new(apicorev1.ProjectedVolumeSource)
 		if err := Convert_core_ProjectedVolumeSource_To_v1_ProjectedVolumeSource(*in, *out, s); err != nil {
 			return err
 		}
 	} else {
 		out.Projected = nil
 	}
-	out.PortworxVolume = (*v1.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
-	out.ScaleIO = (*v1.ScaleIOVolumeSource)(unsafe.Pointer(in.ScaleIO))
-	out.StorageOS = (*v1.StorageOSVolumeSource)(unsafe.Pointer(in.StorageOS))
-	out.CSI = (*v1.CSIVolumeSource)(unsafe.Pointer(in.CSI))
-	out.Ephemeral = (*v1.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	out.PortworxVolume = (*apicorev1.PortworxVolumeSource)(unsafe.Pointer(in.PortworxVolume))
+	out.ScaleIO = (*apicorev1.ScaleIOVolumeSource)(unsafe.Pointer(in.ScaleIO))
+	out.StorageOS = (*apicorev1.StorageOSVolumeSource)(unsafe.Pointer(in.StorageOS))
+	out.CSI = (*apicorev1.CSIVolumeSource)(unsafe.Pointer(in.CSI))
+	out.Ephemeral = (*apicorev1.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
 	return nil
 }
 
 // Convert_core_VolumeSource_To_v1_VolumeSource is an autogenerated conversion function.
-func Convert_core_VolumeSource_To_v1_VolumeSource(in *core.VolumeSource, out *v1.VolumeSource, s conversion.Scope) error {
+func Convert_core_VolumeSource_To_v1_VolumeSource(in *pkgapiscore.VolumeSource, out *apicorev1.VolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_VolumeSource_To_v1_VolumeSource(in, out, s)
 }
 
-func autoConvert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(in *v1.VsphereVirtualDiskVolumeSource, out *core.VsphereVirtualDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(in *apicorev1.VsphereVirtualDiskVolumeSource, out *pkgapiscore.VsphereVirtualDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumePath = in.VolumePath
 	out.FSType = in.FSType
 	out.StoragePolicyName = in.StoragePolicyName
@@ -8282,11 +8282,11 @@ func autoConvert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVol
 }
 
 // Convert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource is an autogenerated conversion function.
-func Convert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(in *v1.VsphereVirtualDiskVolumeSource, out *core.VsphereVirtualDiskVolumeSource, s conversion.Scope) error {
+func Convert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(in *apicorev1.VsphereVirtualDiskVolumeSource, out *pkgapiscore.VsphereVirtualDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_VsphereVirtualDiskVolumeSource_To_core_VsphereVirtualDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(in *core.VsphereVirtualDiskVolumeSource, out *v1.VsphereVirtualDiskVolumeSource, s conversion.Scope) error {
+func autoConvert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(in *pkgapiscore.VsphereVirtualDiskVolumeSource, out *apicorev1.VsphereVirtualDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	out.VolumePath = in.VolumePath
 	out.FSType = in.FSType
 	out.StoragePolicyName = in.StoragePolicyName
@@ -8295,11 +8295,11 @@ func autoConvert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVol
 }
 
 // Convert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource is an autogenerated conversion function.
-func Convert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(in *core.VsphereVirtualDiskVolumeSource, out *v1.VsphereVirtualDiskVolumeSource, s conversion.Scope) error {
+func Convert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(in *pkgapiscore.VsphereVirtualDiskVolumeSource, out *apicorev1.VsphereVirtualDiskVolumeSource, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_VsphereVirtualDiskVolumeSource_To_v1_VsphereVirtualDiskVolumeSource(in, out, s)
 }
 
-func autoConvert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(in *v1.WeightedPodAffinityTerm, out *core.WeightedPodAffinityTerm, s conversion.Scope) error {
+func autoConvert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(in *apicorev1.WeightedPodAffinityTerm, out *pkgapiscore.WeightedPodAffinityTerm, s apimachinerypkgconversion.Scope) error {
 	out.Weight = in.Weight
 	if err := Convert_v1_PodAffinityTerm_To_core_PodAffinityTerm(&in.PodAffinityTerm, &out.PodAffinityTerm, s); err != nil {
 		return err
@@ -8308,11 +8308,11 @@ func autoConvert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(in *
 }
 
 // Convert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm is an autogenerated conversion function.
-func Convert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(in *v1.WeightedPodAffinityTerm, out *core.WeightedPodAffinityTerm, s conversion.Scope) error {
+func Convert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(in *apicorev1.WeightedPodAffinityTerm, out *pkgapiscore.WeightedPodAffinityTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_WeightedPodAffinityTerm_To_core_WeightedPodAffinityTerm(in, out, s)
 }
 
-func autoConvert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(in *core.WeightedPodAffinityTerm, out *v1.WeightedPodAffinityTerm, s conversion.Scope) error {
+func autoConvert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(in *pkgapiscore.WeightedPodAffinityTerm, out *apicorev1.WeightedPodAffinityTerm, s apimachinerypkgconversion.Scope) error {
 	out.Weight = in.Weight
 	if err := Convert_core_PodAffinityTerm_To_v1_PodAffinityTerm(&in.PodAffinityTerm, &out.PodAffinityTerm, s); err != nil {
 		return err
@@ -8321,11 +8321,11 @@ func autoConvert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(in *
 }
 
 // Convert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm is an autogenerated conversion function.
-func Convert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(in *core.WeightedPodAffinityTerm, out *v1.WeightedPodAffinityTerm, s conversion.Scope) error {
+func Convert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(in *pkgapiscore.WeightedPodAffinityTerm, out *apicorev1.WeightedPodAffinityTerm, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_WeightedPodAffinityTerm_To_v1_WeightedPodAffinityTerm(in, out, s)
 }
 
-func autoConvert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(in *v1.WindowsSecurityContextOptions, out *core.WindowsSecurityContextOptions, s conversion.Scope) error {
+func autoConvert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(in *apicorev1.WindowsSecurityContextOptions, out *pkgapiscore.WindowsSecurityContextOptions, s apimachinerypkgconversion.Scope) error {
 	out.GMSACredentialSpecName = (*string)(unsafe.Pointer(in.GMSACredentialSpecName))
 	out.GMSACredentialSpec = (*string)(unsafe.Pointer(in.GMSACredentialSpec))
 	out.RunAsUserName = (*string)(unsafe.Pointer(in.RunAsUserName))
@@ -8334,11 +8334,11 @@ func autoConvert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContext
 }
 
 // Convert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions is an autogenerated conversion function.
-func Convert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(in *v1.WindowsSecurityContextOptions, out *core.WindowsSecurityContextOptions, s conversion.Scope) error {
+func Convert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(in *apicorev1.WindowsSecurityContextOptions, out *pkgapiscore.WindowsSecurityContextOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1_WindowsSecurityContextOptions_To_core_WindowsSecurityContextOptions(in, out, s)
 }
 
-func autoConvert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(in *core.WindowsSecurityContextOptions, out *v1.WindowsSecurityContextOptions, s conversion.Scope) error {
+func autoConvert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(in *pkgapiscore.WindowsSecurityContextOptions, out *apicorev1.WindowsSecurityContextOptions, s apimachinerypkgconversion.Scope) error {
 	out.GMSACredentialSpecName = (*string)(unsafe.Pointer(in.GMSACredentialSpecName))
 	out.GMSACredentialSpec = (*string)(unsafe.Pointer(in.GMSACredentialSpec))
 	out.RunAsUserName = (*string)(unsafe.Pointer(in.RunAsUserName))
@@ -8347,6 +8347,6 @@ func autoConvert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContext
 }
 
 // Convert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions is an autogenerated conversion function.
-func Convert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(in *core.WindowsSecurityContextOptions, out *v1.WindowsSecurityContextOptions, s conversion.Scope) error {
+func Convert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(in *pkgapiscore.WindowsSecurityContextOptions, out *apicorev1.WindowsSecurityContextOptions, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_core_WindowsSecurityContextOptions_To_v1_WindowsSecurityContextOptions(in, out, s)
 }

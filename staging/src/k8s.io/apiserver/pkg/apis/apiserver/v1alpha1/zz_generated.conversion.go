@@ -24,9 +24,9 @@ package v1alpha1
 import (
 	"unsafe"
 
-	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apiserver/pkg/apis/apiserver"
+	apimachinerypkgconversion "k8s.io/apimachinery/pkg/conversion"
+	apimachinerypkgruntime "k8s.io/apimachinery/pkg/runtime"
+	pkgapisapiserver "k8s.io/apiserver/pkg/apis/apiserver"
 )
 
 func init() {
@@ -35,177 +35,177 @@ func init() {
 
 // RegisterConversions adds conversion functions to the given scheme.
 // Public to allow building arbitrary schemes.
-func RegisterConversions(s *runtime.Scheme) error {
-	if err := s.AddGeneratedConversionFunc((*AdmissionConfiguration)(nil), (*apiserver.AdmissionConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(a.(*AdmissionConfiguration), b.(*apiserver.AdmissionConfiguration), scope)
+func RegisterConversions(s *apimachinerypkgruntime.Scheme) error {
+	if err := s.AddGeneratedConversionFunc((*AdmissionConfiguration)(nil), (*pkgapisapiserver.AdmissionConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(a.(*AdmissionConfiguration), b.(*pkgapisapiserver.AdmissionConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.AdmissionConfiguration)(nil), (*AdmissionConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(a.(*apiserver.AdmissionConfiguration), b.(*AdmissionConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.AdmissionConfiguration)(nil), (*AdmissionConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(a.(*pkgapisapiserver.AdmissionConfiguration), b.(*AdmissionConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*AdmissionPluginConfiguration)(nil), (*apiserver.AdmissionPluginConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(a.(*AdmissionPluginConfiguration), b.(*apiserver.AdmissionPluginConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*AdmissionPluginConfiguration)(nil), (*pkgapisapiserver.AdmissionPluginConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(a.(*AdmissionPluginConfiguration), b.(*pkgapisapiserver.AdmissionPluginConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.AdmissionPluginConfiguration)(nil), (*AdmissionPluginConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(a.(*apiserver.AdmissionPluginConfiguration), b.(*AdmissionPluginConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.AdmissionPluginConfiguration)(nil), (*AdmissionPluginConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(a.(*pkgapisapiserver.AdmissionPluginConfiguration), b.(*AdmissionPluginConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*Connection)(nil), (*apiserver.Connection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_Connection_To_apiserver_Connection(a.(*Connection), b.(*apiserver.Connection), scope)
+	if err := s.AddGeneratedConversionFunc((*Connection)(nil), (*pkgapisapiserver.Connection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_Connection_To_apiserver_Connection(a.(*Connection), b.(*pkgapisapiserver.Connection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.Connection)(nil), (*Connection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_Connection_To_v1alpha1_Connection(a.(*apiserver.Connection), b.(*Connection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.Connection)(nil), (*Connection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_Connection_To_v1alpha1_Connection(a.(*pkgapisapiserver.Connection), b.(*Connection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.EgressSelection)(nil), (*EgressSelection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(a.(*apiserver.EgressSelection), b.(*EgressSelection), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.EgressSelection)(nil), (*EgressSelection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(a.(*pkgapisapiserver.EgressSelection), b.(*EgressSelection), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*EgressSelectorConfiguration)(nil), (*apiserver.EgressSelectorConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(a.(*EgressSelectorConfiguration), b.(*apiserver.EgressSelectorConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*EgressSelectorConfiguration)(nil), (*pkgapisapiserver.EgressSelectorConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(a.(*EgressSelectorConfiguration), b.(*pkgapisapiserver.EgressSelectorConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.EgressSelectorConfiguration)(nil), (*EgressSelectorConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(a.(*apiserver.EgressSelectorConfiguration), b.(*EgressSelectorConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.EgressSelectorConfiguration)(nil), (*EgressSelectorConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(a.(*pkgapisapiserver.EgressSelectorConfiguration), b.(*EgressSelectorConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*TCPTransport)(nil), (*apiserver.TCPTransport)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(a.(*TCPTransport), b.(*apiserver.TCPTransport), scope)
+	if err := s.AddGeneratedConversionFunc((*TCPTransport)(nil), (*pkgapisapiserver.TCPTransport)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(a.(*TCPTransport), b.(*pkgapisapiserver.TCPTransport), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.TCPTransport)(nil), (*TCPTransport)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(a.(*apiserver.TCPTransport), b.(*TCPTransport), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.TCPTransport)(nil), (*TCPTransport)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(a.(*pkgapisapiserver.TCPTransport), b.(*TCPTransport), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*TLSConfig)(nil), (*apiserver.TLSConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(a.(*TLSConfig), b.(*apiserver.TLSConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*TLSConfig)(nil), (*pkgapisapiserver.TLSConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(a.(*TLSConfig), b.(*pkgapisapiserver.TLSConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.TLSConfig)(nil), (*TLSConfig)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(a.(*apiserver.TLSConfig), b.(*TLSConfig), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.TLSConfig)(nil), (*TLSConfig)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(a.(*pkgapisapiserver.TLSConfig), b.(*TLSConfig), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*TracingConfiguration)(nil), (*apiserver.TracingConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(a.(*TracingConfiguration), b.(*apiserver.TracingConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*TracingConfiguration)(nil), (*pkgapisapiserver.TracingConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(a.(*TracingConfiguration), b.(*pkgapisapiserver.TracingConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.TracingConfiguration)(nil), (*TracingConfiguration)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(a.(*apiserver.TracingConfiguration), b.(*TracingConfiguration), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.TracingConfiguration)(nil), (*TracingConfiguration)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(a.(*pkgapisapiserver.TracingConfiguration), b.(*TracingConfiguration), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*Transport)(nil), (*apiserver.Transport)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_Transport_To_apiserver_Transport(a.(*Transport), b.(*apiserver.Transport), scope)
+	if err := s.AddGeneratedConversionFunc((*Transport)(nil), (*pkgapisapiserver.Transport)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_Transport_To_apiserver_Transport(a.(*Transport), b.(*pkgapisapiserver.Transport), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.Transport)(nil), (*Transport)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_Transport_To_v1alpha1_Transport(a.(*apiserver.Transport), b.(*Transport), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.Transport)(nil), (*Transport)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_Transport_To_v1alpha1_Transport(a.(*pkgapisapiserver.Transport), b.(*Transport), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*UDSTransport)(nil), (*apiserver.UDSTransport)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(a.(*UDSTransport), b.(*apiserver.UDSTransport), scope)
+	if err := s.AddGeneratedConversionFunc((*UDSTransport)(nil), (*pkgapisapiserver.UDSTransport)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(a.(*UDSTransport), b.(*pkgapisapiserver.UDSTransport), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddGeneratedConversionFunc((*apiserver.UDSTransport)(nil), (*UDSTransport)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(a.(*apiserver.UDSTransport), b.(*UDSTransport), scope)
+	if err := s.AddGeneratedConversionFunc((*pkgapisapiserver.UDSTransport)(nil), (*UDSTransport)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(a.(*pkgapisapiserver.UDSTransport), b.(*UDSTransport), scope)
 	}); err != nil {
 		return err
 	}
-	if err := s.AddConversionFunc((*EgressSelection)(nil), (*apiserver.EgressSelection)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1alpha1_EgressSelection_To_apiserver_EgressSelection(a.(*EgressSelection), b.(*apiserver.EgressSelection), scope)
+	if err := s.AddConversionFunc((*EgressSelection)(nil), (*pkgapisapiserver.EgressSelection)(nil), func(a, b interface{}, scope apimachinerypkgconversion.Scope) error {
+		return Convert_v1alpha1_EgressSelection_To_apiserver_EgressSelection(a.(*EgressSelection), b.(*pkgapisapiserver.EgressSelection), scope)
 	}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func autoConvert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(in *AdmissionConfiguration, out *apiserver.AdmissionConfiguration, s conversion.Scope) error {
-	out.Plugins = *(*[]apiserver.AdmissionPluginConfiguration)(unsafe.Pointer(&in.Plugins))
+func autoConvert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(in *AdmissionConfiguration, out *pkgapisapiserver.AdmissionConfiguration, s apimachinerypkgconversion.Scope) error {
+	out.Plugins = *(*[]pkgapisapiserver.AdmissionPluginConfiguration)(unsafe.Pointer(&in.Plugins))
 	return nil
 }
 
 // Convert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration is an autogenerated conversion function.
-func Convert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(in *AdmissionConfiguration, out *apiserver.AdmissionConfiguration, s conversion.Scope) error {
+func Convert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(in *AdmissionConfiguration, out *pkgapisapiserver.AdmissionConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_AdmissionConfiguration_To_apiserver_AdmissionConfiguration(in, out, s)
 }
 
-func autoConvert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(in *apiserver.AdmissionConfiguration, out *AdmissionConfiguration, s conversion.Scope) error {
+func autoConvert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(in *pkgapisapiserver.AdmissionConfiguration, out *AdmissionConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.Plugins = *(*[]AdmissionPluginConfiguration)(unsafe.Pointer(&in.Plugins))
 	return nil
 }
 
 // Convert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration is an autogenerated conversion function.
-func Convert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(in *apiserver.AdmissionConfiguration, out *AdmissionConfiguration, s conversion.Scope) error {
+func Convert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(in *pkgapisapiserver.AdmissionConfiguration, out *AdmissionConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_AdmissionConfiguration_To_v1alpha1_AdmissionConfiguration(in, out, s)
 }
 
-func autoConvert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(in *AdmissionPluginConfiguration, out *apiserver.AdmissionPluginConfiguration, s conversion.Scope) error {
+func autoConvert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(in *AdmissionPluginConfiguration, out *pkgapisapiserver.AdmissionPluginConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Path = in.Path
-	out.Configuration = (*runtime.Unknown)(unsafe.Pointer(in.Configuration))
+	out.Configuration = (*apimachinerypkgruntime.Unknown)(unsafe.Pointer(in.Configuration))
 	return nil
 }
 
 // Convert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration is an autogenerated conversion function.
-func Convert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(in *AdmissionPluginConfiguration, out *apiserver.AdmissionPluginConfiguration, s conversion.Scope) error {
+func Convert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(in *AdmissionPluginConfiguration, out *pkgapisapiserver.AdmissionPluginConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_AdmissionPluginConfiguration_To_apiserver_AdmissionPluginConfiguration(in, out, s)
 }
 
-func autoConvert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(in *apiserver.AdmissionPluginConfiguration, out *AdmissionPluginConfiguration, s conversion.Scope) error {
+func autoConvert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(in *pkgapisapiserver.AdmissionPluginConfiguration, out *AdmissionPluginConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	out.Path = in.Path
-	out.Configuration = (*runtime.Unknown)(unsafe.Pointer(in.Configuration))
+	out.Configuration = (*apimachinerypkgruntime.Unknown)(unsafe.Pointer(in.Configuration))
 	return nil
 }
 
 // Convert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration is an autogenerated conversion function.
-func Convert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(in *apiserver.AdmissionPluginConfiguration, out *AdmissionPluginConfiguration, s conversion.Scope) error {
+func Convert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(in *pkgapisapiserver.AdmissionPluginConfiguration, out *AdmissionPluginConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_AdmissionPluginConfiguration_To_v1alpha1_AdmissionPluginConfiguration(in, out, s)
 }
 
-func autoConvert_v1alpha1_Connection_To_apiserver_Connection(in *Connection, out *apiserver.Connection, s conversion.Scope) error {
-	out.ProxyProtocol = apiserver.ProtocolType(in.ProxyProtocol)
-	out.Transport = (*apiserver.Transport)(unsafe.Pointer(in.Transport))
+func autoConvert_v1alpha1_Connection_To_apiserver_Connection(in *Connection, out *pkgapisapiserver.Connection, s apimachinerypkgconversion.Scope) error {
+	out.ProxyProtocol = pkgapisapiserver.ProtocolType(in.ProxyProtocol)
+	out.Transport = (*pkgapisapiserver.Transport)(unsafe.Pointer(in.Transport))
 	return nil
 }
 
 // Convert_v1alpha1_Connection_To_apiserver_Connection is an autogenerated conversion function.
-func Convert_v1alpha1_Connection_To_apiserver_Connection(in *Connection, out *apiserver.Connection, s conversion.Scope) error {
+func Convert_v1alpha1_Connection_To_apiserver_Connection(in *Connection, out *pkgapisapiserver.Connection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_Connection_To_apiserver_Connection(in, out, s)
 }
 
-func autoConvert_apiserver_Connection_To_v1alpha1_Connection(in *apiserver.Connection, out *Connection, s conversion.Scope) error {
+func autoConvert_apiserver_Connection_To_v1alpha1_Connection(in *pkgapisapiserver.Connection, out *Connection, s apimachinerypkgconversion.Scope) error {
 	out.ProxyProtocol = ProtocolType(in.ProxyProtocol)
 	out.Transport = (*Transport)(unsafe.Pointer(in.Transport))
 	return nil
 }
 
 // Convert_apiserver_Connection_To_v1alpha1_Connection is an autogenerated conversion function.
-func Convert_apiserver_Connection_To_v1alpha1_Connection(in *apiserver.Connection, out *Connection, s conversion.Scope) error {
+func Convert_apiserver_Connection_To_v1alpha1_Connection(in *pkgapisapiserver.Connection, out *Connection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_Connection_To_v1alpha1_Connection(in, out, s)
 }
 
-func autoConvert_v1alpha1_EgressSelection_To_apiserver_EgressSelection(in *EgressSelection, out *apiserver.EgressSelection, s conversion.Scope) error {
+func autoConvert_v1alpha1_EgressSelection_To_apiserver_EgressSelection(in *EgressSelection, out *pkgapisapiserver.EgressSelection, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_v1alpha1_Connection_To_apiserver_Connection(&in.Connection, &out.Connection, s); err != nil {
 		return err
@@ -213,7 +213,7 @@ func autoConvert_v1alpha1_EgressSelection_To_apiserver_EgressSelection(in *Egres
 	return nil
 }
 
-func autoConvert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(in *apiserver.EgressSelection, out *EgressSelection, s conversion.Scope) error {
+func autoConvert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(in *pkgapisapiserver.EgressSelection, out *EgressSelection, s apimachinerypkgconversion.Scope) error {
 	out.Name = in.Name
 	if err := Convert_apiserver_Connection_To_v1alpha1_Connection(&in.Connection, &out.Connection, s); err != nil {
 		return err
@@ -222,14 +222,14 @@ func autoConvert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(in *apise
 }
 
 // Convert_apiserver_EgressSelection_To_v1alpha1_EgressSelection is an autogenerated conversion function.
-func Convert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(in *apiserver.EgressSelection, out *EgressSelection, s conversion.Scope) error {
+func Convert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(in *pkgapisapiserver.EgressSelection, out *EgressSelection, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_EgressSelection_To_v1alpha1_EgressSelection(in, out, s)
 }
 
-func autoConvert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(in *EgressSelectorConfiguration, out *apiserver.EgressSelectorConfiguration, s conversion.Scope) error {
+func autoConvert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(in *EgressSelectorConfiguration, out *pkgapisapiserver.EgressSelectorConfiguration, s apimachinerypkgconversion.Scope) error {
 	if in.EgressSelections != nil {
 		in, out := &in.EgressSelections, &out.EgressSelections
-		*out = make([]apiserver.EgressSelection, len(*in))
+		*out = make([]pkgapisapiserver.EgressSelection, len(*in))
 		for i := range *in {
 			if err := Convert_v1alpha1_EgressSelection_To_apiserver_EgressSelection(&(*in)[i], &(*out)[i], s); err != nil {
 				return err
@@ -242,11 +242,11 @@ func autoConvert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelecto
 }
 
 // Convert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration is an autogenerated conversion function.
-func Convert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(in *EgressSelectorConfiguration, out *apiserver.EgressSelectorConfiguration, s conversion.Scope) error {
+func Convert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(in *EgressSelectorConfiguration, out *pkgapisapiserver.EgressSelectorConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_EgressSelectorConfiguration_To_apiserver_EgressSelectorConfiguration(in, out, s)
 }
 
-func autoConvert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(in *apiserver.EgressSelectorConfiguration, out *EgressSelectorConfiguration, s conversion.Scope) error {
+func autoConvert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(in *pkgapisapiserver.EgressSelectorConfiguration, out *EgressSelectorConfiguration, s apimachinerypkgconversion.Scope) error {
 	if in.EgressSelections != nil {
 		in, out := &in.EgressSelections, &out.EgressSelections
 		*out = make([]EgressSelection, len(*in))
@@ -262,33 +262,33 @@ func autoConvert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelecto
 }
 
 // Convert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration is an autogenerated conversion function.
-func Convert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(in *apiserver.EgressSelectorConfiguration, out *EgressSelectorConfiguration, s conversion.Scope) error {
+func Convert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(in *pkgapisapiserver.EgressSelectorConfiguration, out *EgressSelectorConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_EgressSelectorConfiguration_To_v1alpha1_EgressSelectorConfiguration(in, out, s)
 }
 
-func autoConvert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(in *TCPTransport, out *apiserver.TCPTransport, s conversion.Scope) error {
+func autoConvert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(in *TCPTransport, out *pkgapisapiserver.TCPTransport, s apimachinerypkgconversion.Scope) error {
 	out.URL = in.URL
-	out.TLSConfig = (*apiserver.TLSConfig)(unsafe.Pointer(in.TLSConfig))
+	out.TLSConfig = (*pkgapisapiserver.TLSConfig)(unsafe.Pointer(in.TLSConfig))
 	return nil
 }
 
 // Convert_v1alpha1_TCPTransport_To_apiserver_TCPTransport is an autogenerated conversion function.
-func Convert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(in *TCPTransport, out *apiserver.TCPTransport, s conversion.Scope) error {
+func Convert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(in *TCPTransport, out *pkgapisapiserver.TCPTransport, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_TCPTransport_To_apiserver_TCPTransport(in, out, s)
 }
 
-func autoConvert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(in *apiserver.TCPTransport, out *TCPTransport, s conversion.Scope) error {
+func autoConvert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(in *pkgapisapiserver.TCPTransport, out *TCPTransport, s apimachinerypkgconversion.Scope) error {
 	out.URL = in.URL
 	out.TLSConfig = (*TLSConfig)(unsafe.Pointer(in.TLSConfig))
 	return nil
 }
 
 // Convert_apiserver_TCPTransport_To_v1alpha1_TCPTransport is an autogenerated conversion function.
-func Convert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(in *apiserver.TCPTransport, out *TCPTransport, s conversion.Scope) error {
+func Convert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(in *pkgapisapiserver.TCPTransport, out *TCPTransport, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_TCPTransport_To_v1alpha1_TCPTransport(in, out, s)
 }
 
-func autoConvert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(in *TLSConfig, out *apiserver.TLSConfig, s conversion.Scope) error {
+func autoConvert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(in *TLSConfig, out *pkgapisapiserver.TLSConfig, s apimachinerypkgconversion.Scope) error {
 	out.CABundle = in.CABundle
 	out.ClientKey = in.ClientKey
 	out.ClientCert = in.ClientCert
@@ -296,11 +296,11 @@ func autoConvert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(in *TLSConfig, out *a
 }
 
 // Convert_v1alpha1_TLSConfig_To_apiserver_TLSConfig is an autogenerated conversion function.
-func Convert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(in *TLSConfig, out *apiserver.TLSConfig, s conversion.Scope) error {
+func Convert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(in *TLSConfig, out *pkgapisapiserver.TLSConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_TLSConfig_To_apiserver_TLSConfig(in, out, s)
 }
 
-func autoConvert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(in *apiserver.TLSConfig, out *TLSConfig, s conversion.Scope) error {
+func autoConvert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(in *pkgapisapiserver.TLSConfig, out *TLSConfig, s apimachinerypkgconversion.Scope) error {
 	out.CABundle = in.CABundle
 	out.ClientKey = in.ClientKey
 	out.ClientCert = in.ClientCert
@@ -308,70 +308,70 @@ func autoConvert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(in *apiserver.TLSConf
 }
 
 // Convert_apiserver_TLSConfig_To_v1alpha1_TLSConfig is an autogenerated conversion function.
-func Convert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(in *apiserver.TLSConfig, out *TLSConfig, s conversion.Scope) error {
+func Convert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(in *pkgapisapiserver.TLSConfig, out *TLSConfig, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_TLSConfig_To_v1alpha1_TLSConfig(in, out, s)
 }
 
-func autoConvert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(in *TracingConfiguration, out *apiserver.TracingConfiguration, s conversion.Scope) error {
+func autoConvert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(in *TracingConfiguration, out *pkgapisapiserver.TracingConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.Endpoint = (*string)(unsafe.Pointer(in.Endpoint))
 	out.SamplingRatePerMillion = (*int32)(unsafe.Pointer(in.SamplingRatePerMillion))
 	return nil
 }
 
 // Convert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration is an autogenerated conversion function.
-func Convert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(in *TracingConfiguration, out *apiserver.TracingConfiguration, s conversion.Scope) error {
+func Convert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(in *TracingConfiguration, out *pkgapisapiserver.TracingConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_TracingConfiguration_To_apiserver_TracingConfiguration(in, out, s)
 }
 
-func autoConvert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(in *apiserver.TracingConfiguration, out *TracingConfiguration, s conversion.Scope) error {
+func autoConvert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(in *pkgapisapiserver.TracingConfiguration, out *TracingConfiguration, s apimachinerypkgconversion.Scope) error {
 	out.Endpoint = (*string)(unsafe.Pointer(in.Endpoint))
 	out.SamplingRatePerMillion = (*int32)(unsafe.Pointer(in.SamplingRatePerMillion))
 	return nil
 }
 
 // Convert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration is an autogenerated conversion function.
-func Convert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(in *apiserver.TracingConfiguration, out *TracingConfiguration, s conversion.Scope) error {
+func Convert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(in *pkgapisapiserver.TracingConfiguration, out *TracingConfiguration, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_TracingConfiguration_To_v1alpha1_TracingConfiguration(in, out, s)
 }
 
-func autoConvert_v1alpha1_Transport_To_apiserver_Transport(in *Transport, out *apiserver.Transport, s conversion.Scope) error {
-	out.TCP = (*apiserver.TCPTransport)(unsafe.Pointer(in.TCP))
-	out.UDS = (*apiserver.UDSTransport)(unsafe.Pointer(in.UDS))
+func autoConvert_v1alpha1_Transport_To_apiserver_Transport(in *Transport, out *pkgapisapiserver.Transport, s apimachinerypkgconversion.Scope) error {
+	out.TCP = (*pkgapisapiserver.TCPTransport)(unsafe.Pointer(in.TCP))
+	out.UDS = (*pkgapisapiserver.UDSTransport)(unsafe.Pointer(in.UDS))
 	return nil
 }
 
 // Convert_v1alpha1_Transport_To_apiserver_Transport is an autogenerated conversion function.
-func Convert_v1alpha1_Transport_To_apiserver_Transport(in *Transport, out *apiserver.Transport, s conversion.Scope) error {
+func Convert_v1alpha1_Transport_To_apiserver_Transport(in *Transport, out *pkgapisapiserver.Transport, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_Transport_To_apiserver_Transport(in, out, s)
 }
 
-func autoConvert_apiserver_Transport_To_v1alpha1_Transport(in *apiserver.Transport, out *Transport, s conversion.Scope) error {
+func autoConvert_apiserver_Transport_To_v1alpha1_Transport(in *pkgapisapiserver.Transport, out *Transport, s apimachinerypkgconversion.Scope) error {
 	out.TCP = (*TCPTransport)(unsafe.Pointer(in.TCP))
 	out.UDS = (*UDSTransport)(unsafe.Pointer(in.UDS))
 	return nil
 }
 
 // Convert_apiserver_Transport_To_v1alpha1_Transport is an autogenerated conversion function.
-func Convert_apiserver_Transport_To_v1alpha1_Transport(in *apiserver.Transport, out *Transport, s conversion.Scope) error {
+func Convert_apiserver_Transport_To_v1alpha1_Transport(in *pkgapisapiserver.Transport, out *Transport, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_Transport_To_v1alpha1_Transport(in, out, s)
 }
 
-func autoConvert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(in *UDSTransport, out *apiserver.UDSTransport, s conversion.Scope) error {
+func autoConvert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(in *UDSTransport, out *pkgapisapiserver.UDSTransport, s apimachinerypkgconversion.Scope) error {
 	out.UDSName = in.UDSName
 	return nil
 }
 
 // Convert_v1alpha1_UDSTransport_To_apiserver_UDSTransport is an autogenerated conversion function.
-func Convert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(in *UDSTransport, out *apiserver.UDSTransport, s conversion.Scope) error {
+func Convert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(in *UDSTransport, out *pkgapisapiserver.UDSTransport, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_v1alpha1_UDSTransport_To_apiserver_UDSTransport(in, out, s)
 }
 
-func autoConvert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(in *apiserver.UDSTransport, out *UDSTransport, s conversion.Scope) error {
+func autoConvert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(in *pkgapisapiserver.UDSTransport, out *UDSTransport, s apimachinerypkgconversion.Scope) error {
 	out.UDSName = in.UDSName
 	return nil
 }
 
 // Convert_apiserver_UDSTransport_To_v1alpha1_UDSTransport is an autogenerated conversion function.
-func Convert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(in *apiserver.UDSTransport, out *UDSTransport, s conversion.Scope) error {
+func Convert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(in *pkgapisapiserver.UDSTransport, out *UDSTransport, s apimachinerypkgconversion.Scope) error {
 	return autoConvert_apiserver_UDSTransport_To_v1alpha1_UDSTransport(in, out, s)
 }
