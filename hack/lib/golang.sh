@@ -501,10 +501,12 @@ kube::golang::old::create_gopath_tree() {
 
   mkdir -p "${go_pkg_basedir}"
 
-  # TODO: This symlink should be relative.
-  if [[ ! -e "${go_pkg_dir}" || "$(readlink "${go_pkg_dir}")" != "${KUBE_ROOT}" ]]; then
-    ln -snf "${KUBE_ROOT}" "${go_pkg_dir}"
-  fi
+  # TODO: These symlinks should be relative.
+  rm -f "${KUBE_GOPATH}/src/*"
+  ln -snf "${KUBE_ROOT}" "${go_pkg_dir}"
+  for d in "${KUBE_ROOT}/staging/src/k8s.io"/*; do
+    ln -snf "$d" "${KUBE_GOPATH}/src/k8s.io/$(basename "$d")"
+  done
 }
 
 # Ensure the go tool exists and is a viable version.
