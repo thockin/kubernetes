@@ -21,9 +21,10 @@ set -o pipefail
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
 # generate the code with:
-# - --output-base because this script should also be able to run inside the vendor dir of
-#   k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
-#   instead of the $GOPATH directly. For normal projects this can be dropped.
+# - --output-base because this script should also be able to run inside the
+# staging dir of k8s.io/kubernetes. The output-base is needed for the
+# generators to output into the staging dir instead of the $GOPATH directly.
+# For normal projects this can be dropped.
 "${SCRIPT_ROOT}/generate-internal-groups.sh" all \
   k8s.io/code-generator/examples/apiserver \
   k8s.io/code-generator/examples/apiserver/apis \

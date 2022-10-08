@@ -35,7 +35,7 @@ UPDATE_API_KNOWN_VIOLATIONS="${UPDATE_API_KNOWN_VIOLATIONS:-}"
 OUT_DIR="_output"
 BIN_DIR="${OUT_DIR}/bin"
 PRJ_SRC_PATH="k8s.io/kubernetes"
-BOILERPLATE_FILENAME="vendor/k8s.io/code-generator/hack/boilerplate.go.txt"
+BOILERPLATE_FILENAME="staging/src/k8s.io/code-generator/hack/boilerplate.go.txt"
 APPLYCONFIG_PKG="k8s.io/client-go/applyconfigurations"
 
 if [[ "${DBG_CODEGEN}" == 1 ]]; then
@@ -48,10 +48,6 @@ fi
 # Example:
 #   kfind -type f -name foobar.go
 function kfind() {
-    # We want to include the "special" vendor directories which are actually
-    # part of the Kubernetes source tree (./staging/*) but we need them to be
-    # named as their ./vendor/* equivalents.  Also, we do not want all of
-    # ./vendor nor ./hack/tools/vendor nor even all of ./vendor/k8s.io.
     find -H .                      \
         \(                         \
         -not \(                    \
@@ -69,8 +65,7 @@ function kfind() {
             \) -prune              \
         \)                         \
         \)                         \
-        "$@"                       \
-        | sed 's|^./staging/src|vendor|'
+        "$@"
 }
 
 function find_all_go_dirs() {
@@ -128,10 +123,14 @@ function codegen::prerelease() {
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: finding all +k8s:prerelease-lifecycle-gen tags"
     fi
+    # FIXME: This tool needs inputs in the form:
+    # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
+    # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
     local tag_dirs=()
     kube::util::read-array tag_dirs < <( \
         grep -l -Z --color=never '+k8s:prerelease-lifecycle-gen=true' "${ALL_K8S_TAG_FILES[@]}" \
             | xargs -0 -n1 dirname \
+            | sed 's|staging/src|vendor|g' \
             | LC_ALL=C sort -u)
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: found ${#tag_dirs[@]} +k8s:prerelease-lifecycle-gen tagged dirs"
@@ -187,10 +186,14 @@ function codegen::deepcopy() {
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: finding all +k8s:deepcopy-gen tags"
     fi
+    # FIXME: This tool needs inputs in the form:
+    # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
+    # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
     local tag_dirs=()
     kube::util::read-array tag_dirs < <( \
         grep -l -Z --color=never '+k8s:deepcopy-gen=' "${ALL_K8S_TAG_FILES[@]}" \
             | xargs -0 -n1 dirname \
+            | sed 's|staging/src|vendor|g' \
             | LC_ALL=C sort -u)
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: found ${#tag_dirs[@]} +k8s:deepcopy-gen tagged dirs"
@@ -253,10 +256,14 @@ function codegen::defaults() {
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: finding all +k8s:defaulter-gen tags"
     fi
+    # FIXME: This tool needs inputs in the form:
+    # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
+    # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
     local tag_dirs=()
     kube::util::read-array tag_dirs < <( \
         grep -l -Z --color=never '+k8s:defaulter-gen=' "${ALL_K8S_TAG_FILES[@]}" \
             | xargs -0 -n1 dirname \
+            | sed 's|staging/src|vendor|g' \
             | LC_ALL=C sort -u)
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: found ${#tag_dirs[@]} +k8s:defaulter-gen tagged dirs"
@@ -324,10 +331,14 @@ function codegen::conversions() {
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: finding all +k8s:conversion-gen tags"
     fi
+    # FIXME: This tool needs inputs in the form:
+    # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
+    # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
     local tag_dirs=()
     kube::util::read-array tag_dirs < <(\
         grep -l -Z --color=never '^// *+k8s:conversion-gen=' "${ALL_K8S_TAG_FILES[@]}" \
             | xargs -0 -n1 dirname \
+            | sed 's|staging/src|vendor|g' \
             | LC_ALL=C sort -u)
     if [[ "${DBG_CODEGEN}" == 1 ]]; then
         kube::log::status "DBG: found ${#tag_dirs[@]} +k8s:conversion-gen tagged dirs"
@@ -443,9 +454,9 @@ function codegen::openapi() {
 
     # Standard dirs which all targets need.
     local apimachinery_dirs=(
-        vendor/k8s.io/apimachinery/pkg/apis/meta/v1
-        vendor/k8s.io/apimachinery/pkg/runtime
-        vendor/k8s.io/apimachinery/pkg/version
+        staging/src/k8s.io/apimachinery/pkg/apis/meta/v1
+        staging/src/k8s.io/apimachinery/pkg/runtime
+        staging/src/k8s.io/apimachinery/pkg/version
     )
 
     # These should probably be configured by tags in code-files somewhere.
@@ -465,8 +476,8 @@ function codegen::openapi() {
     local KUBE_tag_files=()
     kube::util::read-array KUBE_tag_files < <(
         k8s_tag_files_except \
-            vendor/k8s.io/code-generator \
-            vendor/k8s.io/sample-apiserver
+            staging/src/k8s.io/code-generator \
+            staging/src/k8s.io/sample-apiserver
         )
 
     # shellcheck disable=SC2034 # used indirectly
@@ -477,7 +488,7 @@ function codegen::openapi() {
     local AGGREGATOR_tag_files=()
     kube::util::read-array AGGREGATOR_tag_files < <(
         k8s_tag_files_matching \
-            vendor/k8s.io/kube-aggregator \
+            staging/src/k8s.io/kube-aggregator \
             "${apimachinery_dirs[@]}"
         )
 
@@ -489,8 +500,8 @@ function codegen::openapi() {
     local APIEXTENSIONS_tag_files=()
     kube::util::read-array APIEXTENSIONS_tag_files < <(
         k8s_tag_files_matching \
-            vendor/k8s.io/apiextensions \
-            vendor/k8s.io/api/autoscaling/v1 \
+            staging/src/k8s.io/apiextensions \
+            staging/src/k8s.io/api/autoscaling/v1 \
             "${apimachinery_dirs[@]}"
         )
 
@@ -502,7 +513,7 @@ function codegen::openapi() {
     local CODEGEN_tag_files=()
     kube::util::read-array CODEGEN_tag_files < <(
         k8s_tag_files_matching \
-            vendor/k8s.io/code-generator \
+            staging/src/k8s.io/code-generator \
             "${apimachinery_dirs[@]}"
         )
 
@@ -514,7 +525,7 @@ function codegen::openapi() {
     local SAMPLEAPISERVER_tag_files=()
     kube::util::read-array SAMPLEAPISERVER_tag_files < <(
         k8s_tag_files_matching \
-            vendor/k8s.io/sample-apiserver \
+            staging/src/k8s.io/sample-apiserver \
             "${apimachinery_dirs[@]}"
         )
 
@@ -534,10 +545,14 @@ function codegen::openapi() {
             kube::log::status "DBG: finding all +k8s:openapi-gen tags for ${prefix}"
         fi
 
+        # FIXME: This tool needs inputs in the form:
+        # 'k8s.io/kubernetes/vendor/k8s.io/foo' rather than 'k8s.io/foo' or
+        # 'k8s.io/kubernetes/staging/src/k8s.io/foo' or './staging/src/k8s.io/foo'.
         local tag_dirs=()
         kube::util::read-array tag_dirs < <(
             grep -l -Z --color=never '+k8s:openapi-gen=' $(indirect_array "${prefix}_tag_files") \
                 | xargs -0 -n1 dirname \
+                | sed 's|staging/src|vendor|g' \
                 | LC_ALL=C sort -u)
 
         if [[ "${DBG_CODEGEN}" == 1 ]]; then
@@ -584,14 +599,12 @@ function codegen::openapi() {
 }
 
 function codegen::applyconfigs() {
-    GO111MODULE=on go install \
+    hack/make-rules/build.sh \
         k8s.io/kubernetes/pkg/generated/openapi/cmd/models-schema \
         k8s.io/code-generator/cmd/applyconfiguration-gen
 
-    local modelsschema
-    modelsschema=$(kube::util::find-binary "models-schema")
-    local applyconfigurationgen
-    applyconfigurationgen=$(kube::util::find-binary "applyconfiguration-gen")
+    local modelsschema="${BIN_DIR}/models-schema"
+    local applyconfigurationgen="${BIN_DIR}/applyconfiguration-gen"
 
     # because client-gen doesn't do policy/v1alpha1, we have to skip it too
     local ext_apis=()
@@ -614,7 +627,7 @@ function codegen::applyconfigs() {
     "${applyconfigurationgen}" \
         --openapi-schema <("${modelsschema}") \
         --go-header-file "${BOILERPLATE_FILENAME}" \
-        --output-base "${KUBE_ROOT}/vendor" \
+        --output-base "${KUBE_ROOT}/staging/src" \
         --output-package "${APPLYCONFIG_PKG}" \
         $(printf -- " --input-dirs %s" "${ext_apis[@]}") \
         "$@"
@@ -625,20 +638,20 @@ function codegen::applyconfigs() {
 }
 
 function codegen::clients() {
-    GO111MODULE=on go install \
+    hack/make-rules/build.sh \
         k8s.io/code-generator/cmd/client-gen
 
-    local clientgen
-    clientgen=$(kube::util::find-binary "client-gen")
+    local clientgen="${BIN_DIR}/client-gen"
 
     IFS=" " read -r -a group_versions <<< "${KUBE_AVAILABLE_GROUP_VERSIONS}"
     local gv_dirs=()
     for gv in "${group_versions[@]}"; do
         # add items, but strip off any leading apis/ you find to match command expectations
         local api_dir
+        kube::util::group-version-to-pkg-path "${gv}" #ZFIXME
         api_dir=$(kube::util::group-version-to-pkg-path "${gv}")
         local nopkg_dir=${api_dir#pkg/}
-        nopkg_dir=${nopkg_dir#vendor/k8s.io/api/}
+        nopkg_dir=${nopkg_dir#staging/src/k8s.io/api/}
         local pkg_dir=${nopkg_dir#apis/}
 
         # skip groups that aren't being served, clients for these don't matter
@@ -659,7 +672,7 @@ function codegen::clients() {
 
     "${clientgen}" \
         --go-header-file "${BOILERPLATE_FILENAME}" \
-        --output-base "${KUBE_ROOT}/vendor" \
+        --output-base "${KUBE_ROOT}/staging/src" \
         --output-package="k8s.io/client-go" \
         --clientset-name="kubernetes" \
         --input-base="k8s.io/api" \
@@ -673,10 +686,10 @@ function codegen::clients() {
 }
 
 function codegen::listers() {
-    GO111MODULE=on go install k8s.io/code-generator/cmd/lister-gen
+    hack/make-rules/build.sh \
+        k8s.io/code-generator/cmd/lister-gen
 
-    local listergen
-    listergen=$(kube::util::find-binary "lister-gen")
+    local listergen="${BIN_DIR}/lister-gen"
 
     local ext_apis=()
     kube::util::read-array ext_apis < <(
@@ -695,7 +708,7 @@ function codegen::listers() {
 
     "${listergen}" \
         --go-header-file "${BOILERPLATE_FILENAME}" \
-        --output-base "${KUBE_ROOT}/vendor" \
+        --output-base "${KUBE_ROOT}/staging/src" \
         --output-package "k8s.io/client-go/listers" \
         $(printf -- " --input-dirs %s" "${ext_apis[@]}") \
         "$@"
@@ -706,11 +719,10 @@ function codegen::listers() {
 }
 
 function codegen::informers() {
-    GO111MODULE=on go install \
+    hack/make-rules/build.sh \
         k8s.io/code-generator/cmd/informer-gen
 
-    local informergen
-    informergen=$(kube::util::find-binary "informer-gen")
+    local informergen="${BIN_DIR}/informer-gen"
 
     # because client-gen doesn't do policy/v1alpha1, we have to skip it too
     local ext_apis=()
@@ -731,7 +743,7 @@ function codegen::informers() {
 
     "${informergen}" \
         --go-header-file "${BOILERPLATE_FILENAME}" \
-        --output-base "${KUBE_ROOT}/vendor" \
+        --output-base "${KUBE_ROOT}/staging/src" \
         --output-package "k8s.io/client-go/informers" \
         --single-directory \
         --versioned-clientset-package k8s.io/client-go/kubernetes \
@@ -748,17 +760,17 @@ function codegen::subprojects() {
     # Call generation on sub-projects.
     # TODO(thockin): make these take a list of codegens and flags
     local subs=(
-        vendor/k8s.io/code-generator/hack/update-codegen.sh
-        vendor/k8s.io/kube-aggregator/hack/update-codegen.sh
-        vendor/k8s.io/sample-apiserver/hack/update-codegen.sh
-        vendor/k8s.io/sample-controller/hack/update-codegen.sh
-        vendor/k8s.io/apiextensions-apiserver/hack/update-codegen.sh
-        vendor/k8s.io/metrics/hack/update-codegen.sh
-        vendor/k8s.io/apiextensions-apiserver/examples/client-go/hack/update-codegen.sh
+        staging/src/k8s.io/code-generator/hack/update-codegen.sh
+        staging/src/k8s.io/kube-aggregator/hack/update-codegen.sh
+        staging/src/k8s.io/sample-apiserver/hack/update-codegen.sh
+        staging/src/k8s.io/sample-controller/hack/update-codegen.sh
+        staging/src/k8s.io/apiextensions-apiserver/hack/update-codegen.sh
+        staging/src/k8s.io/metrics/hack/update-codegen.sh
+        staging/src/k8s.io/apiextensions-apiserver/examples/client-go/hack/update-codegen.sh
     )
 
-    for s in "${subs[@]}"; do 
-        CODEGEN_PKG=./vendor/k8s.io/code-generator "$s"
+    for s in "${subs[@]}"; do
+        CODEGEN_PKG=./staging/src/k8s.io/code-generator "$s"
     done
 }
 
