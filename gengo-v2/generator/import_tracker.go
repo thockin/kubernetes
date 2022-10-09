@@ -18,6 +18,7 @@ package generator
 
 import (
 	"go/token"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/klog/v2"
@@ -46,7 +47,13 @@ func NewImportTrackerForPackage(local string, typesToAdd ...*types.Type) *namer.
 	tracker := namer.NewDefaultImportTracker(types.Name{Package: local})
 	tracker.IsInvalidType = func(*types.Type) bool { return false }
 	tracker.LocalName = func(name types.Name) string { return golangTrackerLocalName(&tracker, name) }
-	tracker.PrintImport = func(path, name string) string { return name + " \"" + path + "\"" }
+	tracker.PrintImport = func(path, name string) string {
+		if filepath.Base(path) == name {
+			return `"` + path + `"`
+		} else {
+			return name + " \"" + path + "\""
+		}
+	}
 
 	tracker.AddTypes(typesToAdd...)
 	return &tracker
