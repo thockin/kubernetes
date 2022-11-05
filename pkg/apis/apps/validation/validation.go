@@ -21,6 +21,7 @@ import (
 	"strconv"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/validate"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -128,12 +129,12 @@ func ValidateStatefulSetSpec(spec *apps.StatefulSetSpec, fldPath *field.Path, op
 
 	allErrs = append(allErrs, ValidatePersistentVolumeClaimRetentionPolicy(spec.PersistentVolumeClaimRetentionPolicy, fldPath.Child("persistentVolumeClaimRetentionPolicy"))...)
 
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.Replicas), fldPath.Child("replicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.Replicas, fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.MinReadySeconds, fldPath.Child("minReadySeconds"))...)
 	if utilfeature.DefaultFeatureGate.Enabled(features.StatefulSetStartOrdinal) {
 		if spec.Ordinals != nil {
 			replicaStartOrdinal := spec.Ordinals.Start
-			allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(replicaStartOrdinal), fldPath.Child("ordinals.start"))...)
+			allErrs = append(allErrs, validate.GEZ(replicaStartOrdinal, fldPath.Child("ordinals.start"))...)
 		}
 	}
 
@@ -209,16 +210,16 @@ func ValidateStatefulSetUpdate(statefulSet, oldStatefulSet *apps.StatefulSet, op
 func ValidateStatefulSetStatus(status *apps.StatefulSetStatus, fieldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Replicas), fieldPath.Child("replicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.ReadyReplicas), fieldPath.Child("readyReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.CurrentReplicas), fieldPath.Child("currentReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.UpdatedReplicas), fieldPath.Child("updatedReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.AvailableReplicas), fieldPath.Child("availableReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.Replicas, fieldPath.Child("replicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ReadyReplicas, fieldPath.Child("readyReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.CurrentReplicas, fieldPath.Child("currentReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.UpdatedReplicas, fieldPath.Child("updatedReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.AvailableReplicas, fieldPath.Child("availableReplicas"))...)
 	if status.ObservedGeneration != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*status.ObservedGeneration), fieldPath.Child("observedGeneration"))...)
+		allErrs = append(allErrs, validate.GEZ(*status.ObservedGeneration, fieldPath.Child("observedGeneration"))...)
 	}
 	if status.CollisionCount != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*status.CollisionCount), fieldPath.Child("collisionCount"))...)
+		allErrs = append(allErrs, validate.GEZ(*status.CollisionCount, fieldPath.Child("collisionCount"))...)
 	}
 
 	msg := "cannot be greater than status.replicas"
@@ -271,7 +272,7 @@ func ValidateControllerRevision(revision *apps.ControllerRevision) field.ErrorLi
 	if revision.Data == nil {
 		errs = append(errs, field.Required(field.NewPath("data"), "data is mandatory"))
 	}
-	errs = append(errs, apivalidation.ValidateNonnegativeField(revision.Revision, field.NewPath("revision"))...)
+	errs = append(errs, validate.GEZ(revision.Revision, field.NewPath("revision"))...)
 	return errs
 }
 
@@ -325,16 +326,16 @@ func ValidateDaemonSetSpecUpdate(newSpec, oldSpec *apps.DaemonSetSpec, fldPath *
 // validateDaemonSetStatus validates a DaemonSetStatus
 func validateDaemonSetStatus(status *apps.DaemonSetStatus, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.CurrentNumberScheduled), fldPath.Child("currentNumberScheduled"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.NumberMisscheduled), fldPath.Child("numberMisscheduled"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.DesiredNumberScheduled), fldPath.Child("desiredNumberScheduled"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.NumberReady), fldPath.Child("numberReady"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(status.ObservedGeneration, fldPath.Child("observedGeneration"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.UpdatedNumberScheduled), fldPath.Child("updatedNumberScheduled"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.NumberAvailable), fldPath.Child("numberAvailable"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.NumberUnavailable), fldPath.Child("numberUnavailable"))...)
+	allErrs = append(allErrs, validate.GEZ(status.CurrentNumberScheduled, fldPath.Child("currentNumberScheduled"))...)
+	allErrs = append(allErrs, validate.GEZ(status.NumberMisscheduled, fldPath.Child("numberMisscheduled"))...)
+	allErrs = append(allErrs, validate.GEZ(status.DesiredNumberScheduled, fldPath.Child("desiredNumberScheduled"))...)
+	allErrs = append(allErrs, validate.GEZ(status.NumberReady, fldPath.Child("numberReady"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ObservedGeneration, fldPath.Child("observedGeneration"))...)
+	allErrs = append(allErrs, validate.GEZ(status.UpdatedNumberScheduled, fldPath.Child("updatedNumberScheduled"))...)
+	allErrs = append(allErrs, validate.GEZ(status.NumberAvailable, fldPath.Child("numberAvailable"))...)
+	allErrs = append(allErrs, validate.GEZ(status.NumberUnavailable, fldPath.Child("numberUnavailable"))...)
 	if status.CollisionCount != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*status.CollisionCount), fldPath.Child("collisionCount"))...)
+		allErrs = append(allErrs, validate.GEZ(*status.CollisionCount, fldPath.Child("collisionCount"))...)
 	}
 	return allErrs
 }
@@ -378,13 +379,13 @@ func ValidateDaemonSetSpec(spec *apps.DaemonSetSpec, fldPath *field.Path, opts a
 	if spec.Template.Spec.ActiveDeadlineSeconds != nil {
 		allErrs = append(allErrs, field.Forbidden(fldPath.Child("template", "spec", "activeDeadlineSeconds"), "activeDeadlineSeconds in DaemonSet is not Supported"))
 	}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.TemplateGeneration), fldPath.Child("templateGeneration"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.MinReadySeconds, fldPath.Child("minReadySeconds"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.TemplateGeneration, fldPath.Child("templateGeneration"))...)
 
 	allErrs = append(allErrs, ValidateDaemonSetUpdateStrategy(&spec.UpdateStrategy, fldPath.Child("updateStrategy"))...)
 	if spec.RevisionHistoryLimit != nil {
 		// zero is a valid RevisionHistoryLimit
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.RevisionHistoryLimit), fldPath.Child("revisionHistoryLimit"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.RevisionHistoryLimit, fldPath.Child("revisionHistoryLimit"))...)
 	}
 	return allErrs
 }
@@ -419,7 +420,7 @@ func validateRollingUpdateStatefulSet(rollingUpdate *apps.RollingUpdateStatefulS
 	var allErrs field.ErrorList
 	fldPathMaxUn := fldPath.Child("maxUnavailable")
 	allErrs = append(allErrs,
-		apivalidation.ValidateNonnegativeField(
+		validate.GEZ(
 			int64(rollingUpdate.Partition),
 			fldPath.Child("partition"))...)
 	if rollingUpdate.MaxUnavailable != nil {
@@ -471,7 +472,7 @@ func ValidatePositiveIntOrPercent(intOrPercent intstr.IntOrString, fldPath *fiel
 			allErrs = append(allErrs, field.Invalid(fldPath, intOrPercent, msg))
 		}
 	case intstr.Int:
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(intOrPercent.IntValue()), fldPath)...)
+		allErrs = append(allErrs, validate.GEZ(intOrPercent.IntValue(), fldPath)...)
 	default:
 		allErrs = append(allErrs, field.Invalid(fldPath, intOrPercent, "must be an integer or percentage (e.g '5%%')"))
 	}
@@ -549,14 +550,14 @@ func ValidateDeploymentStrategy(strategy *apps.DeploymentStrategy, fldPath *fiel
 func ValidateRollback(rollback *apps.RollbackConfig, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	v := rollback.Revision
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(v), fldPath.Child("version"))...)
+	allErrs = append(allErrs, validate.GEZ(v, fldPath.Child("version"))...)
 	return allErrs
 }
 
 // ValidateDeploymentSpec validates given deployment spec.
 func ValidateDeploymentSpec(spec *apps.DeploymentSpec, fldPath *field.Path, opts apivalidation.PodValidationOptions) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.Replicas), fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.Replicas, fldPath.Child("replicas"))...)
 
 	if spec.Selector == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))
@@ -576,16 +577,16 @@ func ValidateDeploymentSpec(spec *apps.DeploymentSpec, fldPath *field.Path, opts
 	}
 
 	allErrs = append(allErrs, ValidateDeploymentStrategy(&spec.Strategy, fldPath.Child("strategy"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.MinReadySeconds, fldPath.Child("minReadySeconds"))...)
 	if spec.RevisionHistoryLimit != nil {
 		// zero is a valid RevisionHistoryLimit
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.RevisionHistoryLimit), fldPath.Child("revisionHistoryLimit"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.RevisionHistoryLimit, fldPath.Child("revisionHistoryLimit"))...)
 	}
 	if spec.RollbackTo != nil {
 		allErrs = append(allErrs, ValidateRollback(spec.RollbackTo, fldPath.Child("rollback"))...)
 	}
 	if spec.ProgressDeadlineSeconds != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.ProgressDeadlineSeconds), fldPath.Child("progressDeadlineSeconds"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.ProgressDeadlineSeconds, fldPath.Child("progressDeadlineSeconds"))...)
 		if *spec.ProgressDeadlineSeconds <= spec.MinReadySeconds {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("progressDeadlineSeconds"), spec.ProgressDeadlineSeconds, "must be greater than minReadySeconds"))
 		}
@@ -596,14 +597,14 @@ func ValidateDeploymentSpec(spec *apps.DeploymentSpec, fldPath *field.Path, opts
 // ValidateDeploymentStatus validates given deployment status.
 func ValidateDeploymentStatus(status *apps.DeploymentStatus, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(status.ObservedGeneration, fldPath.Child("observedGeneration"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Replicas), fldPath.Child("replicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.UpdatedReplicas), fldPath.Child("updatedReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.ReadyReplicas), fldPath.Child("readyReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.AvailableReplicas), fldPath.Child("availableReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.UnavailableReplicas), fldPath.Child("unavailableReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ObservedGeneration, fldPath.Child("observedGeneration"))...)
+	allErrs = append(allErrs, validate.GEZ(status.Replicas, fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.UpdatedReplicas, fldPath.Child("updatedReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ReadyReplicas, fldPath.Child("readyReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.AvailableReplicas, fldPath.Child("availableReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.UnavailableReplicas, fldPath.Child("unavailableReplicas"))...)
 	if status.CollisionCount != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*status.CollisionCount), fldPath.Child("collisionCount"))...)
+		allErrs = append(allErrs, validate.GEZ(*status.CollisionCount, fldPath.Child("collisionCount"))...)
 	}
 	msg := "cannot be greater than status.replicas"
 	if status.UpdatedReplicas > status.Replicas {
@@ -693,11 +694,11 @@ func ValidateReplicaSetStatusUpdate(rs, oldRs *apps.ReplicaSet) field.ErrorList 
 // ValidateReplicaSetStatus validates a given ReplicaSetStatus.
 func ValidateReplicaSetStatus(status apps.ReplicaSetStatus, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Replicas), fldPath.Child("replicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.FullyLabeledReplicas), fldPath.Child("fullyLabeledReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.ReadyReplicas), fldPath.Child("readyReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.AvailableReplicas), fldPath.Child("availableReplicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.ObservedGeneration), fldPath.Child("observedGeneration"))...)
+	allErrs = append(allErrs, validate.GEZ(status.Replicas, fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.FullyLabeledReplicas, fldPath.Child("fullyLabeledReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ReadyReplicas, fldPath.Child("readyReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.AvailableReplicas, fldPath.Child("availableReplicas"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ObservedGeneration, fldPath.Child("observedGeneration"))...)
 	msg := "cannot be greater than status.replicas"
 	if status.FullyLabeledReplicas > status.Replicas {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("fullyLabeledReplicas"), status.FullyLabeledReplicas, msg))
@@ -718,8 +719,8 @@ func ValidateReplicaSetStatus(status apps.ReplicaSetStatus, fldPath *field.Path)
 func ValidateReplicaSetSpec(spec *apps.ReplicaSetSpec, fldPath *field.Path, opts apivalidation.PodValidationOptions) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.Replicas), fldPath.Child("replicas"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(spec.MinReadySeconds), fldPath.Child("minReadySeconds"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.Replicas, fldPath.Child("replicas"))...)
+	allErrs = append(allErrs, validate.GEZ(spec.MinReadySeconds, fldPath.Child("minReadySeconds"))...)
 
 	if spec.Selector == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("selector"), ""))

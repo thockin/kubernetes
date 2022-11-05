@@ -23,6 +23,7 @@ import (
 
 	"github.com/robfig/cron/v3"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/validate"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/labels"
@@ -169,19 +170,19 @@ func validateJobSpec(spec *batch.JobSpec, fldPath *field.Path, opts apivalidatio
 	allErrs := field.ErrorList{}
 
 	if spec.Parallelism != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.Parallelism), fldPath.Child("parallelism"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.Parallelism, fldPath.Child("parallelism"))...)
 	}
 	if spec.Completions != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.Completions), fldPath.Child("completions"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.Completions, fldPath.Child("completions"))...)
 	}
 	if spec.ActiveDeadlineSeconds != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.ActiveDeadlineSeconds), fldPath.Child("activeDeadlineSeconds"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.ActiveDeadlineSeconds, fldPath.Child("activeDeadlineSeconds"))...)
 	}
 	if spec.BackoffLimit != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.BackoffLimit), fldPath.Child("backoffLimit"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.BackoffLimit, fldPath.Child("backoffLimit"))...)
 	}
 	if spec.TTLSecondsAfterFinished != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.TTLSecondsAfterFinished), fldPath.Child("ttlSecondsAfterFinished"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.TTLSecondsAfterFinished, fldPath.Child("ttlSecondsAfterFinished"))...)
 	}
 	if spec.CompletionMode != nil {
 		if *spec.CompletionMode != batch.NonIndexedCompletion && *spec.CompletionMode != batch.IndexedCompletion {
@@ -322,11 +323,11 @@ func validatePodFailurePolicyRuleOnExitCodes(onExitCode *batch.PodFailurePolicyO
 // validateJobStatus validates a JobStatus and returns an ErrorList with any errors.
 func validateJobStatus(status *batch.JobStatus, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Active), fldPath.Child("active"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Succeeded), fldPath.Child("succeeded"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.Failed), fldPath.Child("failed"))...)
+	allErrs = append(allErrs, validate.GEZ(status.Active, fldPath.Child("active"))...)
+	allErrs = append(allErrs, validate.GEZ(status.Succeeded, fldPath.Child("succeeded"))...)
+	allErrs = append(allErrs, validate.GEZ(status.Failed, fldPath.Child("failed"))...)
 	if status.Ready != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*status.Ready), fldPath.Child("ready"))...)
+		allErrs = append(allErrs, validate.GEZ(*status.Ready, fldPath.Child("ready"))...)
 	}
 	if status.UncountedTerminatedPods != nil {
 		path := fldPath.Child("uncountedTerminatedPods")
@@ -453,7 +454,7 @@ func validateCronJobSpec(spec, oldSpec *batch.CronJobSpec, fldPath *field.Path, 
 	}
 
 	if spec.StartingDeadlineSeconds != nil {
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.StartingDeadlineSeconds), fldPath.Child("startingDeadlineSeconds"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.StartingDeadlineSeconds, fldPath.Child("startingDeadlineSeconds"))...)
 	}
 
 	if oldSpec == nil || !pointer.StringEqual(oldSpec.TimeZone, spec.TimeZone) {
@@ -465,11 +466,11 @@ func validateCronJobSpec(spec, oldSpec *batch.CronJobSpec, fldPath *field.Path, 
 
 	if spec.SuccessfulJobsHistoryLimit != nil {
 		// zero is a valid SuccessfulJobsHistoryLimit
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.SuccessfulJobsHistoryLimit), fldPath.Child("successfulJobsHistoryLimit"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.SuccessfulJobsHistoryLimit, fldPath.Child("successfulJobsHistoryLimit"))...)
 	}
 	if spec.FailedJobsHistoryLimit != nil {
 		// zero is a valid SuccessfulJobsHistoryLimit
-		allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*spec.FailedJobsHistoryLimit), fldPath.Child("failedJobsHistoryLimit"))...)
+		allErrs = append(allErrs, validate.GEZ(*spec.FailedJobsHistoryLimit, fldPath.Child("failedJobsHistoryLimit"))...)
 	}
 
 	return allErrs

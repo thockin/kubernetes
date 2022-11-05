@@ -23,6 +23,7 @@ import (
 	"time"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/validate"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -363,7 +364,7 @@ func validateCSINodeDriverAllocatable(a *storage.VolumeNodeResources, fldPath *f
 		return allErrs
 	}
 
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(*a.Count), fldPath.Child("count"))...)
+	allErrs = append(allErrs, validate.GEZ(*a.Count, fldPath.Child("count"))...)
 	return allErrs
 }
 

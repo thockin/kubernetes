@@ -24,6 +24,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	policyapiv1beta1 "k8s.io/api/policy/v1beta1"
+	"k8s.io/apimachinery/pkg/api/validate"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -100,10 +101,10 @@ func ValidatePodDisruptionBudgetStatusUpdate(status, oldStatus policy.PodDisrupt
 	if apiVersion == policyapiv1beta1.SchemeGroupVersion {
 		return allErrs
 	}
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.DisruptionsAllowed), fldPath.Child("disruptionsAllowed"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.CurrentHealthy), fldPath.Child("currentHealthy"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.DesiredHealthy), fldPath.Child("desiredHealthy"))...)
-	allErrs = append(allErrs, apivalidation.ValidateNonnegativeField(int64(status.ExpectedPods), fldPath.Child("expectedPods"))...)
+	allErrs = append(allErrs, validate.GEZ(status.DisruptionsAllowed, fldPath.Child("disruptionsAllowed"))...)
+	allErrs = append(allErrs, validate.GEZ(status.CurrentHealthy, fldPath.Child("currentHealthy"))...)
+	allErrs = append(allErrs, validate.GEZ(status.DesiredHealthy, fldPath.Child("desiredHealthy"))...)
+	allErrs = append(allErrs, validate.GEZ(status.ExpectedPods, fldPath.Child("expectedPods"))...)
 	return allErrs
 }
 
