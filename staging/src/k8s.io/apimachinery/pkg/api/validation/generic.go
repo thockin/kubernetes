@@ -20,11 +20,7 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation"
-	"k8s.io/apimachinery/pkg/util/validation/field"
 )
-
-// IsNegativeErrorMsg is a error message for value must be greater than or equal to 0.
-const IsNegativeErrorMsg string = `must be greater than or equal to 0`
 
 // ValidateNameFunc validates that the provided name is valid for a given resource type.
 // Not all resources have the same validation rules for names. Prefix is true
@@ -76,13 +72,4 @@ func maskTrailingDash(name string) string {
 		return name[:len(name)-2] + "a"
 	}
 	return name
-}
-
-// ValidateNonnegativeField validates that given value is not negative.
-func ValidateNonnegativeField(value int64, fldPath *field.Path) field.ErrorList {
-	allErrs := field.ErrorList{}
-	if value < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, value, IsNegativeErrorMsg))
-	}
-	return allErrs
 }
