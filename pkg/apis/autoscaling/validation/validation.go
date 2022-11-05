@@ -42,11 +42,7 @@ const (
 func ValidateScale(scale *autoscaling.Scale) field.ErrorList {
 	allErrs := field.ErrorList{}
 	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&scale.ObjectMeta, true, apimachineryvalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
-
-	if scale.Spec.Replicas < 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "replicas"), scale.Spec.Replicas, "must be greater than or equal to 0"))
-	}
-
+	allErrs = append(allErrs, validate.GEZ(scale.Spec.Replicas, field.NewPath("spec", "replicas"))...)
 	return allErrs
 }
 
@@ -195,8 +191,8 @@ var validSelectPolicyTypesList = validSelectPolicyTypes.List()
 func validateScalingRules(rules *autoscaling.HPAScalingRules, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if rules != nil {
-		if rules.StabilizationWindowSeconds != nil && *rules.StabilizationWindowSeconds < 0 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("stabilizationWindowSeconds"), rules.StabilizationWindowSeconds, "must be greater than or equal to zero"))
+		if rules.StabilizationWindowSeconds != nil {
+			allErrs = append(allErrs, validate.GEZ(*rules.StabilizationWindowSeconds, fldPath.Child("stabilizationWindowSeconds"))...)
 		}
 		if rules.StabilizationWindowSeconds != nil && *rules.StabilizationWindowSeconds > MaxStabilizationWindowSeconds {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("stabilizationWindowSeconds"), rules.StabilizationWindowSeconds,

@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/coordination"
@@ -44,9 +45,8 @@ func ValidateLeaseSpec(spec *coordination.LeaseSpec, fldPath *field.Path) field.
 		fld := fldPath.Child("leaseDurationSeconds")
 		allErrs = append(allErrs, field.Invalid(fld, spec.LeaseDurationSeconds, "must be greater than 0"))
 	}
-	if spec.LeaseTransitions != nil && *spec.LeaseTransitions < 0 {
-		fld := fldPath.Child("leaseTransitions")
-		allErrs = append(allErrs, field.Invalid(fld, spec.LeaseTransitions, "must be greater than or equal to 0"))
+	if spec.LeaseTransitions != nil {
+		allErrs = append(allErrs, validate.GEZ(*spec.LeaseTransitions, fldPath.Child("leaseTransitions"))...)
 	}
 	return allErrs
 }

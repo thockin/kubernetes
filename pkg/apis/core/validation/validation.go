@@ -56,7 +56,6 @@ import (
 	netutils "k8s.io/utils/net"
 )
 
-const isNegativeErrorMsg string = `must be greater than or equal to 0`
 const isInvalidQuotaResource string = `must be a standard resource for quota`
 const fieldImmutableErrorMsg string = apimachineryvalidation.FieldImmutableErrorMsg
 const isNotIntegerErrorMsg string = `must be an integer`
@@ -317,7 +316,7 @@ func validateOverhead(overhead core.ResourceList, fldPath *field.Path, opts PodV
 func ValidateNonnegativeQuantity(value resource.Quantity, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if value.Cmp(resource.Quantity{}) < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, value.String(), isNegativeErrorMsg))
+		allErrs = append(allErrs, field.Invalid(fldPath, value.String(), "must be greater than or equal to 0"))
 	}
 	return allErrs
 }
@@ -5897,10 +5896,7 @@ func ValidateConfigMapUpdate(newCfg, oldCfg *core.ConfigMap) field.ErrorList {
 }
 
 func validateBasicResource(quantity resource.Quantity, fldPath *field.Path) field.ErrorList {
-	if quantity.Value() < 0 {
-		return field.ErrorList{field.Invalid(fldPath, quantity.Value(), "must be a valid resource quantity")}
-	}
-	return field.ErrorList{}
+	return validate.GEZ(quantity.Value(), fldPath)
 }
 
 // Validates resource requirement spec.
@@ -6647,8 +6643,8 @@ func validateOS(podSpec *core.PodSpec, fldPath *field.Path, opts PodValidationOp
 
 func ValidatePodLogOptions(opts *core.PodLogOptions) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if opts.TailLines != nil && *opts.TailLines < 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("tailLines"), *opts.TailLines, isNegativeErrorMsg))
+	if opts.TailLines != nil {
+		allErrs = append(allErrs, validate.GEZ(*opts.TailLines, field.NewPath("tailLines"))...)
 	}
 	if opts.LimitBytes != nil && *opts.LimitBytes < 1 {
 		allErrs = append(allErrs, field.Invalid(field.NewPath("limitBytes"), *opts.LimitBytes, "must be greater than 0"))

@@ -20,8 +20,9 @@ import (
 	"fmt"
 	"strings"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/core/helper"
@@ -29,7 +30,6 @@ import (
 	apivalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 )
 
-const isNegativeErrorMsg string = `must be greater than or equal to 0`
 const isNotIntegerErrorMsg string = `must be an integer`
 
 // ValidateResourceRequirements will check if any of the resource
@@ -101,7 +101,7 @@ func ValidateResourceQuantityValue(resource string, value resource.Quantity, fld
 func ValidateNonnegativeQuantity(value resource.Quantity, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	if value.Cmp(resource.Quantity{}) < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, value.String(), isNegativeErrorMsg))
+		allErrs = append(allErrs, field.Invalid(fldPath, value.String(), "must be greater than or equal to 0"))
 	}
 	return allErrs
 }
@@ -127,8 +127,8 @@ func validateResourceName(value string, fldPath *field.Path) field.ErrorList {
 // value. Any incorrect value will be returned to the ErrorList.
 func ValidatePodLogOptions(opts *v1.PodLogOptions) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if opts.TailLines != nil && *opts.TailLines < 0 {
-		allErrs = append(allErrs, field.Invalid(field.NewPath("tailLines"), *opts.TailLines, isNegativeErrorMsg))
+	if opts.TailLines != nil {
+		allErrs = append(allErrs, validate.GEZ(*opts.TailLines, field.NewPath("tailLines"))...)
 	}
 	if opts.LimitBytes != nil && *opts.LimitBytes < 1 {
 		allErrs = append(allErrs, field.Invalid(field.NewPath("limitBytes"), *opts.LimitBytes, "must be greater than 0"))

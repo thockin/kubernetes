@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/component-base/config"
 )
@@ -24,9 +25,7 @@ import (
 // ValidateClientConnectionConfiguration ensures validation of the ClientConnectionConfiguration struct
 func ValidateClientConnectionConfiguration(cc *config.ClientConnectionConfiguration, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	if cc.Burst < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("burst"), cc.Burst, "must be non-negative"))
-	}
+	allErrs = append(allErrs, validate.GEZ(cc.Burst, fldPath.Child("burst"))...)
 	return allErrs
 }
 

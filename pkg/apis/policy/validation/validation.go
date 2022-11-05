@@ -521,12 +521,8 @@ func validateIDRanges(fldPath *field.Path, min, max int64) field.ErrorList {
 
 	// if 0 <= Min <= Max then we do not need to validate max.  It is always greater than or
 	// equal to 0 and Min.
-	if min < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("min"), min, "min cannot be negative"))
-	}
-	if max < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("max"), max, "max cannot be negative"))
-	}
+	allErrs = append(allErrs, validate.GEZ(min, fldPath.Child("min"))...)
+	allErrs = append(allErrs, validate.GEZ(max, fldPath.Child("max"))...)
 	if min > max {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("min"), min, "min cannot be greater than max"))
 	}

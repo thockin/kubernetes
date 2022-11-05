@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	eventratelimitapi "k8s.io/kubernetes/plugin/pkg/admission/eventratelimit/apis/eventratelimit"
@@ -54,9 +55,7 @@ func ValidateConfiguration(config *eventratelimitapi.Configuration) field.ErrorL
 			allErrs = append(allErrs, field.Invalid(idxPath.Child("qps"), limit.QPS, "must be positive"))
 		}
 		if limit.Type != eventratelimitapi.ServerLimitType {
-			if limit.CacheSize < 0 {
-				allErrs = append(allErrs, field.Invalid(idxPath.Child("cacheSize"), limit.CacheSize, "must not be negative"))
-			}
+			allErrs = append(allErrs, validate.GEZ(limit.CacheSize, idxPath.Child("cacheSize"))...)
 		}
 	}
 	return allErrs

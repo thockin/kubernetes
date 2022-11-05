@@ -345,7 +345,7 @@ func TestValidateConditions(t *testing.T) {
 				if !hasError(errs, needle) {
 					t.Errorf("missing %q in\n%v", needle, errorsAsString(errs))
 				}
-				needle = `status.conditions[0].observedGeneration: Invalid value: -1: must be greater than or equal to zero`
+				needle = `status.conditions[0].observedGeneration: Invalid value: -1: must be greater than or equal to 0`
 				if !hasError(errs, needle) {
 					t.Errorf("missing %q in\n%v", needle, errorsAsString(errs))
 				}

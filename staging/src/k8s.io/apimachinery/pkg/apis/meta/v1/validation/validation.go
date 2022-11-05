@@ -21,6 +21,7 @@ import (
 	"regexp"
 	"unicode"
 
+	"k8s.io/apimachinery/pkg/api/validate"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -280,9 +281,7 @@ func ValidateCondition(condition metav1.Condition, fldPath *field.Path) field.Er
 		allErrs = append(allErrs, field.NotSupported(fldPath.Child("status"), condition.Status, validConditionStatuses.List()))
 	}
 
-	if condition.ObservedGeneration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("observedGeneration"), condition.ObservedGeneration, "must be greater than or equal to zero"))
-	}
+	allErrs = append(allErrs, validate.GEZ(condition.ObservedGeneration, fldPath.Child("observedGeneration"))...)
 
 	if condition.LastTransitionTime.IsZero() {
 		allErrs = append(allErrs, field.Required(fldPath.Child("lastTransitionTime"), "must be set"))

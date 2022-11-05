@@ -526,12 +526,12 @@ func TestValidatePodSecurityPolicy(t *testing.T) {
 		"invalid uid": {
 			psp:         invalidUIDPSP,
 			errorType:   field.ErrorTypeInvalid,
-			errorDetail: "min cannot be negative",
+			errorDetail: "must be greater than or equal to 0",
 		},
 		"invalid gid": {
 			psp:         invalidGIDPSP,
 			errorType:   field.ErrorTypeInvalid,
-			errorDetail: "min cannot be negative",
+			errorDetail: "must be greater than or equal to 0",
 		},
 		"missing object meta name": {
 			psp:         missingObjectMetaName,
@@ -546,12 +546,12 @@ func TestValidatePodSecurityPolicy(t *testing.T) {
 		"invalid range negative min": {
 			psp:         invalidRangeNegativeMin,
 			errorType:   field.ErrorTypeInvalid,
-			errorDetail: "min cannot be negative",
+			errorDetail: "must be greater than or equal to 0",
 		},
 		"invalid range negative max": {
 			psp:         invalidRangeNegativeMax,
 			errorType:   field.ErrorTypeInvalid,
-			errorDetail: "max cannot be negative",
+			errorDetail: "must be greater than or equal to 0",
 		},
 		"non-empty required drops and all caps are allowed by a wildcard": {
 			psp:         wildcardAllowedCapAndRequiredDrop,

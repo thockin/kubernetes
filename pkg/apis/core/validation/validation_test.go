@@ -17517,7 +17517,7 @@ func TestValidateResourceQuota(t *testing.T) {
 		},
 		"negative-limits": {
 			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: negativeSpec},
-			errDetail: isNegativeErrorMsg,
+			errDetail: "must be greater than or equal to 0",
 		},
 		"fractional-api-resource": {
 			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: fractionalPodSpec},

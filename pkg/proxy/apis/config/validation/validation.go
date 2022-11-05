@@ -116,9 +116,7 @@ func validateKubeProxyIPTablesConfiguration(config kubeproxyconfig.KubeProxyIPTa
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("SyncPeriod"), config.SyncPeriod, "must be greater than 0"))
 	}
 
-	if config.MinSyncPeriod.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("MinSyncPeriod"), config.MinSyncPeriod, "must be greater than or equal to 0"))
-	}
+	allErrs = append(allErrs, validate.GEZ(config.MinSyncPeriod.Duration, fldPath.Child("MinSyncPeriod"))...)
 
 	if config.MinSyncPeriod.Duration > config.SyncPeriod.Duration {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("SyncPeriod"), config.MinSyncPeriod, fmt.Sprintf("must be greater than or equal to %s", fldPath.Child("MinSyncPeriod").String())))
@@ -134,9 +132,7 @@ func validateKubeProxyIPVSConfiguration(config kubeproxyconfig.KubeProxyIPVSConf
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("SyncPeriod"), config.SyncPeriod, "must be greater than 0"))
 	}
 
-	if config.MinSyncPeriod.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("MinSyncPeriod"), config.MinSyncPeriod, "must be greater than or equal to 0"))
-	}
+	allErrs = append(allErrs, validate.GEZ(config.MinSyncPeriod.Duration, fldPath.Child("MinSyncPeriod"))...)
 
 	if config.MinSyncPeriod.Duration > config.SyncPeriod.Duration {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("SyncPeriod"), config.MinSyncPeriod, fmt.Sprintf("must be greater than or equal to %s", fldPath.Child("MinSyncPeriod").String())))
@@ -152,21 +148,16 @@ func validateKubeProxyIPVSConfiguration(config kubeproxyconfig.KubeProxyIPVSConf
 func validateKubeProxyConntrackConfiguration(config kubeproxyconfig.KubeProxyConntrackConfiguration, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	if config.MaxPerCore != nil && *config.MaxPerCore < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("MaxPerCore"), config.MaxPerCore, "must be greater than or equal to 0"))
+	if config.MaxPerCore != nil {
+		allErrs = append(allErrs, validate.GEZ(*config.MaxPerCore, fldPath.Child("MaxPerCore"))...)
 	}
 
-	if config.Min != nil && *config.Min < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("Min"), config.Min, "must be greater than or equal to 0"))
+	if config.Min != nil {
+		allErrs = append(allErrs, validate.GEZ(*config.Min, fldPath.Child("Min"))...)
 	}
 
-	if config.TCPEstablishedTimeout.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("TCPEstablishedTimeout"), config.TCPEstablishedTimeout, "must be greater than or equal to 0"))
-	}
-
-	if config.TCPCloseWaitTimeout.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("TCPCloseWaitTimeout"), config.TCPCloseWaitTimeout, "must be greater than or equal to 0"))
-	}
+	allErrs = append(allErrs, validate.GEZ(config.TCPEstablishedTimeout.Duration, fldPath.Child("TCPEstablishedTimeout"))...)
+	allErrs = append(allErrs, validate.GEZ(config.TCPCloseWaitTimeout.Duration, fldPath.Child("TCPCloseWaitTimeout"))...)
 
 	return allErrs
 }
@@ -278,19 +269,9 @@ func validateKubeProxyNodePortAddress(nodePortAddresses []string, fldPath *field
 
 func validateIPVSTimeout(config kubeproxyconfig.KubeProxyIPVSConfiguration, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-
-	if config.TCPTimeout.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("TCPTimeout"), config.TCPTimeout, "must be greater than or equal to 0"))
-	}
-
-	if config.TCPFinTimeout.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("TCPFinTimeout"), config.TCPFinTimeout, "must be greater than or equal to 0"))
-	}
-
-	if config.UDPTimeout.Duration < 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("UDPTimeout"), config.UDPTimeout, "must be greater than or equal to 0"))
-	}
-
+	allErrs = append(allErrs, validate.GEZ(config.TCPTimeout.Duration, fldPath.Child("TCPTimeout"))...)
+	allErrs = append(allErrs, validate.GEZ(config.TCPFinTimeout.Duration, fldPath.Child("TCPFinTimeout"))...)
+	allErrs = append(allErrs, validate.GEZ(config.UDPTimeout.Duration, fldPath.Child("UDPTimeout"))...)
 	return allErrs
 }
 

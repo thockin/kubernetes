@@ -486,7 +486,7 @@ func TestValidateKubeProxyIPTablesConfiguration(t *testing.T) {
 				SyncPeriod:    metav1.Duration{Duration: 5 * time.Second},
 				MinSyncPeriod: metav1.Duration{Duration: -1 * time.Second},
 			},
-			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeIPTablesConfiguration.MinSyncPeriod"), metav1.Duration{Duration: -1 * time.Second}, "must be greater than or equal to 0")},
+			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeIPTablesConfiguration.MinSyncPeriod"), -1*time.Second, "must be greater than or equal to 0")},
 		},
 		"MasqueradeBit cannot be < 0": {
 			config: kubeproxyconfig.KubeProxyIPTablesConfiguration{
@@ -508,16 +508,18 @@ func TestValidateKubeProxyIPTablesConfiguration(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		errs := validateKubeProxyIPTablesConfiguration(testCase.config, newPath.Child("KubeIPTablesConfiguration"))
-		if len(testCase.expectedErrs) != len(errs) {
-			t.Fatalf("Expected %d errors, got %d errors: %v", len(testCase.expectedErrs), len(errs), errs)
-		}
-		for i, err := range errs {
-			if err.Error() != testCase.expectedErrs[i].Error() {
-				t.Errorf("Expected error: %s, got %s", testCase.expectedErrs[i], err.Error())
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			errs := validateKubeProxyIPTablesConfiguration(testCase.config, newPath.Child("KubeIPTablesConfiguration"))
+			if len(testCase.expectedErrs) != len(errs) {
+				t.Fatalf("expected %d errors, got %d: %v", len(testCase.expectedErrs), len(errs), errs)
 			}
-		}
+			for i, err := range errs {
+				if err.Error() != testCase.expectedErrs[i].Error() {
+					t.Errorf("wrong error message:\nexpected: %q\n     got: %q", testCase.expectedErrs[i], err.Error())
+				}
+			}
+		})
 	}
 }
 
@@ -548,7 +550,7 @@ func TestValidateKubeProxyIPVSConfiguration(t *testing.T) {
 				SyncPeriod:    metav1.Duration{Duration: 5 * time.Second},
 				MinSyncPeriod: metav1.Duration{Duration: -1 * time.Second},
 			},
-			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeIPVSConfiguration.MinSyncPeriod"), metav1.Duration{Duration: -1 * time.Second}, "must be greater than or equal to 0")},
+			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeIPVSConfiguration.MinSyncPeriod"), -1*time.Second, "must be greater than or equal to 0")},
 		},
 		"SyncPeriod must be greater than MinSyncPeriod": {
 			config: kubeproxyconfig.KubeProxyIPVSConfiguration{
@@ -603,21 +605,23 @@ func TestValidateKubeProxyIPVSConfiguration(t *testing.T) {
 				UDPTimeout:    metav1.Duration{Duration: -1 * time.Second},
 				TCPFinTimeout: metav1.Duration{Duration: -1 * time.Second},
 			},
-			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeIPVSConfiguration.TCPTimeout"), metav1.Duration{Duration: -1 * time.Second}, "must be greater than or equal to 0"),
-				field.Invalid(newPath.Child("KubeIPVSConfiguration.TCPFinTimeout"), metav1.Duration{Duration: -1 * time.Second}, "must be greater than or equal to 0"),
-				field.Invalid(newPath.Child("KubeIPVSConfiguration.UDPTimeout"), metav1.Duration{Duration: -1 * time.Second}, "must be greater than or equal to 0")},
+			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeIPVSConfiguration.TCPTimeout"), -1*time.Second, "must be greater than or equal to 0"),
+				field.Invalid(newPath.Child("KubeIPVSConfiguration.TCPFinTimeout"), -1*time.Second, "must be greater than or equal to 0"),
+				field.Invalid(newPath.Child("KubeIPVSConfiguration.UDPTimeout"), -1*time.Second, "must be greater than or equal to 0")},
 		},
 	}
-	for _, testCase := range testCases {
-		errs := validateKubeProxyIPVSConfiguration(testCase.config, newPath.Child("KubeIPVSConfiguration"))
-		if len(testCase.expectedErrs) != len(errs) {
-			t.Fatalf("Expected %d errors, got %d errors: %v", len(testCase.expectedErrs), len(errs), errs)
-		}
-		for i, err := range errs {
-			if err.Error() != testCase.expectedErrs[i].Error() {
-				t.Errorf("Expected error: %s, got %s", testCase.expectedErrs[i], err.Error())
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			errs := validateKubeProxyIPVSConfiguration(testCase.config, newPath.Child("KubeIPVSConfiguration"))
+			if len(testCase.expectedErrs) != len(errs) {
+				t.Fatalf("expected %d errors, got %d: %v", len(testCase.expectedErrs), len(errs), errs)
 			}
-		}
+			for i, err := range errs {
+				if err.Error() != testCase.expectedErrs[i].Error() {
+					t.Errorf("wrong error message:\nexpected: %q\n     got: %q", testCase.expectedErrs[i], err.Error())
+				}
+			}
+		})
 	}
 }
 
@@ -670,7 +674,7 @@ func TestValidateKubeProxyConntrackConfiguration(t *testing.T) {
 				TCPEstablishedTimeout: &metav1.Duration{Duration: -5 * time.Second},
 				TCPCloseWaitTimeout:   &metav1.Duration{Duration: 5 * time.Second},
 			},
-			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeConntrackConfiguration.TCPEstablishedTimeout"), metav1.Duration{Duration: -5 * time.Second}, "must be greater than or equal to 0")},
+			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeConntrackConfiguration.TCPEstablishedTimeout"), -5*time.Second, "must be greater than or equal to 0")},
 		},
 		"invalid CloseWaitTimeout < 0": {
 			config: kubeproxyconfig.KubeProxyConntrackConfiguration{
@@ -679,18 +683,18 @@ func TestValidateKubeProxyConntrackConfiguration(t *testing.T) {
 				TCPEstablishedTimeout: &metav1.Duration{Duration: 5 * time.Second},
 				TCPCloseWaitTimeout:   &metav1.Duration{Duration: -5 * time.Second},
 			},
-			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeConntrackConfiguration.TCPCloseWaitTimeout"), metav1.Duration{Duration: -5 * time.Second}, "must be greater than or equal to 0")},
+			expectedErrs: field.ErrorList{field.Invalid(newPath.Child("KubeConntrackConfiguration.TCPCloseWaitTimeout"), -5*time.Second, "must be greater than or equal to 0")},
 		},
 	}
 
 	for _, testCase := range testCases {
 		errs := validateKubeProxyConntrackConfiguration(testCase.config, newPath.Child("KubeConntrackConfiguration"))
 		if len(testCase.expectedErrs) != len(errs) {
-			t.Fatalf("Expected %d errors, got %d errors: %v", len(testCase.expectedErrs), len(errs), errs)
+			t.Fatalf("expected %d errors, got %d: %v", len(testCase.expectedErrs), len(errs), errs)
 		}
 		for i, err := range errs {
 			if err.Error() != testCase.expectedErrs[i].Error() {
-				t.Errorf("Expected error: %s, got %s", testCase.expectedErrs[i], err.Error())
+				t.Errorf("wrong error message:\nexpected: %q\n     got: %q", testCase.expectedErrs[i], err.Error())
 			}
 		}
 	}

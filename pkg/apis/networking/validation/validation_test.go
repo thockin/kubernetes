@@ -535,7 +535,7 @@ func TestValidateNetworkPolicyStatusUpdate(t *testing.T) {
 				},
 			},
 			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("status").Child("conditions").Index(0).Child("observedGeneration"),
-				int64(-1), "must be greater than or equal to zero")},
+				int64(-1), "must be greater than or equal to 0")},
 		},
 		"invalid null transition time": {
 			obj: networking.NetworkPolicyStatus{
@@ -566,7 +566,7 @@ func TestValidateNetworkPolicyStatusUpdate(t *testing.T) {
 			},
 			expectedErrs: field.ErrorList{
 				field.Invalid(field.NewPath("status").Child("conditions").Index(0).Child("observedGeneration"),
-					int64(-1), "must be greater than or equal to zero"),
+					int64(-1), "must be greater than or equal to 0"),
 				field.Required(field.NewPath("status").Child("conditions").Index(0).Child("lastTransitionTime"),
 					"must be set"),
 			},
