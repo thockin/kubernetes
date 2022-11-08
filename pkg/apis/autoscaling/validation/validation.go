@@ -57,9 +57,7 @@ func validateHorizontalPodAutoscalerSpec(autoscaler autoscaling.HorizontalPodAut
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("minReplicas"), *autoscaler.MinReplicas,
 			fmt.Sprintf("must be greater than or equal to %d", minReplicasLowerBound)))
 	}
-	if autoscaler.MaxReplicas < 1 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than 0"))
-	}
+	allErrs = append(allErrs, validate.GTZ(autoscaler.MaxReplicas, fldPath.Child("maxReplicas"))...)
 	if autoscaler.MinReplicas != nil && autoscaler.MaxReplicas < *autoscaler.MinReplicas {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("maxReplicas"), autoscaler.MaxReplicas, "must be greater than or equal to `minReplicas`"))
 	}
@@ -448,8 +446,8 @@ func validateMetricTarget(mt autoscaling.MetricTarget, fldPath *field.Path) fiel
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("averageValue"), mt.AverageValue, "must be positive"))
 	}
 
-	if mt.AverageUtilization != nil && *mt.AverageUtilization < 1 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("averageUtilization"), mt.AverageUtilization, "must be greater than 0"))
+	if mt.AverageUtilization != nil {
+		allErrs = append(allErrs, validate.GTZ(*mt.AverageUtilization, fldPath.Child("averageUtilization"))...)
 	}
 
 	return allErrs

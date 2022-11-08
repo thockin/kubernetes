@@ -41,9 +41,8 @@ func ValidateLeaseUpdate(lease, oldLease *coordination.Lease) field.ErrorList {
 func ValidateLeaseSpec(spec *coordination.LeaseSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	if spec.LeaseDurationSeconds != nil && *spec.LeaseDurationSeconds <= 0 {
-		fld := fldPath.Child("leaseDurationSeconds")
-		allErrs = append(allErrs, field.Invalid(fld, spec.LeaseDurationSeconds, "must be greater than 0"))
+	if spec.LeaseDurationSeconds != nil {
+		allErrs = append(allErrs, validate.GTZ(*spec.LeaseDurationSeconds, fldPath.Child("leaseDurationSeconds"))...)
 	}
 	if spec.LeaseTransitions != nil {
 		allErrs = append(allErrs, validate.GEZ(*spec.LeaseTransitions, fldPath.Child("leaseTransitions"))...)
