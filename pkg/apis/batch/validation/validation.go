@@ -99,8 +99,8 @@ func ValidateGeneratedSelector(obj *batch.Job) field.ErrorList {
 	// the user added coflicting labels.  Validate that the expected
 	// generated ones are there.
 
-	allErrs = append(allErrs, apivalidation.ValidateHasLabel(obj.Spec.Template.ObjectMeta, field.NewPath("spec").Child("template").Child("metadata"), "controller-uid", string(obj.UID))...)
-	allErrs = append(allErrs, apivalidation.ValidateHasLabel(obj.Spec.Template.ObjectMeta, field.NewPath("spec").Child("template").Child("metadata"), "job-name", string(obj.Name))...)
+	allErrs = append(allErrs, validate.HasLabelValue(obj.Spec.Template.ObjectMeta, field.NewPath("spec").Child("template").Child("metadata"), "controller-uid", string(obj.UID))...)
+	allErrs = append(allErrs, validate.HasLabelValue(obj.Spec.Template.ObjectMeta, field.NewPath("spec").Child("template").Child("metadata"), "job-name", string(obj.Name))...)
 	expectedLabels := make(map[string]string)
 	expectedLabels["controller-uid"] = string(obj.UID)
 	expectedLabels["job-name"] = string(obj.Name)

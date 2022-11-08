@@ -102,22 +102,6 @@ var allowedEphemeralContainerFields = map[string]bool{
 // https://github.com/opencontainers/runtime-spec/blob/master/config.md#platform-specific-configuration
 var validOS = sets.NewString(string(core.Linux), string(core.Windows))
 
-// ValidateHasLabel requires that metav1.ObjectMeta has a Label with key and expectedValue
-func ValidateHasLabel(meta metav1.ObjectMeta, fldPath *field.Path, key, expectedValue string) field.ErrorList {
-	allErrs := field.ErrorList{}
-	actualValue, found := meta.Labels[key]
-	if !found {
-		allErrs = append(allErrs, field.Required(fldPath.Child("labels").Key(key),
-			fmt.Sprintf("must be '%s'", expectedValue)))
-		return allErrs
-	}
-	if actualValue != expectedValue {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("labels").Key(key), meta.Labels,
-			fmt.Sprintf("must be '%s'", expectedValue)))
-	}
-	return allErrs
-}
-
 // ValidateAnnotations validates that a set of annotations are correctly defined.
 func ValidateAnnotations(annotations map[string]string, fldPath *field.Path) field.ErrorList {
 	return apimachineryvalidation.ValidateAnnotations(annotations, fldPath)
