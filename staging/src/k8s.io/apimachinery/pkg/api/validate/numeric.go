@@ -29,3 +29,11 @@ func GEZ[T signed](value T, fldPath *field.Path) field.ErrorList {
 	}
 	return field.ErrorList{field.Invalid(fldPath, value, `must be greater than or equal to 0`)}
 }
+
+// GTZ validates that the specified value is greater than 0.
+func GTZ[T signed](value T, fldPath *field.Path) field.ErrorList {
+	if value > 0 {
+		return nil
+	}
+	return field.ErrorList{field.Invalid(fldPath, value, `must be greater than 0`)}
+}

@@ -60,3 +60,42 @@ func TestGEZ(t *testing.T) {
 		check(GEZ(int64(tc.val), field.NewPath("fieldname")))
 	}
 }
+
+func TestGTZ(t *testing.T) {
+	cases := []struct {
+		val int
+		ok  bool
+	}{{
+		val: -1,
+		ok:  false,
+	}, {
+		val: 0,
+		ok:  false,
+	}, {
+		val: 1,
+		ok:  true,
+	}}
+
+	for _, tc := range cases {
+		var check func(errs field.ErrorList)
+		if tc.ok {
+			check = func(errs field.ErrorList) {
+				if len(errs) != 0 {
+					t.Errorf("unexpected failure for input %d: %v", tc.val, errs)
+				}
+			}
+		} else {
+			check = func(errs field.ErrorList) {
+				if len(errs) == 0 {
+					t.Errorf("unexpected success for input %d", tc.val)
+				} else if len(errs) > 1 {
+					t.Errorf("unexpected failures for input %d: %v", tc.val, errs)
+				}
+			}
+		}
+		check(GTZ(tc.val, field.NewPath("fieldname")))
+		check(GTZ(int16(tc.val), field.NewPath("fieldname")))
+		check(GTZ(int32(tc.val), field.NewPath("fieldname")))
+		check(GTZ(int64(tc.val), field.NewPath("fieldname")))
+	}
+}
