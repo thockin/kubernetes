@@ -96,6 +96,75 @@ func TestValidateLabels(t *testing.T) {
 	}
 }
 
+func TestValidateAnnotations(t *testing.T) {
+	const (
+		maxLengthErrMsg = "must be no more than"
+		namePartErrMsg  = "name part must consist of"
+		nameErrMsg      = "a qualified name must consist of"
+	)
+
+	successCases := []map[string]string{
+		{"simple": "bar"},
+		{"now-with-dashes": "bar"},
+		{"1-starts-with-num": "bar"},
+		{"1234": "bar"},
+		{"simple/simple": "bar"},
+		{"now-with-dashes/simple": "bar"},
+		{"now-with-dashes/now-with-dashes": "bar"},
+		{"now.with.dots/simple": "bar"},
+		{"now-with.dashes-and.dots/simple": "bar"},
+		{"1-num.2-num/3-num": "bar"},
+		{"1234/5678": "bar"},
+		{"1.2.3.4/5678": "bar"},
+		{"UpperCase123": "bar"},
+		{"a": strings.Repeat("b", AnnotationsMaxSize-1)},
+		{
+			"a": strings.Repeat("b", AnnotationsMaxSize/2-1),
+			"c": strings.Repeat("d", AnnotationsMaxSize/2-1),
+		},
+	}
+	for i := range successCases {
+		errs := ValidateAnnotations(successCases[i], field.NewPath("field"))
+		if len(errs) != 0 {
+			t.Errorf("case[%d] expected success, got %#v", i, errs)
+		}
+	}
+
+	keyErrorCases := []struct {
+		annotations map[string]string
+		expect      string
+	}{
+		{map[string]string{"nospecialchars^=@": "bar"}, namePartErrMsg},
+		{map[string]string{"cantendwithadash-": "bar"}, namePartErrMsg},
+		{map[string]string{"only/one/slash": "bar"}, nameErrMsg},
+		{map[string]string{strings.Repeat("a", 254): "bar"}, maxLengthErrMsg},
+	}
+	for i := range keyErrorCases {
+		errs := ValidateAnnotations(keyErrorCases[i].annotations, field.NewPath("field"))
+		if len(errs) != 1 {
+			t.Errorf("case[%d]: expected failure", i)
+		} else {
+			if !strings.Contains(errs[0].Detail, keyErrorCases[i].expect) {
+				t.Errorf("case[%d]: error details do not include %q: %q", i, keyErrorCases[i].expect, errs[0].Detail)
+			}
+		}
+	}
+
+	sizeErrorCases := []map[string]string{
+		{"a": strings.Repeat("b", AnnotationsMaxSize)},
+		{
+			"a": strings.Repeat("b", AnnotationsMaxSize/2),
+			"c": strings.Repeat("d", AnnotationsMaxSize/2),
+		},
+	}
+	for i := range sizeErrorCases {
+		errs := ValidateAnnotations(sizeErrorCases[i], field.NewPath("field"))
+		if len(errs) != 1 {
+			t.Errorf("case[%d] expected failure", i)
+		}
+	}
+}
+
 func TestValidDryRun(t *testing.T) {
 	tests := [][]string{
 		{},

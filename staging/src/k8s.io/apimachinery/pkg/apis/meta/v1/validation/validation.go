@@ -19,6 +19,7 @@ package validation
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"unicode"
 
 	"k8s.io/apimachinery/pkg/api/validate"
@@ -113,6 +114,39 @@ func ValidateLabels(labels map[string]string, fldPath *field.Path) field.ErrorLi
 		}
 	}
 	return allErrs
+}
+
+// AnnotationsMaxSize is the limit for the sum total size of all
+// annotations keys and values.
+const AnnotationsMaxSize int = 256 * 1024 // 256 kB
+
+// ValidateAnnotations validates that a set of annotations are correctly defined.
+func ValidateAnnotations(annotations map[string]string, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+	for k := range annotations {
+		// Keys are QualifiedNames except that case doesn't matter, so convert
+		// to lowercase before checking.
+		for _, msg := range validation.IsQualifiedName(strings.ToLower(k)) {
+			allErrs = append(allErrs, field.Invalid(fldPath, k, msg))
+		}
+	}
+	if err := ValidateAnnotationsSize(annotations); err != nil {
+		allErrs = append(allErrs, field.TooLong(fldPath, "", AnnotationsMaxSize))
+	}
+	return allErrs
+}
+
+// ValidateAnnotationsSize validates that the total size of all keys and values is
+// allowable for annotations.
+func ValidateAnnotationsSize(annotations map[string]string) error {
+	var totalSize int64
+	for k, v := range annotations {
+		totalSize += (int64)(len(k)) + (int64)(len(v))
+	}
+	if totalSize > (int64)(AnnotationsMaxSize) {
+		return fmt.Errorf("annotations size %d is larger than limit %d", totalSize, AnnotationsMaxSize)
+	}
+	return nil
 }
 
 func ValidateDeleteOptions(options *metav1.DeleteOptions) field.ErrorList {

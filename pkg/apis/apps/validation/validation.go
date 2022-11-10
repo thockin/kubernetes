@@ -64,7 +64,7 @@ func ValidatePodTemplateSpecForStatefulSet(template *api.PodTemplateSpec, select
 		// volume mounts in the containers.
 		// allErrs = append(allErrs, apivalidation.ValidatePodTemplateSpec(template, fldPath)...)
 		allErrs = append(allErrs, unversionedvalidation.ValidateLabels(template.Labels, fldPath.Child("labels"))...)
-		allErrs = append(allErrs, apivalidation.ValidateAnnotations(template.Annotations, fldPath.Child("annotations"))...)
+		allErrs = append(allErrs, unversionedvalidation.ValidateAnnotations(template.Annotations, fldPath.Child("annotations"))...)
 		allErrs = append(allErrs, apivalidation.ValidatePodSpecificAnnotations(template.Annotations, &template.Spec, fldPath.Child("annotations"), opts)...)
 	}
 	return allErrs
@@ -654,7 +654,7 @@ func ValidateDeployment(obj *apps.Deployment, opts apivalidation.PodValidationOp
 
 // ValidateDeploymentRollback validates a given DeploymentRollback.
 func ValidateDeploymentRollback(obj *apps.DeploymentRollback) field.ErrorList {
-	allErrs := apivalidation.ValidateAnnotations(obj.UpdatedAnnotations, field.NewPath("updatedAnnotations"))
+	allErrs := unversionedvalidation.ValidateAnnotations(obj.UpdatedAnnotations, field.NewPath("updatedAnnotations"))
 	if len(obj.Name) == 0 {
 		allErrs = append(allErrs, field.Required(field.NewPath("name"), "name is required"))
 	}
