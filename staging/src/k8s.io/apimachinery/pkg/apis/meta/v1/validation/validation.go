@@ -22,6 +22,7 @@ import (
 	"unicode"
 
 	"k8s.io/apimachinery/pkg/api/validate"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -313,7 +314,7 @@ var conditionReasonRegexp = regexp.MustCompile("^" + conditionReasonFmt + "$")
 // isValidConditionReason tests for a string that conforms to rules for condition reasons. This checks the format, but not the length.
 func isValidConditionReason(value string) []string {
 	if !conditionReasonRegexp.MatchString(value) {
-		return []string{validation.RegexError(conditionReasonErrMsg, conditionReasonFmt, "my_name", "MY_NAME", "MyName", "ReasonA,ReasonB", "ReasonA:ReasonB")}
+		return []string{content.RegexError(conditionReasonErrMsg, conditionReasonFmt, "my_name", "MY_NAME", "MyName", "ReasonA,ReasonB", "ReasonA:ReasonB")}
 	}
 	return nil
 }

@@ -17,13 +17,13 @@ limitations under the License.
 package validation
 
 import (
-	"fmt"
 	"math"
 	"net"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	netutils "k8s.io/utils/net"
 )
@@ -51,22 +51,22 @@ func IsQualifiedName(value string) []string {
 		var prefix string
 		prefix, name = parts[0], parts[1]
 		if len(prefix) == 0 {
-			errs = append(errs, "prefix part "+EmptyError())
+			errs = append(errs, "prefix part must be non-empty")
 		} else if msgs := IsDNS1123Subdomain(prefix); len(msgs) != 0 {
 			errs = append(errs, prefixEach(msgs, "prefix part ")...)
 		}
 	default:
-		return append(errs, "a qualified name "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc")+
+		return append(errs, "a qualified name "+content.RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc")+
 			" with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')")
 	}
 
 	if len(name) == 0 {
-		errs = append(errs, "name part "+EmptyError())
+		errs = append(errs, "name part must be non-empty")
 	} else if len(name) > qualifiedNameMaxLength {
-		errs = append(errs, "name part "+MaxLenError(qualifiedNameMaxLength))
+		errs = append(errs, "name part "+content.TooLongError(qualifiedNameMaxLength))
 	}
 	if !qualifiedNameRegexp.MatchString(name) {
-		errs = append(errs, "name part "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc"))
+		errs = append(errs, "name part "+content.RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc"))
 	}
 	return errs
 }
@@ -147,7 +147,7 @@ func IsDomainPrefixedPath(fldPath *field.Path, dpPath string) field.ErrorList {
 
 	path := segments[1]
 	if !httpPathRegexp.MatchString(path) {
-		return append(allErrs, field.Invalid(fldPath, path, RegexError("Invalid path", httpPathFmt)))
+		return append(allErrs, field.Invalid(fldPath, path, content.RegexError("Invalid path", httpPathFmt)))
 	}
 
 	return allErrs
@@ -167,10 +167,10 @@ var labelValueRegexp = regexp.MustCompile("^" + labelValueFmt + "$")
 func IsValidLabelValue(value string) []string {
 	var errs []string
 	if len(value) > LabelValueMaxLength {
-		errs = append(errs, MaxLenError(LabelValueMaxLength))
+		errs = append(errs, content.TooLongError(LabelValueMaxLength))
 	}
 	if !labelValueRegexp.MatchString(value) {
-		errs = append(errs, RegexError(labelValueErrMsg, labelValueFmt, "MyValue", "my_value", "12345"))
+		errs = append(errs, content.RegexError(labelValueErrMsg, labelValueFmt, "MyValue", "my_value", "12345"))
 	}
 	return errs
 }
@@ -188,7 +188,7 @@ var dns1123LabelRegexp = regexp.MustCompile("^" + dns1123LabelFmt + "$")
 func IsDNS1123Label(value string) []string {
 	var errs []string
 	if len(value) > DNS1123LabelMaxLength {
-		errs = append(errs, MaxLenError(DNS1123LabelMaxLength))
+		errs = append(errs, content.TooLongError(DNS1123LabelMaxLength))
 	}
 	if !dns1123LabelRegexp.MatchString(value) {
 		if dns1123SubdomainRegexp.MatchString(value) {
@@ -196,7 +196,7 @@ func IsDNS1123Label(value string) []string {
 			// already checked length, it must be dots.
 			errs = append(errs, "must not contain dots")
 		} else {
-			errs = append(errs, RegexError(dns1123LabelErrMsg, dns1123LabelFmt, "my-name", "123-abc"))
+			errs = append(errs, content.RegexError(dns1123LabelErrMsg, dns1123LabelFmt, "my-name", "123-abc"))
 		}
 	}
 	return errs
@@ -215,10 +215,10 @@ var dns1123SubdomainRegexp = regexp.MustCompile("^" + dns1123SubdomainFmt + "$")
 func IsDNS1123Subdomain(value string) []string {
 	var errs []string
 	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+		errs = append(errs, content.TooLongError(DNS1123SubdomainMaxLength))
 	}
 	if !dns1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, RegexError(dns1123SubdomainErrorMsg, dns1123SubdomainFmt, "example.com"))
+		errs = append(errs, content.RegexError(dns1123SubdomainErrorMsg, dns1123SubdomainFmt, "example.com"))
 	}
 	return errs
 }
@@ -236,10 +236,10 @@ var dns1035LabelRegexp = regexp.MustCompile("^" + dns1035LabelFmt + "$")
 func IsDNS1035Label(value string) []string {
 	var errs []string
 	if len(value) > DNS1035LabelMaxLength {
-		errs = append(errs, MaxLenError(DNS1035LabelMaxLength))
+		errs = append(errs, content.TooLongError(DNS1035LabelMaxLength))
 	}
 	if !dns1035LabelRegexp.MatchString(value) {
-		errs = append(errs, RegexError(dns1035LabelErrMsg, dns1035LabelFmt, "my-name", "abc-123"))
+		errs = append(errs, content.RegexError(dns1035LabelErrMsg, dns1035LabelFmt, "my-name", "abc-123"))
 	}
 	return errs
 }
@@ -258,10 +258,10 @@ func IsWildcardDNS1123Subdomain(value string) []string {
 
 	var errs []string
 	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+		errs = append(errs, content.TooLongError(DNS1123SubdomainMaxLength))
 	}
 	if !wildcardDNS1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, RegexError(wildcardDNS1123SubdomainErrMsg, wildcardDNS1123SubdomainFmt, "*.example.com"))
+		errs = append(errs, content.RegexError(wildcardDNS1123SubdomainErrMsg, wildcardDNS1123SubdomainFmt, "*.example.com"))
 	}
 	return errs
 }
@@ -275,7 +275,7 @@ var cIdentifierRegexp = regexp.MustCompile("^" + cIdentifierFmt + "$")
 // in C. This checks the format, but not the length.
 func IsCIdentifier(value string) []string {
 	if !cIdentifierRegexp.MatchString(value) {
-		return []string{RegexError(identifierErrMsg, cIdentifierFmt, "my_name", "MY_NAME", "MyName")}
+		return []string{content.RegexError(identifierErrMsg, cIdentifierFmt, "my_name", "MY_NAME", "MyName")}
 	}
 	return nil
 }
@@ -285,7 +285,7 @@ func IsValidPortNum(port int) []string {
 	if 1 <= port && port <= 65535 {
 		return nil
 	}
-	return []string{InclusiveRangeError(1, 65535)}
+	return []string{content.InclusiveRangeError(1, 65535)}
 }
 
 // IsInRange tests that the argument is in an inclusive range.
@@ -293,7 +293,7 @@ func IsInRange(value int, min int, max int) []string {
 	if value >= min && value <= max {
 		return nil
 	}
-	return []string{InclusiveRangeError(min, max)}
+	return []string{content.InclusiveRangeError(min, max)}
 }
 
 // Now in libcontainer UID/GID limits is 0 ~ 1<<31 - 1
@@ -310,7 +310,7 @@ func IsValidGroupID(gid int64) []string {
 	if minGroupID <= gid && gid <= maxGroupID {
 		return nil
 	}
-	return []string{InclusiveRangeError(minGroupID, maxGroupID)}
+	return []string{content.InclusiveRangeError(minGroupID, maxGroupID)}
 }
 
 // IsValidUserID tests that the argument is a valid Unix UID.
@@ -318,7 +318,7 @@ func IsValidUserID(uid int64) []string {
 	if minUserID <= uid && uid <= maxUserID {
 		return nil
 	}
-	return []string{InclusiveRangeError(minUserID, maxUserID)}
+	return []string{content.InclusiveRangeError(minUserID, maxUserID)}
 }
 
 var portNameCharsetRegex = regexp.MustCompile("^[-a-z0-9]+$")
@@ -334,7 +334,7 @@ var portNameOneLetterRegexp = regexp.MustCompile("[a-z]")
 func IsValidPortName(port string) []string {
 	var errs []string
 	if len(port) > 15 {
-		errs = append(errs, MaxLenError(15))
+		errs = append(errs, content.TooLongError(15))
 	}
 	if !portNameCharsetRegex.MatchString(port) {
 		errs = append(errs, "must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)")
@@ -387,7 +387,7 @@ var percentRegexp = regexp.MustCompile("^" + percentFmt + "$")
 // IsValidPercent checks that string is in the form of a percentage
 func IsValidPercent(percent string) []string {
 	if !percentRegexp.MatchString(percent) {
-		return []string{RegexError(percentErrMsg, percentFmt, "1%", "93%")}
+		return []string{content.RegexError(percentErrMsg, percentFmt, "1%", "93%")}
 	}
 	return nil
 }
@@ -401,7 +401,7 @@ var httpHeaderNameRegexp = regexp.MustCompile("^" + httpHeaderNameFmt + "$")
 // definition of a valid header field name (a stricter subset than RFC7230).
 func IsHTTPHeaderName(value string) []string {
 	if !httpHeaderNameRegexp.MatchString(value) {
-		return []string{RegexError(httpHeaderNameErrMsg, httpHeaderNameFmt, "X-Header-Name")}
+		return []string{content.RegexError(httpHeaderNameErrMsg, httpHeaderNameFmt, "X-Header-Name")}
 	}
 	return nil
 }
@@ -415,7 +415,7 @@ var envVarNameRegexp = regexp.MustCompile("^" + envVarNameFmt + "$")
 func IsEnvVarName(value string) []string {
 	var errs []string
 	if !envVarNameRegexp.MatchString(value) {
-		errs = append(errs, RegexError(envVarNameFmtErrMsg, envVarNameFmt, "my.env-name", "MY_ENV.NAME", "MyEnvName1"))
+		errs = append(errs, content.RegexError(envVarNameFmtErrMsg, envVarNameFmt, "my.env-name", "MY_ENV.NAME", "MyEnvName1"))
 	}
 
 	errs = append(errs, hasChDirPrefix(value)...)
@@ -431,41 +431,13 @@ var configMapKeyRegexp = regexp.MustCompile("^" + configMapKeyFmt + "$")
 func IsConfigMapKey(value string) []string {
 	var errs []string
 	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+		errs = append(errs, content.TooLongError(DNS1123SubdomainMaxLength))
 	}
 	if !configMapKeyRegexp.MatchString(value) {
-		errs = append(errs, RegexError(configMapKeyErrMsg, configMapKeyFmt, "key.name", "KEY_NAME", "key-name"))
+		errs = append(errs, content.RegexError(configMapKeyErrMsg, configMapKeyFmt, "key.name", "KEY_NAME", "key-name"))
 	}
 	errs = append(errs, hasChDirPrefix(value)...)
 	return errs
-}
-
-// MaxLenError returns a string explanation of a "string too long" validation
-// failure.
-func MaxLenError(length int) string {
-	return fmt.Sprintf("must be no more than %d characters", length)
-}
-
-// RegexError returns a string explanation of a regex validation failure.
-func RegexError(msg string, fmt string, examples ...string) string {
-	if len(examples) == 0 {
-		return msg + " (regex used for validation is '" + fmt + "')"
-	}
-	msg += " (e.g. "
-	for i := range examples {
-		if i > 0 {
-			msg += " or "
-		}
-		msg += "'" + examples[i] + "', "
-	}
-	msg += "regex used for validation is '" + fmt + "')"
-	return msg
-}
-
-// EmptyError returns a string explanation of a "must not be empty" validation
-// failure.
-func EmptyError() string {
-	return "must be non-empty"
 }
 
 func prefixEach(msgs []string, prefix string) []string {
@@ -473,12 +445,6 @@ func prefixEach(msgs []string, prefix string) []string {
 		msgs[i] = prefix + msgs[i]
 	}
 	return msgs
-}
-
-// InclusiveRangeError returns a string explanation of a numeric "must be
-// between" validation failure.
-func InclusiveRangeError(lo, hi int) string {
-	return fmt.Sprintf(`must be between %d and %d, inclusive`, lo, hi)
 }
 
 func hasChDirPrefix(value string) []string {

@@ -435,25 +435,25 @@ func TestCreateSecretGeneric(t *testing.T) {
 		"create_invalid_secret_literal_key_with_invalid_character": {
 			secretName:  "foo",
 			fromLiteral: []string{"key#1=value1"},
-			expectErr:   `"key#1" is not valid key name for a Secret a valid config key must consist of alphanumeric characters, '-', '_' or '.' (e.g. 'key.name',  or 'KEY_NAME',  or 'key-name', regex used for validation is '[-._a-zA-Z0-9]+')`,
+			expectErr:   `"key#1" is not valid key name for a Secret a valid config key must consist of alphanumeric characters, '-', '_' or '.' (e.g. 'key.name', 'KEY_NAME', 'key-name'; regex: '[-._a-zA-Z0-9]+')`,
 		},
 		"create_invalid_secret_env_key_contains_#": {
 			secretName:  "invalid_key",
 			setup:       setupSecretEnvFile([][]string{{"key#1=value1"}}),
 			fromEnvFile: []string{"file.env"},
-			expectErr:   `"key#1" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')`,
+			expectErr:   `"key#1" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name', 'MY_ENV.NAME', 'MyEnvName1'; regex: '[-._a-zA-Z][-._a-zA-Z0-9]*')`,
 		},
 		"create_invalid_secret_env_key_start_with_digit": {
 			secretName:  "invalid_key",
 			setup:       setupSecretEnvFile([][]string{{"1key=value1"}}),
 			fromEnvFile: []string{"file.env"},
-			expectErr:   `"1key" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')`,
+			expectErr:   `"1key" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name', 'MY_ENV.NAME', 'MyEnvName1'; regex: '[-._a-zA-Z][-._a-zA-Z0-9]*')`,
 		},
 		"create_invalid_secret_env_key_with_invalid_character": {
 			secretName:  "invalid_key",
 			setup:       setupSecretEnvFile([][]string{{"key@=value1"}}),
 			fromEnvFile: []string{"file.env"},
-			expectErr:   `"key@" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')`,
+			expectErr:   `"key@" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name', 'MY_ENV.NAME', 'MyEnvName1'; regex: '[-._a-zA-Z][-._a-zA-Z0-9]*')`,
 		},
 		"create_invalid_secret_duplicate_key1": {
 			secretName:  "foo",

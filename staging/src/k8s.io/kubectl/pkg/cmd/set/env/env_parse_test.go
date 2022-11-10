@@ -53,7 +53,7 @@ func ExampleParseEnv_good_with_stdin_and_error() {
 	ss := []string{"-", "This not in the key=value format."}
 	fmt.Println(ParseEnv(ss, r))
 	// Output:
-	// [] [] true "This not in the key" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')
+	// [] [] true "This not in the key" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name', 'MY_ENV.NAME', 'MyEnvName1'; regex: '[-._a-zA-Z][-._a-zA-Z0-9]*')
 }
 
 func ExampleParseEnv_good_without_stdin() {
@@ -68,7 +68,7 @@ func ExampleParseEnv_bad_first() {
 	bad := []string{"This not in the key=value format."}
 	fmt.Println(ParseEnv(bad, r))
 	// Output:
-	// [] [] false "This not in the key" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')
+	// [] [] false "This not in the key" is not a valid key name: a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name', 'MY_ENV.NAME', 'MyEnvName1'; regex: '[-._a-zA-Z][-._a-zA-Z0-9]*')
 }
 
 func ExampleParseEnv_bad_second() {

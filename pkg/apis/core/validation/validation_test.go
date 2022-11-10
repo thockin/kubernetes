@@ -33,10 +33,10 @@ import (
 	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/featuregate"
@@ -4688,7 +4688,7 @@ func TestValidateVolumes(t *testing.T) {
 			errs: []verr{{
 				etype:  field.ErrorTypeInvalid,
 				field:  "fc.lun",
-				detail: validation.InclusiveRangeError(0, 255),
+				detail: content.InclusiveRangeError(0, 255),
 			}},
 		},
 		// FlexVolume

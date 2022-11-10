@@ -1068,7 +1068,7 @@ func TestValidateIngressCreate(t *testing.T) {
 			tweakIngress: func(ingress *networking.Ingress) {
 				ingress.Spec.TLS = []networking.IngressTLS{{SecretName: "invalid name"}}
 			},
-			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("spec").Child("tls").Index(0).Child("secretName"), "invalid name", `a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`)},
+			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("spec").Child("tls").Index(0).Child("secretName"), "invalid name", `a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com'; regex: '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`)},
 		},
 		"valid rules with wildcard host": {
 			tweakIngress: func(ingress *networking.Ingress) {
@@ -1442,7 +1442,7 @@ func TestValidateIngressUpdate(t *testing.T) {
 				oldIngress.Spec.TLS = []networking.IngressTLS{{SecretName: "valid"}}
 				newIngress.Spec.TLS = []networking.IngressTLS{{SecretName: "invalid name"}}
 			},
-			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("spec").Child("tls").Index(0).Child("secretName"), "invalid name", `a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`)},
+			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("spec").Child("tls").Index(0).Child("secretName"), "invalid name", `a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com'; regex: '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`)},
 		},
 		"change invalid secret -> invalid secret": {
 			tweakIngresses: func(newIngress, oldIngress *networking.Ingress) {
@@ -1579,7 +1579,7 @@ func TestValidateIngressClass(t *testing.T) {
 		},
 		"invalid name, valid controller": {
 			ingressClass: makeValidIngressClass("test*123", "foo.co/bar"),
-			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("metadata.name"), "test*123", "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')")},
+			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("metadata.name"), "test*123", "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com'; regex: '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')")},
 		},
 		"valid name, empty controller": {
 			ingressClass: makeValidIngressClass("test123", ""),
@@ -1636,8 +1636,8 @@ func TestValidateIngressClass(t *testing.T) {
 			),
 			expectedErrs: field.ErrorList{field.Invalid(field.NewPath("spec.parameters.namespace"), "foo_ns",
 				"a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',"+
-					" and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', "+
-					"regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')")},
+					" and must start and end with an alphanumeric character (e.g. 'my-name', '123-abc'; "+
+					"regex: '[a-z0-9]([-a-z0-9]*[a-z0-9])?')")},
 		},
 		"valid name, valid controller, valid Cluster scope": {
 			ingressClass: makeValidIngressClass("test123", "foo.co/bar",

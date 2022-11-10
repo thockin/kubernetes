@@ -337,7 +337,7 @@ func TestValidateConditions(t *testing.T) {
 				Message:            "",
 			}},
 			validateErrs: func(t *testing.T, errs field.ErrorList) {
-				needle := `status.conditions[0].type: Invalid value: ":invalid": name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')`
+				needle := `status.conditions[0].type: Invalid value: ":invalid": name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName', 'my.name', '123-abc'; regex: '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')`
 				if !hasError(errs, needle) {
 					t.Errorf("missing %q in\n%v", needle, errorsAsString(errs))
 				}
@@ -353,7 +353,7 @@ func TestValidateConditions(t *testing.T) {
 				if !hasError(errs, needle) {
 					t.Errorf("missing %q in\n%v", needle, errorsAsString(errs))
 				}
-				needle = `status.conditions[0].reason: Invalid value: "invalid;val": a condition reason must start with alphabetic character, optionally followed by a string of alphanumeric characters or '_,:', and must end with an alphanumeric character or '_' (e.g. 'my_name',  or 'MY_NAME',  or 'MyName',  or 'ReasonA,ReasonB',  or 'ReasonA:ReasonB', regex used for validation is '[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?')`
+				needle = `status.conditions[0].reason: Invalid value: "invalid;val": a condition reason must start with alphabetic character, optionally followed by a string of alphanumeric characters or '_,:', and must end with an alphanumeric character or '_' (e.g. 'my_name', 'MY_NAME', 'MyName', 'ReasonA,ReasonB', 'ReasonA:ReasonB'; regex: '[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?')`
 				if !hasError(errs, needle) {
 					t.Errorf("missing %q in\n%v", needle, errorsAsString(errs))
 				}
@@ -411,7 +411,7 @@ func TestValidateConditions(t *testing.T) {
 				Reason: "valid,val:",
 			}},
 			validateErrs: func(t *testing.T, errs field.ErrorList) {
-				needle := `status.conditions[0].reason: Invalid value: "valid,val:": a condition reason must start with alphabetic character, optionally followed by a string of alphanumeric characters or '_,:', and must end with an alphanumeric character or '_' (e.g. 'my_name',  or 'MY_NAME',  or 'MyName',  or 'ReasonA,ReasonB',  or 'ReasonA:ReasonB', regex used for validation is '[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?')`
+				needle := `status.conditions[0].reason: Invalid value: "valid,val:": a condition reason must start with alphabetic character, optionally followed by a string of alphanumeric characters or '_,:', and must end with an alphanumeric character or '_' (e.g. 'my_name', 'MY_NAME', 'MyName', 'ReasonA,ReasonB', 'ReasonA:ReasonB'; regex: '[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?')`
 				if !hasError(errs, needle) {
 					t.Errorf("missing %q in\n%v", needle, errorsAsString(errs))
 				}

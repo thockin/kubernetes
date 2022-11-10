@@ -34,6 +34,7 @@ import (
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/api/validate"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -61,7 +62,7 @@ const fieldImmutableErrorMsg string = apimachineryvalidation.FieldImmutableError
 const isNotIntegerErrorMsg string = `must be an integer`
 const isNotPositiveErrorMsg string = `must be greater than zero`
 
-var pdPartitionErrorMsg string = validation.InclusiveRangeError(1, 255)
+var pdPartitionErrorMsg string = content.InclusiveRangeError(1, 255)
 var fileModeErrorMsg = "must be a number between 0 and 0777 (octal), both inclusive"
 
 // BannedOwners is a black list of object that are not allowed to be owners.
@@ -748,7 +749,7 @@ func validateISCSIVolumeSource(iscsi *core.ISCSIVolumeSource, fldPath *field.Pat
 		}
 	}
 	if iscsi.Lun < 0 || iscsi.Lun > 255 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), iscsi.Lun, validation.InclusiveRangeError(0, 255)))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), iscsi.Lun, content.InclusiveRangeError(0, 255)))
 	}
 	if (iscsi.DiscoveryCHAPAuth || iscsi.SessionCHAPAuth) && iscsi.SecretRef == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("secretRef"), ""))
@@ -792,7 +793,7 @@ func validateISCSIPersistentVolumeSource(iscsi *core.ISCSIPersistentVolumeSource
 		}
 	}
 	if iscsi.Lun < 0 || iscsi.Lun > 255 {
-		allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), iscsi.Lun, validation.InclusiveRangeError(0, 255)))
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), iscsi.Lun, content.InclusiveRangeError(0, 255)))
 	}
 	if (iscsi.DiscoveryCHAPAuth || iscsi.SessionCHAPAuth) && iscsi.SecretRef == nil {
 		allErrs = append(allErrs, field.Required(fldPath.Child("secretRef"), ""))
@@ -833,7 +834,7 @@ func validateFCVolumeSource(fc *core.FCVolumeSource, fldPath *field.Path) field.
 			allErrs = append(allErrs, field.Required(fldPath.Child("lun"), "lun is required if targetWWNs is specified"))
 		} else {
 			if *fc.Lun < 0 || *fc.Lun > 255 {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), fc.Lun, validation.InclusiveRangeError(0, 255)))
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("lun"), fc.Lun, content.InclusiveRangeError(0, 255)))
 			}
 		}
 	}
@@ -3758,7 +3759,7 @@ func ValidatePodSpec(spec *core.PodSpec, podMeta *metav1.ObjectMeta, fldPath *fi
 	if spec.ActiveDeadlineSeconds != nil {
 		value := *spec.ActiveDeadlineSeconds
 		if value < 1 || value > math.MaxInt32 {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("activeDeadlineSeconds"), value, validation.InclusiveRangeError(1, math.MaxInt32)))
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("activeDeadlineSeconds"), value, content.InclusiveRangeError(1, math.MaxInt32)))
 		}
 	}
 
@@ -4521,7 +4522,7 @@ func ValidatePodUpdate(newPod, oldPod *core.Pod, opts PodValidationOptions) fiel
 	if newPod.Spec.ActiveDeadlineSeconds != nil {
 		newActiveDeadlineSeconds := *newPod.Spec.ActiveDeadlineSeconds
 		if newActiveDeadlineSeconds < 0 || newActiveDeadlineSeconds > math.MaxInt32 {
-			allErrs = append(allErrs, field.Invalid(specPath.Child("activeDeadlineSeconds"), newActiveDeadlineSeconds, validation.InclusiveRangeError(0, math.MaxInt32)))
+			allErrs = append(allErrs, field.Invalid(specPath.Child("activeDeadlineSeconds"), newActiveDeadlineSeconds, content.InclusiveRangeError(0, math.MaxInt32)))
 			return allErrs
 		}
 		if oldPod.Spec.ActiveDeadlineSeconds != nil {

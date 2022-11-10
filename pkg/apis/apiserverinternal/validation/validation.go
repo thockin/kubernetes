@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -173,17 +174,17 @@ func isValidAPIVersion(apiVersion string) []string {
 		var group string
 		group, version = parts[0], parts[1]
 		if len(group) == 0 {
-			errs = append(errs, "group part: "+utilvalidation.EmptyError())
+			errs = append(errs, "group must be specified")
 		} else if msgs := utilvalidation.IsDNS1123Subdomain(group); len(msgs) != 0 {
 			errs = append(errs, prefixEach(msgs, "group part: ")...)
 		}
 	default:
-		return append(errs, "an apiVersion is "+utilvalidation.RegexError(dns1035LabelErrMsg, dns1035LabelFmt, "my-name", "abc-123")+
+		return append(errs, "an apiVersion is "+content.RegexError(dns1035LabelErrMsg, dns1035LabelFmt, "my-name", "abc-123")+
 			" with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyVersion')")
 	}
 
 	if len(version) == 0 {
-		errs = append(errs, "version part: "+utilvalidation.EmptyError())
+		errs = append(errs, "version must be specified")
 	} else if msgs := utilvalidation.IsDNS1035Label(version); len(msgs) != 0 {
 		errs = append(errs, prefixEach(msgs, "version part: ")...)
 	}
