@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/validation"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
 )
@@ -78,7 +78,7 @@ func getCertificateNames(cert *x509.Certificate) []string {
 
 	cn := cert.Subject.CommonName
 	cnIsIP := netutils.ParseIPSloppy(cn) != nil
-	cnIsValidDomain := cn == "*" || len(validation.IsDNS1123Subdomain(strings.TrimPrefix(cn, "*."))) == 0
+	cnIsValidDomain := cn == "*" || len(content.IsDNS1123Subdomain(strings.TrimPrefix(cn, "*."))) == 0
 	// don't use the CN if it is a valid IP because our IP serving detection may unexpectedly use it to terminate the connection.
 	if !cnIsIP && cnIsValidDomain {
 		names = append(names, cn)

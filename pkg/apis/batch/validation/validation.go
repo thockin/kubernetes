@@ -24,6 +24,7 @@ import (
 	"github.com/robfig/cron/v3"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/validate"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/labels"
@@ -129,7 +130,7 @@ func ValidateJob(job *batch.Job, opts JobValidationOptions) field.ErrorList {
 		// The index could be maximum `.spec.completions-1`
 		// If we don't validate this here, the indexed job will fail to create pods later.
 		maximumPodHostname := fmt.Sprintf("%s-%d", job.ObjectMeta.Name, *job.Spec.Completions-1)
-		if errs := apimachineryvalidation.IsDNS1123Label(maximumPodHostname); len(errs) > 0 {
+		if errs := content.IsDNS1123Label(maximumPodHostname); len(errs) > 0 {
 			allErrs = append(allErrs, field.Invalid(field.NewPath("metadata").Child("name"), job.ObjectMeta.Name, fmt.Sprintf("will not able to create pod with invalid DNS label: %s", maximumPodHostname)))
 		}
 	}

@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -95,7 +96,7 @@ func ValidateWebhookService(fldPath *field.Path, namespace, name string, path *s
 			allErrors = append(allErrors, field.Invalid(fldPath.Child("path"), urlPath, fmt.Sprintf("segment[%d] may not be empty", i)))
 			continue
 		}
-		failures := validation.IsDNS1123Subdomain(step)
+		failures := content.IsDNS1123Subdomain(step)
 		for _, failure := range failures {
 			allErrors = append(allErrors, field.Invalid(fldPath.Child("path"), urlPath, fmt.Sprintf("segment[%d]: %v", i, failure)))
 		}

@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -142,7 +143,7 @@ func (o *ServiceOptions) Validate() error {
 		return fmt.Errorf("at least one tcp port specifier must be provided")
 	}
 	if o.Type == corev1.ServiceTypeExternalName {
-		if errs := validation.IsDNS1123Subdomain(o.ExternalName); len(errs) != 0 {
+		if errs := content.IsDNS1123Subdomain(o.ExternalName); len(errs) != 0 {
 			return fmt.Errorf("invalid service external name %s", o.ExternalName)
 		}
 	}

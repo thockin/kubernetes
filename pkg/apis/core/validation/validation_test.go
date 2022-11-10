@@ -48,8 +48,8 @@ import (
 )
 
 const (
-	dnsLabelErrMsg          = "a lowercase RFC 1123 label must consist of"
-	dnsSubdomainLabelErrMsg = "a lowercase RFC 1123 subdomain"
+	dnsLabelErrMsg          = "must consist of lower case alphanumeric characters or '-'"
+	dnsSubdomainLabelErrMsg = "must consist of lower case alphanumeric characters, '-', or '.'"
 	envVarNameErrMsg        = "a valid environment variable name must consist of"
 )
 

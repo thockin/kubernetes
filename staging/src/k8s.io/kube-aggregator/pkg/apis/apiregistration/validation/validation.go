@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/api/validation/path"
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
@@ -51,7 +52,7 @@ func ValidateAPIService(apiService *apiregistration.APIService) field.ErrorList 
 		allErrs = append(allErrs, field.Required(field.NewPath("spec", "group"), "only v1 may have an empty group and it better be legacy kube"))
 	}
 	if len(apiService.Spec.Group) > 0 {
-		for _, errString := range utilvalidation.IsDNS1123Subdomain(apiService.Spec.Group) {
+		for _, errString := range content.IsDNS1123Subdomain(apiService.Spec.Group) {
 			allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "group"), apiService.Spec.Group, errString))
 		}
 	}

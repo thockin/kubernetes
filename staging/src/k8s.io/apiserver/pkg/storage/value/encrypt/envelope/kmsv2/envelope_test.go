@@ -349,7 +349,7 @@ func TestValidateAnnotations(t *testing.T) {
 	atleastTwoSegmentsErrorMsg := "should be a domain with at least two segments separated by dots"
 	moreThan63CharsErrorMsg := "must be no more than 63 characters"
 	moreThan253CharsErrorMsg := "must be no more than 253 characters"
-	dns1123SubdomainErrorMsg := "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+	dns1123SubdomainErrorMsg := "must consist of lower case alphanumeric characters, '-', or '.', and must start and end with an alphanumeric character"
 
 	annotationsNameErrorCases := []struct {
 		annotations map[string][]byte

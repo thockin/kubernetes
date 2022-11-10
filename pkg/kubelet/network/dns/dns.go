@@ -25,8 +25,8 @@ import (
 	"strings"
 
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
-	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/tools/record"
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
@@ -115,7 +115,7 @@ func (c *Configurer) formDNSSearchFitsLimits(composedSearch []string, pod *v1.Po
 	// search path exceeding 255 characters. We have to filter them out.
 	l := 0
 	for _, search := range composedSearch {
-		if len(search) > utilvalidation.DNS1123SubdomainMaxLength {
+		if len(search) > content.DNS1123SubdomainMaxLength {
 			limitsExceeded = true
 			continue
 		}
@@ -210,8 +210,8 @@ func (c *Configurer) CheckLimitsForResolvConf() {
 	}
 
 	for _, search := range hostSearch {
-		if len(search) > utilvalidation.DNS1123SubdomainMaxLength {
-			log := fmt.Sprintf("Resolv.conf file %q contains a search path which length is more than allowed %d chars!", c.ResolverConfig, utilvalidation.DNS1123SubdomainMaxLength)
+		if len(search) > content.DNS1123SubdomainMaxLength {
+			log := fmt.Sprintf("Resolv.conf file %q contains a search path which length is more than allowed %d chars!", c.ResolverConfig, content.DNS1123SubdomainMaxLength)
 			c.recorder.Event(c.nodeRef, v1.EventTypeWarning, "CheckLimitsForResolvConf", log)
 			klog.V(4).InfoS("Check limits for resolv.conf failed", "eventlog", log)
 			return

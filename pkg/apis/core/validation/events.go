@@ -23,10 +23,10 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	eventsv1beta1 "k8s.io/api/events/v1beta1"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/kubernetes/pkg/apis/core"
 )
@@ -186,7 +186,7 @@ func legacyValidateEvent(event *core.Event, requestVersion schema.GroupVersion) 
 		}
 	}
 
-	for _, msg := range validation.IsDNS1123Subdomain(event.Namespace) {
+	for _, msg := range content.IsDNS1123Subdomain(event.Namespace) {
 		allErrs = append(allErrs, field.Invalid(field.NewPath("namespace"), event.Namespace, msg))
 	}
 	return allErrs

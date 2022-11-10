@@ -651,7 +651,7 @@ func TestValidateValidatingWebhookConfiguration(t *testing.T) {
 					SideEffects: &unknownSideEffect,
 				},
 			}, true),
-			expectedError: `clientConfig.service.path: Invalid value: "/apis/foo.bar/v1alpha1/--bad": segment[3]: a lowercase RFC 1123 subdomain`,
+			expectedError: `clientConfig.service.path: Invalid value: "/apis/foo.bar/v1alpha1/--bad": segment[3]:`,
 		},
 		{
 			name: "invalid port 0",
@@ -1551,7 +1551,7 @@ func TestValidateMutatingWebhookConfiguration(t *testing.T) {
 					SideEffects: &unknownSideEffect,
 				},
 			}, true),
-			expectedError: `clientConfig.service.path: Invalid value: "/apis/foo.bar/v1alpha1/--bad": segment[3]: a lowercase RFC 1123 subdomain`,
+			expectedError: `clientConfig.service.path: Invalid value: "/apis/foo.bar/v1alpha1/--bad": segment[3]:`,
 		},
 		{
 			name: "invalid port 0",

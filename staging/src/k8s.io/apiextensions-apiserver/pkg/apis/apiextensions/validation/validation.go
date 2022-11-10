@@ -30,6 +30,7 @@ import (
 	"k8s.io/apiextensions-apiserver/pkg/apiserver/schema/cel"
 	structuraldefaulting "k8s.io/apiextensions-apiserver/pkg/apiserver/schema/defaulting"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	genericvalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
@@ -225,7 +226,7 @@ func validateCustomResourceDefinitionSpec(ctx context.Context, spec *apiextensio
 
 	if len(spec.Group) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("group"), ""))
-	} else if errs := utilvalidation.IsDNS1123Subdomain(spec.Group); len(errs) > 0 {
+	} else if errs := content.IsDNS1123Subdomain(spec.Group); len(errs) > 0 {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("group"), spec.Group, strings.Join(errs, ",")))
 	} else if len(strings.Split(spec.Group, ".")) < 2 {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("group"), spec.Group, "should be a domain with at least one dot"))

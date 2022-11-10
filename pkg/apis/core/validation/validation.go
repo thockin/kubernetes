@@ -110,7 +110,7 @@ func ValidateAnnotations(annotations map[string]string, fldPath *field.Path) fie
 
 func ValidateDNS1123Label(value string, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	for _, msg := range validation.IsDNS1123Label(value) {
+	for _, msg := range content.IsDNS1123Label(value) {
 		allErrs = append(allErrs, field.Invalid(fldPath, value, msg))
 	}
 	return allErrs
@@ -128,7 +128,7 @@ func ValidateQualifiedName(value string, fldPath *field.Path) field.ErrorList {
 // ValidateDNS1123Subdomain validates that a name is a proper DNS subdomain.
 func ValidateDNS1123Subdomain(value string, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
-	for _, msg := range validation.IsDNS1123Subdomain(value) {
+	for _, msg := range content.IsDNS1123Subdomain(value) {
 		allErrs = append(allErrs, field.Invalid(fldPath, value, msg))
 	}
 	return allErrs
@@ -1540,7 +1540,7 @@ func ValidateCSIDriverName(driverName string, fldPath *field.Path) field.ErrorLi
 		allErrs = append(allErrs, field.TooLong(fldPath, driverName, 63))
 	}
 
-	for _, msg := range validation.IsDNS1123Subdomain(strings.ToLower(driverName)) {
+	for _, msg := range content.IsDNS1123Subdomain(strings.ToLower(driverName)) {
 		allErrs = append(allErrs, field.Invalid(fldPath, driverName, msg))
 	}
 
@@ -1666,7 +1666,7 @@ func ValidationOptionsForPersistentVolume(pv, oldPv *core.PersistentVolume) Pers
 
 func secretRefRequiresSubdomainSecretName(secretRef *core.SecretReference) bool {
 	// ref and name were specified and name didn't fit within label validation
-	return secretRef != nil && len(secretRef.Name) > 0 && len(validation.IsDNS1123Label(secretRef.Name)) > 0
+	return secretRef != nil && len(secretRef.Name) > 0 && len(content.IsDNS1123Label(secretRef.Name)) > 0
 }
 
 func ValidatePersistentVolumeSpec(pvSpec *core.PersistentVolumeSpec, pvName string, validateInlinePersistentVolumeSpec bool, fldPath *field.Path, opts PersistentVolumeSpecValidationOptions) field.ErrorList {
@@ -6474,7 +6474,7 @@ func validateWindowsSecurityContextOptions(windowsOptions *core.WindowsSecurityC
 
 	if windowsOptions.GMSACredentialSpecName != nil {
 		// gmsaCredentialSpecName must be the name of a custom resource
-		for _, msg := range validation.IsDNS1123Subdomain(*windowsOptions.GMSACredentialSpecName) {
+		for _, msg := range content.IsDNS1123Subdomain(*windowsOptions.GMSACredentialSpecName) {
 			allErrs = append(allErrs, field.Invalid(fieldPath.Child("gmsaCredentialSpecName"), windowsOptions.GMSACredentialSpecName, msg))
 		}
 	}
@@ -6654,7 +6654,7 @@ func ValidateLoadBalancerStatus(status *core.LoadBalancerStatus, fldPath *field.
 			}
 		}
 		if len(ingress.Hostname) > 0 {
-			for _, msg := range validation.IsDNS1123Subdomain(ingress.Hostname) {
+			for _, msg := range content.IsDNS1123Subdomain(ingress.Hostname) {
 				allErrs = append(allErrs, field.Invalid(idxPath.Child("hostname"), ingress.Hostname, msg))
 			}
 			if isIP := (netutils.ParseIPSloppy(ingress.Hostname) != nil); isIP {

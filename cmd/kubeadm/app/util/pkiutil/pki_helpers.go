@@ -36,8 +36,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/validation"
 	certutil "k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/keyutil"
 	"k8s.io/klog/v2"
@@ -505,9 +505,9 @@ func appendSANsToAltNames(altNames *certutil.AltNames, SANs []string, certName s
 	for _, altname := range SANs {
 		if ip := netutils.ParseIPSloppy(altname); ip != nil {
 			altNames.IPs = append(altNames.IPs, ip)
-		} else if len(validation.IsDNS1123Subdomain(altname)) == 0 {
+		} else if len(content.IsDNS1123Subdomain(altname)) == 0 {
 			altNames.DNSNames = append(altNames.DNSNames, altname)
-		} else if len(validation.IsWildcardDNS1123Subdomain(altname)) == 0 {
+		} else if len(content.IsWildcardDNS1123Subdomain(altname)) == 0 {
 			altNames.DNSNames = append(altNames.DNSNames, altname)
 		} else {
 			klog.Warningf(

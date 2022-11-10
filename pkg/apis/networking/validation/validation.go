@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	pathvalidation "k8s.io/apimachinery/pkg/api/validation/path"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -302,12 +303,12 @@ func validateIngressTLS(spec *networking.IngressSpec, fldPath *field.Path, opts 
 	for tlsIndex, itls := range spec.TLS {
 		for i, host := range itls.Hosts {
 			if strings.Contains(host, "*") {
-				for _, msg := range validation.IsWildcardDNS1123Subdomain(host) {
+				for _, msg := range content.IsWildcardDNS1123Subdomain(host) {
 					allErrs = append(allErrs, field.Invalid(fldPath.Index(tlsIndex).Child("hosts").Index(i), host, msg))
 				}
 				continue
 			}
-			for _, msg := range validation.IsDNS1123Subdomain(host) {
+			for _, msg := range content.IsDNS1123Subdomain(host) {
 				allErrs = append(allErrs, field.Invalid(fldPath.Index(tlsIndex).Child("hosts").Index(i), host, msg))
 			}
 		}
@@ -364,7 +365,7 @@ func ValidateIngressLoadBalancerStatus(status *networking.IngressLoadBalancerSta
 			}
 		}
 		if len(ingress.Hostname) > 0 {
-			for _, msg := range validation.IsDNS1123Subdomain(ingress.Hostname) {
+			for _, msg := range content.IsDNS1123Subdomain(ingress.Hostname) {
 				allErrs = append(allErrs, field.Invalid(idxPath.Child("hostname"), ingress.Hostname, msg))
 			}
 			if isIP := (netutils.ParseIPSloppy(ingress.Hostname) != nil); isIP {
@@ -389,12 +390,12 @@ func validateIngressRules(ingressRules []networking.IngressRule, fldPath *field.
 			// TODO: Ports and ips are allowed in the host part of a url
 			// according to RFC 3986, consider allowing them.
 			if strings.Contains(ih.Host, "*") {
-				for _, msg := range validation.IsWildcardDNS1123Subdomain(ih.Host) {
+				for _, msg := range content.IsWildcardDNS1123Subdomain(ih.Host) {
 					allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, msg))
 				}
 				wildcardHost = true
 			} else {
-				for _, msg := range validation.IsDNS1123Subdomain(ih.Host) {
+				for _, msg := range content.IsDNS1123Subdomain(ih.Host) {
 					allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, msg))
 				}
 			}
@@ -552,7 +553,7 @@ func validateIngressTypedLocalObjectReference(params *api.TypedLocalObjectRefere
 	}
 
 	if params.APIGroup != nil {
-		for _, msg := range validation.IsDNS1123Subdomain(*params.APIGroup) {
+		for _, msg := range content.IsDNS1123Subdomain(*params.APIGroup) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("apiGroup"), *params.APIGroup, msg))
 		}
 	}

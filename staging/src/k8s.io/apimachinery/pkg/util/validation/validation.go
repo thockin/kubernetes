@@ -52,7 +52,7 @@ func IsQualifiedName(value string) []string {
 		prefix, name = parts[0], parts[1]
 		if len(prefix) == 0 {
 			errs = append(errs, "prefix part must be non-empty")
-		} else if msgs := IsDNS1123Subdomain(prefix); len(msgs) != 0 {
+		} else if msgs := content.IsDNS1123Subdomain(prefix); len(msgs) != 0 {
 			errs = append(errs, prefixEach(msgs, "prefix part ")...)
 		}
 	default:
@@ -81,7 +81,7 @@ func IsFullyQualifiedName(fldPath *field.Path, name string) field.ErrorList {
 	if len(name) == 0 {
 		return append(allErrors, field.Required(fldPath, ""))
 	}
-	if errs := IsDNS1123Subdomain(name); len(errs) > 0 {
+	if errs := content.IsDNS1123Subdomain(name); len(errs) > 0 {
 		return append(allErrors, field.Invalid(fldPath, name, strings.Join(errs, ",")))
 	}
 	if len(strings.Split(name, ".")) < 3 {
@@ -101,14 +101,14 @@ func IsFullyQualifiedDomainName(fldPath *field.Path, name string) field.ErrorLis
 	if strings.HasSuffix(name, ".") {
 		name = name[:len(name)-1]
 	}
-	if errs := IsDNS1123Subdomain(name); len(errs) > 0 {
+	if errs := content.IsDNS1123Subdomain(name); len(errs) > 0 {
 		return append(allErrors, field.Invalid(fldPath, name, strings.Join(errs, ",")))
 	}
 	if len(strings.Split(name, ".")) < 2 {
 		return append(allErrors, field.Invalid(fldPath, name, "should be a domain with at least two segments separated by dots"))
 	}
 	for _, label := range strings.Split(name, ".") {
-		if errs := IsDNS1123Label(label); len(errs) > 0 {
+		if errs := content.IsDNS1123Label(label); len(errs) > 0 {
 			return append(allErrors, field.Invalid(fldPath, label, strings.Join(errs, ",")))
 		}
 	}
@@ -141,7 +141,7 @@ func IsDomainPrefixedPath(fldPath *field.Path, dpPath string) field.ErrorList {
 	}
 
 	host := segments[0]
-	for _, err := range IsDNS1123Subdomain(host) {
+	for _, err := range content.IsDNS1123Subdomain(host) {
 		allErrs = append(allErrs, field.Invalid(fldPath, host, err))
 	}
 
@@ -175,54 +175,6 @@ func IsValidLabelValue(value string) []string {
 	return errs
 }
 
-const dns1123LabelFmt string = "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
-const dns1123LabelErrMsg string = "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
-
-// DNS1123LabelMaxLength is a label's max length in DNS (RFC 1123)
-const DNS1123LabelMaxLength int = 63
-
-var dns1123LabelRegexp = regexp.MustCompile("^" + dns1123LabelFmt + "$")
-
-// IsDNS1123Label tests for a string that conforms to the definition of a label in
-// DNS (RFC 1123).
-func IsDNS1123Label(value string) []string {
-	var errs []string
-	if len(value) > DNS1123LabelMaxLength {
-		errs = append(errs, content.TooLongError(DNS1123LabelMaxLength))
-	}
-	if !dns1123LabelRegexp.MatchString(value) {
-		if dns1123SubdomainRegexp.MatchString(value) {
-			// It was a valid subdomain and not a valid label.  Since we
-			// already checked length, it must be dots.
-			errs = append(errs, "must not contain dots")
-		} else {
-			errs = append(errs, content.RegexError(dns1123LabelErrMsg, dns1123LabelFmt, "my-name", "123-abc"))
-		}
-	}
-	return errs
-}
-
-const dns1123SubdomainFmt string = dns1123LabelFmt + "(\\." + dns1123LabelFmt + ")*"
-const dns1123SubdomainErrorMsg string = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
-
-// DNS1123SubdomainMaxLength is a subdomain's max length in DNS (RFC 1123)
-const DNS1123SubdomainMaxLength int = 253
-
-var dns1123SubdomainRegexp = regexp.MustCompile("^" + dns1123SubdomainFmt + "$")
-
-// IsDNS1123Subdomain tests for a string that conforms to the definition of a
-// subdomain in DNS (RFC 1123).
-func IsDNS1123Subdomain(value string) []string {
-	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, content.TooLongError(DNS1123SubdomainMaxLength))
-	}
-	if !dns1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, content.RegexError(dns1123SubdomainErrorMsg, dns1123SubdomainFmt, "example.com"))
-	}
-	return errs
-}
-
 const dns1035LabelFmt string = "[a-z]([-a-z0-9]*[a-z0-9])?"
 const dns1035LabelErrMsg string = "a DNS-1035 label must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character"
 
@@ -240,28 +192,6 @@ func IsDNS1035Label(value string) []string {
 	}
 	if !dns1035LabelRegexp.MatchString(value) {
 		errs = append(errs, content.RegexError(dns1035LabelErrMsg, dns1035LabelFmt, "my-name", "abc-123"))
-	}
-	return errs
-}
-
-// wildcard definition - RFC 1034 section 4.3.3.
-// examples:
-// - valid: *.bar.com, *.foo.bar.com
-// - invalid: *.*.bar.com, *.foo.*.com, *bar.com, f*.bar.com, *
-const wildcardDNS1123SubdomainFmt = "\\*\\." + dns1123SubdomainFmt
-const wildcardDNS1123SubdomainErrMsg = "a wildcard DNS-1123 subdomain must start with '*.', followed by a valid DNS subdomain, which must consist of lower case alphanumeric characters, '-' or '.' and end with an alphanumeric character"
-
-// IsWildcardDNS1123Subdomain tests for a string that conforms to the definition of a
-// wildcard subdomain in DNS (RFC 1034 section 4.3.3).
-func IsWildcardDNS1123Subdomain(value string) []string {
-	wildcardDNS1123SubdomainRegexp := regexp.MustCompile("^" + wildcardDNS1123SubdomainFmt + "$")
-
-	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, content.TooLongError(DNS1123SubdomainMaxLength))
-	}
-	if !wildcardDNS1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, content.RegexError(wildcardDNS1123SubdomainErrMsg, wildcardDNS1123SubdomainFmt, "*.example.com"))
 	}
 	return errs
 }
@@ -422,6 +352,7 @@ func IsEnvVarName(value string) []string {
 	return errs
 }
 
+const configMapKeyMaxLength = 253
 const configMapKeyFmt = `[-._a-zA-Z0-9]+`
 const configMapKeyErrMsg string = "a valid config key must consist of alphanumeric characters, '-', '_' or '.'"
 
@@ -430,8 +361,8 @@ var configMapKeyRegexp = regexp.MustCompile("^" + configMapKeyFmt + "$")
 // IsConfigMapKey tests for a string that is a valid key for a ConfigMap or Secret
 func IsConfigMapKey(value string) []string {
 	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, content.TooLongError(DNS1123SubdomainMaxLength))
+	if len(value) > content.DNS1123SubdomainMaxLength {
+		errs = append(errs, content.TooLongError(configMapKeyMaxLength))
 	}
 	if !configMapKeyRegexp.MatchString(value) {
 		errs = append(errs, content.RegexError(configMapKeyErrMsg, configMapKeyFmt, "key.name", "KEY_NAME", "key-name"))

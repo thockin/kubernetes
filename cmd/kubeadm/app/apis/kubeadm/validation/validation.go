@@ -28,8 +28,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	bootstrapapi "k8s.io/cluster-bootstrap/token/api"
 	bootstraputil "k8s.io/cluster-bootstrap/token/util"
@@ -110,7 +110,7 @@ func ValidateNodeRegistrationOptions(nro *kubeadm.NodeRegistrationOptions, fldPa
 		allErrs = append(allErrs, field.Required(fldPath, "--node-name or .nodeRegistration.name in the config file is a required value. It seems like this value couldn't be automatically detected in your environment, please specify the desired value using the CLI or config file."))
 	} else {
 		nameFldPath := fldPath.Child("name")
-		for _, err := range validation.IsDNS1123Subdomain(nro.Name) {
+		for _, err := range content.IsDNS1123Subdomain(nro.Name) {
 			allErrs = append(allErrs, field.Invalid(nameFldPath, nro.Name, err))
 		}
 	}
@@ -321,8 +321,8 @@ func ValidateEtcd(e *kubeadm.Etcd, fldPath *field.Path) field.ErrorList {
 func ValidateCertSANs(altnames []string, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	for _, altname := range altnames {
-		if errs := validation.IsDNS1123Subdomain(altname); len(errs) != 0 {
-			if errs2 := validation.IsWildcardDNS1123Subdomain(altname); len(errs2) != 0 {
+		if errs := content.IsDNS1123Subdomain(altname); len(errs) != 0 {
+			if errs2 := content.IsWildcardDNS1123Subdomain(altname); len(errs2) != 0 {
 				if netutils.ParseIPSloppy(altname) == nil {
 					allErrs = append(allErrs, field.Invalid(fldPath, altname, fmt.Sprintf("altname is not a valid IP address, DNS label or a DNS label with subdomain wildcards: %s; %s", strings.Join(errs, "; "), strings.Join(errs2, "; "))))
 				}
@@ -513,7 +513,7 @@ func ValidateDNS(dns *kubeadm.DNS, fldPath *field.Path) field.ErrorList {
 func ValidateNetworking(c *kubeadm.ClusterConfiguration, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 	dnsDomainFldPath := fldPath.Child("dnsDomain")
-	for _, err := range validation.IsDNS1123Subdomain(c.Networking.DNSDomain) {
+	for _, err := range content.IsDNS1123Subdomain(c.Networking.DNSDomain) {
 		allErrs = append(allErrs, field.Invalid(dnsDomainFldPath, c.Networking.DNSDomain, err))
 	}
 

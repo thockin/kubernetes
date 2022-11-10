@@ -19,6 +19,7 @@ package validation
 import (
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation"
 )
 
@@ -34,7 +35,7 @@ func NameIsDNSSubdomain(name string, prefix bool) []string {
 	if prefix {
 		name = maskTrailingDash(name)
 	}
-	return validation.IsDNS1123Subdomain(name)
+	return content.IsDNS1123Subdomain(name)
 }
 
 // NameIsDNSLabel is a ValidateNameFunc for names that must be a DNS 1123 label.
@@ -42,7 +43,7 @@ func NameIsDNSLabel(name string, prefix bool) []string {
 	if prefix {
 		name = maskTrailingDash(name)
 	}
-	return validation.IsDNS1123Label(name)
+	return content.IsDNS1123Label(name)
 }
 
 // NameIsDNS1035Label is a ValidateNameFunc for names that must be a DNS 952 label.

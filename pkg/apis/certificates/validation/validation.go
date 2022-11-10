@@ -25,9 +25,9 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apimachinery/pkg/util/sets"
-	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilcert "k8s.io/client-go/util/cert"
 	"k8s.io/kubernetes/pkg/apis/certificates"
@@ -290,7 +290,7 @@ func ValidateCertificateSigningRequestSignerName(fldPath *field.Path, signerName
 	}
 
 	// validate that segments[0] is less than 253 characters altogether
-	maxDomainSegmentLength := utilvalidation.DNS1123SubdomainMaxLength
+	maxDomainSegmentLength := content.DNS1123SubdomainMaxLength
 	if len(segments[0]) > maxDomainSegmentLength {
 		el = append(el, field.TooLong(fldPath, segments[0], maxDomainSegmentLength))
 	}
@@ -299,7 +299,7 @@ func ValidateCertificateSigningRequestSignerName(fldPath *field.Path, signerName
 	for _, lbl := range domainLabels {
 		// use IsDNS1123Label as we want to ensure the max length of any single label in the domain
 		// is 63 characters
-		if errs := utilvalidation.IsDNS1123Label(lbl); len(errs) > 0 {
+		if errs := content.IsDNS1123Label(lbl); len(errs) > 0 {
 			for _, err := range errs {
 				el = append(el, field.Invalid(fldPath, segments[0], fmt.Sprintf("validating label %q: %s", lbl, err)))
 			}
@@ -320,7 +320,7 @@ func ValidateCertificateSigningRequestSignerName(fldPath *field.Path, signerName
 	for _, lbl := range pathLabels {
 		// use IsDNS1123Subdomain because it enforces a length restriction of 253 characters
 		// which is required in order to fit a full resource name into a single 'label'
-		if errs := utilvalidation.IsDNS1123Subdomain(lbl); len(errs) > 0 {
+		if errs := content.IsDNS1123Subdomain(lbl); len(errs) > 0 {
 			for _, err := range errs {
 				el = append(el, field.Invalid(fldPath, segments[1], fmt.Sprintf("validating label %q: %s", lbl, err)))
 			}
@@ -332,7 +332,7 @@ func ValidateCertificateSigningRequestSignerName(fldPath *field.Path, signerName
 	}
 
 	// ensure that segments[1] can accommodate a dns label + dns subdomain + '.'
-	maxPathSegmentLength := utilvalidation.DNS1123SubdomainMaxLength + utilvalidation.DNS1123LabelMaxLength + 1
+	maxPathSegmentLength := content.DNS1123SubdomainMaxLength + content.DNS1123LabelMaxLength + 1
 	maxSignerNameLength := maxDomainSegmentLength + maxPathSegmentLength + 1
 	if len(signerName) > maxSignerNameLength {
 		el = append(el, field.TooLong(fldPath, signerName, maxSignerNameLength))

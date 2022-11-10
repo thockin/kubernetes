@@ -23,7 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"k8s.io/apimachinery/pkg/util/validation"
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
 
@@ -105,7 +105,7 @@ func ParseHostPort(hostport string) (string, string, error) {
 	}
 
 	// if host is a validate RFC-1123 subdomain, returns it
-	if errs := validation.IsDNS1123Subdomain(host); len(errs) == 0 {
+	if errs := content.IsDNS1123Subdomain(host); len(errs) == 0 {
 		return host, port, nil
 	}
 

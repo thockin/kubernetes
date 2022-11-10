@@ -99,7 +99,7 @@ func TestValidateServerStorageVersion(t *testing.T) {
 				EncodingVersion:   "v1",
 				DecodableVersions: []string{"v1", "mygroup_com/v2"},
 			},
-			expectedErr: `[].decodableVersions[1]: Invalid value: "mygroup_com/v2": group part: a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com'; regex: '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`,
+			expectedErr: `[].decodableVersions[1]: Invalid value: "mygroup_com/v2": group part: must consist of lower case alphanumeric characters, '-', or '.', and must start and end with an alphanumeric character (e.g. 'example.com'; regex: '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')`,
 		},
 		{
 			ssv: apiserverinternal.ServerStorageVersion{

@@ -43,7 +43,7 @@ func ValidateStorageVersionName(name string, prefix bool) []string {
 	if idx < 0 {
 		allErrs = append(allErrs, "name must be in the form of <group>.<resource>")
 	} else {
-		for _, msg := range utilvalidation.IsDNS1123Subdomain(name[:idx]) {
+		for _, msg := range content.IsDNS1123Subdomain(name[:idx]) {
 			allErrs = append(allErrs, "the group segment "+msg)
 		}
 		for _, msg := range utilvalidation.IsDNS1035Label(name[idx+1:]) {
@@ -175,7 +175,7 @@ func isValidAPIVersion(apiVersion string) []string {
 		group, version = parts[0], parts[1]
 		if len(group) == 0 {
 			errs = append(errs, "group must be specified")
-		} else if msgs := utilvalidation.IsDNS1123Subdomain(group); len(msgs) != 0 {
+		} else if msgs := content.IsDNS1123Subdomain(group); len(msgs) != 0 {
 			errs = append(errs, prefixEach(msgs, "group part: ")...)
 		}
 	default:
