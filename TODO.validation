@@ -1,0 +1,106 @@
+*** DO NOT MERGE THIS FILE ***
+
+The goal of this branch is to consolidate validation helper functions into a
+better-factored set of patterns and to simplify all of the validation logic we
+have (tens of thousands of LOC).
+
+We currently have shared helper functions in several places:
+- k8s.io/apimachinery/pkg/util/validation
+- k8s.io/apimachinery/pkg/api/validation
+- k8s.io/apimachinery/pkg/api/validation/path
+- k8s.io/apimachinery/pkg/util/validation/field
+- k8s.io/apimachinery/pkg/apis/meta/v1/validation
+- k8s.io/kubernetes/pkg/apis/core/validation
+
+
+We have lots of open-coded logic like this
+
+```
+	if scale.Spec.Replicas < 0 {
+		allErrs = append(allErrs, field.Invalid(field.NewPath("spec", "replicas"), scale.Spec.Replicas, "must be greater than or equal to 0"))
+	}
+```
+
+When reviewing such code, one has to ask:
+* is `field.Invalid()` the right error type?
+* does the error message follow conventions?
+* does the tested expression match the error message?
+* does the tested expression match the value passed to `Invalid()`?
+
+We also frequently see code like this:
+
+```
+	for _, msg := range utilvalidation.IsWildcardDNS1123Subdomain(ih.Host) {
+		allErrs = append(allErrs, field.Invalid(fldPath.Index(i).Child("host"), ih.Host, msg))
+	}
+```
+
+We also see inconsistent use of `field.Required()`, `field.Forbidden()` and
+other functions.
+
+Ultimately, we want to move MOST validation to be declarative.  CEL is moving
+there, and hopefully this effort will converge with that.  What I'd like to get
+to is that writing field validation involves something like the following
+decision:
+1) if possible, use a rule from the built-in "library" (which gives good,
+   consistent error messages)
+2) otherwise, if possible write it as a simple CEL expression with a custom
+   error message
+3) otherwise, write code
+
+So here's my plan:
+
+Part 1: Refactor obvious stuff and build up the "library".  This involves
+finding the most common things that are open-coded (e.g. numeric comparisons,
+common string formats) and publishing a "one true" package with functions for
+them.  Many such functions exist is various places, but we should bring them
+all together in one place with common style and good test coverage.
+
+Part 2: Get rid of the "for each msg" stuff, and convert those into the above.
+Optimize for reading.  Most validation code should be a series of `validate
+field X with library function Y` statements. Conditionals or loops or other
+logic should be rare exceptions.
+
+Part 3: Convert to a declarative form and generate code (if needed) to call the
+library functions.  This will make API reviews easier, and we can flag fields
+which don't have validation.
+
+Part 4: Optimize for reading - seek ways to make any remaining validation code
+easier to review.
+
+TODO:
+- Decide where this library really lives
+  - could be staging/src/k8s.io/apimachinery/... or could maybe be a new repo
+  - some of this logic is used by other projects, sometimes just copied into
+    them and then vendored back into k/k (e.g. kustomize).
+- The library:
+  - all numeric comparators
+  - should metav1 stuff go in here or not?
+  - should core API stuff go here or not?
+  - Immutable()
+  - UserID and GroupID
+    - use UnixGroup/User types?
+  - ObjectRef (including sanity checking names to not contain "..", etc)
+  - make field.OneOfMissing() and field.OneOfTooMany()
+- Cleanup:
+  - package `content` should not use FieldError
+  - Rename "qualified name" - it's just confusing
+  - convert validate.Name to validate.ByFunc or something
+  - rename name validators to consistent style
+  - IP validation should use k/utils/net with netip
+  - s/is immutable/may not be changed/
+  - DNS validation should enbforce each label's length
+  - truncate long values when making errors
+  - avoid regex when possible (bad errors)
+  - common wording "can't" vs "cannot" vs "can not" vs "may not"...
+  - instead of `allErrs = append(allErrs, ...` maybe `allErrs.Append(...` ?
+  - NotSupported should take []interface{}
+  - error messages for DNS Label say "a lowercase ..." which violates the "must xyz" convetnion
+- Audit:
+  - ConfigMap validation is suspect
+    - change ConfigMapKey to FileName (API change)
+  - Can we get rid of DNS 1035?
+    - change service to 1123 (API change and behavior change)?
+  - Can we do better/cleaner with Quantity?
+- Codegen:
+  - handle `if field != ""` (and 0, and nil) automatically
