@@ -117,7 +117,7 @@ func getPackages(context *generator.Context, arguments *args.GeneratorArgs) []ge
 			&generator.BasicPackage{
 				PackageName: pkg.Name,
 				PackagePath: pkg.Path,
-				Source:      pkg.SourcePath,
+				PackageDir:  pkg.SourcePath,
 				HeaderText:  boilerplate,
 				FilterFunc: func(c *generator.Context, t *types.Type) bool {
 					// This filters for types this Package cares about.  The
