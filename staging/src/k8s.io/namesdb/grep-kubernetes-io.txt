@@ -1,0 +1,894 @@
+abac.authorization.kubernetes.io/v0 \
+addonmanager.kubernetes.io/mode: EnsureExists
+addonmanager.kubernetes.io/mode: NotMatch
+addonmanager.kubernetes.io/mode: Reconcile
+alpha.config.kubernetes.io/transformations
+alpha.kubernetes.io/*
+apf.kubernetes.io/autoupdate-spec: 'true'
+apiserver.kubernetes.io/identity": "kube-apiserver",
+apiserver.kubernetes.io/identity": "kube-controller-manager",
+apparmor.security.beta.kubernetes.io/allowedProfileNames"
+apparmor.security.beta.kubernetes.io/defaultProfileName"
+app.kubernetes.io/component: attacher-cluster-role
+app.kubernetes.io/instance: hostpath.csi.k8s.io
+app.kubernetes.io/instance: test-driver.dra.k8s.io
+app.kubernetes.io/managed-by: kustomize-<version>
+app.kubernetes.io/name: csi-hostpathplugin
+app.kubernetes.io/part-of: csi-driver-host-path
+applyset.kubernetes.io/additional-namespaces: test
+applyset.kubernetes.io/contains-group-resources: replicationcontrollers,services
+applyset.kubernetes.io/id: applyset-0eFHV8ySqp7XoShsGvyWFQD3s96yqwHmzc4e0HR1dsY-v1
+applyset.kubernetes.io/is-parent-type: "true"
+applyset.kubernetes.io/part-of: applyset-bjd1LnyQq0mtUu-riZCqjDQOmh0iNb9O2RcuT12WR0k-v1
+applyset.kubernetes.io/tooling: kubectl/v0.0.0
+apps.kubernetes.io/name": "test",
+authentication.kubernetes.io/pod-name": {pod.ObjectMeta.Name},
+authentication.kubernetes.io/pod-uid":  {string(pod.ObjectMeta.UID)},
+autoscaling.alpha.kubernetes.io/behavior"
+autoscaling.alpha.kubernetes.io/conditions"
+autoscaling.alpha.kubernetes.io/current-metrics"
+autoscaling.alpha.kubernetes.io/metrics"
+batch.kubernetes.io/controller-uid
+batch.kubernetes.io/job-completion-index.
+batch.kubernetes.io/job-name
+batch.kubernetes.io/job-tracking
+beta.kubernetes.io/arch": "amd64",
+beta.kubernetes.io/fluentd-ds-ready: "true"
+beta.kubernetes.io/instance-type: n1-standard-4
+beta.kubernetes.io/kube-proxy-ds-ready=true,node.kubernetes.io/kube-proxy-ds-ready!=true" "node.kubernetes.io/kube-proxy-ds-ready=true"
+beta.kubernetes.io/masq-agent-ds-ready=true,node.kubernetes.io/masq-agent-ds-ready!=true" "node.kubernetes.io/masq-agent-ds-ready=true"
+beta.kubernetes.io/metadata-proxy-ready": "true",
+beta.kubernetes.io/os":   "linux",
+bootstrap.kubernetes.io/token
+cluster-autoscaler.kubernetes.io/scale-down-disabled"
+config.kubernetes.io/container"]
+config.kubernetes.io/formatting"
+config.kubernetes.io/function"
+config.kubernetes.io/index
+config.kubernetes.io/local-config: "true"`
+config.kubernetes.io/merge-source"
+config.kubernetes.io/origin"
+config.kubernetes.io/path"
+config.kubernetes.io/v1
+container.apparmor.security.beta.kubernetes.io/container1: localhost/foo
+container.apparmor.security.beta.kubernetes.io/container1: unconfined
+controller.kubernetes.io/hash"
+controller.kubernetes.io/pod-deletion-cost"
+control-plane.alpha.kubernetes.io/leader"
+cronjob.kubernetes.io/instantiate": "manual"},
+csi-kubernetes.io/aws-ebs-0").Obj()
+csi.volume.kubernetes.io/nodeid"
+deployment.kubernetes.io/desired-replicas"
+deployment.kubernetes.io/max-replicas"
+deployment.kubernetes.io/revision": "1"
+deployment.kubernetes.io/revision: "1"
+deployment.kubernetes.io/revision-history: 1,3"
+endpoints.kubernetes.io/last-change-trigger-time"
+endpoints.kubernetes.io/over-capacity"
+endpointslice.kubernetes.io/managed-by"
+endpointslice.kubernetes.io/skip-mirror"
+external-provisioner.volume.kubernetes.io/finalizer"
+failure-domain.beta.kubernetes.io/region`,
+failure-domain.beta.kubernetes.io/zone"
+fake.kubernetes.io/annotation": testJSON},
+foo.kubelet.kubernetes.io/foo"] = value
+ingressclass.kubernetes.io/is-default-class"
+ingress.gcp.kubernetes.io/pre-shared-cert"
+ingress.kubernetes.io/annotation1=bla",
+internal.config.kubernetes.io/seqindent annotations on Resources as they are Read.
+ipaddress.kubernetes.io/ip-family"
+ipaddress.kubernetes.io/managed-by"
+
+#################LEFT OFF HERE
+
+kubeadm.alpha.kubernetes.io/cri-socket"
+kubeadm.alpha.kubernetes.io/cri-socket":"unix:///run/containerd/containerd.sock"}}}`,
+kubeadm.kubernetes.io/component-config.hash"
+kubeadm.kubernetes.io/etcd.advertise-client-urls"
+kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint"
+kube-aggregator.kubernetes.io/automanaged"
+kubectl.kubernetes.io/apply-test"
+kubectl.kubernetes.io/default-container"
+kubectl.kubernetes.io/default-container' annotation
+kubectl.kubernetes.io/default-container annotation for selecting the container to be attached
+kubectl.kubernetes.io/default-container annotation for selecting the container to be attached or the first container in the pod will be chosen")
+kubectl.kubernetes.io/default-container" annotation is present, we preset the opts.Containers to default to selected
+kubectl.kubernetes.io/default-container": "c1",
+kubectl.kubernetes.io/last-applied-configuration"
+kubectl.kubernetes.io/last-applied-configuration")),
+kubectl.kubernetes.io/last-applied-configuration"),
+kubectl.kubernetes.io/last-applied-configuration": |
+kubectl.kubernetes.io/last-applied-configuration"]
+kubectl.kubernetes.io/last-applied-configuration: {}
+kubectl.kubernetes.io/last-applied-configuration: |
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get configmap ssa-test -o yaml "${kube_flags[@]:?}")"
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get configmap ssa-test -o yaml "${kube_flags[@]:?}")" || exit 1
+kubectl.kubernetes.io/last-applied-configuration" <<< "$(kubectl get hpa frontend -o yaml "${kube_flags[@]}")"
+kubectl.kubernetes.io/last-applied-configuration" <<< "$(kubectl get pod nginx -o yaml "${kube_flags[@]}")"
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]:?}")"
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]}" )"
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]}")"
+kubectl.kubernetes.io/last-applied-configuration" <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]}")"
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]:?}")" || exit 1
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]}" )" || exit 1
+kubectl.kubernetes.io/last-applied-configuration <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]}")" || exit 1
+kubectl.kubernetes.io/last-applied-configuration" <<< "$(kubectl get pods test-pod -o yaml "${kube_flags[@]}")" || exit 1
+kubectl.kubernetes.io/last-applied-configuration" <<< "$(kubectl get rc frontend -o yaml "${kube_flags[@]}")" || exit 1
+kubectl.kubernetes.io/last-applied-configuration" <<< "$(kubectl get svc nginx -o yaml "${kube_flags[@]}")"
+kubectl.kubernetes.io/last-applied-configuration > "${KUBE_TEMP}"/annotation-configuration
+kubectl.kubernetes.io/last-applied-configuration > "${KUBE_TEMP}"/annotation-configuration-replaced
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"unit-test.test.com/v1\",\"key\":\"value\",\"kind\":\"Widget\",\"metadata\":{\"annotations\":{},\"labels\":{\"foo\":\"bar\"},\"name\":\"widget\",\"namespace\":\"test\"}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"data\":{\"baz\":\"qux\",\"foo\":\"changed-value\",\"new-data\":\"new-value\",\"new-data2\":\"new-value\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"cm1\",\"namespace\":\"myproject\"}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"data\":{\"baz\":\"qux\",\"foo\":\"changed-value\",\"new-data\":\"new-value\",\"new-data2\":\"new-value\",\"new-data3\":\"newivalue\"},\"kind\":\"ConfigMap\",\"metadata\":{\"annotations\":{},\"name\":\"cm1\",\"namespace\":\"myproject\"}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2017-02-01T21:14:09Z\",\"labels\":{\"app\":\"svc1\",\"new-label\":\"new-value\"},\"name\":\"svc1\",\"namespace\":\"myproject\",\"resourceVersion\":\"20820\"},\"spec\":{\"ports\":[{\"name\":\"80\",\"port\":81,\"protocol\":\"TCP\",\"targetPort\":80}],\"selector\":{\"app\":\"svc1\"},\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2017-02-01T21:14:09Z\",\"labels\":{\"app\":\"svc1\",\"new-label\":\"new-value\"},\"name\":\"svc1\",\"namespace\":\"myproject\",\"resourceVersion\":\"20820\"},\"spec\":{\"ports\":[{\"name\":\"80\",\"port\":81,\"protocol\":\"TCP\",\"targetPort\":92}],\"selector\":{\"app\":\"svc1\"},\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2017-02-27T19:40:53Z\",\"labels\":{\"app\":\"svc1\"},\"name\":\"svc1\",\"namespace\":\"edit-test\",\"resourceVersion\":\"670\",\"selfLink\":\"/api/v1/namespaces/edit-test/services/svc1\",\"uid\":\"a6c11186-fd24-11e6-b53c-480fcf4a5275\"},\"spec\":{\"clusterIP\":\"10.0.0.204\",\"ports\":[{\"name\":\"80\",\"port\":80,\"protocol\":\"TCP\",\"targetPort\":80}],\"selector\":{\"app\":\"svc1\"},\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2017-02-27T19:40:53Z\",\"labels\":{\"app\":\"svc1\",\"new-label\":\"new-value\"},\"name\":\"svc1\",\"namespace\":\"edit-test\",\"resourceVersion\":\"670\",\"selfLink\":\"/api/v1/namespaces/edit-test/services/svc1\",\"uid\":\"a6c11186-fd24-11e6-b53c-480fcf4a5275\"},\"spec\":{\"clusterIP\":\"10.0.0.204\",\"ports\":[{\"name\":\"80\",\"port\":80,\"protocol\":\"TCP\",\"targetPort\":80}],\"selector\":{\"app\":\"svc1\"},\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":\"2017-02-27T19:40:53Z\",\"labels\":{\"app\":\"svc1\",\"new-label\":\"new-value\"},\"name\":\"svc1\",\"namespace\":\"edit-test\",\"resourceVersion\":\"670\",\"selfLink\":\"/api/v1/namespaces/edit-test/services/svc1\",\"uid\":\"a6c11186-fd24-11e6-b53c-480fcf4a5275\"},\"spec\":{\"clusterIP\":\"10.0.0.204\",\"ports\":[{\"name\":\"80\",\"port\":80,\"protocol\":\"TCP\",\"targetPort\":80}],\"selector\":{\"app\":\"svc1\"},\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"},"labels":{"new-label":"new-value"}}}'
+kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"svc1\",\"new-label\":\"foo\",\"new-label2\":\"foo2\"},\"name\":\"svc1\",\"namespace\":\"myproject\"},\"spec\":{\"ports\":[{\"name\":\"80\",\"port\":82,\"protocol\":\"TCP\",\"targetPort\":81}],\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration for Server-Side Apply. This is non-fatal and will be retried next time you apply. Error: %[1]s\n"
+kubectl.kubernetes.io/last-applied-configuration: '{"kind":"Deployment","apiVersion":"apps/v1","metadata":{"name":"nginx-deployment","creationTimestamp":null,"labels":{"name":"nginx"}},"spec":{"selector":{"matchLabels":{"name":"nginx"}},"template":{"metadata":{"creationTimestamp":null,"labels":{"name":"nginx"}},"spec":{"containers":[{"name":"nginx","image":"nginx","resources":{}}]}},"strategy":{}},"status":{}}'
+kubectl.kubernetes.io/last-applied-configuration": "{\"kind\":\"Service\",\"apiVersion\":\"v1\",\"metadata\":{\"name\":\"svc1\",\"creationTimestamp\":null,\"labels\":{\"app\":\"svc1\"}},\"spec\":{\"ports\":[{\"name\":\"80\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":80}],\"selector\":{\"app\":\"svc1\"},\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"svc1\",\"new-label\":\"foo\"},\"name\":\"svc1\",\"namespace\":\"myproject\"},\"spec\":{\"ports\":[{\"name\":\"80\",\"port\":81,\"protocol\":\"TCP\",\"targetPort\":81}],\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"svc1\",\"new-label\":\"foo\",\"new-label1\":\"foo1\"},\"name\":\"svc1\",\"namespace\":\"myproject\"},\"spec\":{\"ports\":[{\"name\":\"80\",\"port\":81,\"protocol\":\"TCP\",\"targetPort\":81}],\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "{\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"svc1\",\"new-label\":\"foo\",\"new-label2\":\"foo2\"},\"name\":\"svc1\",\"namespace\":\"myproject\"},\"spec\":{\"ports\":[{\"name\":\"80\",\"port\":82,\"protocol\":\"TCP\",\"targetPort\":81}],\"sessionAffinity\":\"None\",\"type\":\"ClusterIP\"},\"status\":{\"loadBalancer\":{}}}\n"
+kubectl.kubernetes.io/last-applied-configuration": "nonempty"
+kubectl.kubernetes.io/last-applied-configuration": "` + originalLastApplied + `"
+kubectl.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
+kubelet.kubernetes.io/foo"] = value
+kubernetes.io/api-version,omitempty"`
+kubernetes.io/arch"
+kubernetes.io/arch":                    "amd64",
+kubernetes.io/arch: amd64
+kubernetes.io/arch="amd64"
+kubernetes.io/arch" instead`,
+kubernetes.io/arch label to be present")
+kubernetes.io/arch to match runtime.GOARCH but got %v", val)
+kubernetes.io/arch"] = value
+kubernetes.io/aws-ebs"
+kubernetes.io/aws-ebs",
+kubernetes.io/aws-ebs volume plugin.
+kubernetes.io/azure-disk
+kubernetes.io/azure-disk"
+kubernetes.io/azure-disk",
+kubernetes.io/azure-file"
+kubernetes.io/azure-file" {
+kubernetes.io/azure-file")
+kubernetes.io/azure-file",
+kubernetes.io/azure-file-resource-group"
+kubernetes.io/basic-auth"
+.kubernetes.io/blah",
+kubernetes.io/blah")
+kubernetes.io/blah"] = "blah"
+kubernetes.io/blah"] = "superblah"
+kubernetes.io/blue",
+kubernetes.io/bootstrapping": "rbac-defaults"}
+kubernetes.io/bootstrapping": "rbac-defaults"})
+kubernetes.io/bootstrapping"] != "rbac-defaults" {
+kubernetes.io/bootstrapping: rbac-defaults
+kubernetes.io/bootstrapping": "rbac-defaults"}; !reflect.DeepEqual(got, want) {
+kubernetes.io/cephfs"
+kubernetes.io/cephfs" {
+kubernetes.io/cephfs")
+kubernetes.io/cephfs",
+kubernetes.io/change-cause"
+kubernetes.io/change-cause.*'
+kubernetes.io/change-cause":"edit test cmd invocation"}
+kubernetes.io/change-cause":"edit test cmd invocation"},
+kubernetes.io/change-cause: foo change cause
+kubernetes.io/change-cause":"original creating command a"}
+kubernetes.io/change-cause: original creating command a
+kubernetes.io/change-cause":"original creating command b"},
+kubernetes.io/change-cause: original creating command b
+kubernetes.io/cinder"
+kubernetes.io/cinder",
+kubernetes.io/cinder volume plugin.
+kubernetes.io/clusterCIDR"
+kubernetes.io/cluster-id":"%s"}`, clusterID)
+kubernetes.io/cluster-service"
+kubernetes.io/cluster-service: "true"
+kubernetes.io/cluster-service=true").
+kubernetes.io/cluster-service=true".
+kubernetes.io/cluster-service=true.
+kubernetes.io/cluster-service=true` is deprecated (only for Addon Manager).
+kubernetes.io/cluster-service=true\n"
+kubernetes.io/config.hash"
+kubernetes.io/config.hash"]
+kubernetes.io/configmap"
+kubernetes.io/config.mirror"
+kubernetes.io/config.mirror]",
+kubernetes.io/config.seen"
+kubernetes.io/config.source"
+kubernetes.io/createdby"
+kubernetes.io/created-for/pvc/name"
+kubernetes.io/created-for/pvc/namespace"
+kubernetes.io/created-for/pv/name"
+kubernetes.io/csi
+kubernetes.io/csi"
+kubernetes.io/csi" {
+kubernetes.io/csi:"
+kubernetes.io/csi`
+kubernetes.io/csi" && claim.Spec.DataSource != nil {
+kubernetes.io/csi:csi-hostpath. It helps to distinguish
+kubernetes.io/csi:" + csiName
+kubernetes.io/csi/pd.csi.storage.gke.io^projects/UNSPECIFIED/zones/UNSPECIFIED/disks/"
+kubernetes.io/csi/volumeDevices/publish/{specName}
+kubernetes.io/csi/volumeDevices/publish/{specName}/{podUID}
+kubernetes.io/csi/volumeDevices/publish/{specName}/{podUID} ... Publish path
+kubernetes.io/csi/volumeDevices/publish/%s/%s", "spec-0", testPodUID)),
+kubernetes.io/csi/volumeDevices/publish/%s/%s", "test.spec.1", testPodUID)),
+kubernetes.io/csi/volumeDevices/publish/<volume name>
+kubernetes.io/csi/volumeDevices/pvc-1d205234-06cd-4fe4-a7ea-0e8f3e2faf5f/dev/e196ebd3-2ab1-4185-bed4-b997ba38d1dc"
+kubernetes.io/csi/volumeDevices/pvc-1d205234-06cd-4fe4-a7ea-0e8f3e2faf5f/dev/e196ebd3-2ab1-4185-bed4-b997ba38d1dc", suffix)
+kubernetes.io/csi/volumeDevices/{specName}/dev
+kubernetes.io/csi/volumeDevices/{specName}/dev/ ... Global map path
+kubernetes.io/csi/volumeDevices/{specName}/dev/{podUID} ... MapFile(Bind mount to publish Path)
+kubernetes.io/csi/volumeDevices/{specVolumeID}/data
+kubernetes.io/csi/volumeDevices/{specVolumeID}/dev
+kubernetes.io/csi/volumeDevices/%s/%s", "spec-0", "dev")),
+kubernetes.io/csi/volumeDevices/%s/%s", "test.spec.1", "dev")),
+kubernetes.io/csi/volumeDevices/staging/{specName}
+kubernetes.io/csi/volumeDevices/staging/{specName} ... Staging path
+kubernetes.io/csi/volumeDevices/staging/%s", "spec-0")),
+kubernetes.io/csi/volumeDevices/staging/%s", "test.spec.1")),
+kubernetes.io/csi/volumeDevices/staging/<volume name>
+kubernetes.io/csi/volumeDevices/<volume name>.
+kubernetes.io/deprecation: 'cloud-provider clusterrole is DEPRECATED in the
+kubernetes.io/deprecation: 'cloud-provider role is DEPRECATED in the
+kubernetes.io/description"
+kubernetes.io/dockercfg"
+kubernetes.io/dockerconfigjson"
+kubernetes.io/dockerconfigjson'
+kubernetes.io/downward-api"
+kubernetes.io/dra"
+kubernetes.io/dra`.
+kubernetes.io/e2e-evict-taint-key",
+kubernetes.io/e2e-evict-taint-key", Value: "evictTaintVal", Effect: v1.TaintEffectNoExecute}},
+kubernetes.io/e2e-evict-taint-key", Value: "evictTaintVal", Effect: v1.TaintEffectNoExecute, TolerationSeconds: &ts}},
+kubernetes.io/e2e-label-key-%s", string(uuid.NewUUID()))
+kubernetes.io/e2e-node-topologyKey"
+kubernetes.io/e2e-pts-filter"
+kubernetes.io/e2e-pts-preemption"
+kubernetes.io/e2e-pts-score"
+kubernetes.io/e2e-scheduling-priorities-%s", string(uuid.NewUUID()[:23])),
+kubernetes.io/e2e-%s", string(uuid.NewUUID()))
+kubernetes.io/e2e-taint-key-001-%s", string(uuid.NewUUID())),
+kubernetes.io/e2e-taint-key-002-%s", string(uuid.NewUUID())),
+kubernetes.io/e2e-taint-key-%s", string(uuid.NewUUID())),
+kubernetes.io/educate-dolphins",
+kubernetes.io/empty-dir"
+kubernetes.io/empty-dir" {
+kubernetes.io/empty-dir",
+kubernetes.io/empty-dir", basePath)
+kubernetes.io/empty-dir", tmpDir)
+kubernetes.io/enforce-mountable-secrets"
+kubernetes.io/enforce-mountable-secrets" annotation set to "true".
+kubernetes.io/fakeAttacher" {
+kubernetes.io/fakeAttacher")
+kubernetes.io/fakeAttacher",
+kubernetes.io/fakeAttacher"}}}}) {
+kubernetes.io/fakeAttacher"}}}}}) {
+kubernetes.io/fakePlugin"
+kubernetes.io/fake-provisioner-type",
+kubernetes.io/fc"
+kubernetes.io/fc" {
+kubernetes.io/fc")
+kubernetes.io/fc") {
+kubernetes.io/fc/50050768030539b6-50050768030539b7-lun-0",
+kubernetes.io/fc/50050768030539b6-lun-0",
+kubernetes.io/fc/50050768030539b6-lun-x",
+kubernetes.io/fc/50060e801049cfd1-lun-0
+kubernetes.io/fc/50060e801049cfd1-lun-0"},
+kubernetes.io/fc/60050763008084e6e0000000000001ae",
+kubernetes.io/fc/60050763008084e6e0000000000001ae-60050763008084e6e0000000000001af",
+kubernetes.io/fc/lun-0",
+kubernetes.io/fc/target1-target2-lun-0
+kubernetes.io/fc/volumeDevices/3600508b400105e210000900000490000"},
+kubernetes.io/fc/volumeDevices/3600508b400105e210000900000490000/
+kubernetes.io/fc/volumeDevices/3600508b400105e210000900000490000/{pod uuid}
+kubernetes.io/fc/volumeDevices/50060e801049cfd1-lun-0/
+kubernetes.io/fc/volumeDevices/50060e801049cfd1-lun-0/{pod uuid}
+kubernetes.io/fc/volumeDevices/target-lun-0
+kubernetes.io/flexvolume"
+kubernetes.io/foo",
+kubernetes.io/foo": "A",
+kubernetes.io/foo-parameter": "free/form/string",
+kubernetes.io/foo-provisioner",
+kubernetes.io/foo]":       "reserved",
+kubernetes.io/fsType"
+kubernetes.io/gce-pd
+kubernetes.io/gce-pd"
+kubernetes.io/gce-pd" {
+kubernetes.io/gce-pd")
+kubernetes.io/gce-pd",
+kubernetes.io/gce-pd/"
+kubernetes.io/gce-pd/mounts/gce-pd",
+kubernetes.io/gce-pd/mounts/gce-pd"},
+kubernetes.io/gce-pd/mounts/gce-pd2",
+kubernetes.io/gce-pd/mounts/gce-pd2"},
+kubernetes.io/gce-pd" or "kubernetes.io/aws-ebs".
+kubernetes.io/gce-pd/<volName> should not be marked when CSI Migration is on
+kubernetes.io/gce-pd/volumeDevices/pdVol1
+kubernetes.io/gce-pd/volumeDevices/pdVol1"
+kubernetes.io/gce-pd/volumeDevices/vol-XXXXXX
+kubernetes.io/git-repo"
+kubernetes.io/git-repo" {
+kubernetes.io/git-repo")
+kubernetes.io/glusterfs",
+kubernetes.io/glusterfs", "Delete",
+kubernetes.io/h2c' - HTTP/2 over cleartext as described in https://www.rfc-editor.org/rfc/rfc7540
+kubernetes.io/hostname
+kubernetes.io/hostname"
+kubernetes.io/hostname") ||
+kubernetes.io/hostname",
+kubernetes.io/hostname"]
+kubernetes.io/hostname"])
+kubernetes.io/hostname.
+kubernetes.io/hostname":"127.0.0.1"
+kubernetes.io/hostname":"127.0.0.2"
+kubernetes.io/hostname": basePod.Spec.NodeName},
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetBlockDev, &hostPathBlockDev)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetBlockDev, &hostPathUnset)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetCharDev, &hostPathCharDev)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetCharDev, &hostPathUnset)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetDir, fmt.Sprintf("%s is not a block device", targetDir), &hostPathBlockDev)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetDir, &hostPathDirectory)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetDir, &hostPathDirectoryOrCreate)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetDir, &hostPathUnset)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetFile, &hostPathFile)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetFile, &hostPathFileOrCreate)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetFile, &hostPathUnset)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetSocket, &hostPathSocket)
+kubernetes.io/hostname": basePod.Spec.NodeName}, targetSocket, &hostPathUnset)
+kubernetes.io/hostname":"control-plane-foo"}},"spec":{},"status":{"daemonEndpoints":{"kubeletEndpoint":{"Port":0}},"nodeInfo":{"machineID":"","systemUUID":"","bootID":"","kernelVersion":"","osImage":"","containerRuntimeVersion":"","kubeletVersion":"","kubeProxyVersion":"","operatingSystem":"","architecture":""}}}`),
+kubernetes.io/hostname", each Node is a domain of that topology.
+kubernetes.io/hostname": hostname,
+kubernetes.io/hostname": idr.controlPlaneName,
+kubernetes.io/hostname=knode-abc123"
+kubernetes.io/hostname label.
+kubernetes.io/hostname label on node %s", nodeName)
+kubernetes.io/hostname":                "master01",
+kubernetes.io/hostname="master01"
+kubernetes.io/hostname"] = name
+kubernetes.io/hostname": "node-a"},
+kubernetes.io/hostname: node-default-pool-something
+kubernetes.io/hostname": nodeHostNameLabel}
+kubernetes.io/hostname": nodeHostNameLabel},
+kubernetes.io/hostname": nodeName,
+kubernetes.io/hostname": testNodeName}
+kubernetes.io/hostname: the value indicates the hostname of the node
+kubernetes.io/hostname"] = value
+kubernetes.io/host-path
+kubernetes.io/host-path"
+kubernetes.io/host-path",
+kubernetes.io/hostpath"
+kubernetes.io/ingress.allow-http"
+kubernetes.io/ingress.class"
+kubernetes.io/ingress.class`
+kubernetes.io/ingress.class`.
+kubernetes.io/ingress.class` annotation (simple constant name) was never
+kubernetes.io/ingress.global-static-ip-name"
+kubernetes.io/ingress.global-static-ip-name: "staticip"
+kubernetes.io/invalid/provisioner",
+kubernetes.io/iscsi"
+kubernetes.io/iscsi" {
+kubernetes.io/iscsi")
+kubernetes.io/iscsi",
+kubernetes.io/iscsi/" + devicePath)
+kubernetes.io/iscsi/iface-default/127.0.0.1:3260-iqn.2003-01.org.linux-iscsi.f21.x8664:sn.4b0aae584f7c-lun-0",
+kubernetes.io/iscsi/iface-default/127.0.0.1:3260-iqn.2003-01.org.linux-iscsi.f21.x8664:sn.4b0aae584f7c-lun-0 rw,relatime shared:421 - ext4 /dev/sda rw,context="system_u:object_r:container_file_t:s0:c314,c894",data=ordered
+kubernetes.io/iscsi/iface-default/" + devicePath
+kubernetes.io/iscsi/iface-" + ifaceName + "/" + devicePath)
+kubernetes.io/iscsi/iface_name/portal-some_iqn-lun-lun_id
+kubernetes.io/iscsi/{ifaceName}/{portal-some_iqn-lun-lun_id}
+kubernetes.io/iscsi/volumeDevices/default/127.0.0.1:3260-iqn.2014-12.server:storage.target01-lun-0"
+kubernetes.io/iscsi/volumeDevices/iface-default/127.0.0.1:3260-iqn.2014-12.server:storage.target01"
+kubernetes.io/iscsi/volumeDevices/iface-default/127.0.0.1:3260-iqn.2014-12.server:storage.target01-lun-0"
+kubernetes.io/iscsi/volumeDevices/iface-default/192.168.0.10:3260-iqn.2017-05.com.example:test-lun-0
+kubernetes.io/iscsi/volumeDevices/iface-default/192.168.0.10:3260-iqn.2017-05.com.example:test-lun-0/{pod uuid}
+kubernetes.io/iscsi/volumeDevices/iface_name/portal-some_iqn-lun-lun_id
+kubernetes.io/kube-apiserver-client
+kubernetes.io/kube-apiserver-client"
+kubernetes.io/kube-apiserver-client")
+kubernetes.io/kube-apiserver-client",
+kubernetes.io/kube-apiserver-client.
+kubernetes.io/kube-apiserver-client"} 6`,
+kubernetes.io/kube-apiserver-client"} 7`,
+kubernetes.io/kube-apiserver-client and contains an unexpected usage",
+kubernetes.io/kube-apiserver-client certificate controller: %v", err)
+kubernetes.io/kube-apiserver-client": issues client certificates that can be used to authenticate to kube-apiserver.
+kubernetes.io/kube-apiserver-client-kubelet
+kubernetes.io/kube-apiserver-client-kubelet"
+kubernetes.io/kube-apiserver-client-kubelet")
+kubernetes.io/kube-apiserver-client-kubelet",
+kubernetes.io/kube-apiserver-client-kubelet".
+kubernetes.io/kube-apiserver-client-kubelet certificate controller: %v", err)
+kubernetes.io/kube-apiserver-client-kubelet" issues client certificates that kubelets use to authenticate to kube-apiserver.
+kubernetes.io/kube-apiserver-client-kubelet": issues client certificates that kubelets use to authenticate to kube-apiserver.
+kubernetes.io/kube-apiserver-client-kubelet signer.  If specified, --cluster-signing-{cert,key}-file must not be set.")
+kubernetes.io/kube-apiserver-client-kubelet" signerName).
+kubernetes.io/kube-apiserver-client signer.  If specified, --cluster-signing-{cert,key}-file must not be set.")
+kubernetes.io/kube-apiserver-client" signer issues client certificates that can be used to authenticate to kube-apiserver.
+kubernetes.io/kube-apiserver-client" signerName),
+kubernetes.io/kube-apiserver-client signer with system:masters group is not allowed`,
+kubernetes.io/kube-apiserver-client`, that its organization (group)
+kubernetes.io/kubelet`.
+kubernetes.io/kubelet-serving
+kubernetes.io/kubelet-serving"
+kubernetes.io/kubelet-serving")
+kubernetes.io/kubelet-serving",
+kubernetes.io/kubelet-serving".
+kubernetes.io/kubelet-serving certificate controller: %v", err)
+kubernetes.io/kubelet-serving" issues serving certificates that kubelets use to serve TLS endpoints,
+kubernetes.io/kubelet-serving" issues serving certificates that kubelets use to serve TLS endpoints, which kube-apiserver can connect to securely.
+kubernetes.io/kubelet-serving signer
+kubernetes.io/kubelet-serving signer.  If specified, --cluster-signing-{cert,key}-file must not be set.")
+kubernetes.io/kubelet-serving" signerName).
+kubernetes.io/kubernetes.io/local-volume/volumeDevices/{volumeName}
+kubernetes.io/legacy-token-last-used"
+kubernetes.io/legacy-unknown
+kubernetes.io/legacy-unknown"
+kubernetes.io/legacy-unknown" {
+kubernetes.io/legacy-unknown")
+kubernetes.io/legacy-unknown",
+kubernetes.io/legacy-unknown".
+kubernetes.io/legacy-unknown certificate controller: %v", err)
+kubernetes.io/legacy-unknown signer.  If specified, --cluster-signing-{cert,key}-file must not be set.")
+kubernetes.io/legacy-unknown", "./testdata/ca.crt", "./testdata/ca.key", nil, 1*time.Hour)
+kubernetes.io/legacy-unknown": the legacy signerName is not allowed via this API version`},
+kubernetes.io/limit-ranger"
+kubernetes.io/local-volume"
+kubernetes.io/local-volume",
+kubernetes.io/local-volume/mounts
+kubernetes.io/local-volume/mounts/localpv.spec.Name;
+kubernetes.io/local-volume/mounts/pvA"
+kubernetes.io/metadata.name
+kubernetes.io/metadata.name"
+kubernetes.io/metadata.name",
+kubernetes.io/metadata.name label
+kubernetes.io/metadata.name"] = s.Name
+kubernetes.io/mock-provisioner"
+kubernetes.io/mock-volume"
+kubernetes.io/mounterArgs.FsGroup"
+kubernetes.io/name"]
+kubernetes.io/name: "CoreDNS"
+kubernetes.io/name: "GLBC"
+kubernetes.io/name: "GLBCDefaultBackend"
+kubernetes.io/name: "KubeDNS"
+kubernetes.io/name: "KubeDNSUpstream"
+kubernetes.io/name: "Metrics-server"
+kubernetes.io/nfs"
+kubernetes.io/nfs" {
+kubernetes.io/nfs")
+kubernetes.io/nfs",
+kubernetes.io/nfs", "Delete",
+kubernetes.io/nfs", "Retain",
+kubernetes.io/node-topologyKey"
+kubernetes.io/no-provisioner"
+kubernetes.io/no-provisioner",
+kubernetes.io/not-a-real-signer",
+kubernetes.io/not-recognised",
+kubernetes.io/os"
+kubernetes.io/os",
+kubernetes.io/os: {}
+kubernetes.io/os" instead`,
+kubernetes.io/os` label doesn't match node label",
+kubernetes.io/os label to be present")
+kubernetes.io/os":                      "linux",
+kubernetes.io/os":             "linux",
+kubernetes.io/os": "linux",
+kubernetes.io/os": "linux"}
+kubernetes.io/os: linux
+kubernetes.io/os="linux"
+kubernetes.io/os": "linux"}.AsSelector()
+kubernetes.io/os": os,
+kubernetes.io/os to match runtime.GOOS but got %v", val)
+kubernetes.io/os"] = value
+kubernetes.io/os": "windows",
+kubernetes.io/os": "windows"}
+kubernetes.io/os": "windows"},
+kubernetes.io/os"], "windows")
+kubernetes.io/os: windows
+kubernetes.io/os=windows
+kubernetes.io/os=windows \
+kubernetes.io/os=windows"
+kubernetes.io/os": "windows"}.AsSelector()
+kubernetes.io/os=windows -o name)
+kubernetes.io/otherblah"] = "doh"
+kubernetes.io/pd/some-random-clusterb9772-pvc-72e1c7f1-fd41-11e6-94d4-42010a800049
+kubernetes.io/pd/some-random-clusterb9772-pvc-8895a852-fd42-11e6-94d4-42010a800049
+kubernetes.io/pd/some-random-clusterb9772-pvc-8bf50554-fd42-11e6-94d4-42010a800049
+kubernetes.io/pd/some-random-clusterb9772-pvc-8fb5e386-4641-11e7-a490-42010a800283
+kubernetes.io/pd/some-random-clusterb9772-pvc-c2435a06-14d7-11e7-9baf-42010a800049
+kubernetes.io/pd/some-random-clusterb9772-pvc-c787c67d-14d7-11e7-9baf-42010a800049
+kubernetes.io/pod.name"
+kubernetes.io/pod.namespace"
+kubernetes.io/pods-to-activate"
+kubernetes.io/pod.uid"
+kubernetes.io/portworx-volume"
+kubernetes.io/portworx-volume" {
+kubernetes.io/portworx-volume")
+kubernetes.io/projected"
+kubernetes.io/pv-controller"
+kubernetes.io/pvc-protection"
+kubernetes.io/pvOrVolumeName"
+kubernetes.io/pv-protection"
+kubernetes.io/rbd
+kubernetes.io/rbd"
+kubernetes.io/rbd" {
+kubernetes.io/rbd")
+kubernetes.io/rbd",
+kubernetes.io/rbd/mounts", fmt.Sprintf("%s-image-%s", pool, image))
+kubernetes.io/rbd/mounts/pool1-image-image1"),
+kubernetes.io/rbd/mounts/pool2-image-image2"),
+kubernetes.io/rbd/mounts/pool2-image-image2", tmpDir),
+kubernetes.io/rbd/mounts/{pool}-image-{image}.
+kubernetes.io/rbd/mounts/pool-image-image.
+kubernetes.io/rbd/mounts/%s-image-%s", pool, image))
+kubernetes.io/rbd/rbd
+kubernetes.io/rbd/rbd", fmt.Sprintf("%s-image-%s", pool, image))
+kubernetes.io/rbd/rbd/pool1-image-image1", tmpDir),
+kubernetes.io/rbd/rbd/{pool}-image-{image}.
+kubernetes.io/rbd/rbd/pool-image-image.
+kubernetes.io/rbd/rbd/%s-image-%s", pool, image))
+kubernetes.io/rbd/volumeDevices/pdVol1
+kubernetes.io/rbd/volumeDevices/pool-image-image.
+kubernetes.io/rbd/volumeDevices/volumes-image-volume-a4b47414-a675-47dc-a9cc-c223f13439b0"
+kubernetes.io/readwrite"
+kubernetes.io/resource-foo",
+kubernetes.io/role"
+kubernetes.io/role="master" label
+kubernetes.io/role": "node"},
+kubernetes.io/role="<role>" label
+kubernetes.io/runtimehandler",
+kubernetes.io/runtimehandler": "handler",
+kubernetes.io/runtimehandler": "handler_name",
+kubernetes.io/runtimehandler", Value: "handler_name"},
+kubernetes.io/secret"
+kubernetes.io/serviceaccount
+kubernetes.io/serviceaccount"
+kubernetes.io/serviceaccount",
+kubernetes.io/serviceaccount/ca.crt
+kubernetes.io/serviceaccount/ca.crt"
+kubernetes.io/serviceaccount/ca.crt",
+kubernetes.io/service-account.name"
+kubernetes.io/service-account.name]
+kubernetes.io/serviceAccount.name"
+kubernetes.io/serviceaccount/namespace"`
+kubernetes.io/serviceaccount/namespace.
+kubernetes.io/serviceaccount/namespace"); err == nil {
+kubernetes.io/service-account.name"] - the name of the ServiceAccount the token identifies
+kubernetes.io/serviceaccount` path when the
+kubernetes.io/serviceaccount/secret.name"`
+kubernetes.io/serviceaccount/service-account.name"`
+kubernetes.io/serviceaccount/service-account.uid"`
+kubernetes.io/service-account-token"
+kubernetes.io/service-account-token",
+kubernetes.io/serviceaccount/token
+kubernetes.io/serviceaccount/token"
+kubernetes.io/serviceaccount/token")
+kubernetes.io/serviceaccount/token",
+kubernetes.io/service-account-token", int64(0), "0s"}}},
+kubernetes.io/service-account-token", int64(1), "0s"}}},
+kubernetes.io/service-account-token secret validation
+kubernetes.io/service-account.uid"
+kubernetes.io/service-account.uid] and Data[token]) might be contributed later by a controller loop
+kubernetes.io/service-account.uid"] - the UID of the ServiceAccount the token identifies
+kubernetes.io/service-name"
+kubernetes.io/service-name"`
+kubernetes.io/service-name":"foo-svc"}`,
+kubernetes.io/service-name=" + j.Name
+kubernetes.io/service-name label"),
+kubernetes.io/service-name=" + name,
+kubernetes.io/service-name":"%s"}`, am.serviceName),
+kubernetes.io/service-name=" + serviceName,
+kubernetes.io/service-name":"%s", "kubernetes.io/service-ip":"%s"}`,
+kubernetes.io/service-name":"%s"}`, nm.String())
+kubernetes.io/service-name":"%s"}`, serviceName)
+kubernetes.io/service-name":"%s"}`, serviceName),
+kubernetes.io/service-name":"%s"}`, types.NamespacedName{Name: svc.Name, Namespace: svc.Namespace}.String()),
+kubernetes.io/service-name":"/`+svc.Name+`"}`)
+kubernetes.io/service-name=" + svc.Name,
+kubernetes.io/some-plugin/...
+kubernetes.io/some-plugin/mounts/volume-XXXX
+kubernetes.io/some-plugin/mounts/volume-XXXX",
+kubernetes.io/something")
+kubernetes.io/ssh-auth"
+kubernetes.io/testPlugin"
+kubernetes.io/tls
+kubernetes.io/tls"
+kubernetes.io/tls".
+kubernetes.io/tls'
+kubernetes.io/tls", then "literals" or "files" must have exactly two
+kubernetes.io/unknown",
+kubernetes.io/vsphere-volume
+kubernetes.io/vsphere-volume"
+kubernetes.io/vsphere-volume" {
+kubernetes.io/vsphere-volume")
+kubernetes.io/vsphere-volume",
+kubernetes.io/vsphere-volume/mounts/<name>
+kubernetes.io/vsphere-volume/volumeDevices/
+kubernetes.io/vsphere-volume/volumeDevices/[datastore1]\\040volumes/myDisk
+kubernetes.io/vsphere-volume/volumeDevices/volPath1"
+kubernetes.io/will/not/work/", false, ""},
+.metadata.annotations.applyset.kubernetes.io/contains-group-resources"))}, nil
+metadata.annotations.scheduler.alpha.kubernetes.io/preferAvoidPods[0].PodSignature.PodController.Controller": true,
+metadata.annotations.scheduler.alpha.kubernetes.io/preferAvoidPods[0].PodSignature":                          true,
+node.alpha.kubernetes.io/ttl"
+node.alpha.kubernetes.io/ttl":                           "0",
+node.alpha.kubernetes.io/ttl": "0"}}},
+node.alpha.kubernetes.io/ttl: "0"
+node.alpha.kubernetes.io/ttl="0"
+node.alpha.kubernetes.io/ttl\":\"0\"}}}",
+node.alpha.kubernetes.io/ttl": "0", "a": "b"}}},
+node.alpha.kubernetes.io/ttl\":\"10\"}}}",
+node.alpha.kubernetes.io/ttl": "10", "a": "b"}}},
+node.alpha.kubernetes.io/ttl\":\"15\"}}}",
+node.alpha.kubernetes.io/ttl\":\"30\"}}}",
+node.alpha.kubernetes.io/ttl": "60"}}},
+node.alpha.kubernetes.io/ttl\":\"60\"}}}",
+node.cloudprovider.kubernetes.io/shutdown"
+node.cloudprovider.kubernetes.io/uninitialized"
+node.cloudprovider.kubernetes.io/uninitialized",
+node.cloudprovider.kubernetes.io/uninitialized") should not be
+node.kubernetes.io/disk-pressure"
+node.kubernetes.io/exclude-disruption"
+node.kubernetes.io/exclude-disruption label": {
+node.kubernetes.io/exclude-disruption": "true",
+node.kubernetes.io/exclude-disruption": "true"},
+node.kubernetes.io/exclude-from-external-load-balancers"
+node.kubernetes.io/exclude-from-external-load-balancers".
+node.kubernetes.io/exclude-from-external-load-balancers" will
+node.kubernetes.io/foo"] = value
+node.kubernetes.io/instance-type"
+node.kubernetes.io/instance-type=<instance-type>
+node.kubernetes.io/instance-type"] = value
+node.kubernetes.io/kube-proxy-ds-ready: "true"
+node.kubernetes.io/kube-proxy-ds-ready=true"
+node.kubernetes.io/masq-agent-ds-ready: "true"
+node.kubernetes.io/memory-pressure"
+node.kubernetes.io/network-unavailable"
+node.kubernetes.io/not-ready
+node.kubernetes.io/not-ready"
+node.kubernetes.io/not-ready:NoExecute.
+node.kubernetes.io/not-ready", Operator: "Exists", Effect: "NoExecute", TolerationSeconds: &[]int64{-2}[0]}}),
+node.kubernetes.io/not-ready", Operator: "Exists", Effect: "NoSchedule", TolerationSeconds: &[]int64{20}[0]}}),
+node.kubernetes.io/os
+node.kubernetes.io/os:NoSchedule-
+-node.kubernetes.io/os=win1809:NoSchedule}
+-node.kubernetes.io/os=win1809:NoSchedule}"
+node.kubernetes.io/out-of-service"
+node.kubernetes.io/out-of-service", deleteCount)
+node.kubernetes.io/out-of-service` taint.
+node.kubernetes.io/out-of-service taint and hence it will not wait for
+node.kubernetes.io/out-of-service taint and hence it will wait for
+node.kubernetes.io/out-of-service taint present.
+node.kubernetes.io/out-of-service taint with NoExecute effect, skip verifySafeToDetach check
+node.kubernetes.io/pid-pressure"
+node.kubernetes.io/unreachable
+node.kubernetes.io/unreachable"
+node.kubernetes.io/unschedulable"
+node.kubernetes.io/unschedulable, effect:NoSchedule} taint.
+node.kubernetes.io/windows-build"
+node-restriction.kubernetes.io/foo"] = value
+node-role.kubernetes.io/control-plane
+node-role.kubernetes.io/control-plane"
+node-role.kubernetes.io/control-plane" {
+node-role.kubernetes.io/control-plane": ""}},
+node-role.kubernetes.io/control-plane"]
+node-role.kubernetes.io/control-plane"}]}}`,
+node-role.kubernetes.io/control-plane`,
+node-role.kubernetes.io/control-plane", Effect: "NoSchedule"}},
+node-role.kubernetes.io/control-plane"},{"effect":"NoSchedule","key":"node.cloudprovider.kubernetes.io/uninitialized"}]}}`,
+node-role.kubernetes.io/control-plane":"","node.kubernetes.io/exclude-from-external-load-balancers":""}}}`,
+node-role.kubernetes.io/control-plane,node-role.kubernetes.io/master`, "Nodes with taints in this comma-delimited list will not block the test framework from starting tests. The default taint 'node-role.kubernetes.io/master' is DEPRECATED and will be removed from the list in a future release.")
+node-role.kubernetes.io/control-plane"]; ok {
+node-role.kubernetes.io/control-plane": "true",
+node-role.kubernetes.io/control-plane="true"
+node-role.kubernetes.io/master
+node-role.kubernetes.io/master" {
+node-role.kubernetes.io/master"]
+node-role.kubernetes.io/master: ""
+node-role.kubernetes.io/master": "", "node-role.kubernetes.io/control-plane": "", "node-role.kubernetes.io/proxy": "", "kubernetes.io/role": "node"},
+node-role.kubernetes.io/master=:NoSchedule"
+node-role.kubernetes.io/master"]; ok {
+node-role.kubernetes.io/master taint in 1.25 or later.
+node-role.kubernetes.io/master":        "true",
+node-role.kubernetes.io/master="true"`,
+node-role.kubernetes.io/worker: ""
+nodeTopology.matchLabels.beta.kubernetes.io/arch: deprecated since v1.14; use "kubernetes.io/arch" instead`,
+nodeTopology.matchLabels.beta.kubernetes.io/os: deprecated since v1.14; use "kubernetes.io/os" instead`,
+other.kubernetes.io/foo"] = value
+pdb.kubernetes.io/deprecated-v1beta1-empty-selector-match"
+pdb.kubernetes.io/deprecated-v1beta1-empty-selector-match",
+pod.alpha.kubernetes.io/init-container-statuses": true,
+pod.alpha.kubernetes.io/init-containers":         true,
+pod.alpha.kubernetes.io/opaque-int-resource-foo",
+pod.beta.kubernetes.io/init-container-statuses":  true,
+pod.beta.kubernetes.io/init-containers":          true,
+pod-security.kubernetes.io/enforce": "baseline"}}}
+pod-security.kubernetes.io/enforce": "baseline", "pod-security.kubernetes.io/warn": "baseline", "pod-security.kubernetes.io/audit": "baseline"}}}
+pod-security.kubernetes.io/enforce": "invalid",
+pod-security.kubernetes.io/enforce": "privileged"}}}
+pod-security.kubernetes.io/enforce": "restricted"}}}
+pod-security.kubernetes.io/enforce: restricted
+pod-security.kubernetes.io/warn": "baseline"}}}
+pod-security.kubernetes.io/warn": "baseline", "pod-security.kubernetes.io/audit": "restricted"}}}
+pod-security.kubernetes.io/warn": "restricted"}}}
+prefix.kubernetes.io/blah",
+prefix.kubernetes.io/foo/bar",
+pv.beta.kubernetes.io/gid"
+pv.kubernetes.io/bind-completed"
+pv.kubernetes.io/bind-completed: "true"
+pv.kubernetes.io/bound-by-controller"
+pv.kubernetes.io/migrated-to"
+pv.kubernetes.io/migrated-to" annotation if migration with the CSI
+pv.kubernetes.io/provisioned-by"
+rbac.authorization.kubernetes.io/autoupdate"
+rbac.authorization.kubernetes.io/autoupdate"] != "false" {
+rbac.authorization.kubernetes.io/autoupdate"] = "false"
+rbac.authorization.kubernetes.io/autoupdate: false)"
+rbac.authorization.kubernetes.io/autoupdate\"] should be %v, got %v", publicInfoViewerRoleBinding.Annotations["rbac.authorization.kubernetes.io/autoupdate"], "false")
+rbac.authorization.kubernetes.io/autoupdate: "true"
+scheduler.alpha.kubernetes.io/critical-pod: ""
+scheduler.alpha.kubernetes.io/critical-pod: {}
+scheduler.alpha.kubernetes.io/critical-pod`,
+scheduler.alpha.kubernetes.io/critical-pod]: non-functional in v1.16+; use the "priorityClassName" field instead`,
+scheduler.alpha.kubernetes.io/critical-pod`:         `true`,
+scheduler.alpha.kubernetes.io/defaultTolerations"
+scheduler.alpha.kubernetes.io/defaultTolerations and
+scheduler.alpha.kubernetes.io/node-selector
+scheduler.alpha.kubernetes.io/node-selector"}
+scheduler.alpha.kubernetes.io/node-selector is for assigning
+scheduler.alpha.kubernetes.io/node-selector": test.namespaceNodeSelector}
+scheduler.alpha.kubernetes.io/preferAvoidPods"
+scheduler.alpha.kubernetes.io/preferAvoidPods and
+scheduler.alpha.kubernetes.io/taints"
+scheduler.alpha.kubernetes.io/tolerations"
+scheduler.alpha.kubernetes.io/tolerationsWhitelist"
+scheduler.alpha.kubernetes.io/tolerationsWhitelist annotations
+scheduler.alpha.kubernetes.io/tolerationsWhitelist". If these keys are
+seccomp.security.alpha.kubernetes.io/allowedProfileNames"
+seccomp.security.alpha.kubernetes.io/defaultProfileName"
+seccomp.security.alpha.kubernetes.io/pod"
+seccomp.security.alpha.kubernetes.io/pod']
+seccomp.security.alpha.kubernetes.io/pod: {}
+seccomp.security.alpha.kubernetes.io/pod`:           `default`,
+seccomp.security.alpha.kubernetes.io/pod]: non-functional in v1.27+; use the "seccompProfile" field instead`,
+seccomp.security.alpha.kubernetes.io/pod": "runtime/default",
+seccomp.security.alpha.kubernetes.io/pod: runtime/default
+seccomp.security.alpha.kubernetes.io/pod":         "unconfined",
+seccomp.security.alpha.kubernetes.io/pod": "unconfined",
+seccomp.security.alpha.kubernetes.io/pod: unconfined
+seccomp.security.alpha.kubernetes.io/pod="unconfined"`,
+security.alpha.kubernetes.io/sysctls`,
+security.alpha.kubernetes.io/sysctls`:               `a,b,c`,
+security.alpha.kubernetes.io/sysctls]: non-functional in v1.11+; use the "sysctls" field instead`,
+security.alpha.kubernetes.io/unsafe-sysctls`,
+security.alpha.kubernetes.io/unsafe-sysctls`:        `d,e,f`,
+security.alpha.kubernetes.io/unsafe-sysctls]: non-functional in v1.11+; use the "sysctls" field instead`,
+service.alpha.kubernetes.io/app-protocols"
+service.alpha.kubernetes.io/app-protocols: '{"http2":"HTTP2"}'
+service.alpha.kubernetes.io/tolerate-unready-endpoints` on the governing service
+service.beta.kubernetes.io/azure-allowed-service-tags"
+service.beta.kubernetes.io/azure-dns-label-name"
+service.beta.kubernetes.io/azure-load-balancer-disable-tcp-reset": "true"}, false, 80)
+service.beta.kubernetes.io/azure-load-balancer-disable-tcp-reset": "true"}, false, 80),
+service.beta.kubernetes.io/azure-load-balancer-disable-tcp-reset": "True"}, false, 80),
+service.beta.kubernetes.io/azure-load-balancer-enable-high-availability-ports"
+service.beta.kubernetes.io/azure-load-balancer-enable-high-availability-ports": "true",
+service.beta.kubernetes.io/azure-load-balancer-health-probe-protocol"
+service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path"
+service.beta.kubernetes.io/azure-load-balancer-internal"
+service.beta.kubernetes.io/azure-load-balancer-internal-subnet"
+service.beta.kubernetes.io/azure-load-balancer-internal":                       "true",
+service.beta.kubernetes.io/azure-load-balancer-mode"
+service.beta.kubernetes.io/azure-load-balancer-mode")
+service.beta.kubernetes.io/azure-load-balancer-mode`, If set to false, the same standard load balancer
+service.beta.kubernetes.io/azure-load-balancer-resource-group"
+service.beta.kubernetes.io/azure-load-balancer-tcp-idle-timeout"
+service.beta.kubernetes.io/azure-pip-ip-tags"
+service.beta.kubernetes.io/azure-pip-name"
+service.beta.kubernetes.io/azure-pip-tags"
+service.beta.kubernetes.io/azure-shared-securityrule"
+service.beta.kubernetes.io/load-balancer-source-ranges"
+service.kubernetes.io/headless
+service.kubernetes.io/headless"
+service.kubernetes.io/headless annotation")
+service.kubernetes.io/headless", func(ctx context.Context) {
+service.kubernetes.io/headless label")
+service.kubernetes.io/load-balancer-cleanup"
+service.kubernetes.io/service-proxy-name"
+service.kubernetes.io/service-proxy-name": "foo-bar"}
+service.kubernetes.io/service-proxy-name", func(ctx context.Context) {
+service.kubernetes.io/topology-aware-hints"
+service.kubernetes.io/topology-aware-hints` and
+service.kubernetes.io/topology-aware-hints" annotation on this Service is set to "Auto"
+service.kubernetes.io/topology-aware-hints` has precedence.
+service.kubernetes.io/topology-mode"
+service.kubernetes.io/topology-mode`
+service.kubernetes.io/topology-mode` annotations are set, the value of
+snapshot.storage.kubernetes.io/deletion-secret-name"
+snapshot.storage.kubernetes.io/deletion-secret-namespace"
+snapshot.storage.kubernetes.io/pvc-as-source-protection"
+snapshot.storage.kubernetes.io/volumesnapshot-bound-protection"
+snapshot.storage.kubernetes.io/volumesnapshotcontent-bound-protection"
+spec.pod.beta.kubernetes.io/statefulset-index']",
+spec.pod.beta.kubernetes.io/statefulset-index": "1",
+spec.pod.beta.kubernetes.io/statefulset-index": "1"},
+statefulset.kubernetes.io/pod-name"
+storage.alpha.kubernetes.io/migrated-plugins"
+storageclass.beta.kubernetes.io/is-default-class"
+storageclass.kubernetes.io/is-default-class"
+storageclass.kubernetes.io/is-default-class: "true"
+subdomain.kubernetes.io/something")
+testgrid.kubernetes.io/sig-instrumentation-tests#kind-json-logging-master
+test.volume.kubernetes.io/finalizer"
+topology.kubernetes.io/region"
+topology.kubernetes.io/region",
+topology.kubernetes.io/region=<region>
+topology.kubernetes.io/region", "region-a").
+topology.kubernetes.io/region": "region-a",
+topology.kubernetes.io/region": {"region-a"},
+topology.kubernetes.io/region", "region-b").
+topology.kubernetes.io/region": "region-b",
+topology.kubernetes.io/region": {"region-b"},
+topology.kubernetes.io/region", "region-c").
+topology.kubernetes.io/region": "region-c",
+topology.kubernetes.io/region": {"region-c"},
+topology.kubernetes.io/region: the value indicates the region where the
+topology.kubernetes.io/region": "us-central1",
+topology.kubernetes.io/region: us-central1
+topology.kubernetes.io/region=us-central1
+topology.kubernetes.io/region":            "us-west",
+topology.kubernetes.io/region"] = value
+topology.kubernetes.io/region: westus
+topology.kubernetes.io/test1",
+topology.kubernetes.io/test1:DoNotSchedule when max skew 3 is exceeded for selector key1=val1,key2=val2\n") ||
+topology.kubernetes.io/test2",
+topology.kubernetes.io/test2:ScheduleAnyway when max skew 1 is exceeded\n") {
+topology.kubernetes.io/zone
+topology.kubernetes.io/zone"
+topology.kubernetes.io/zone",
+-topology.kubernetes.io/zone}: ${ZONE}"
+topology.kubernetes.io/zone: "0"
+topology.kubernetes.io/zone", each zone is a domain of that topology.
+topology.kubernetes.io/zone: the value indicates the zone where the
+topology.kubernetes.io/zone":   "us-central1-a",
+topology.kubernetes.io/zone=us-central1-a
+topology.kubernetes.io/zone":   "us-central1-b",
+topology.kubernetes.io/zone: us-central1-b
+topology.kubernetes.io/zone=us-central1-b
+topology.kubernetes.io/zone=us-east1"
+topology.kubernetes.io/zone":              "us-west-1a",
+topology.kubernetes.io/zone"] = value
+topology.kubernetes.io/zone": "z1", "topology.kubernetes.io/region": "r1"},
+topology.kubernetes.io/zone=<zone>
+topology.kubernetes.io/zone":   "zone-a",
+topology.kubernetes.io/zone":   {"zone-a"},
+topology.kubernetes.io/zone", "zone-a").Node,
+topology.kubernetes.io/zone":   "zone-b",
+topology.kubernetes.io/zone":   {"zone-b"},
+topology.kubernetes.io/zone", "zone-b").Node,
+topology.kubernetes.io/zone":   "zone-c",
+topology.kubernetes.io/zone":   {"zone-c"},
+topology.kubernetes.io/zone", "zone-c").Node,
+volume.alpha.kubernetes.io/pre-resize-capacity"
+volume.alpha.kubernetes.io/pre-resize-capacity from the pv
+volume.alpha.kubernetes.io/storage-class": "anything",
+volume.beta.kubernetes.io/mount-options"
+volume.beta.kubernetes.io/storage-class"
+volume.beta.kubernetes.io/storage-class\"",
+volume.beta.kubernetes.io/storage-class: nginx-sc
+volume.beta.kubernetes.io/storage-provisioner"
+volume.kubernetes.io/selected-node"
+volume.kubernetes.io/selected-node"]
+volume.kubernetes.io/selected-node": node1}
+volume.kubernetes.io/storage-provisioner"
+volume.kubernetes.io/storage-provisioner"] = class.Provisioner
+volume.kubernetes.io/storage-resizer"
+volumes.kubernetes.io/controller-managed-attach-detach"
+volumes.kubernetes.io/controller-managed-attach-detach": "true",
+volumes.kubernetes.io/controller-managed-attach-detach: "true"
+volumes.kubernetes.io/controller-managed-attach-detach="true"`,
+volumes.kubernetes.io/keep-terminated-pod-volumes"
