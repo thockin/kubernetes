@@ -20660,6 +20660,7 @@ func TestValidPodLogOptions(t *testing.T) {
 		{core.PodLogOptions{SinceSeconds: &positive}, 0},
 		{core.PodLogOptions{SinceSeconds: &zero}, 1},
 		{core.PodLogOptions{SinceTime: &now}, 0},
+		{core.PodLogOptions{SinceTime: &now, SinceSeconds: &positive}, 1},
 	}
 	for i, test := range tests {
 		errs := ValidatePodLogOptions(&test.opt)

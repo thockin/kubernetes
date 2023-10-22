@@ -2868,7 +2868,7 @@ func validatePodResourceClaim(podMeta *metav1.ObjectMeta, claim core.PodResource
 func validatePodResourceClaimSource(claimSource core.ClaimSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if claimSource.ResourceClaimName != nil && claimSource.ResourceClaimTemplateName != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath, claimSource, "at most one of `resourceClaimName` or `resourceClaimTemplateName` may be specified"))
+		allErrs = append(allErrs, field.IncompatibleWith(fldPath.Child("resourceClaimName"), fldPath.Child("resourceClaimTemplateName")))
 	}
 	if claimSource.ResourceClaimName == nil && claimSource.ResourceClaimTemplateName == nil {
 		allErrs = append(allErrs, field.Invalid(fldPath, claimSource, "must specify one of: `resourceClaimName`, `resourceClaimTemplateName`"))
@@ -3425,14 +3425,15 @@ func validateHostUsers(spec *core.PodSpec, fldPath *field.Path) field.ErrorList 
 	// know of any good use case and we can always enable them later.
 
 	// Note we already validated above spec.SecurityContext is not nil.
+	hostUsers := fldPath.Child("hostUsers")
 	if spec.SecurityContext.HostNetwork {
-		allErrs = append(allErrs, field.Forbidden(fldPath.Child("hostNetwork"), "when `pod.Spec.HostUsers` is false"))
+		allErrs = append(allErrs, field.IncompatibleWithValue(fldPath.Child("hostNetwork"), hostUsers, field.Not(true)))
 	}
 	if spec.SecurityContext.HostPID {
-		allErrs = append(allErrs, field.Forbidden(fldPath.Child("HostPID"), "when `pod.Spec.HostUsers` is false"))
+		allErrs = append(allErrs, field.IncompatibleWithValue(fldPath.Child("hostPID"), hostUsers, field.Not(true)))
 	}
 	if spec.SecurityContext.HostIPC {
-		allErrs = append(allErrs, field.Forbidden(fldPath.Child("HostIPC"), "when `pod.Spec.HostUsers` is false"))
+		allErrs = append(allErrs, field.IncompatibleWithValue(fldPath.Child("hostIPC"), hostUsers, field.Not(true)))
 	}
 
 	return allErrs
@@ -3575,10 +3576,10 @@ func validatePodDNSConfig(dnsConfig *core.PodDNSConfig, dnsPolicy *core.DNSPolic
 	// Validate DNSNone case. Must provide at least one DNS name server.
 	if dnsPolicy != nil && *dnsPolicy == core.DNSNone {
 		if dnsConfig == nil {
-			return append(allErrs, field.Required(fldPath, fmt.Sprintf("must provide `dnsConfig` when `dnsPolicy` is %s", core.DNSNone)))
+			return append(allErrs, field.RequiredWhenValue(fldPath, fldPath.Sibling("dnsPolicy"), core.DNSNone))
 		}
 		if len(dnsConfig.Nameservers) == 0 {
-			return append(allErrs, field.Required(fldPath.Child("nameservers"), fmt.Sprintf("must provide at least one DNS nameserver when `dnsPolicy` is %s", core.DNSNone)))
+			return append(allErrs, field.RequiredWhenValue(fldPath.Child("nameservers"), fldPath.Sibling("dnsPolicy"), core.DNSNone))
 		}
 	}
 
@@ -3794,11 +3795,11 @@ func ValidateTolerations(tolerations []core.Toleration, fldPath *field.Path) fie
 		// empty operator means Equal
 		case core.TolerationOpEqual, "":
 			if errs := validation.IsValidLabelValue(toleration.Value); len(errs) != 0 {
-				allErrors = append(allErrors, field.Invalid(idxPath.Child("operator"), toleration.Value, strings.Join(errs, ";")))
+				allErrors = append(allErrors, field.Invalid(idxPath.Child("value"), toleration.Value, strings.Join(errs, ";")))
 			}
 		case core.TolerationOpExists:
 			if len(toleration.Value) > 0 {
-				allErrors = append(allErrors, field.Invalid(idxPath.Child("operator"), toleration, "value must be empty when `operator` is 'Exists'"))
+				allErrors = append(allErrors, field.IncompatibleWithValue(idxPath.Child("value"), fldPath.Child("operator"), core.TolerationOpExists))
 			}
 		default:
 			validValues := []string{string(core.TolerationOpEqual), string(core.TolerationOpExists)}
@@ -3873,7 +3874,7 @@ func validatePodMetadataAndSpec(pod *core.Pod, opts PodValidationOptions) field.
 				for si, source := range volume.Projected.Sources {
 					saPath := path.Child("sources").Index(si).Child("serviceAccountToken")
 					if source.ServiceAccountToken != nil {
-						allErrs = append(allErrs, field.Forbidden(saPath, "must not be specified when serviceAccountName is not set"))
+						allErrs = append(allErrs, field.DependsOn(saPath, field.NewPath("spec", "serviceAccountName")))
 					}
 				}
 			}
@@ -4472,19 +4473,19 @@ func validateSeccompProfileField(sp *core.SeccompProfile, fldPath *field.Path) f
 		return allErrs
 	}
 
-	if err := validateSeccompProfileType(fldPath.Child("type"), sp.Type); err != nil {
+	if err := validateSeccompProfileType(fldPath, sp); err != nil {
 		allErrs = append(allErrs, err)
 	}
 
 	if sp.Type == core.SeccompProfileTypeLocalhost {
 		if sp.LocalhostProfile == nil {
-			allErrs = append(allErrs, field.Required(fldPath.Child("localhostProfile"), "must be set when seccomp type is Localhost"))
+			allErrs = append(allErrs, field.RequiredWhenValue(fldPath.Child("localhostProfile"), fldPath.Child("type"), core.SeccompProfileTypeLocalhost))
 		} else {
 			allErrs = append(allErrs, validateLocalDescendingPath(*sp.LocalhostProfile, fldPath.Child("localhostProfile"))...)
 		}
 	} else {
 		if sp.LocalhostProfile != nil {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("localhostProfile"), sp, "can only be set when seccomp type is Localhost"))
+			allErrs = append(allErrs, field.DependsOnValue(fldPath.Child("localhostProfile"), fldPath.Child("type"), core.SeccompProfileTypeLocalhost))
 		}
 	}
 
@@ -4519,14 +4520,14 @@ func ValidateSeccompPodAnnotations(annotations map[string]string, fldPath *field
 }
 
 // ValidateSeccompProfileType tests that the argument is a valid SeccompProfileType.
-func validateSeccompProfileType(fldPath *field.Path, seccompProfileType core.SeccompProfileType) *field.Error {
-	switch seccompProfileType {
+func validateSeccompProfileType(fldPath *field.Path, sp *core.SeccompProfile) *field.Error {
+	switch sp.Type {
 	case core.SeccompProfileTypeLocalhost, core.SeccompProfileTypeRuntimeDefault, core.SeccompProfileTypeUnconfined:
 		return nil
 	case "":
-		return field.Required(fldPath, "type is required when seccompProfile is set")
+		return field.RequiredWhen(fldPath.Child("type"), fldPath)
 	default:
-		return field.NotSupported(fldPath, seccompProfileType, []string{string(core.SeccompProfileTypeLocalhost), string(core.SeccompProfileTypeRuntimeDefault), string(core.SeccompProfileTypeUnconfined)})
+		return field.NotSupported(fldPath, sp.Type, []string{string(core.SeccompProfileTypeLocalhost), string(core.SeccompProfileTypeRuntimeDefault), string(core.SeccompProfileTypeUnconfined)})
 	}
 }
 
@@ -5227,7 +5228,7 @@ func ValidateService(service *core.Service) field.ErrorList {
 		allErrs = append(allErrs, validateClientIPAffinityConfig(service.Spec.SessionAffinityConfig, specPath.Child("sessionAffinityConfig"))...)
 	} else if service.Spec.SessionAffinity == core.ServiceAffinityNone {
 		if service.Spec.SessionAffinityConfig != nil {
-			allErrs = append(allErrs, field.Forbidden(specPath.Child("sessionAffinityConfig"), fmt.Sprintf("must not be set when session affinity is %s", string(core.ServiceAffinityNone))))
+			allErrs = append(allErrs, field.DependsOnValue(specPath.Child("sessionAffinityConfig"), specPath.Child("sessionAffinity"), field.Not(core.ServiceAffinityNone)))
 		}
 	}
 
@@ -5257,7 +5258,7 @@ func ValidateService(service *core.Service) field.ErrorList {
 		for i := range service.Spec.Ports {
 			portPath := portsPath.Index(i)
 			if service.Spec.Ports[i].NodePort != 0 {
-				allErrs = append(allErrs, field.Forbidden(portPath.Child("nodePort"), "may not be used when `type` is 'ClusterIP'"))
+				allErrs = append(allErrs, field.DependsOnValue(portPath.Child("nodePort"), specPath.Child("type"), field.Not(core.ServiceTypeClusterIP)))
 			}
 		}
 	}
@@ -5307,7 +5308,7 @@ func ValidateService(service *core.Service) field.ErrorList {
 			val = service.Annotations[core.AnnotationLoadBalancerSourceRangesKey]
 		}
 		if service.Spec.Type != core.ServiceTypeLoadBalancer {
-			allErrs = append(allErrs, field.Forbidden(fieldPath, "may only be used when `type` is 'LoadBalancer'"))
+			allErrs = append(allErrs, field.DependsOnValue(fieldPath, specPath.Child("type"), core.ServiceTypeLoadBalancer))
 		}
 		_, err := apiservice.GetLoadBalancerSourceRanges(service)
 		if err != nil {
@@ -5316,7 +5317,7 @@ func ValidateService(service *core.Service) field.ErrorList {
 	}
 
 	if service.Spec.AllocateLoadBalancerNodePorts != nil && service.Spec.Type != core.ServiceTypeLoadBalancer {
-		allErrs = append(allErrs, field.Forbidden(specPath.Child("allocateLoadBalancerNodePorts"), "may only be used when `type` is 'LoadBalancer'"))
+		allErrs = append(allErrs, field.DependsOnValue(specPath.Child("allocateLoadBalancerNodePorts"), specPath.Child("type"), core.ServiceTypeLoadBalancer))
 	}
 
 	if service.Spec.Type == core.ServiceTypeLoadBalancer && service.Spec.AllocateLoadBalancerNodePorts == nil {
@@ -6062,10 +6063,10 @@ func ValidateLimitRange(limitRange *core.LimitRange) field.ErrorList {
 
 		if limit.Type == core.LimitTypePod {
 			if len(limit.Default) > 0 {
-				allErrs = append(allErrs, field.Forbidden(idxPath.Child("default"), "may not be specified when `type` is 'Pod'"))
+				allErrs = append(allErrs, field.IncompatibleWithValue(idxPath.Child("default"), idxPath.Child("type"), core.LimitTypePod))
 			}
 			if len(limit.DefaultRequest) > 0 {
-				allErrs = append(allErrs, field.Forbidden(idxPath.Child("defaultRequest"), "may not be specified when `type` is 'Pod'"))
+				allErrs = append(allErrs, field.IncompatibleWithValue(idxPath.Child("defaultRequest"), idxPath.Child("type"), core.LimitTypePod))
 			}
 		} else {
 			for k, q := range limit.Default {
@@ -7080,7 +7081,7 @@ func ValidatePodLogOptions(opts *core.PodLogOptions) field.ErrorList {
 	}
 	switch {
 	case opts.SinceSeconds != nil && opts.SinceTime != nil:
-		allErrs = append(allErrs, field.Forbidden(field.NewPath(""), "at most one of `sinceTime` or `sinceSeconds` may be specified"))
+		allErrs = append(allErrs, field.IncompatibleWith(field.NewPath("sinceTime"), field.NewPath("sinceSeconds")))
 	case opts.SinceSeconds != nil:
 		if *opts.SinceSeconds < 1 {
 			allErrs = append(allErrs, field.Invalid(field.NewPath("sinceSeconds"), *opts.SinceSeconds, "must be greater than 0"))
@@ -7098,7 +7099,7 @@ func ValidateLoadBalancerStatus(status *core.LoadBalancerStatus, fldPath *field.
 	allErrs := field.ErrorList{}
 	ingrPath := fldPath.Child("ingress")
 	if !utilfeature.DefaultFeatureGate.Enabled(features.AllowServiceLBStatusOnNonLB) && spec.Type != core.ServiceTypeLoadBalancer && len(status.Ingress) != 0 {
-		allErrs = append(allErrs, field.Forbidden(ingrPath, "may only be used when `spec.type` is 'LoadBalancer'"))
+		allErrs = append(allErrs, field.DependsOnValue(ingrPath, field.NewPath("spec", "type"), core.ServiceTypeLoadBalancer))
 	} else {
 		for i, ingress := range status.Ingress {
 			idxPath := ingrPath.Index(i)

@@ -69,11 +69,21 @@ func (p *Path) Root() *Path {
 	return p
 }
 
+// Parent returns the parent element of this Path.
+func (p *Path) Parent() *Path {
+	return p.parent
+}
+
 // Child creates a new Path that is a child of the method receiver.
 func (p *Path) Child(name string, moreNames ...string) *Path {
 	r := NewPath(name, moreNames...)
 	r.Root().parent = p
 	return r
+}
+
+// Sibling returns the parent element of this Path.
+func (p *Path) Sibling(name string, moreNames ...string) *Path {
+	return p.parent.Child(name, moreNames...)
 }
 
 // Index indicates that the previous Path is to be subscripted by an int.
