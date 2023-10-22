@@ -2932,7 +2932,7 @@ func validatePodResourceClaim(podMeta *metav1.ObjectMeta, claim core.PodResource
 func validatePodResourceClaimSource(claimSource core.ClaimSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 	if claimSource.ResourceClaimName != nil && claimSource.ResourceClaimTemplateName != nil {
-		allErrs = append(allErrs, field.Invalid(fldPath, claimSource, "at most one of `resourceClaimName` or `resourceClaimTemplateName` may be specified"))
+		allErrs = append(allErrs, field.MutuallyExclusive(fldPath.Child("resourceClaimName"), field.NewPath("resourceClaimTemplateName")))
 	}
 	if claimSource.ResourceClaimName == nil && claimSource.ResourceClaimTemplateName == nil {
 		allErrs = append(allErrs, field.Invalid(fldPath, claimSource, "must specify one of: `resourceClaimName`, `resourceClaimTemplateName`"))
@@ -7176,7 +7176,7 @@ func ValidatePodLogOptions(opts *core.PodLogOptions) field.ErrorList {
 	}
 	switch {
 	case opts.SinceSeconds != nil && opts.SinceTime != nil:
-		allErrs = append(allErrs, field.Forbidden(field.NewPath(""), "at most one of `sinceTime` or `sinceSeconds` may be specified"))
+		allErrs = append(allErrs, field.MutuallyExclusive(field.NewPath("sinceTime"), field.NewPath("sinceSeconds")))
 	case opts.SinceSeconds != nil:
 		if *opts.SinceSeconds < 1 {
 			allErrs = append(allErrs, field.Invalid(field.NewPath("sinceSeconds"), *opts.SinceSeconds, "must be greater than 0"))

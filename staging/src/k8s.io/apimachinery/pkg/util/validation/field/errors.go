@@ -220,6 +220,18 @@ func Forbidden(field *Path, detail string) *Error {
 	return &Error{ErrorTypeForbidden, field.String(), "", detail}
 }
 
+// MutuallyExclusive returns a *Error indicating that a field is mutually
+// exclusive with one or more other fields.  The value(s) of the other field(s)
+// is not considered.
+func MutuallyExclusive(field *Path, others ...*Path) *Error {
+	strOthers := make([]string, len(others))
+	for i, v := range others {
+		strOthers[i] = v.String()
+	}
+	detail := "mutually exclusive with: " + strings.Join(strOthers, ", ")
+	return &Error{ErrorTypeForbidden, field.String(), "", detail}
+}
+
 // TooLong returns a *Error indicating "too long".  This is used to
 // report that the given value is too long.  This is similar to
 // Invalid, but the returned error will not include the too-long

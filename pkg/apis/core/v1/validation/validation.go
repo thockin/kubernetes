@@ -136,7 +136,7 @@ func ValidatePodLogOptions(opts *v1.PodLogOptions) field.ErrorList {
 	}
 	switch {
 	case opts.SinceSeconds != nil && opts.SinceTime != nil:
-		allErrs = append(allErrs, field.Forbidden(field.NewPath(""), "at most one of `sinceTime` or `sinceSeconds` may be specified"))
+		allErrs = append(allErrs, field.MutuallyExclusive(field.NewPath("sinceTime"), field.NewPath("sinceSeconds")))
 	case opts.SinceSeconds != nil:
 		if *opts.SinceSeconds < 1 {
 			allErrs = append(allErrs, field.Invalid(field.NewPath("sinceSeconds"), *opts.SinceSeconds, "must be greater than 0"))
