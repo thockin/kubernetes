@@ -387,7 +387,7 @@ func (m *managerImpl) synchronize(diskInfoProvider DiskInfoProvider, podFunc Act
 		}
 		message, annotations := evictionMessage(resourceToReclaim, pod, statsFunc, thresholds, observations)
 		var condition *v1.PodCondition
-		if utilfeature.DefaultFeatureGate.Enabled(features.PodDisruptionConditions) {
+		if utilfeature.Enabled(features.PodDisruptionConditions) {
 			condition = &v1.PodCondition{
 				Type:    v1.DisruptionTarget,
 				Status:  v1.ConditionTrue,
