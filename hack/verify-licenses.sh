@@ -99,7 +99,7 @@ do
 		then
 			# Check whether the License URL is incorrectly formed
 			# TODO: Remove this workaround check once PR https://github.com/google/go-licenses/pull/110 is merged
-			IFS='/' read -r -a split_license_url <<< ${LICENSE_URL}
+			IFS='/' read -r -a split_license_url <<< "${LICENSE_URL}"
 			for part_of_url in "${split_license_url[@]}"
 			do
 				if  [[ ${part_of_url} == '' ]]
