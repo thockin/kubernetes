@@ -48,18 +48,26 @@ import (
 )
 
 type ExpectedFieldError struct {
-	Type   field.ErrorType
-	Field  string
+	Field string
+	Type  field.ErrorType
+
+	// Detail is checked that the actual error contains a substring of this value.
+	// Errors are sorted by detail as a last resort so in some cases it may be
+	// necessary to use a prefix of the actual detail for this value
 	Detail string
-	// Ignored, but left in case we may want to enforce this in the future
+	// Only checked for native errors, may be checked for schema errors in the future
+	// (blocked by fact that some CRD/CEL errors place name of type for badvalue)
 	BadValue interface{}
 
-	// If this error should be skipped
+	// If this error should be skipped under schema validation for some reason
 	SchemaSkipReason string
+	// If this error should be skipped under native validation for some reason
+	NativeSkipReason string
 
 	// If it is not yet possible to reproduce this error exactly for schema
 	// validation, then provides an alternative matching error
-	SchemaType field.ErrorType
+	SchemaType  field.ErrorType
+	SchemaField string
 }
 
 type ExpectedErrorList []ExpectedFieldError
@@ -67,9 +75,14 @@ type ExpectedErrorList []ExpectedFieldError
 func (e ExpectedErrorList) NativeErrors() field.ErrorList {
 	var res field.ErrorList
 	for _, err := range e {
+		if len(err.NativeSkipReason) > 0 {
+			continue
+		}
 		res = append(res, &field.Error{
-			Type:  err.Type,
-			Field: err.Field,
+			Type:     err.Type,
+			Field:    err.Field,
+			BadValue: err.BadValue,
+			Detail:   err.Detail,
 		})
 	}
 	return res
@@ -78,13 +91,23 @@ func (e ExpectedErrorList) NativeErrors() field.ErrorList {
 func (e ExpectedErrorList) SchemaErrors() field.ErrorList {
 	var res field.ErrorList
 	for _, err := range e {
+		if len(err.SchemaSkipReason) > 0 {
+			continue
+		}
 		typ := err.Type
 		if len(err.SchemaType) > 0 {
 			typ = err.SchemaType
 		}
+
+		fld := err.Field
+		if len(err.SchemaField) > 0 {
+			fld = err.SchemaField
+		}
+
 		res = append(res, &field.Error{
-			Type:  typ,
-			Field: err.Field,
+			Type:   typ,
+			Field:  fld,
+			Detail: err.Detail,
 		})
 	}
 	return res
@@ -276,10 +299,6 @@ func CompareErrorLists(lhs field.ErrorList, rhs field.ErrorList) error {
 	fieldsToErrorsLHS := map[string]field.ErrorList{}
 	fieldsToErrorsRHS := map[string]field.ErrorList{}
 	for _, v := range lhs {
-		// We don't yet support validating BadValue, since CEL errors put name of
-		// type instead of value.
-		v.BadValue = nil
-
 		if existing, exists := fieldsToErrorsLHS[v.Field]; exists {
 			fieldsToErrorsLHS[v.Field] = append(existing, v)
 		} else {
@@ -288,10 +307,6 @@ func CompareErrorLists(lhs field.ErrorList, rhs field.ErrorList) error {
 	}
 
 	for _, v := range rhs {
-		// We don't yet support validating BadValue, since CEL errors put name of
-		// type instead of value.
-		v.BadValue = nil
-
 		if existing, exists := fieldsToErrorsRHS[v.Field]; exists {
 			fieldsToErrorsRHS[v.Field] = append(existing, v)
 		} else {
@@ -335,6 +350,9 @@ func CompareErrorLists(lhs field.ErrorList, rhs field.ErrorList) error {
 			return false
 		})
 	}
+
+	// Ignore any metadata.name and metadata.namespace errors until it is possible
+	// to encode name formats and scope into schema
 
 	// The expected error detail is supposed to be a substring of the actual
 	// detail. But cmp.Diff doesn't support that. So, assuming our error lists
