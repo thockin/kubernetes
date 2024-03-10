@@ -1,0 +1,90 @@
+* Write convention doc for gates
+* retool feature-gate checking
+* retool validation code
+* use declarative defaults
+* Convert `// +k8s:foo` to `//ks8:foo`
+  - make tag extraction finds it
+  - fix protobuf-gen to exclude these
+* revisit +featureGate
+* generated.proto -> zz_generated.proto
+* put label consts in staging/src/k8s.io/api/<name>/types.go
+  - normalize all imports as:
+    - staging/src/k8s.io/api/<name>/v1 = "namev1" or "v1"
+    - staging/src/k8s.io/api/<name> = "name" or "nameapi"
+    - pkg/apis/<name> = "nameint" or "internal"
+* major: label pods with SA name, `expose serviceaccount` and handle quarantine
+* custom stop signal (as a lifecycle hook?)
+* IDL
+* Controller-manager controllers as self-contained plugins
+* deletionReason string
+* A way to register finalizers to be set synchronously at creation.
+  - e.g. DRA
+* Pod "replaces-other-pod" label
+* make fieldPath host the various error methods
+* fork spew
+* note defaulted fields in managed fields
+* Use +validations, delete manual code
+* Get rid of all ObjectReference users in favor of bespoke types
+* Change all utilpointer.FooPtr() -> ptr.Foo()
+* Namesdb - collect annotations and labels
+* Make conversrion-gen take explicit peer-type names
+* Service validation overhaul (look for TODOs)
+* IDL
+  - every field needs to define:
+    - validation
+    - default value
+    - optional/required
+    - feature gates
+    - one-of-ness
+    - "if not specified" behavior
+* Pkg for common API consts
+
+Validation:
+- get rid of isNegativeErrorMsg
+  - NilOr(GEZ)
+- all int comparators: https://pkg.go.dev/golang.org/x/exp/constraints#Integer
+- convert validate.Name to validate.ByFunc or similar
+- rename name validators to IsFooName
+- rename generic validation to "contents" or "content"
+- rename vendor/k8s.io/apimachinery/pkg/api/validation/generic.go to names.go?
+- grep for ParseIP in validtion.go
+- s/is immutable/may not be changed/
+- UserID and GroupID
+- kill other error strings from pkg/apis/core/validation/validation.go
+- Updates do not decrement
+- Arbitrary message mutation
+- break into multiple files?
+- s/TooLognMaxLenght/TooMany and fix error message
+- field.OneOf()
+
+- DNS validation should enbforce each label's length
+- make error funcs be methods on field.Path()
+- truncate values when making errors
+- break down regex errors into simpler rules in non-util
+- un-export DNS fmt/len variables
+- scrub errors in per-api validation, use validation funcs for messages
+  - revisit "cannot", "can't" - UDP LB has cannot
+- audit ConfigMap validation
+- wrap direct util calls in field.Error returner funcs
+- fold-in events.go
+  - should events be loggable without a namespace?  In any namespace?
+- TODO: examples?
+- nix TooLong or provide a truncator func
+- s/TooLongMaxLength/TooMany/
+- nix dups between API and validation
+- versioned validation
+- NotSupported take []interface{}
+- rname util/validation to util/strfmt or something
+- common names with/without "Valid"
+- use UnixGroup/User types
+- change ConfigMapKey to FileName (API change)
+- change service to 1123 (API change and behavior change)
+- change most Names to Label (API breaking change)
+- ValidateRefName -> confirm sane path element if no function pointer passed
+
+
+should NewAggregate return error?  test usage
+status.actual idea or eductae about not using pointers internally
+dont .String() quantities, just %s
+
+
