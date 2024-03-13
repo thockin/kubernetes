@@ -41,4 +41,5 @@ require (
 replace (
 	k8s.io/apimachinery => ../apimachinery
 	k8s.io/code-generator => ../code-generator
+	k8s.io/utils => ../utils
 )
