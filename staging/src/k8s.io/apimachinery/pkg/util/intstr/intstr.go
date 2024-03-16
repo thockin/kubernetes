@@ -130,7 +130,8 @@ func (intstr IntOrString) MarshalJSON() ([]byte, error) {
 // the OpenAPI spec of this type.
 //
 // See: https://github.com/kubernetes/kube-openapi/tree/master/pkg/generators
-func (IntOrString) OpenAPISchemaType() []string { return []string{"string"} }
+// FIXME: This is a hack to make IntOrString work
+func (IntOrString) OpenAPISchemaType() []string { return []string{"number"} }
 
 // OpenAPISchemaFormat is used by the kube-openapi generator when constructing
 // the OpenAPI spec of this type.
