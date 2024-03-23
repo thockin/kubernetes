@@ -423,27 +423,31 @@ func IsEnvVarName(value string) []string {
 }
 
 const configMapKeyFmt = `[-._a-zA-Z0-9]+`
-const configMapKeyErrMsg string = "a valid config key must consist of alphanumeric characters, '-', '_' or '.'"
+const configMapKeyErrMsg string = "a valid config key must consist of alphanumeric characters, '-', '_', or '.'"
 
 var configMapKeyRegexp = regexp.MustCompile("^" + configMapKeyFmt + "$")
 
 // IsConfigMapKey tests for a string that is a valid key for a ConfigMap or Secret
 func IsConfigMapKey(value string) []string {
 	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+	if len(value) == 0 {
+		errs = append(errs, "key must not be empty")
+	} else {
+		if len(value) > DNS1123SubdomainMaxLength {
+			errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+		}
+		if !configMapKeyRegexp.MatchString(value) {
+			errs = append(errs, RegexError(configMapKeyErrMsg, configMapKeyFmt, "key.name", "KEY_NAME", "key-name"))
+		}
+		errs = append(errs, hasChDirPrefix(value)...)
 	}
-	if !configMapKeyRegexp.MatchString(value) {
-		errs = append(errs, RegexError(configMapKeyErrMsg, configMapKeyFmt, "key.name", "KEY_NAME", "key-name"))
-	}
-	errs = append(errs, hasChDirPrefix(value)...)
 	return errs
 }
 
 // MaxLenError returns a string explanation of a "string too long" validation
 // failure.
 func MaxLenError(length int) string {
-	return fmt.Sprintf("must be no more than %d characters", length)
+	return fmt.Sprintf("must not be more than %d characters", length)
 }
 
 // RegexError returns a string explanation of a regex validation failure.

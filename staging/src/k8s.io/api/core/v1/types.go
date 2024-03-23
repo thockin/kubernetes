@@ -5091,9 +5091,6 @@ type ServiceSpec struct {
 	// +listType=map
 	// +listMapKey=port
 	// +listMapKey=protocol
-	// +k8s:validation:cel[0]:rule>self.size() > 1 ? self.all(p, has(p.name)) : true
-	// +k8s:validation:cel[0]:reason>FieldValueRequired
-	// +k8s:validation:cel[0]:fieldPath>.spec.ports
 	Ports []ServicePort `json:"ports,omitempty" patchStrategy:"merge" patchMergeKey:"port" protobuf:"bytes,1,rep,name=ports"`
 
 	// Route service traffic to pods with label keys and values matching this
@@ -7043,11 +7040,28 @@ type ConfigMap struct {
 	Immutable *bool `json:"immutable,omitempty" protobuf:"varint,4,opt,name=immutable"`
 
 	// Data contains the configuration data.
-	// Each key must consist of alphanumeric characters, '-', '_' or '.'.
+	// Each key must consist of alphanumeric characters, '-', '_', or '.'.
 	// Values with non-UTF-8 byte sequences must use the BinaryData field.
 	// The keys stored in Data must not overlap with the keys in
 	// the BinaryData field, this is enforced during validation process.
 	// +optional
+	// +k8s:validation:cel[0]:rule>self.all(key, key != "")
+	// +k8s:validation:cel[0]:message>key must not be empty
+	// +k8s:validation:cel[0]:reason>FieldValueInvalid
+	// +k8s:validation:cel[1]:rule>self.all(key, key.size() <= 253 )
+	// +k8s:validation:cel[1]:message>must not be more than 253 characters
+	// +k8s:validation:cel[1]:reason>FieldValueInvalid
+	// +k8s:validation:cel[2]:rule>self.all(key, key.matches('^[-._a-zA-Z0-9]+'))
+	// +k8s:validation:cel[2]:message>key must consist of alphanumeric characters, '-', '_', or '.'
+	// +k8s:validation:cel[2]:reason>FieldValueInvalid
+	// +k8s:validation:cel[3]:rule>self.all(key, key != ".")
+	// +k8s:validation:cel[3]:message>must not be "."
+	// +k8s:validation:cel[3]:reason>FieldValueInvalid
+	// +k8s:validation:cel[4]:rule>self.all(key, !key.matches('^\.\.'))
+	// +k8s:validation:cel[4]:message>must not begin with ".."
+	// +k8s:validation:cel[4]:reason>FieldValueInvalid
+	// FIXME: how to define that names muct be unique?
+	// FIXME: how to define that total size must be < 1K?
 	Data map[string]string `json:"data,omitempty" protobuf:"bytes,2,rep,name=data"`
 
 	// BinaryData contains the binary data.

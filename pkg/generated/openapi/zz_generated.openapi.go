@@ -18571,8 +18571,13 @@ func schema_k8sio_api_core_v1_ConfigMap(ref common.ReferenceCallback) common.Ope
 						},
 					},
 					"data": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-validations": []interface{}{map[string]interface{}{"message": "key must not be empty", "reason": "FieldValueInvalid", "rule": "self.all(key, key != \"\")"}, map[string]interface{}{"message": "must not be more than 253 characters", "reason": "FieldValueInvalid", "rule": "self.all(key, key.size() <= 253 )"}, map[string]interface{}{"message": "key must consist of alphanumeric characters, '-', '_', or '.'", "reason": "FieldValueInvalid", "rule": "self.all(key, key.matches('^[-._a-zA-Z0-9]+'))"}, map[string]interface{}{"message": "must not be \".\"", "reason": "FieldValueInvalid", "rule": "self.all(key, key != \".\")"}, map[string]interface{}{"message": "must not begin with \"..\"", "reason": "FieldValueInvalid", "rule": "self.all(key, !key.matches('^\\.\\.'))"}},
+							},
+						},
 						SchemaProps: spec.SchemaProps{
-							Description: "Data contains the configuration data. Each key must consist of alphanumeric characters, '-', '_' or '.'. Values with non-UTF-8 byte sequences must use the BinaryData field. The keys stored in Data must not overlap with the keys in the BinaryData field, this is enforced during validation process.",
+							Description: "Data contains the configuration data. Each key must consist of alphanumeric characters, '-', '_', or '.'. Values with non-UTF-8 byte sequences must use the BinaryData field. The keys stored in Data must not overlap with the keys in the BinaryData field, this is enforced during validation process. FIXME: how to define that names muct be unique? FIXME: how to define that total size must be < 1K?",
 							Type:        []string{"object"},
 							AdditionalProperties: &spec.SchemaOrBool{
 								Allows: true,
@@ -28973,7 +28978,6 @@ func schema_k8sio_api_core_v1_ServiceSpec(ref common.ReferenceCallback) common.O
 								"x-kubernetes-list-type":       "map",
 								"x-kubernetes-patch-merge-key": "port",
 								"x-kubernetes-patch-strategy":  "merge",
-								"x-kubernetes-validations":     []interface{}{map[string]interface{}{"fieldPath": ".spec.ports", "message": "fubar", "reason": "FieldValueRequired", "rule": "self.size() > 1 ? self.all(p, has(p.name)) : true"}},
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -52454,7 +52458,6 @@ func schema_apimachinery_pkg_util_intstr_IntOrString(ref common.ReferenceCallbac
 				Description: "IntOrString is a type that can hold an int32 or a string.  When used in JSON or YAML marshalling and unmarshalling, it produces or consumes the inner type.  This allows you to have, for example, a JSON field that can accept a name or number.",
 				OneOf:       common.GenerateOpenAPIV3OneOfSchema(intstr.IntOrString{}.OpenAPIV3OneOfTypes()),
 				Format:      intstr.IntOrString{}.OpenAPISchemaFormat(),
-				Type:        intstr.IntOrString{}.OpenAPISchemaType(),
 			},
 		},
 	}, common.OpenAPIDefinition{

@@ -394,7 +394,7 @@ func LogErrors(t *testing.T, want, got field.ErrorList) bool {
 	}
 	for k, want := range fieldsToErrorsWant {
 		if got, found := fieldsToErrorsGot[k]; !found {
-			t.Errorf("expected error(s) for field %q: %v", k, pretty(want))
+			t.Errorf("missing error(s) for field %q: %v", k, pretty(want))
 			errs = true
 		} else if pwant, pgot := pretty(want), pretty(got); !cmp.Equal(pwant, pgot) {
 			t.Errorf("wrong error(s) for field %q: %v", k, cmp.Diff(pwant, pgot))

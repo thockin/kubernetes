@@ -85,7 +85,7 @@ func (p *Path) Index(index int) *Path {
 // Key indicates that the previous Path is to be subscripted by a string.
 // This sets the same underlying value as Index.
 func (p *Path) Key(key string) *Path {
-	return &Path{index: key, parent: p}
+	return &Path{index: strconv.Quote(key), parent: p}
 }
 
 // String produces a string representation of the Path.
