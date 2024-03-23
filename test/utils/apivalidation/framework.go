@@ -19,7 +19,6 @@ package apivalidation
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -105,9 +104,10 @@ func (e ExpectedErrorList) SchemaErrors() field.ErrorList {
 		}
 
 		res = append(res, &field.Error{
-			Type:   typ,
-			Field:  fld,
-			Detail: err.Detail,
+			Type:     typ,
+			Field:    fld,
+			BadValue: err.BadValue,
+			Detail:   err.Detail,
 		})
 	}
 	return res
@@ -145,8 +145,8 @@ func TestValidate[T comparableObject, O any](t *testing.T, scheme *runtime.Schem
 				nativeErrors := validator(c.Object, c.Options)
 				t.Log("native errors", nativeErrors)
 
-				if err := CompareErrorLists(c.ExpectedErrors.NativeErrors(), nativeErrors); err != nil {
-					t.Fatal(fmt.Errorf("native object validation failed: %w", err))
+				if LogErrors(t, c.ExpectedErrors.NativeErrors(), nativeErrors) {
+					t.Fatal("native object validation failed")
 				}
 			})
 
@@ -251,8 +251,8 @@ func TestValidate[T comparableObject, O any](t *testing.T, scheme *runtime.Schem
 					}
 
 					t.Log("unstructured errors", fieldErrors)
-					if err := CompareErrorLists(c.ExpectedErrors.SchemaErrors(), fieldErrors); err != nil {
-						t.Fatal(fmt.Errorf("versioned object validation failed: %w", err))
+					if LogErrors(t, c.ExpectedErrors.SchemaErrors(), fieldErrors) {
+						t.Fatal("versioned object validation failed")
 					}
 				})
 			}
@@ -292,30 +292,32 @@ func isNil[T comparable](arg T) bool {
 }
 
 // Compares a declarative validation error list with a legit one and
-// returns the diff
-func CompareErrorLists(lhs field.ErrorList, rhs field.ErrorList) error {
+// returns true on errors
+func LogErrors(t *testing.T, want, got field.ErrorList) bool {
+	t.Helper()
+
 	// Categorize each error by field path
 	// Make sure each field path list has matching errors
-	fieldsToErrorsLHS := map[string]field.ErrorList{}
-	fieldsToErrorsRHS := map[string]field.ErrorList{}
-	for _, v := range lhs {
-		if existing, exists := fieldsToErrorsLHS[v.Field]; exists {
-			fieldsToErrorsLHS[v.Field] = append(existing, v)
+	fieldsToErrorsWant := map[string]field.ErrorList{}
+	fieldsToErrorsGot := map[string]field.ErrorList{}
+	for _, v := range want {
+		if existing, exists := fieldsToErrorsWant[v.Field]; exists {
+			fieldsToErrorsWant[v.Field] = append(existing, v)
 		} else {
-			fieldsToErrorsLHS[v.Field] = field.ErrorList{v}
+			fieldsToErrorsWant[v.Field] = field.ErrorList{v}
 		}
 	}
 
-	for _, v := range rhs {
-		if existing, exists := fieldsToErrorsRHS[v.Field]; exists {
-			fieldsToErrorsRHS[v.Field] = append(existing, v)
+	for _, v := range got {
+		if existing, exists := fieldsToErrorsGot[v.Field]; exists {
+			fieldsToErrorsGot[v.Field] = append(existing, v)
 		} else {
-			fieldsToErrorsRHS[v.Field] = field.ErrorList{v}
+			fieldsToErrorsGot[v.Field] = field.ErrorList{v}
 		}
 	}
 
 	// Sort
-	for _, v := range fieldsToErrorsLHS {
+	for _, v := range fieldsToErrorsWant {
 		sort.SliceStable(v, func(i, j int) bool {
 			iV := v[i]
 			jV := v[j]
@@ -333,7 +335,7 @@ func CompareErrorLists(lhs field.ErrorList, rhs field.ErrorList) error {
 		})
 	}
 
-	for _, v := range fieldsToErrorsRHS {
+	for _, v := range fieldsToErrorsGot {
 		sort.SliceStable(v, func(i, j int) bool {
 			iV := v[i]
 			jV := v[j]
@@ -359,31 +361,54 @@ func CompareErrorLists(lhs field.ErrorList, rhs field.ErrorList) error {
 	// are exhaustive matches, we wipe out detail fields for pairwise errors
 	// after sorting
 
-	for k, lhsErrors := range fieldsToErrorsLHS {
-		rhsErrors, ok := fieldsToErrorsRHS[k]
+	for k, wantErrors := range fieldsToErrorsWant {
+		gotErrors, ok := fieldsToErrorsGot[k]
 		if !ok {
 			continue
-		} else if len(lhsErrors) != len(rhsErrors) {
+		} else if len(wantErrors) != len(gotErrors) {
 			continue
 		}
 
-		for i, lhsErr := range lhsErrors {
-			rhsErr := rhsErrors[i]
+		for i, wantErr := range wantErrors {
+			gotErr := gotErrors[i]
 
-			if strings.Contains(rhsErr.Detail, lhsErr.Detail) {
-				rhsErr.Detail = ""
-				lhsErr.Detail = ""
+			if strings.Contains(gotErr.Detail, wantErr.Detail) {
+				gotErr.Detail = ""
+				wantErr.Detail = ""
 
-				lhsErrors[i] = lhsErr
-				rhsErrors[i] = rhsErr
+				wantErrors[i] = wantErr
+				gotErrors[i] = gotErr
 			}
 		}
 
 	}
 
 	// Diff
-	if diff := cmp.Diff(fieldsToErrorsLHS, fieldsToErrorsRHS); len(diff) != 0 {
-		return errors.New(diff)
+	errs := false
+	pretty := func(in any) string {
+		jb, err := json.MarshalIndent(in, "", "  ")
+		if err != nil {
+			t.Fatalf("error unmarshaling %#v", in)
+		}
+		return string(jb)
 	}
-	return nil
+	for k, want := range fieldsToErrorsWant {
+		if got, found := fieldsToErrorsGot[k]; !found {
+			t.Errorf("expected error(s) for field %q: %v", k, pretty(want))
+			errs = true
+		} else if pwant, pgot := pretty(want), pretty(got); !cmp.Equal(pwant, pgot) {
+			t.Errorf("wrong error(s) for field %q: %v", k, cmp.Diff(pwant, pgot))
+			errs = true
+		}
+	}
+	for k, got := range fieldsToErrorsGot {
+		if _, found := fieldsToErrorsWant[k]; !found {
+			t.Errorf("unexpected error(s) for field %q: %v", k, pretty(got))
+			errs = true
+		}
+	}
+	if errs {
+		return true
+	}
+	return false
 }

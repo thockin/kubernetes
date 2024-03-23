@@ -182,7 +182,7 @@ func NotFound(field *Path, value interface{}) *Error {
 // to report required values that are not provided (e.g. empty strings, null
 // values, or empty arrays).
 func Required(field *Path, detail string) *Error {
-	return &Error{ErrorTypeRequired, field.String(), "", detail}
+	return &Error{ErrorTypeRequired, field.String(), nil, detail}
 }
 
 // Duplicate returns a *Error indicating "duplicate value".  This is

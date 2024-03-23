@@ -5091,6 +5091,9 @@ type ServiceSpec struct {
 	// +listType=map
 	// +listMapKey=port
 	// +listMapKey=protocol
+	// +k8s:validation:cel[0]:rule>self.size() > 1 ? self.all(p, has(p.name)) : true
+	// +k8s:validation:cel[0]:reason>FieldValueRequired
+	// +k8s:validation:cel[0]:fieldPath>.spec.ports
 	Ports []ServicePort `json:"ports,omitempty" patchStrategy:"merge" patchMergeKey:"port" protobuf:"bytes,1,rep,name=ports"`
 
 	// Route service traffic to pods with label keys and values matching this
@@ -5336,7 +5339,7 @@ type ServicePort struct {
 	// The IP protocol for this port. Supports "TCP", "UDP", and "SCTP".
 	// Default is TCP.
 	// +default="TCP"
-	// +optional
+	// +required
 	Protocol Protocol `json:"protocol,omitempty" protobuf:"bytes,2,opt,name=protocol,casttype=Protocol"`
 
 	// The application protocol for this port.
@@ -5358,6 +5361,8 @@ type ServicePort struct {
 	AppProtocol *string `json:"appProtocol,omitempty" protobuf:"bytes,6,opt,name=appProtocol"`
 
 	// The port that will be exposed by this service.
+	// +k8s:validation:minimum=1
+	// +k8s:validation:maximum=65535
 	Port int32 `json:"port" protobuf:"varint,3,opt,name=port"`
 
 	// Number or name of the port to access on the pods targeted by the service.

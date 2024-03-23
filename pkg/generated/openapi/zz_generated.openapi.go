@@ -23662,7 +23662,7 @@ func schema_k8sio_api_core_v1_PersistentVolume(ref common.ReferenceCallback) com
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "spec defines a specification of a persistent volume owned by the cluster. Provisioned by an administrator. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes\n\nDesired rule to fix issue checking capacity > 0 constraint with proper error message/field paths -k8s:validation:override:capacity:additionalProperties:cel[0]:rule>quantity(self).isGreaterThan(0)",
+							Description: "spec defines a specification of a persistent volume owned by the cluster. Provisioned by an administrator. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes",
 							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.PersistentVolumeSpec"),
 						},
@@ -28894,6 +28894,8 @@ func schema_k8sio_api_core_v1_ServicePort(ref common.ReferenceCallback) common.O
 						SchemaProps: spec.SchemaProps{
 							Description: "The port that will be exposed by this service.",
 							Default:     0,
+							Minimum:     ptr.To[float64](1),
+							Maximum:     ptr.To[float64](65535),
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
@@ -28912,7 +28914,7 @@ func schema_k8sio_api_core_v1_ServicePort(ref common.ReferenceCallback) common.O
 						},
 					},
 				},
-				Required: []string{"port"},
+				Required: []string{"protocol", "port"},
 			},
 		},
 		Dependencies: []string{
@@ -28971,6 +28973,7 @@ func schema_k8sio_api_core_v1_ServiceSpec(ref common.ReferenceCallback) common.O
 								"x-kubernetes-list-type":       "map",
 								"x-kubernetes-patch-merge-key": "port",
 								"x-kubernetes-patch-strategy":  "merge",
+								"x-kubernetes-validations":     []interface{}{map[string]interface{}{"fieldPath": ".spec.ports", "message": "fubar", "reason": "FieldValueRequired", "rule": "self.size() > 1 ? self.all(p, has(p.name)) : true"}},
 							},
 						},
 						SchemaProps: spec.SchemaProps{
@@ -52451,8 +52454,7 @@ func schema_apimachinery_pkg_util_intstr_IntOrString(ref common.ReferenceCallbac
 				Description: "IntOrString is a type that can hold an int32 or a string.  When used in JSON or YAML marshalling and unmarshalling, it produces or consumes the inner type.  This allows you to have, for example, a JSON field that can accept a name or number.",
 				OneOf:       common.GenerateOpenAPIV3OneOfSchema(intstr.IntOrString{}.OpenAPIV3OneOfTypes()),
 				Format:      intstr.IntOrString{}.OpenAPISchemaFormat(),
-				//FIXME: This is needed to make IntOrString pass
-				Type: intstr.IntOrString{}.OpenAPISchemaType(),
+				Type:        intstr.IntOrString{}.OpenAPISchemaType(),
 			},
 		},
 	}, common.OpenAPIDefinition{
