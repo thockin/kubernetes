@@ -38,7 +38,7 @@ func main() {
 	featureGate := featuregate.NewFeatureGate()
 	runtime.Must(logsapi.AddFeatureGates(featureGate))
 	flag.Var(featureGate, "feature-gate",
-		"A set of key=value pairs that describe feature gates for alpha/experimental features. "+
+		"5555 A set of key=value pairs that describe feature gates for alpha/experimental features. "+
 			"Options are:\n"+strings.Join(featureGate.KnownFeatures(), "\n"))
 	c := logsapi.NewLoggingConfiguration()
 	logsapi.AddGoFlags(c, flag.CommandLine)

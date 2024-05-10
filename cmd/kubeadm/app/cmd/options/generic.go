@@ -70,10 +70,10 @@ func AddImageMetaFlags(fs *pflag.FlagSet, imageRepository *string) {
 // AddFeatureGatesStringFlag adds the --feature-gates flag to the given flagset
 func AddFeatureGatesStringFlag(fs *pflag.FlagSet, featureGatesString *string) {
 	if knownFeatures := features.KnownFeatures(&features.InitFeatureGates); len(knownFeatures) > 0 {
-		fs.StringVar(featureGatesString, FeatureGatesString, *featureGatesString, "A set of key=value pairs that describe feature gates for various features. "+
+		fs.StringVar(featureGatesString, FeatureGatesString, *featureGatesString, "2222 A set of key=value pairs that describe feature gates for various features. "+
 			"Options are:\n"+strings.Join(knownFeatures, "\n"))
 	} else {
-		fs.StringVar(featureGatesString, FeatureGatesString, *featureGatesString, "A set of key=value pairs that describe feature gates for various features. "+
+		fs.StringVar(featureGatesString, FeatureGatesString, *featureGatesString, "2222 A set of key=value pairs that describe feature gates for various features. "+
 			"No feature gates are available in this release.")
 	}
 }

@@ -105,8 +105,8 @@ func registerNodeFlags(flags *flag.FlagSet) {
 	flag.StringVar(&framework.TestContext.ClusterDNSDomain, "dns-domain", "", "The DNS Domain of the cluster.")
 	flag.Var(cliflag.NewMapStringString(&framework.TestContext.RuntimeConfig), "runtime-config", "The runtime configuration used on node e2e tests.")
 	flags.BoolVar(&framework.TestContext.RequireDevices, "require-devices", false, "If true, require device plugins to be installed in the running environment.")
-	flags.Var(cliflag.NewMapStringBool(&featureGates), "feature-gates", "A set of key=value pairs that describe feature gates for alpha/experimental features.")
-	flags.Var(cliflag.NewMapStringBool(&serviceFeatureGates), "service-feature-gates", "A set of key=value pairs that describe feature gates for alpha/experimental features for API service.")
+	flags.Var(cliflag.NewMapStringBool(&featureGates), "feature-gates", "6666 A set of key=value pairs that describe feature gates for alpha/experimental features.")
+	flags.Var(cliflag.NewMapStringBool(&serviceFeatureGates), "service-feature-gates", "7777 A set of key=value pairs that describe feature gates for alpha/experimental features for API service.")
 	flags.BoolVar(&framework.TestContext.StandaloneMode, "standalone-mode", false, "If true, starts kubelet in standalone mode.")
 }
 

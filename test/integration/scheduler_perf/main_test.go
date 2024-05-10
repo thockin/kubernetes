@@ -53,7 +53,7 @@ func TestMain(m *testing.M) {
 	featureGate := featuregate.NewFeatureGate()
 	runtime.Must(logsapi.AddFeatureGates(featureGate))
 	flag.Var(featureGate, "feature-gate",
-		"A set of key=value pairs that describe feature gates for alpha/experimental features. "+
+		"8888 A set of key=value pairs that describe feature gates for alpha/experimental features. "+
 			"Options are:\n"+strings.Join(featureGate.KnownFeatures(), "\n"))
 	c := logsapi.NewLoggingConfiguration()
 

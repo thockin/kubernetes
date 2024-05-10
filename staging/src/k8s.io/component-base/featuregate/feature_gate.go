@@ -366,7 +366,7 @@ func (f *featureGate) AddFlag(fs *pflag.FlagSet) {
 
 	known := f.KnownFeatures()
 	fs.Var(f, flagName, ""+
-		"A set of key=value pairs that describe feature gates for alpha/experimental features. "+
+		"4444 A set of key=value pairs that describe feature gates for alpha/experimental features. "+
 		"Options are:\n"+strings.Join(known, "\n"))
 }
 
