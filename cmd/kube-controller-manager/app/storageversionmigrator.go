@@ -26,8 +26,9 @@ import (
 	"k8s.io/controller-manager/controller"
 	"k8s.io/kubernetes/cmd/kube-controller-manager/names"
 	"k8s.io/kubernetes/pkg/features"
+	"k8s.io/utils/feature"
 
-	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	oldutilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientgofeaturegate "k8s.io/client-go/features"
 	svm "k8s.io/kubernetes/pkg/controller/storageversionmigrator"
 )
@@ -45,8 +46,8 @@ func startSVMController(
 	controllerContext ControllerContext,
 	controllerName string,
 ) (controller.Interface, bool, error) {
-	if !utilfeature.DefaultFeatureGate.Enabled(features.StorageVersionMigrator) ||
-		!clientgofeaturegate.FeatureGates().Enabled(clientgofeaturegate.InformerResourceVersion) {
+	if !oldutilfeature.DefaultFeatureGate.Enabled(features.StorageVersionMigrator) &&
+		!feature.Enabled(clientgofeaturegate.InformerResourceVersionGate) {
 		return nil, false, nil
 	}
 

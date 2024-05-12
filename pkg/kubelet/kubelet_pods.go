@@ -69,6 +69,7 @@ import (
 	"k8s.io/kubernetes/pkg/volume/util/volumepathhandler"
 	volumevalidation "k8s.io/kubernetes/pkg/volume/validation"
 	"k8s.io/kubernetes/third_party/forked/golang/expansion"
+	"k8s.io/utils/feature"
 	utilnet "k8s.io/utils/net"
 )
 
@@ -348,7 +349,8 @@ func makeMounts(pod *v1.Pod, podDir string, container *v1.Container, hostName, h
 		if err != nil {
 			return nil, cleanupAction, fmt.Errorf("failed to resolve recursive read-only mode: %w", err)
 		}
-		if rro && !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) {
+		if rro && !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) &&
+			!feature.Enabled(features.RecursiveReadOnlyMountsGate) {
 			return nil, cleanupAction, fmt.Errorf("recursive read-only mount needs feature gate %q to be enabled", features.RecursiveReadOnlyMounts)
 		}
 
@@ -2136,7 +2138,8 @@ func (kl *Kubelet) convertToAPIContainerStatuses(pod *v1.Pod, podStatus *kubecon
 		}
 		// status.VolumeMounts cannot be propagated from kubecontainer.Status
 		// because the CRI API is unaware of the volume names.
-		if utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) {
+		if utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) ||
+			feature.Enabled(features.RecursiveReadOnlyMountsGate) {
 			for _, vol := range container.VolumeMounts {
 				volStatus := v1.VolumeMountStatus{
 					Name:      vol.Name,
@@ -2148,7 +2151,8 @@ func (kl *Kubelet) convertToAPIContainerStatuses(pod *v1.Pod, podStatus *kubecon
 					if b, err := resolveRecursiveReadOnly(vol, supportsRRO); err != nil {
 						klog.ErrorS(err, "failed to resolve recursive read-only mode", "mode", *vol.RecursiveReadOnly)
 					} else if b {
-						if utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) {
+						if utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) ||
+							feature.Enabled(features.RecursiveReadOnlyMountsGate) {
 							rroMode = v1.RecursiveReadOnlyEnabled
 						} else {
 							klog.ErrorS(nil, "recursive read-only mount needs feature gate to be enabled",

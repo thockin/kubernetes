@@ -40,6 +40,7 @@ import (
 	"k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/kubelet/client"
+	"k8s.io/utils/feature"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
@@ -103,7 +104,8 @@ func dropDisabledFields(node *api.Node, oldNode *api.Node) {
 		node.Spec.ConfigSource = nil
 	}
 
-	if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) {
+	if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) &&
+		!feature.Enabled(features.RecursiveReadOnlyMountsGate) {
 		node.Status.RuntimeHandlers = nil
 	}
 }

@@ -29,6 +29,7 @@ import (
 	"k8s.io/kubernetes/pkg/apis/core/helper"
 	apivalidation "k8s.io/kubernetes/pkg/apis/core/validation"
 	"k8s.io/kubernetes/pkg/features"
+	"k8s.io/utils/feature"
 )
 
 // ContainerType signifies container type
@@ -685,7 +686,8 @@ func dropDisabledFields(
 		// For other types of containers, validateContainers will handle them.
 	}
 
-	if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) && !rroInUse(oldPodSpec) {
+	if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) &&
+		!feature.Enabled(features.RecursiveReadOnlyMountsGate) && !rroInUse(oldPodSpec) {
 		for i := range podSpec.Containers {
 			for j := range podSpec.Containers[i].VolumeMounts {
 				podSpec.Containers[i].VolumeMounts[j].RecursiveReadOnly = nil
@@ -809,7 +811,8 @@ func dropDisabledPodStatusFields(podStatus, oldPodStatus *api.PodStatus, podSpec
 		podStatus.HostIPs = nil
 	}
 
-	if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) && !rroInUse(oldPodSpec) {
+	if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) &&
+		!feature.Enabled(features.RecursiveReadOnlyMountsGate) && !rroInUse(oldPodSpec) {
 		for i := range podStatus.ContainerStatuses {
 			podStatus.ContainerStatuses[i].VolumeMounts = nil
 		}

@@ -24,6 +24,8 @@ import (
 	"os"
 	_ "time/tzdata" // for CronJob Time Zone support
 
+	clientfeatures "k8s.io/client-go/features"
+
 	"k8s.io/component-base/cli"
 	_ "k8s.io/component-base/logs/json/register"          // for JSON log format registration
 	_ "k8s.io/component-base/metrics/prometheus/clientgo" // load all the prometheus client-go plugin
@@ -32,6 +34,9 @@ import (
 )
 
 func main() {
+	// FIXME: Example, do not merge
+	clientfeatures.WatchListClientGate.Set(true)
+
 	command := app.NewControllerManagerCommand()
 	code := cli.Run(command)
 	os.Exit(code)

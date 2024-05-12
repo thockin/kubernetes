@@ -43,6 +43,7 @@ import (
 	"k8s.io/kubernetes/pkg/kubelet/cm"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	"k8s.io/kubernetes/pkg/kubelet/events"
+	"k8s.io/utils/feature"
 	netutils "k8s.io/utils/net"
 
 	"k8s.io/klog/v2"
@@ -485,7 +486,8 @@ func GoRuntime() Setter {
 // RuntimeHandlers returns a Setter that sets RuntimeHandlers on the node.
 func RuntimeHandlers(fn func() []kubecontainer.RuntimeHandler) Setter {
 	return func(ctx context.Context, node *v1.Node) error {
-		if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) {
+		if !utilfeature.DefaultFeatureGate.Enabled(features.RecursiveReadOnlyMounts) &&
+			!feature.Enabled(features.RecursiveReadOnlyMountsGate) {
 			return nil
 		}
 		handlers := fn()

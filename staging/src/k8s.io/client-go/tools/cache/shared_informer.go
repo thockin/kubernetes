@@ -29,6 +29,7 @@ import (
 	"k8s.io/client-go/tools/cache/synctrack"
 	"k8s.io/utils/buffer"
 	"k8s.io/utils/clock"
+	"k8s.io/utils/feature"
 
 	"k8s.io/klog/v2"
 
@@ -411,7 +412,8 @@ func (v *dummyController) HasSynced() bool {
 }
 
 func (v *dummyController) LastSyncResourceVersion() string {
-	if clientgofeaturegate.FeatureGates().Enabled(clientgofeaturegate.InformerResourceVersion) {
+	if clientgofeaturegate.FeatureGates().Enabled(clientgofeaturegate.InformerResourceVersion) ||
+		feature.Enabled(clientgofeaturegate.InformerResourceVersionGate) {
 		return v.informer.LastSyncResourceVersion()
 	}
 

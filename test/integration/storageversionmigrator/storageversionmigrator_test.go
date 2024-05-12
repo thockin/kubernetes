@@ -30,9 +30,9 @@ import (
 	encryptionconfigcontroller "k8s.io/apiserver/pkg/server/options/encryptionconfig/controller"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientgofeaturegate "k8s.io/client-go/features"
-	"k8s.io/component-base/featuregate"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/kubernetes/pkg/features"
+	"k8s.io/utils/feature"
 )
 
 // TestStorageVersionMigration is an integration test that verifies storage version migration works.
@@ -47,7 +47,7 @@ import (
 // 8. Verify that the resource version of the secret is not updated. i.e. it was a no-op update
 func TestStorageVersionMigration(t *testing.T) {
 	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.StorageVersionMigrator, true)
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, featuregate.Feature(clientgofeaturegate.InformerResourceVersion), true)
+	feature.SetForTesting(clientgofeaturegate.InformerResourceVersionGate, t, true)
 
 	// this makes the test super responsive. It's set to a default of 1 minute.
 	encryptionconfigcontroller.EncryptionConfigFileChangePollDuration = time.Millisecond
@@ -149,7 +149,7 @@ func TestStorageVersionMigration(t *testing.T) {
 // 11. Verify the list of CRs at v2 works
 func TestStorageVersionMigrationWithCRD(t *testing.T) {
 	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.StorageVersionMigrator, true)
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, featuregate.Feature(clientgofeaturegate.InformerResourceVersion), true)
+	feature.SetForTesting(clientgofeaturegate.InformerResourceVersionGate, t, true)
 	// decode errors are expected when using conversation webhooks
 	etcd3watcher.TestOnlySetFatalOnDecodeError(false)
 	defer etcd3watcher.TestOnlySetFatalOnDecodeError(true)
