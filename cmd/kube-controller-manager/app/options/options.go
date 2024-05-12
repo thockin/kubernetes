@@ -45,6 +45,7 @@ import (
 	kubectrlmgrconfigscheme "k8s.io/kubernetes/pkg/controller/apis/config/scheme"
 	"k8s.io/kubernetes/pkg/controller/garbagecollector"
 	garbagecollectorconfig "k8s.io/kubernetes/pkg/controller/garbagecollector/config"
+	"k8s.io/kubernetes/pkg/features"
 	netutils "k8s.io/utils/net"
 
 	// add the kubernetes feature gates
@@ -274,6 +275,8 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	fs.StringVar(&s.Master, "master", s.Master, "The address of the Kubernetes API server (overrides any value in kubeconfig).")
 	fs.StringVar(&s.Generic.ClientConnection.Kubeconfig, "kubeconfig", s.Generic.ClientConnection.Kubeconfig, "Path to kubeconfig file with authorization and master location information (the master location can be overridden by the master flag).")
 	utilfeature.DefaultMutableFeatureGate.AddFlag(fss.FlagSet("generic"))
+	features.KubernetesGates().EnablePFlagControl("new-feature-gates", fss.FlagSet("generic"))
+	features.KubernetesGates().EnableEnvControl("KUBE_FEATURE_", func(err error) { panic(err.Error()) })
 
 	return fss
 }

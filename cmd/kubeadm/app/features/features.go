@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/component-base/featuregate"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/feature"
 )
 
 const (
@@ -41,6 +42,16 @@ const (
 	// WaitForAllControlPlaneComponents is expected to be alpha in v1.30
 	WaitForAllControlPlaneComponents = "WaitForAllControlPlaneComponents"
 )
+
+var (
+	// This is the composed set of gates that kubadm exposes.
+	kubeadmGates = &feature.GateSet{}
+)
+
+// Gates returns the set of feature gates exposed by this library.
+func Gates() *feature.GateSet {
+	return kubeadmGates
+}
 
 // InitFeatureGates are the default feature gates for the init command
 var InitFeatureGates = FeatureList{

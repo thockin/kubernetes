@@ -95,6 +95,7 @@ func NewCommandStartWardleServer(ctx context.Context, defaults *WardleServerOpti
 	flags := cmd.Flags()
 	o.RecommendedOptions.AddFlags(flags)
 	utilfeature.DefaultMutableFeatureGate.AddFlag(flags)
+	//FIXME: what gateset(s) should this use?
 
 	return cmd
 }

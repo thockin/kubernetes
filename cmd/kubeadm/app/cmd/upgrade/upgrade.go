@@ -25,6 +25,7 @@ import (
 	"k8s.io/kubernetes/cmd/kubeadm/app/cmd/options"
 	cmdutil "k8s.io/kubernetes/cmd/kubeadm/app/cmd/util"
 	kubeadmconstants "k8s.io/kubernetes/cmd/kubeadm/app/constants"
+	"k8s.io/kubernetes/cmd/kubeadm/app/features"
 )
 
 // applyPlanFlags holds the values for the common flags in `kubeadm upgrade apply` and `kubeadm upgrade plan`
@@ -73,4 +74,8 @@ func addApplyPlanFlags(fs *pflag.FlagSet, flags *applyPlanFlags) {
 	fs.BoolVar(&flags.printConfig, "print-config", flags.printConfig, "Specifies whether the configuration file that will be used in the upgrade should be printed or not.")
 	options.AddFeatureGatesStringFlag(fs, &flags.featureGatesString)
 	options.AddIgnorePreflightErrorsFlag(fs, &flags.ignorePreflightErrors)
+
+	// Enable feature gates
+	features.Gates().EnablePFlagControl("new-feature-gates", fs)
+	features.Gates().EnableEnvControl("KUBE_FEATURE_", func(err error) { panic(err.Error()) })
 }

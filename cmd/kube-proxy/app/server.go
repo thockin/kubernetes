@@ -576,6 +576,10 @@ with the apiserver API to configure the proxy.`,
 	opts.AddFlags(fs)
 	fs.AddGoFlagSet(goflag.CommandLine) // for --boot-id-file and --machine-id-file
 
+	// Enable feature gates
+	features.KubernetesGates().EnablePFlagControl("new-feature-gates", fs)
+	features.KubernetesGates().EnableEnvControl("KUBE_FEATURE_", func(err error) { panic(err.Error()) })
+
 	_ = cmd.MarkFlagFilename("config", "yaml", "yml", "json")
 
 	return cmd

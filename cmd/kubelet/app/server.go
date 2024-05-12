@@ -289,6 +289,10 @@ is checked every 20 seconds (also configurable with a flag).`,
 	options.AddGlobalFlags(cleanFlagSet)
 	cleanFlagSet.BoolP("help", "h", false, fmt.Sprintf("help for %s", cmd.Name()))
 
+	// Enable feature gates
+	features.KubernetesGates().EnablePFlagControl("new-feature-gates", cleanFlagSet)
+	features.KubernetesGates().EnableEnvControl("KUBE_FEATURE_", func(err error) { panic(err.Error()) })
+
 	// ugly, but necessary, because Cobra's default UsageFunc and HelpFunc pollute the flagset with global flags
 	const usageFmt = "Usage:\n  %s\n\nFlags:\n%s"
 	cmd.SetUsageFunc(func(cmd *cobra.Command) error {
@@ -373,6 +377,7 @@ func kubeletConfigFlagPrecedence(kc *kubeletconfiginternal.KubeletConfiguration,
 	fs := newFakeFlagSet(newFlagSetWithGlobals())
 	// register throwaway KubeletFlags
 	options.NewKubeletFlags().AddFlags(fs)
+	features.KubernetesGates().EnablePFlagControl("new-feature-gates", fs)
 	// register new KubeletConfiguration
 	options.AddKubeletConfigFlags(fs, kc)
 	// Remember original feature gates, so we can merge with flag gates later

@@ -139,6 +139,10 @@ func newCmdInit(out io.Writer, initOptions *initOptions) *cobra.Command {
 	initOptions.bto.AddTTLFlag(cmd.Flags())
 	options.AddImageMetaFlags(cmd.Flags(), &initOptions.externalClusterCfg.ImageRepository)
 
+	// Enable feature gates
+	features.Gates().EnablePFlagControl("new-feature-gates", cmd.Flags())
+	features.Gates().EnableEnvControl("KUBE_FEATURE_", func(err error) { panic(err.Error()) })
+
 	// defines additional flag that are not used by the init command but that could be eventually used
 	// by the sub-commands automatically generated for phases
 	initRunner.SetAdditionalFlags(func(flags *flag.FlagSet) {
