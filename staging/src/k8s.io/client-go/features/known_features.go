@@ -16,6 +16,10 @@ limitations under the License.
 
 package features
 
+import (
+	"k8s.io/utils/feature"
+)
+
 const (
 	// Every feature gate should add method here following this template:
 	//
@@ -42,6 +46,47 @@ const (
 	// alpha: v1.30
 	InformerResourceVersion Feature = "InformerResourceVersion"
 )
+
+var (
+	libGates = &feature.GateSet{}
+
+	// Every feature gate should add method here following this template:
+	//
+	// // owner: @username
+	// // alpha: v1.4
+	// MyFeature featuregate.Feature = "MyFeature"
+	//
+	// Feature gates should be listed in alphabetical, case-sensitive
+	// (upper before any lower case character) order. This reduces the risk
+	// of code conflicts because changes are more likely to be scattered
+	// across the file.
+
+	// owner: @p0lyn0mial
+	// beta: v1.30
+	//
+	// Allow the client to get a stream of individual items instead of chunking from the server.
+	//
+	// NOTE:
+	//  The feature is disabled in Beta by default because
+	//  it will only be turned on for selected control plane component(s).
+	WatchListClientGate = libGates.AddOrDie(&feature.Gate{
+		Name:    "WatchListClient",
+		Release: feature.Beta,
+	})
+
+	// owner: @nilekhc
+	// alpha: v1.30
+	InformerResourceVersionGate = libGates.AddOrDie(&feature.Gate{
+		Name:    "InformerResourceVersion",
+		Release: feature.Alpha,
+	})
+)
+
+// NewFeatureGates returns the set of feature gates exposed by this library.
+// FIXME: Rename to FeatureGates once old-style function of same name is gone.
+func NewFeatureGates() *feature.GateSet {
+	return libGates
+}
 
 // defaultKubernetesFeatureGates consists of all known Kubernetes-specific feature keys.
 //

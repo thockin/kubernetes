@@ -19,6 +19,7 @@ package features
 import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/featuregate"
+	"k8s.io/utils/feature"
 )
 
 const (
@@ -45,6 +46,43 @@ const (
 
 func init() {
 	utilfeature.DefaultMutableFeatureGate.Add(defaultKubernetesFeatureGates)
+}
+
+var (
+	libGates = &feature.GateSet{}
+
+	// Every feature gate should add method here following this template:
+	//
+	// // owner: @username
+	// // alpha: v1.4
+	// MyFeature() bool
+
+	// owner: @alexzielenski
+	// alpha: v1.28
+	//
+	// Ignores errors raised on unchanged fields of Custom Resources
+	// across UPDATE/PATCH requests.
+	CRDValidationRatchetingGate = libGates.AddOrDie(&feature.Gate{
+		Name:    "CRDValidationRatcheting",
+		Default: true,
+		Release: feature.Beta,
+	})
+
+	// owner: @jpbetz
+	// alpha: v1.30
+	//
+	// CustomResourceDefinitions may include SelectableFields to declare which fields
+	// may be used as field selectors.
+	CustomResourceFieldSelectorsGate = libGates.AddOrDie(&feature.Gate{
+		Name:    "CustomResourceFieldSelectors",
+		Default: false,
+		Release: feature.Beta,
+	})
+)
+
+// FeatureGates returns the set of feature gates exposed by this library.
+func FeatureGates() *feature.GateSet {
+	return libGates
 }
 
 // defaultKubernetesFeatureGates consists of all known Kubernetes-specific feature keys.

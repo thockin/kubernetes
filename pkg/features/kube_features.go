@@ -23,6 +23,8 @@ import (
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	clientfeatures "k8s.io/client-go/features"
 	"k8s.io/component-base/featuregate"
+	kubeaggregatorfeatures "k8s.io/kube-aggregator/pkg/features"
+	"k8s.io/utils/feature"
 )
 
 const (
@@ -963,6 +965,31 @@ const (
 	// Allows recursive read-only mounts.
 	RecursiveReadOnlyMounts featuregate.Feature = "RecursiveReadOnlyMounts"
 )
+
+var (
+	// This is the composed set of gates that standard Kubernetes components
+	// will expose.  It starts with a few critical libs and then we will define
+	// our own below.
+	kubeGates = feature.MergeGateSets(
+		clientfeatures.NewFeatureGates(),
+		kubeaggregatorfeatures.FeatureGates(),
+		apiextensionsfeatures.FeatureGates())
+
+	// owner: @AkihiroSuda
+	// kep: https://kep.k8s.io/3857
+	// alpha: v1.30
+	//
+	// Allows recursive read-only mounts.
+	RecursiveReadOnlyMountsGate = kubeGates.AddOrDie(&feature.Gate{
+		Name: "RecursiveReadOnlyMounts", Default: false, Release: feature.Alpha,
+	})
+)
+
+// KubernetesGates returns the set of feature gates that standard Kubernetes
+// components will expose.
+func KubernetesGates() *feature.GateSet {
+	return kubeGates
+}
 
 func init() {
 	runtime.Must(utilfeature.DefaultMutableFeatureGate.Add(defaultKubernetesFeatureGates))
