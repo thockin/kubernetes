@@ -34,6 +34,7 @@ import (
 	logsapi "k8s.io/component-base/logs/api/v1"
 	"k8s.io/component-base/metrics"
 	"k8s.io/klog/v2"
+	"k8s.io/kubernetes/pkg/features"
 	netutil "k8s.io/utils/net"
 
 	_ "k8s.io/kubernetes/pkg/features"
@@ -101,7 +102,7 @@ type CompletedOptions struct {
 // NewOptions creates a new ServerRunOptions object with default parameters
 func NewOptions() *Options {
 	s := Options{
-		GenericServerRunOptions: genericoptions.NewServerRunOptions(),
+		GenericServerRunOptions: genericoptions.NewServerRunOptions(features.KubernetesGates()),
 		Etcd:                    genericoptions.NewEtcdOptions(storagebackend.NewDefaultConfig(kubeoptions.DefaultEtcdPathPrefix, nil)),
 		SecureServing:           kubeoptions.NewSecureServingOptions(),
 		Audit:                   genericoptions.NewAuditOptions(),
