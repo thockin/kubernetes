@@ -14,6 +14,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "apiservices",
               "responseKind": {
                 "group": "",
@@ -63,6 +64,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "controllerrevisions",
               "responseKind": {
                 "group": "",
@@ -86,6 +88,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "daemonsets",
               "responseKind": {
                 "group": "",
@@ -127,6 +130,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "deployments",
               "responseKind": {
                 "group": "",
@@ -181,6 +185,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "replicasets",
               "responseKind": {
                 "group": "",
@@ -235,6 +240,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "statefulsets",
               "responseKind": {
                 "group": "",
@@ -300,6 +306,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "events",
               "responseKind": {
                 "group": "",
@@ -337,6 +344,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "selfsubjectreviews",
               "responseKind": {
                 "group": "",
@@ -350,6 +358,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "tokenreviews",
               "responseKind": {
                 "group": "",
@@ -369,6 +378,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "selfsubjectreviews",
               "responseKind": {
                 "group": "",
@@ -388,6 +398,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "selfsubjectreviews",
               "responseKind": {
                 "group": "",
@@ -415,6 +426,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "localsubjectaccessreviews",
               "responseKind": {
                 "group": "",
@@ -428,6 +440,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "selfsubjectaccessreviews",
               "responseKind": {
                 "group": "",
@@ -441,6 +454,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "selfsubjectrulesreviews",
               "responseKind": {
                 "group": "",
@@ -454,6 +468,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "subjectaccessreviews",
               "responseKind": {
                 "group": "",
@@ -484,6 +499,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "horizontalpodautoscalers",
               "responseKind": {
                 "group": "",
@@ -531,6 +547,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "horizontalpodautoscalers",
               "responseKind": {
                 "group": "",
@@ -586,6 +603,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "cronjobs",
               "responseKind": {
                 "group": "",
@@ -627,6 +645,7 @@
               "categories": [
                 "all"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "jobs",
               "responseKind": {
                 "group": "",
@@ -676,6 +695,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "certificatesigningrequests",
               "responseKind": {
                 "group": "",
@@ -733,6 +753,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "clustertrustbundles",
               "responseKind": {
                 "group": "",
@@ -767,6 +788,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "ingressclasses",
               "responseKind": {
                 "group": "",
@@ -787,6 +809,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "ingresses",
               "responseKind": {
                 "group": "",
@@ -825,6 +848,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 9223372036854775807,
               "resource": "networkpolicies",
               "responseKind": {
                 "group": "",
@@ -854,6 +878,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "ipaddresses",
               "responseKind": {
                 "group": "",
@@ -877,6 +902,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "servicecidrs",
               "responseKind": {
                 "group": "",
@@ -926,6 +952,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "poddisruptionbudgets",
               "responseKind": {
                 "group": "",
@@ -978,6 +1005,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "clusterrolebindings",
               "responseKind": {
                 "group": "",
@@ -998,6 +1026,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "clusterroles",
               "responseKind": {
                 "group": "",
@@ -1018,6 +1047,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "rolebindings",
               "responseKind": {
                 "group": "",
@@ -1038,6 +1068,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "roles",
               "responseKind": {
                 "group": "",
@@ -1072,6 +1103,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "csidrivers",
               "responseKind": {
                 "group": "",
@@ -1092,6 +1124,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "csinodes",
               "responseKind": {
                 "group": "",
@@ -1112,6 +1145,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "csistoragecapacities",
               "responseKind": {
                 "group": "",
@@ -1132,6 +1166,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "storageclasses",
               "responseKind": {
                 "group": "",
@@ -1155,6 +1190,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "volumeattachments",
               "responseKind": {
                 "group": "",
@@ -1196,6 +1232,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "volumeattributesclasses",
               "responseKind": {
                 "group": "",
@@ -1236,6 +1273,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "mutatingwebhookconfigurations",
               "responseKind": {
                 "group": "",
@@ -1259,6 +1297,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingadmissionpolicies",
               "responseKind": {
                 "group": "",
@@ -1297,6 +1336,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingadmissionpolicybindings",
               "responseKind": {
                 "group": "",
@@ -1320,6 +1360,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingwebhookconfigurations",
               "responseKind": {
                 "group": "",
@@ -1349,6 +1390,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingadmissionpolicies",
               "responseKind": {
                 "group": "",
@@ -1387,6 +1429,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingadmissionpolicybindings",
               "responseKind": {
                 "group": "",
@@ -1416,6 +1459,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingadmissionpolicies",
               "responseKind": {
                 "group": "",
@@ -1454,6 +1498,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "validatingadmissionpolicybindings",
               "responseKind": {
                 "group": "",
@@ -1491,6 +1536,7 @@
               "categories": [
                 "api-extensions"
               ],
+              "namespaceDeletionOrder": 0,
               "resource": "customresourcedefinitions",
               "responseKind": {
                 "group": "",
@@ -1544,6 +1590,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "priorityclasses",
               "responseKind": {
                 "group": "",
@@ -1581,6 +1628,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "leases",
               "responseKind": {
                 "group": "",
@@ -1615,6 +1663,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "runtimeclasses",
               "responseKind": {
                 "group": "",
@@ -1649,6 +1698,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "endpointslices",
               "responseKind": {
                 "group": "",
@@ -1683,6 +1733,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "flowschemas",
               "responseKind": {
                 "group": "",
@@ -1718,6 +1769,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "prioritylevelconfigurations",
               "responseKind": {
                 "group": "",
@@ -1759,6 +1811,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "flowschemas",
               "responseKind": {
                 "group": "",
@@ -1794,6 +1847,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "prioritylevelconfigurations",
               "responseKind": {
                 "group": "",
@@ -1843,6 +1897,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "storageversions",
               "responseKind": {
                 "group": "",
@@ -1892,6 +1947,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "podschedulingcontexts",
               "responseKind": {
                 "group": "",
@@ -1927,6 +1983,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "resourceclaimparameters",
               "responseKind": {
                 "group": "",
@@ -1947,6 +2004,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "resourceclaims",
               "responseKind": {
                 "group": "",
@@ -1982,6 +2040,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "resourceclaimtemplates",
               "responseKind": {
                 "group": "",
@@ -2002,6 +2061,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "resourceclasses",
               "responseKind": {
                 "group": "",
@@ -2022,6 +2082,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "resourceclassparameters",
               "responseKind": {
                 "group": "",
@@ -2042,6 +2103,7 @@
               ]
             },
             {
+              "namespaceDeletionOrder": 0,
               "resource": "resourceslices",
               "responseKind": {
                 "group": "",
@@ -2076,6 +2138,7 @@
           "freshness": "Current",
           "resources": [
             {
+              "namespaceDeletionOrder": 0,
               "resource": "storageversionmigrations",
               "responseKind": {
                 "group": "",

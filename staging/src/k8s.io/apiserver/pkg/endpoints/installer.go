@@ -97,10 +97,11 @@ func ConvertGroupVersionIntoToDiscovery(list []metav1.APIResource) ([]apidiscove
 				Version: r.Version,
 				Kind:    r.Kind,
 			},
-			Verbs:            r.Verbs,
-			ShortNames:       r.ShortNames,
-			Categories:       r.Categories,
-			SingularResource: r.SingularName,
+			Verbs:                  r.Verbs,
+			ShortNames:             r.ShortNames,
+			Categories:             r.Categories,
+			SingularResource:       r.SingularName,
+			NamespaceDeletionOrder: r.NamespaceDeletionOrder,
 		}
 		apiResourceList = append(apiResourceList, resource)
 		parentResources[r.Name] = len(apiResourceList) - 1
@@ -1097,6 +1098,17 @@ func (a *APIInstaller) registerResourceHandlers(path string, storage rest.Storag
 		apiResource.Group = gvk.Group
 		apiResource.Version = gvk.Version
 		apiResource.Kind = gvk.Kind
+	}
+
+	if namespaceScoped {
+		if deletionOrderProvider, ok := storage.(rest.NamespaceDeletionOrderProvider); ok {
+			o := deletionOrderProvider.DeletionOrder()
+			if o < 0 {
+				return nil, nil, fmt.Errorf("resource %s NamespaceDeletionOrderProvider returned a negative value: %d", resource, o)
+			}
+
+			apiResource.NamespaceDeletionOrder = o
+		}
 	}
 
 	// Record the existence of the GVR and the corresponding GVK

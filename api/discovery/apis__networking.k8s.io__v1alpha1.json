@@ -6,6 +6,7 @@
     {
       "kind": "IPAddress",
       "name": "ipaddresses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "ip"
@@ -26,6 +27,7 @@
     {
       "kind": "ServiceCIDR",
       "name": "servicecidrs",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "servicecidr",
       "storageVersionHash": "3cDF5hqTkLY=",
@@ -43,6 +45,7 @@
     {
       "kind": "ServiceCIDR",
       "name": "servicecidrs/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

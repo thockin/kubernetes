@@ -6,6 +6,7 @@
     {
       "kind": "RuntimeClass",
       "name": "runtimeclasses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "runtimeclass",
       "storageVersionHash": "WQTu1GL3T2Q=",

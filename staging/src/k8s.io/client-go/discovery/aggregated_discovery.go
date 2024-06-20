@@ -120,12 +120,13 @@ var emptyKind = metav1.GroupVersionKind{}
 // discovery, and the subresource MUST have the GVK.
 func convertAPIResource(in apidiscovery.APIResourceDiscovery) (metav1.APIResource, error) {
 	result := metav1.APIResource{
-		Name:         in.Resource,
-		SingularName: in.SingularResource,
-		Namespaced:   in.Scope == apidiscovery.ScopeNamespace,
-		Verbs:        in.Verbs,
-		ShortNames:   in.ShortNames,
-		Categories:   in.Categories,
+		Name:                   in.Resource,
+		SingularName:           in.SingularResource,
+		Namespaced:             in.Scope == apidiscovery.ScopeNamespace,
+		Verbs:                  in.Verbs,
+		ShortNames:             in.ShortNames,
+		Categories:             in.Categories,
+		NamespaceDeletionOrder: in.NamespaceDeletionOrder,
 	}
 	var err error
 	if in.ResponseKind != nil && (*in.ResponseKind) != emptyKind {
@@ -243,12 +244,13 @@ func convertAPIGroupv2beta1(g apidiscoveryv2beta1.APIGroupDiscovery) (
 // discovery, and the subresource MUST have the GVK.
 func convertAPIResourcev2beta1(in apidiscoveryv2beta1.APIResourceDiscovery) (metav1.APIResource, error) {
 	result := metav1.APIResource{
-		Name:         in.Resource,
-		SingularName: in.SingularResource,
-		Namespaced:   in.Scope == apidiscoveryv2beta1.ScopeNamespace,
-		Verbs:        in.Verbs,
-		ShortNames:   in.ShortNames,
-		Categories:   in.Categories,
+		Name:                   in.Resource,
+		SingularName:           in.SingularResource,
+		Namespaced:             in.Scope == apidiscoveryv2beta1.ScopeNamespace,
+		Verbs:                  in.Verbs,
+		ShortNames:             in.ShortNames,
+		Categories:             in.Categories,
+		NamespaceDeletionOrder: in.NamespaceDeletionOrder,
 	}
 	// Can return partial result with error, which can be the parent for a
 	// subresource. Do not add this result to the returned discovery resources.

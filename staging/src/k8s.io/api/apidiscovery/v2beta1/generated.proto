@@ -102,6 +102,9 @@ message APIResourceDiscovery {
   // +listType=map
   // +listMapKey=subresource
   repeated APISubresourceDiscovery subresources = 8;
+
+  // FIXME:
+  optional int64 namespaceDeletionOrder = 11;
 }
 
 // APISubresourceDiscovery provides information about an API subresource for discovery.

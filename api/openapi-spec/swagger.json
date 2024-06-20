@@ -17703,6 +17703,11 @@
           "description": "name is the plural name of the resource.",
           "type": "string"
         },
+        "namespaceDeletionOrder": {
+          "description": "FIXME:",
+          "format": "int64",
+          "type": "integer"
+        },
         "namespaced": {
           "description": "namespaced indicates if a resource is namespaced or not.",
           "type": "boolean"
@@ -17740,7 +17745,8 @@
         "singularName",
         "namespaced",
         "kind",
-        "verbs"
+        "verbs",
+        "namespaceDeletionOrder"
       ],
       "type": "object"
     },

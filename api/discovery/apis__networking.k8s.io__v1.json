@@ -6,6 +6,7 @@
     {
       "kind": "IngressClass",
       "name": "ingressclasses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "ingressclass",
       "storageVersionHash": "l/iqIbDgFyQ=",
@@ -23,6 +24,7 @@
     {
       "kind": "Ingress",
       "name": "ingresses",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "ing"
@@ -43,6 +45,7 @@
     {
       "kind": "Ingress",
       "name": "ingresses/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -54,6 +57,7 @@
     {
       "kind": "NetworkPolicy",
       "name": "networkpolicies",
+      "namespaceDeletionOrder": 9223372036854775807,
       "namespaced": true,
       "shortNames": [
         "netpol"

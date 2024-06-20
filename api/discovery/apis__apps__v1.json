@@ -6,6 +6,7 @@
     {
       "kind": "ControllerRevision",
       "name": "controllerrevisions",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "controllerrevision",
       "storageVersionHash": "85nkx63pcBU=",
@@ -26,6 +27,7 @@
       ],
       "kind": "DaemonSet",
       "name": "daemonsets",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "ds"
@@ -46,6 +48,7 @@
     {
       "kind": "DaemonSet",
       "name": "daemonsets/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -60,6 +63,7 @@
       ],
       "kind": "Deployment",
       "name": "deployments",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "deploy"
@@ -81,6 +85,7 @@
       "group": "autoscaling",
       "kind": "Scale",
       "name": "deployments/scale",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -93,6 +98,7 @@
     {
       "kind": "Deployment",
       "name": "deployments/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -107,6 +113,7 @@
       ],
       "kind": "ReplicaSet",
       "name": "replicasets",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "rs"
@@ -128,6 +135,7 @@
       "group": "autoscaling",
       "kind": "Scale",
       "name": "replicasets/scale",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -140,6 +148,7 @@
     {
       "kind": "ReplicaSet",
       "name": "replicasets/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -154,6 +163,7 @@
       ],
       "kind": "StatefulSet",
       "name": "statefulsets",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "sts"
@@ -175,6 +185,7 @@
       "group": "autoscaling",
       "kind": "Scale",
       "name": "statefulsets/scale",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -187,6 +198,7 @@
     {
       "kind": "StatefulSet",
       "name": "statefulsets/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [

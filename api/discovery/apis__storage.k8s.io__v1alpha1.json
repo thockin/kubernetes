@@ -6,6 +6,7 @@
     {
       "kind": "VolumeAttributesClass",
       "name": "volumeattributesclasses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "vac"

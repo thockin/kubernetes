@@ -144,6 +144,7 @@ func autoConvert_v2beta1_APIResourceDiscovery_To_apidiscovery_APIResourceDiscove
 	out.ShortNames = *(*[]string)(unsafe.Pointer(&in.ShortNames))
 	out.Categories = *(*[]string)(unsafe.Pointer(&in.Categories))
 	out.Subresources = *(*[]apidiscovery.APISubresourceDiscovery)(unsafe.Pointer(&in.Subresources))
+	out.NamespaceDeletionOrder = in.NamespaceDeletionOrder
 	return nil
 }
 
@@ -161,6 +162,7 @@ func autoConvert_apidiscovery_APIResourceDiscovery_To_v2beta1_APIResourceDiscove
 	out.ShortNames = *(*[]string)(unsafe.Pointer(&in.ShortNames))
 	out.Categories = *(*[]string)(unsafe.Pointer(&in.Categories))
 	out.Subresources = *(*[]v2beta1.APISubresourceDiscovery)(unsafe.Pointer(&in.Subresources))
+	out.NamespaceDeletionOrder = in.NamespaceDeletionOrder
 	return nil
 }
 

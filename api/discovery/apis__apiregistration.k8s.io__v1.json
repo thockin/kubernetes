@@ -9,6 +9,7 @@
       ],
       "kind": "APIService",
       "name": "apiservices",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "apiservice",
       "storageVersionHash": "InPBPD7+PqM=",
@@ -26,6 +27,7 @@
     {
       "kind": "APIService",
       "name": "apiservices/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

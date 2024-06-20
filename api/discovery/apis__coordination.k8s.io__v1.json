@@ -6,6 +6,7 @@
     {
       "kind": "Lease",
       "name": "leases",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "lease",
       "storageVersionHash": "gqkMMb/YqFM=",

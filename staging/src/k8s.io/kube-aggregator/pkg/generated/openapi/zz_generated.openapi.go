@@ -343,8 +343,16 @@ func schema_pkg_apis_meta_v1_APIResource(ref common.ReferenceCallback) common.Op
 							Format:      "",
 						},
 					},
+					"namespaceDeletionOrder": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FIXME:",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
 				},
-				Required: []string{"name", "singularName", "namespaced", "kind", "verbs"},
+				Required: []string{"name", "singularName", "namespaced", "kind", "verbs", "namespaceDeletionOrder"},
 			},
 		},
 	}

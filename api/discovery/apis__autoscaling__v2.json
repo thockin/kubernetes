@@ -9,6 +9,7 @@
       ],
       "kind": "HorizontalPodAutoscaler",
       "name": "horizontalpodautoscalers",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "hpa"
@@ -29,6 +30,7 @@
     {
       "kind": "HorizontalPodAutoscaler",
       "name": "horizontalpodautoscalers/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [

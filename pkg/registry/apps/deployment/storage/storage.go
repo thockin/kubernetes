@@ -19,6 +19,7 @@ package storage
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -477,4 +478,14 @@ func (i *scaleUpdatedObjectInfo) UpdatedObject(ctx context.Context, oldObj runti
 	deployment.ManagedFields = updatedEntries
 
 	return deployment, nil
+}
+
+// Implement NamespaceDeletionOrderProvider
+var _ rest.NamespaceDeletionOrderProvider = &REST{}
+
+// DeletionOrder implements the NamespaceDeletionOrderProvider interface.
+// Returns an integer indicating whether this type should be deleted earlier
+// (lower number) of later (higher value).
+func (r *REST) DeletionOrder() int64 {
+	return math.MinInt64 // explicitly first
 }

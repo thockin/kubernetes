@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"slices"
 	"sync"
 	"time"
 
@@ -515,36 +516,81 @@ func (d *namespacedResourcesDeleter) deleteAllContent(ctx context.Context, ns *v
 	}
 	// TODO(sttts): get rid of opCache and pass the verbs (especially "deletecollection") down into the deleter
 	deletableResources := discovery.FilteredBy(discovery.SupportsAllVerbs{Verbs: []string{"delete"}}, resources)
-	groupVersionResources, err := discovery.GroupVersionResources(deletableResources)
-	if err != nil {
-		// discovery errors are not fatal.  We often have some set of resources we can operate against even if we don't have a complete list
-		errs = append(errs, err)
-		conditionUpdater.ProcessGroupVersionErr(err)
+
+	type nothing struct{}
+	// Build an index of all the specific order values used.
+	indexMap := map[int64]nothing{}
+	for _, resList := range deletableResources {
+		for _, res := range resList.APIResources {
+			indexMap[res.NamespaceDeletionOrder] = nothing{}
+		}
+	}
+	index := make([]int64, 0, len(indexMap))
+	for ord := range indexMap {
+		index = append(index, ord)
+	}
+	slices.Sort(index)
+
+	// Build a map of order -> set of GVRs
+	orderedGVRs := map[int64]map[schema.GroupVersionResource]nothing{}
+	for _, ord := range index {
+		fn := func(groupVersion string, r *metav1.APIResource) bool {
+			return r.NamespaceDeletionOrder == ord
+		}
+		theseResources := discovery.FilteredBy(discovery.ResourcePredicateFunc(fn), deletableResources)
+		groupVersionResources, err := discovery.GroupVersionResources(theseResources)
+		if err != nil {
+			// discovery errors are not fatal.  We often have some set of resources we can operate against even if we don't have a complete list
+			errs = append(errs, err)
+			conditionUpdater.ProcessGroupVersionErr(err)
+			continue
+		}
+
+		orderedGVRs[ord] = map[schema.GroupVersionResource]nothing{}
+		for k, v := range groupVersionResources {
+			orderedGVRs[ord][k] = v
+		}
 	}
 
 	numRemainingTotals := allGVRDeletionMetadata{
 		gvrToNumRemaining:        map[schema.GroupVersionResource]int{},
 		finalizersToNumRemaining: map[string]int{},
 	}
-	for gvr := range groupVersionResources {
-		gvrDeletionMetadata, err := d.deleteAllContentForGroupVersionResource(ctx, gvr, namespace, namespaceDeletedAt)
-		if err != nil {
-			// If there is an error, hold on to it but proceed with all the remaining
-			// groupVersionResources.
-			errs = append(errs, err)
-			conditionUpdater.ProcessDeleteContentErr(err)
-		}
-		if gvrDeletionMetadata.finalizerEstimateSeconds > estimate {
-			estimate = gvrDeletionMetadata.finalizerEstimateSeconds
-		}
-		if gvrDeletionMetadata.numRemaining > 0 {
-			numRemainingTotals.gvrToNumRemaining[gvr] = gvrDeletionMetadata.numRemaining
-			for finalizer, numRemaining := range gvrDeletionMetadata.finalizersToNumRemaining {
-				if numRemaining == 0 {
-					continue
-				}
-				numRemainingTotals.finalizersToNumRemaining[finalizer] = numRemainingTotals.finalizersToNumRemaining[finalizer] + numRemaining
+	for _, ord := range index {
+		blocked := false
+		for gvr := range orderedGVRs[ord] {
+			logger.V(4).Info("namespace controller - deleteAllContent for GVR", "namespace", namespace, "ordinal", ord, "gvr", gvr)
+			gvrDeletionMetadata, err := d.deleteAllContentForGroupVersionResource(ctx, gvr, namespace, namespaceDeletedAt)
+			if err != nil {
+				// If there is an error, hold on to it but proceed with all the remaining
+				// groupVersionResources.
+				errs = append(errs, err)
+				conditionUpdater.ProcessDeleteContentErr(err)
 			}
+			if gvrDeletionMetadata.finalizerEstimateSeconds > estimate {
+				estimate = gvrDeletionMetadata.finalizerEstimateSeconds
+			}
+			if gvrDeletionMetadata.numRemaining > 0 {
+				blocked = true
+				numRemainingTotals.gvrToNumRemaining[gvr] = gvrDeletionMetadata.numRemaining
+				for finalizer, numRemaining := range gvrDeletionMetadata.finalizersToNumRemaining {
+					if numRemaining == 0 {
+						continue
+					}
+					numRemainingTotals.finalizersToNumRemaining[finalizer] = numRemainingTotals.finalizersToNumRemaining[finalizer] + numRemaining
+				}
+			}
+		}
+		if blocked {
+			// Do not proceed to the next ordinal. This function will be called
+			// periodically, at which time we will re-evaluate everything.
+			byGVR := map[string]int{}
+			for gvr, n := range numRemainingTotals.gvrToNumRemaining {
+				byGVR[gvr.String()] = n
+			}
+			byFinalizer := numRemainingTotals.finalizersToNumRemaining
+			logger.V(4).Info("namespace controller - deleteAllContent is blocked", "namespace", namespace, "ordinal", ord, "byGVR", byGVR, "byFinalizer", byFinalizer)
+			break
 		}
 	}
 	conditionUpdater.ProcessContentTotals(numRemainingTotals)

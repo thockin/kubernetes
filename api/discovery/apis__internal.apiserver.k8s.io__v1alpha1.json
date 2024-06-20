@@ -6,6 +6,7 @@
     {
       "kind": "StorageVersion",
       "name": "storageversions",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "storageversion",
       "storageVersionHash": "c8YZt5U0nPk=",
@@ -23,6 +24,7 @@
     {
       "kind": "StorageVersion",
       "name": "storageversions/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

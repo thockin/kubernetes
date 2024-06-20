@@ -6,6 +6,7 @@
     {
       "kind": "SelfSubjectReview",
       "name": "selfsubjectreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "selfsubjectreview",
       "verbs": [

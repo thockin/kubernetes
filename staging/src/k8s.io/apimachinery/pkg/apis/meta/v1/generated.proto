@@ -107,6 +107,9 @@ message APIResource {
   // This field will remain optional even if it graduates.
   // +optional
   optional string storageVersionHash = 10;
+
+  // FIXME:
+  optional int64 namespaceDeletionOrder = 11;
 }
 
 // APIResourceList is a list of APIResource, it is used to expose the name of the

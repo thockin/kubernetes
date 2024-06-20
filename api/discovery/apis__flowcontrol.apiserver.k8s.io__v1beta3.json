@@ -6,6 +6,7 @@
     {
       "kind": "FlowSchema",
       "name": "flowschemas",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "flowschema",
       "storageVersionHash": "GJVAJZSZBIw=",
@@ -23,6 +24,7 @@
     {
       "kind": "FlowSchema",
       "name": "flowschemas/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -34,6 +36,7 @@
     {
       "kind": "PriorityLevelConfiguration",
       "name": "prioritylevelconfigurations",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "prioritylevelconfiguration",
       "storageVersionHash": "Kir5PVfvNeI=",
@@ -51,6 +54,7 @@
     {
       "kind": "PriorityLevelConfiguration",
       "name": "prioritylevelconfigurations/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

@@ -6,6 +6,7 @@
     {
       "kind": "CertificateSigningRequest",
       "name": "certificatesigningrequests",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "csr"
@@ -26,6 +27,7 @@
     {
       "kind": "CertificateSigningRequest",
       "name": "certificatesigningrequests/approval",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -37,6 +39,7 @@
     {
       "kind": "CertificateSigningRequest",
       "name": "certificatesigningrequests/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

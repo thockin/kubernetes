@@ -6,6 +6,7 @@
     {
       "kind": "StorageVersionMigration",
       "name": "storageversionmigrations",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "storageversionmigration",
       "storageVersionHash": "N0mJdFqO17c=",
@@ -23,6 +24,7 @@
     {
       "kind": "StorageVersionMigration",
       "name": "storageversionmigrations/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

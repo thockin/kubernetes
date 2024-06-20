@@ -17,6 +17,8 @@ limitations under the License.
 package storage
 
 import (
+	"math"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
@@ -61,4 +63,14 @@ var _ rest.ShortNamesProvider = &REST{}
 // ShortNames implements the ShortNamesProvider interface. Returns a list of short names for a resource.
 func (r *REST) ShortNames() []string {
 	return []string{"netpol"}
+}
+
+// Implement NamespaceDeletionOrderProvider
+var _ rest.NamespaceDeletionOrderProvider = &REST{}
+
+// DeletionOrder implements the NamespaceDeletionOrderProvider interface.
+// Returns an integer indicating whether this type should be deleted earlier
+// (lower number) of later (higher value).
+func (r *REST) DeletionOrder() int64 {
+	return math.MaxInt64 // Explicitly last
 }

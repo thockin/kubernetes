@@ -6,6 +6,7 @@
     {
       "kind": "SelfSubjectReview",
       "name": "selfsubjectreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "selfsubjectreview",
       "verbs": [
@@ -15,6 +16,7 @@
     {
       "kind": "TokenReview",
       "name": "tokenreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "tokenreview",
       "verbs": [

@@ -18,6 +18,7 @@ package storage
 
 import (
 	"context"
+	"math"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -114,4 +115,14 @@ func (r *StatusREST) GetResetFields() map[fieldpath.APIVersion]*fieldpath.Set {
 
 func (r *StatusREST) ConvertToTable(ctx context.Context, object runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
 	return r.store.ConvertToTable(ctx, object, tableOptions)
+}
+
+// Implement NamespaceDeletionOrderProvider
+var _ rest.NamespaceDeletionOrderProvider = &REST{}
+
+// DeletionOrder implements the NamespaceDeletionOrderProvider interface.
+// Returns an integer indicating whether this type should be deleted earlier
+// (lower number) of later (higher value).
+func (r *REST) DeletionOrder() int64 {
+	return math.MinInt64 // explicitly first
 }

@@ -6,6 +6,7 @@
     {
       "kind": "EndpointSlice",
       "name": "endpointslices",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "endpointslice",
       "storageVersionHash": "qgS0xkrxYAI=",

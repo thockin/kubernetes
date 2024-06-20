@@ -9,6 +9,7 @@
       ],
       "kind": "CronJob",
       "name": "cronjobs",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "cj"
@@ -29,6 +30,7 @@
     {
       "kind": "CronJob",
       "name": "cronjobs/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -43,6 +45,7 @@
       ],
       "kind": "Job",
       "name": "jobs",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "job",
       "storageVersionHash": "mudhfqk/qZY=",
@@ -60,6 +63,7 @@
     {
       "kind": "Job",
       "name": "jobs/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [

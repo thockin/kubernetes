@@ -1173,6 +1173,8 @@ type APIResource struct {
 	// This field will remain optional even if it graduates.
 	// +optional
 	StorageVersionHash string `json:"storageVersionHash,omitempty" protobuf:"bytes,10,opt,name=storageVersionHash"`
+	//FIXME:
+	NamespaceDeletionOrder int64 `json:"namespaceDeletionOrder" protobuf:"varint,11,opt,name=namespaceDeletionOrder"`
 }
 
 // Verbs masks the value so protobuf can generate

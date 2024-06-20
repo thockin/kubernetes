@@ -365,3 +365,13 @@ func (r *EphemeralContainersREST) Update(ctx context.Context, name string, objIn
 	// subresources should never allow create on update.
 	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation, false, options)
 }
+
+// Implement NamespaceDeletionOrderProvider
+var _ rest.NamespaceDeletionOrderProvider = &REST{}
+
+// DeletionOrder implements the NamespaceDeletionOrderProvider interface.
+// Returns an integer indicating whether this type should be deleted earlier
+// (lower number) of later (higher value).
+func (r *REST) DeletionOrder() int64 {
+	return 0 // explicitly NOT first
+}

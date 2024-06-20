@@ -5503,8 +5503,16 @@ func schema_k8sio_api_apidiscovery_v2_APIResourceDiscovery(ref common.ReferenceC
 							},
 						},
 					},
+					"namespaceDeletionOrder": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FIXME:",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
 				},
-				Required: []string{"resource", "scope", "singularResource", "verbs"},
+				Required: []string{"resource", "scope", "singularResource", "verbs", "namespaceDeletionOrder"},
 			},
 		},
 		Dependencies: []string{
@@ -5867,8 +5875,16 @@ func schema_k8sio_api_apidiscovery_v2beta1_APIResourceDiscovery(ref common.Refer
 							},
 						},
 					},
+					"namespaceDeletionOrder": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FIXME:",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
 				},
-				Required: []string{"resource", "scope", "singularResource", "verbs"},
+				Required: []string{"resource", "scope", "singularResource", "verbs", "namespaceDeletionOrder"},
 			},
 		},
 		Dependencies: []string{
@@ -53199,8 +53215,16 @@ func schema_pkg_apis_meta_v1_APIResource(ref common.ReferenceCallback) common.Op
 							Format:      "",
 						},
 					},
+					"namespaceDeletionOrder": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FIXME:",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
 				},
-				Required: []string{"name", "singularName", "namespaced", "kind", "verbs"},
+				Required: []string{"name", "singularName", "namespaced", "kind", "verbs", "namespaceDeletionOrder"},
 			},
 		},
 	}

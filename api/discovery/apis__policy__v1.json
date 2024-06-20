@@ -6,6 +6,7 @@
     {
       "kind": "PodDisruptionBudget",
       "name": "poddisruptionbudgets",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "pdb"
@@ -26,6 +27,7 @@
     {
       "kind": "PodDisruptionBudget",
       "name": "poddisruptionbudgets/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [

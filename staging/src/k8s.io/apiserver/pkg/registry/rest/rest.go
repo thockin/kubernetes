@@ -390,3 +390,8 @@ type UpdateResetFieldsStrategy interface {
 	RESTUpdateStrategy
 	ResetFieldsStrategy
 }
+
+// FIXME:
+type NamespaceDeletionOrderProvider interface {
+	DeletionOrder() int64
+}

@@ -6,6 +6,7 @@
     {
       "kind": "LocalSubjectAccessReview",
       "name": "localsubjectaccessreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "localsubjectaccessreview",
       "verbs": [
@@ -15,6 +16,7 @@
     {
       "kind": "SelfSubjectAccessReview",
       "name": "selfsubjectaccessreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "selfsubjectaccessreview",
       "verbs": [
@@ -24,6 +26,7 @@
     {
       "kind": "SelfSubjectRulesReview",
       "name": "selfsubjectrulesreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "selfsubjectrulesreview",
       "verbs": [
@@ -33,6 +36,7 @@
     {
       "kind": "SubjectAccessReview",
       "name": "subjectaccessreviews",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "subjectaccessreview",
       "verbs": [

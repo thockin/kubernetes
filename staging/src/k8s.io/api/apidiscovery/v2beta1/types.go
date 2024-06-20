@@ -117,6 +117,8 @@ type APIResourceDiscovery struct {
 	// +listType=map
 	// +listMapKey=subresource
 	Subresources []APISubresourceDiscovery `json:"subresources,omitempty" protobuf:"bytes,8,rep,name=subresources"`
+	//FIXME:
+	NamespaceDeletionOrder int64 `json:"namespaceDeletionOrder" protobuf:"varint,11,opt,name=namespaceDeletionOrder"`
 }
 
 // ResourceScope is an enum defining the different scopes available to a resource.

@@ -110,6 +110,8 @@ type APIResourceDiscovery struct {
 	// +listType=map
 	// +listMapKey=subresource
 	Subresources []APISubresourceDiscovery
+	//FIXME:
+	NamespaceDeletionOrder int64
 }
 
 // ResourceScope is an enum defining the different scopes available to a resource.

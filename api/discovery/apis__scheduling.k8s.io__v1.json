@@ -6,6 +6,7 @@
     {
       "kind": "PriorityClass",
       "name": "priorityclasses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "pc"

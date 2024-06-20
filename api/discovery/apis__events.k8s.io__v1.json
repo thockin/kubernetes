@@ -6,6 +6,7 @@
     {
       "kind": "Event",
       "name": "events",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "ev"

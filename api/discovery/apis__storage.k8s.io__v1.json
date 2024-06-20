@@ -6,6 +6,7 @@
     {
       "kind": "CSIDriver",
       "name": "csidrivers",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "csidriver",
       "storageVersionHash": "hL6j/rwBV5w=",
@@ -23,6 +24,7 @@
     {
       "kind": "CSINode",
       "name": "csinodes",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "csinode",
       "storageVersionHash": "Pe62DkZtjuo=",
@@ -40,6 +42,7 @@
     {
       "kind": "CSIStorageCapacity",
       "name": "csistoragecapacities",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "csistoragecapacity",
       "storageVersionHash": "xeVl+2Ly1kE=",
@@ -57,6 +60,7 @@
     {
       "kind": "StorageClass",
       "name": "storageclasses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "sc"
@@ -77,6 +81,7 @@
     {
       "kind": "VolumeAttachment",
       "name": "volumeattachments",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "volumeattachment",
       "storageVersionHash": "tJx/ezt6UDU=",
@@ -94,6 +99,7 @@
     {
       "kind": "VolumeAttachment",
       "name": "volumeattachments/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [

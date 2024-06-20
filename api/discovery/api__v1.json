@@ -5,6 +5,7 @@
     {
       "kind": "Binding",
       "name": "bindings",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "binding",
       "verbs": [
@@ -14,6 +15,7 @@
     {
       "kind": "ComponentStatus",
       "name": "componentstatuses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "cs"
@@ -27,6 +29,7 @@
     {
       "kind": "ConfigMap",
       "name": "configmaps",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "cm"
@@ -47,6 +50,7 @@
     {
       "kind": "Endpoints",
       "name": "endpoints",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "ep"
@@ -67,6 +71,7 @@
     {
       "kind": "Event",
       "name": "events",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "ev"
@@ -87,6 +92,7 @@
     {
       "kind": "LimitRange",
       "name": "limitranges",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "limits"
@@ -107,6 +113,7 @@
     {
       "kind": "Namespace",
       "name": "namespaces",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "ns"
@@ -126,6 +133,7 @@
     {
       "kind": "Namespace",
       "name": "namespaces/finalize",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -135,6 +143,7 @@
     {
       "kind": "Namespace",
       "name": "namespaces/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -146,6 +155,7 @@
     {
       "kind": "Node",
       "name": "nodes",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "no"
@@ -166,6 +176,7 @@
     {
       "kind": "NodeProxyOptions",
       "name": "nodes/proxy",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -179,6 +190,7 @@
     {
       "kind": "Node",
       "name": "nodes/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -190,6 +202,7 @@
     {
       "kind": "PersistentVolumeClaim",
       "name": "persistentvolumeclaims",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "pvc"
@@ -210,6 +223,7 @@
     {
       "kind": "PersistentVolumeClaim",
       "name": "persistentvolumeclaims/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -221,6 +235,7 @@
     {
       "kind": "PersistentVolume",
       "name": "persistentvolumes",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "pv"
@@ -241,6 +256,7 @@
     {
       "kind": "PersistentVolume",
       "name": "persistentvolumes/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
@@ -255,6 +271,7 @@
       ],
       "kind": "Pod",
       "name": "pods",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "po"
@@ -275,6 +292,7 @@
     {
       "kind": "PodAttachOptions",
       "name": "pods/attach",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -285,6 +303,7 @@
     {
       "kind": "Binding",
       "name": "pods/binding",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -294,6 +313,7 @@
     {
       "kind": "Pod",
       "name": "pods/ephemeralcontainers",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -306,6 +326,7 @@
       "group": "policy",
       "kind": "Eviction",
       "name": "pods/eviction",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -316,6 +337,7 @@
     {
       "kind": "PodExecOptions",
       "name": "pods/exec",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -326,6 +348,7 @@
     {
       "kind": "Pod",
       "name": "pods/log",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -335,6 +358,7 @@
     {
       "kind": "PodPortForwardOptions",
       "name": "pods/portforward",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -345,6 +369,7 @@
     {
       "kind": "PodProxyOptions",
       "name": "pods/proxy",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -358,6 +383,7 @@
     {
       "kind": "Pod",
       "name": "pods/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -369,6 +395,7 @@
     {
       "kind": "PodTemplate",
       "name": "podtemplates",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "podtemplate",
       "storageVersionHash": "LIXB2x4IFpk=",
@@ -389,6 +416,7 @@
       ],
       "kind": "ReplicationController",
       "name": "replicationcontrollers",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "rc"
@@ -410,6 +438,7 @@
       "group": "autoscaling",
       "kind": "Scale",
       "name": "replicationcontrollers/scale",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -422,6 +451,7 @@
     {
       "kind": "ReplicationController",
       "name": "replicationcontrollers/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -433,6 +463,7 @@
     {
       "kind": "ResourceQuota",
       "name": "resourcequotas",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "quota"
@@ -453,6 +484,7 @@
     {
       "kind": "ResourceQuota",
       "name": "resourcequotas/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -464,6 +496,7 @@
     {
       "kind": "Secret",
       "name": "secrets",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "secret",
       "storageVersionHash": "S6u1pOWzb84=",
@@ -481,6 +514,7 @@
     {
       "kind": "ServiceAccount",
       "name": "serviceaccounts",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "sa"
@@ -502,6 +536,7 @@
       "group": "authentication.k8s.io",
       "kind": "TokenRequest",
       "name": "serviceaccounts/token",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -515,6 +550,7 @@
       ],
       "kind": "Service",
       "name": "services",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "shortNames": [
         "svc"
@@ -535,6 +571,7 @@
     {
       "kind": "ServiceProxyOptions",
       "name": "services/proxy",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -548,6 +585,7 @@
     {
       "kind": "Service",
       "name": "services/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [

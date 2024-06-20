@@ -6,6 +6,7 @@
     {
       "kind": "PodSchedulingContext",
       "name": "podschedulingcontexts",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "podschedulingcontext",
       "storageVersionHash": "qtdNX2rnDEA=",
@@ -23,6 +24,7 @@
     {
       "kind": "PodSchedulingContext",
       "name": "podschedulingcontexts/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -34,6 +36,7 @@
     {
       "kind": "ResourceClaimParameters",
       "name": "resourceclaimparameters",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "resourceclaimparameters",
       "storageVersionHash": "DWM408h+ZHE=",
@@ -51,6 +54,7 @@
     {
       "kind": "ResourceClaim",
       "name": "resourceclaims",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "resourceclaim",
       "storageVersionHash": "sMQbgChfibk=",
@@ -68,6 +72,7 @@
     {
       "kind": "ResourceClaim",
       "name": "resourceclaims/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "",
       "verbs": [
@@ -79,6 +84,7 @@
     {
       "kind": "ResourceClaimTemplate",
       "name": "resourceclaimtemplates",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "resourceclaimtemplate",
       "storageVersionHash": "1o2b66bFoGM=",
@@ -96,6 +102,7 @@
     {
       "kind": "ResourceClass",
       "name": "resourceclasses",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "resourceclass",
       "storageVersionHash": "wkt0Tpte++U=",
@@ -113,6 +120,7 @@
     {
       "kind": "ResourceClassParameters",
       "name": "resourceclassparameters",
+      "namespaceDeletionOrder": 0,
       "namespaced": true,
       "singularName": "resourceclassparameters",
       "storageVersionHash": "MDq5XoTnXWQ=",
@@ -130,6 +138,7 @@
     {
       "kind": "ResourceSlice",
       "name": "resourceslices",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "resourceslice",
       "storageVersionHash": "IECvOcO76kw=",

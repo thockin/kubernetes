@@ -9,6 +9,7 @@
       ],
       "kind": "CustomResourceDefinition",
       "name": "customresourcedefinitions",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "shortNames": [
         "crd",
@@ -30,6 +31,7 @@
     {
       "kind": "CustomResourceDefinition",
       "name": "customresourcedefinitions/status",
+      "namespaceDeletionOrder": 0,
       "namespaced": false,
       "singularName": "",
       "verbs": [
