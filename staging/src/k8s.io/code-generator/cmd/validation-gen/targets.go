@@ -22,7 +22,6 @@ import (
 	"reflect"
 	"strings"
 
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/code-generator/cmd/validation-gen/validators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -155,6 +154,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		inputToPkg[v] = k
 	}
 
+	visited := map[*types.Type]*callNode{}
 	for _, i := range context.Inputs {
 		pkg := context.Universe[i]
 
@@ -196,13 +196,12 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			}
 		}
 
-		validationFunctionTypes := sets.New[*types.Type]()
-		visited := sets.New[*types.Type]()
+		validationFunctionTypes := map[*types.Type]*callNode{}
 		for _, t := range rootTypes {
-			if validationFunctionTypes.Has(t) { // already found
+			if _, ok := validationFunctionTypes[t]; ok { // already found
 				continue
 			}
-			callTree, err := buildCallTree(declarativeValidator, inputToPkg, t)
+			callTree, err := buildCallTree(declarativeValidator, inputToPkg, t, visited)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)
 			}
@@ -210,13 +209,12 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 				continue
 			}
 			callTree.VisitInOrder(func(ancestors []*callNode, current *callNode) {
-				if visited.Has(current.underlyingType) {
+				if _, ok := validationFunctionTypes[current.underlyingType]; ok {
 					return
 				}
-				visited.Insert(current.underlyingType)
 				// Generate a validation function for each struct.
 				if current.underlyingType != nil && current.underlyingType.Kind == types.Struct {
-					validationFunctionTypes.Insert(current.underlyingType)
+					validationFunctionTypes[current.underlyingType] = current.copy(true)
 				}
 			})
 		}

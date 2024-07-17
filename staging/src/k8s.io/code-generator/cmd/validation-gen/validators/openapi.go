@@ -47,7 +47,6 @@ var (
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
 	var v []FunctionGen
-
 	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
 	schema, err := generators.ParseCommentTags(t, comments, markerPrefix)
 	if err != nil {
