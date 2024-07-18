@@ -19,6 +19,7 @@ package validate
 import (
 	"slices"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -26,7 +27,7 @@ import (
 // characters.
 func MaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
 	if len(value) > max {
-		return field.ErrorList{field.Invalid(fldPath, value, MaxLenError(max))}
+		return field.ErrorList{field.Invalid(fldPath, value, content.MaxLenError(max))}
 	}
 	return nil
 }

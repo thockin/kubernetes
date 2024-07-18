@@ -41,7 +41,8 @@ const (
 )
 
 var (
-	isValidIPValidator = types.Name{Package: libValidationPkg, Name: "IP"}
+	ipValidator        = types.Name{Package: libValidationPkg, Name: "IP"}
+	dnsLabelValidator  = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 )
 
@@ -66,8 +67,15 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 }
 
 func FormatValidationFunction(format string) FunctionGen {
+	// The naming convention for these formats follows the JSON schema style:
+	// all lower-case, dashes between words. See
+	// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
+	// for more examples.
 	if format == "ip" {
-		return Function(formatTagName, isValidIPValidator)
+		return Function(formatTagName, ipValidator)
+	}
+	if format == "dns-label" {
+		return Function(formatTagName, dnsLabelValidator)
 	}
 	// TODO: Flesh out the list of validation functions
 
