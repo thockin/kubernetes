@@ -25,8 +25,8 @@ import (
 	fmt "fmt"
 
 	v1 "k8s.io/api/apps/v1"
+	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
 )
@@ -111,7 +111,7 @@ func Validate_DaemonSetSpec(in *v1.DaemonSetSpec, fldPath *field.Path) (errs fie
 }
 
 func Validate_DaemonSetUpdateStrategy(in *v1.DaemonSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
+	errs = append(errs, validate.Enum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
 	return errs
 }
 
@@ -135,7 +135,7 @@ func Validate_DeploymentSpec(in *v1.DeploymentSpec, fldPath *field.Path) (errs f
 }
 
 func Validate_DeploymentStrategy(in *v1.DeploymentStrategy, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "Recreate", "RollingUpdate")...)
+	errs = append(errs, validate.Enum(fldPath.Child("type"), in.Type, "Recreate", "RollingUpdate")...)
 	return errs
 }
 
@@ -176,13 +176,13 @@ func Validate_StatefulSetSpec(in *v1.StatefulSetSpec, fldPath *field.Path) (errs
 		c := &in.VolumeClaimTemplates[k]
 		errs = append(errs, corev1.Validate_PersistentVolumeClaim(c, fldPath.Index(k))...)
 	}
-	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("serviceName"), in.ServiceName, 32)...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("podManagementPolicy"), in.PodManagementPolicy, "OrderedReady", "Parallel")...)
+	errs = append(errs, validate.MaxLength(fldPath.Child("serviceName"), in.ServiceName, 32)...)
+	errs = append(errs, validate.Enum(fldPath.Child("podManagementPolicy"), in.PodManagementPolicy, "OrderedReady", "Parallel")...)
 	errs = append(errs, Validate_StatefulSetUpdateStrategy(&in.UpdateStrategy, fldPath.Child("updateStrategy"))...)
 	return errs
 }
 
 func Validate_StatefulSetUpdateStrategy(in *v1.StatefulSetUpdateStrategy, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
+	errs = append(errs, validate.Enum(fldPath.Child("type"), in.Type, "OnDelete", "RollingUpdate")...)
 	return errs
 }

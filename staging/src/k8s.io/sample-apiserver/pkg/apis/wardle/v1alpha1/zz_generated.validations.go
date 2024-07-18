@@ -24,8 +24,8 @@ package v1alpha1
 import (
 	fmt "fmt"
 
+	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -67,7 +67,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 }
 
 func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)
+	errs = append(errs, validate.IP(fldPath.Child("reference"), in.Reference)...)
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	return errs
 }
@@ -95,10 +95,10 @@ func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.Erro
 }
 
 func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateMaxLength(fldPath.Child("reference"), in.Reference, 128)...)
-	errs = append(errs, validation.IsValidIP(fldPath.Child("reference"), in.Reference)...)
+	errs = append(errs, validate.MaxLength(fldPath.Child("reference"), in.Reference, 128)...)
+	errs = append(errs, validate.IP(fldPath.Child("reference"), in.Reference)...)
 	if in.ReferenceType != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("referenceType"), *in.ReferenceType, "Fischer", "Flunder")...)
+		errs = append(errs, validate.Enum(fldPath.Child("referenceType"), *in.ReferenceType, "Fischer", "Flunder")...)
 	}
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
 	for k := range in.Extras {
@@ -116,7 +116,7 @@ func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.Erro
 }
 
 func Validate_FlunderStatus(in *FlunderStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
+	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
 	return errs
 }
 
@@ -129,12 +129,12 @@ func Validate_Layer(in *Layer, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_Something(in *Something, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
+	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
 	return errs
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.IsValidIP(fldPath.Child("name"), in.Name)...)
+	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
 	for k := range in.Something {
 		c := &in.Something[k]
 		errs = append(errs, Validate_Something(c, fldPath.Index(k))...)

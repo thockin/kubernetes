@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"math"
 	"regexp"
-	"slices"
 	"strings"
 	"unicode"
 
+	"k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	netutils "k8s.io/utils/net"
 )
@@ -69,22 +69,6 @@ func IsQualifiedName(value string) []string {
 		errs = append(errs, "name part "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc"))
 	}
 	return errs
-}
-
-func ValidateMaxLength(fldPath *field.Path, value string, max int) field.ErrorList {
-	if len(value) > max {
-		return field.ErrorList{field.Invalid(fldPath, value, MaxLenError(max))}
-	}
-	return nil
-}
-
-// TODO: scanning the symbols list is O(n) vs the O(1) set.has check used by hand written validation.
-func ValidateEnum[T ~string](fldPath *field.Path, value T, symbols ...string) field.ErrorList {
-	valueString := string(value)
-	if !slices.Contains(symbols, valueString) {
-		return field.ErrorList{field.NotSupported(fldPath, value, symbols)}
-	}
-	return nil
 }
 
 // IsFullyQualifiedName checks if the name is fully qualified. This is similar
@@ -368,13 +352,8 @@ func IsValidPortName(port string) []string {
 }
 
 // IsValidIP tests that the argument is a valid IP address.
-func IsValidIP(fldPath *field.Path, value string) field.ErrorList {
-	var allErrors field.ErrorList
-	if netutils.ParseIPSloppy(value) == nil {
-		allErrors = append(allErrors, field.Invalid(fldPath, value, "must be a valid IP address, (e.g. 10.9.8.7 or 2001:db8::ffff)"))
-	}
-	return allErrors
-}
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate.IP instead.
+var IsValidIP = validate.IP
 
 // IsValidIPv4Address tests that the argument is a valid IPv4 address.
 func IsValidIPv4Address(fldPath *field.Path, value string) field.ErrorList {
@@ -490,9 +469,8 @@ func IsConfigMapKey(value string) []string {
 
 // MaxLenError returns a string explanation of a "string too long" validation
 // failure.
-func MaxLenError(length int) string {
-	return fmt.Sprintf("must be no more than %d characters", length)
-}
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate.MaxLenError instead.
+var MaxLenError = validate.MaxLenError
 
 // RegexError returns a string explanation of a regex validation failure.
 func RegexError(msg string, fmt string, examples ...string) string {

@@ -33,16 +33,16 @@ func InitOpenAPIDeclarativeValidator(c *generator.Context) DeclarativeValidator 
 type openAPIDeclarativeValidator struct{}
 
 const (
-	markerPrefix      = "+k8s:validation:"
-	utilValidationPkg = "k8s.io/apimachinery/pkg/util/validation"
+	markerPrefix     = "+k8s:validation:"
+	libValidationPkg = "k8s.io/apimachinery/pkg/api/validate"
 
 	formatTagName    = "k8s:validation:format"
 	maxLengthTagName = "k8s:validation:maxLength"
 )
 
 var (
-	isValidIPValidator = types.Name{Package: utilValidationPkg, Name: "IsValidIP"}
-	maxLengthValidator = types.Name{Package: utilValidationPkg, Name: "ValidateMaxLength"}
+	isValidIPValidator = types.Name{Package: libValidationPkg, Name: "IP"}
+	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 )
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
