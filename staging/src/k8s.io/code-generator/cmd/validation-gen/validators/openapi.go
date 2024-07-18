@@ -34,10 +34,8 @@ type openAPIDeclarativeValidator struct{}
 
 const (
 	markerPrefix     = "+k8s:validation:"
-	libValidationPkg = "k8s.io/apimachinery/pkg/api/validate"
-
-	formatTagName    = "k8s:validation:format"
-	maxLengthTagName = "k8s:validation:maxLength"
+	formatTagName    = markerPrefix + ":format"
+	maxLengthTagName = markerPrefix + ":maxLength"
 )
 
 var (
