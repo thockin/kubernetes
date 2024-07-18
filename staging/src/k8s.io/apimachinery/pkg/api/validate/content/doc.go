@@ -14,14 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package validate
-
-import (
-	"fmt"
-)
-
-// MaxLenError returns a string explanation of a "string too long" validation
-// failure.
-func MaxLenError(length int) string {
-	return fmt.Sprintf("must be no more than %d characters", length)
-}
+// package content holds parsing functions for commonly used string formats
+// which are designed for use with the k8s.io/code-generator/cmd/validation-gen
+// tool.  Each function has a similar fingerprint:
+//
+//	func Is<Format>(value string, <other args...>) []string
+//
+// These functions return a list of discrete error messages which can be
+// presented to users.
+package content
