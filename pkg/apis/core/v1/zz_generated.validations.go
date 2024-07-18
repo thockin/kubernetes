@@ -330,6 +330,11 @@ func Validate_HTTPGetAction(in *v1.HTTPGetAction, fldPath *field.Path) (errs fie
 	return errs
 }
 
+func Validate_HostAlias(in *v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validate.Required(fldPath.Child("ip"), in.IP)...)
+	return errs
+}
+
 func Validate_HostPathVolumeSource(in *v1.HostPathVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	if in.Type != nil {
 		errs = append(errs, validate.Enum(fldPath.Child("type"), *in.Type, "", "BlockDevice", "CharDevice", "Directory", "DirectoryOrCreate", "File", "FileOrCreate", "Socket")...)
@@ -590,6 +595,10 @@ func Validate_PodSpec(in *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList
 		c := &in.Tolerations[k]
 		errs = append(errs, Validate_Toleration(c, fldPath.Index(k))...)
 	}
+	for k := range in.HostAliases {
+		c := &in.HostAliases[k]
+		errs = append(errs, Validate_HostAlias(c, fldPath.Index(k))...)
+	}
 	if in.PreemptionPolicy != nil {
 		errs = append(errs, validate.Enum(fldPath.Child("preemptionPolicy"), *in.PreemptionPolicy, "Never", "PreemptLowerPriority")...)
 	}
@@ -787,6 +796,7 @@ func Validate_TopologySpreadConstraint(in *v1.TopologySpreadConstraint, fldPath 
 }
 
 func Validate_Volume(in *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validate.Required(fldPath.Child("name"), in.Name)...)
 	errs = append(errs, Validate_VolumeSource(&in.VolumeSource, fldPath.Child("VolumeSource"))...)
 	return errs
 }

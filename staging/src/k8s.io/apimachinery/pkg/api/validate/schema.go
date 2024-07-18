@@ -40,3 +40,13 @@ func Enum[T ~string](fldPath *field.Path, value T, symbols ...string) field.Erro
 	}
 	return nil
 }
+
+// Required verifies that the specified value is not the zero-value for its
+// type.
+func Required[T comparable](fldPath *field.Path, value T) field.ErrorList {
+	var zero T
+	if value == zero {
+		return field.ErrorList{field.Required(fldPath, "")}
+	}
+	return nil
+}

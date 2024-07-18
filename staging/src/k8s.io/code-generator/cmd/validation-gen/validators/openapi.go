@@ -53,7 +53,7 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 		return nil, err
 	}
 	if schema.MaxLength != nil {
-		v = append(v, Function(formatTagName, maxLengthValidator, *schema.MaxLength))
+		v = append(v, Function(maxLengthTagName, maxLengthValidator, *schema.MaxLength))
 	}
 	if len(schema.Format) > 0 {
 		formatFunction := FormatValidationFunction(schema.Format)
@@ -67,7 +67,7 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 
 func FormatValidationFunction(format string) FunctionGen {
 	if format == "ip" {
-		return Function(maxLengthTagName, isValidIPValidator)
+		return Function(formatTagName, isValidIPValidator)
 	}
 	// TODO: Flesh out the list of validation functions
 
