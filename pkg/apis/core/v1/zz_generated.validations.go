@@ -25,8 +25,8 @@ import (
 	fmt "fmt"
 
 	v1 "k8s.io/api/core/v1"
+	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	validation "k8s.io/apimachinery/pkg/util/validation"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -207,16 +207,16 @@ func Validate_Affinity(in *v1.Affinity, fldPath *field.Path) (errs field.ErrorLi
 }
 
 func Validate_AppArmorProfile(in *v1.AppArmorProfile, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "Localhost", "RuntimeDefault", "Unconfined")...)
+	errs = append(errs, validate.Enum(fldPath.Child("type"), in.Type, "Localhost", "RuntimeDefault", "Unconfined")...)
 	return errs
 }
 
 func Validate_AzureDiskVolumeSource(in *v1.AzureDiskVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	if in.CachingMode != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("cachingMode"), *in.CachingMode, "None", "ReadOnly", "ReadWrite")...)
+		errs = append(errs, validate.Enum(fldPath.Child("cachingMode"), *in.CachingMode, "None", "ReadOnly", "ReadWrite")...)
 	}
 	if in.Kind != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("kind"), *in.Kind, "Dedicated", "Managed", "Shared")...)
+		errs = append(errs, validate.Enum(fldPath.Child("kind"), *in.Kind, "Dedicated", "Managed", "Shared")...)
 	}
 	return errs
 }
@@ -242,8 +242,8 @@ func Validate_Container(in *v1.Container, fldPath *field.Path) (errs field.Error
 	if in.Lifecycle != nil {
 		errs = append(errs, Validate_Lifecycle(in.Lifecycle, fldPath.Child("lifecycle"))...)
 	}
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("terminationMessagePolicy"), in.TerminationMessagePolicy, "FallbackToLogsOnError", "File")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("imagePullPolicy"), in.ImagePullPolicy, "Always", "IfNotPresent", "Never")...)
+	errs = append(errs, validate.Enum(fldPath.Child("terminationMessagePolicy"), in.TerminationMessagePolicy, "FallbackToLogsOnError", "File")...)
+	errs = append(errs, validate.Enum(fldPath.Child("imagePullPolicy"), in.ImagePullPolicy, "Always", "IfNotPresent", "Never")...)
 	if in.SecurityContext != nil {
 		errs = append(errs, Validate_SecurityContext(in.SecurityContext, fldPath.Child("securityContext"))...)
 	}
@@ -251,12 +251,12 @@ func Validate_Container(in *v1.Container, fldPath *field.Path) (errs field.Error
 }
 
 func Validate_ContainerPort(in *v1.ContainerPort, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
+	errs = append(errs, validate.Enum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
 	return errs
 }
 
 func Validate_EndpointPort(in *v1.EndpointPort, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
+	errs = append(errs, validate.Enum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
 	return errs
 }
 
@@ -310,8 +310,8 @@ func Validate_EphemeralContainerCommon(in *v1.EphemeralContainerCommon, fldPath 
 	if in.Lifecycle != nil {
 		errs = append(errs, Validate_Lifecycle(in.Lifecycle, fldPath.Child("lifecycle"))...)
 	}
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("terminationMessagePolicy"), in.TerminationMessagePolicy, "FallbackToLogsOnError", "File")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("imagePullPolicy"), in.ImagePullPolicy, "Always", "IfNotPresent", "Never")...)
+	errs = append(errs, validate.Enum(fldPath.Child("terminationMessagePolicy"), in.TerminationMessagePolicy, "FallbackToLogsOnError", "File")...)
+	errs = append(errs, validate.Enum(fldPath.Child("imagePullPolicy"), in.ImagePullPolicy, "Always", "IfNotPresent", "Never")...)
 	if in.SecurityContext != nil {
 		errs = append(errs, Validate_SecurityContext(in.SecurityContext, fldPath.Child("securityContext"))...)
 	}
@@ -326,13 +326,13 @@ func Validate_EphemeralVolumeSource(in *v1.EphemeralVolumeSource, fldPath *field
 }
 
 func Validate_HTTPGetAction(in *v1.HTTPGetAction, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("scheme"), in.Scheme, "HTTP", "HTTPS")...)
+	errs = append(errs, validate.Enum(fldPath.Child("scheme"), in.Scheme, "HTTP", "HTTPS")...)
 	return errs
 }
 
 func Validate_HostPathVolumeSource(in *v1.HostPathVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	if in.Type != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), *in.Type, "", "BlockDevice", "CharDevice", "Directory", "DirectoryOrCreate", "File", "FileOrCreate", "Socket")...)
+		errs = append(errs, validate.Enum(fldPath.Child("type"), *in.Type, "", "BlockDevice", "CharDevice", "Directory", "DirectoryOrCreate", "File", "FileOrCreate", "Socket")...)
 	}
 	return errs
 }
@@ -371,7 +371,7 @@ func Validate_LoadBalancerStatus(in *v1.LoadBalancerStatus, fldPath *field.Path)
 }
 
 func Validate_ModifyVolumeStatus(in *v1.ModifyVolumeStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("status"), in.Status, "InProgress", "Infeasible", "Pending")...)
+	errs = append(errs, validate.Enum(fldPath.Child("status"), in.Status, "InProgress", "Infeasible", "Pending")...)
 	return errs
 }
 
@@ -389,7 +389,7 @@ func Validate_NamespaceList(in *v1.NamespaceList, fldPath *field.Path) (errs fie
 }
 
 func Validate_NamespaceStatus(in *v1.NamespaceStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("phase"), in.Phase, "Active", "Terminating")...)
+	errs = append(errs, validate.Enum(fldPath.Child("phase"), in.Phase, "Active", "Terminating")...)
 	return errs
 }
 
@@ -427,7 +427,7 @@ func Validate_NodeSelector(in *v1.NodeSelector, fldPath *field.Path) (errs field
 }
 
 func Validate_NodeSelectorRequirement(in *v1.NodeSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("operator"), in.Operator, "DoesNotExist", "Exists", "Gt", "In", "Lt", "NotIn")...)
+	errs = append(errs, validate.Enum(fldPath.Child("operator"), in.Operator, "DoesNotExist", "Exists", "Gt", "In", "Lt", "NotIn")...)
 	return errs
 }
 
@@ -452,7 +452,7 @@ func Validate_NodeSpec(in *v1.NodeSpec, fldPath *field.Path) (errs field.ErrorLi
 }
 
 func Validate_NodeStatus(in *v1.NodeStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("phase"), in.Phase, "Pending", "Running", "Terminated")...)
+	errs = append(errs, validate.Enum(fldPath.Child("phase"), in.Phase, "Pending", "Running", "Terminated")...)
 	return errs
 }
 
@@ -478,13 +478,13 @@ func Validate_PersistentVolumeClaimList(in *v1.PersistentVolumeClaimList, fldPat
 
 func Validate_PersistentVolumeClaimSpec(in *v1.PersistentVolumeClaimSpec, fldPath *field.Path) (errs field.ErrorList) {
 	if in.VolumeMode != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("volumeMode"), *in.VolumeMode, "Block", "Filesystem")...)
+		errs = append(errs, validate.Enum(fldPath.Child("volumeMode"), *in.VolumeMode, "Block", "Filesystem")...)
 	}
 	return errs
 }
 
 func Validate_PersistentVolumeClaimStatus(in *v1.PersistentVolumeClaimStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("phase"), in.Phase, "Bound", "Lost", "Pending")...)
+	errs = append(errs, validate.Enum(fldPath.Child("phase"), in.Phase, "Bound", "Lost", "Pending")...)
 	if in.ModifyVolumeStatus != nil {
 		errs = append(errs, Validate_ModifyVolumeStatus(in.ModifyVolumeStatus, fldPath.Child("modifyVolumeStatus"))...)
 	}
@@ -516,9 +516,9 @@ func Validate_PersistentVolumeSource(in *v1.PersistentVolumeSource, fldPath *fie
 
 func Validate_PersistentVolumeSpec(in *v1.PersistentVolumeSpec, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_PersistentVolumeSource(&in.PersistentVolumeSource, fldPath.Child("PersistentVolumeSource"))...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("persistentVolumeReclaimPolicy"), in.PersistentVolumeReclaimPolicy, "Delete", "Recycle", "Retain")...)
+	errs = append(errs, validate.Enum(fldPath.Child("persistentVolumeReclaimPolicy"), in.PersistentVolumeReclaimPolicy, "Delete", "Recycle", "Retain")...)
 	if in.VolumeMode != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("volumeMode"), *in.VolumeMode, "Block", "Filesystem")...)
+		errs = append(errs, validate.Enum(fldPath.Child("volumeMode"), *in.VolumeMode, "Block", "Filesystem")...)
 	}
 	if in.NodeAffinity != nil {
 		errs = append(errs, Validate_VolumeNodeAffinity(in.NodeAffinity, fldPath.Child("nodeAffinity"))...)
@@ -527,7 +527,7 @@ func Validate_PersistentVolumeSpec(in *v1.PersistentVolumeSpec, fldPath *field.P
 }
 
 func Validate_PersistentVolumeStatus(in *v1.PersistentVolumeStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("phase"), in.Phase, "Available", "Bound", "Failed", "Pending", "Released")...)
+	errs = append(errs, validate.Enum(fldPath.Child("phase"), in.Phase, "Available", "Bound", "Failed", "Pending", "Released")...)
 	return errs
 }
 
@@ -547,10 +547,10 @@ func Validate_PodList(in *v1.PodList, fldPath *field.Path) (errs field.ErrorList
 
 func Validate_PodSecurityContext(in *v1.PodSecurityContext, fldPath *field.Path) (errs field.ErrorList) {
 	if in.SupplementalGroupsPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("supplementalGroupsPolicy"), *in.SupplementalGroupsPolicy, "Merge", "Strict")...)
+		errs = append(errs, validate.Enum(fldPath.Child("supplementalGroupsPolicy"), *in.SupplementalGroupsPolicy, "Merge", "Strict")...)
 	}
 	if in.FSGroupChangePolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("fsGroupChangePolicy"), *in.FSGroupChangePolicy, "Always", "OnRootMismatch")...)
+		errs = append(errs, validate.Enum(fldPath.Child("fsGroupChangePolicy"), *in.FSGroupChangePolicy, "Always", "OnRootMismatch")...)
 	}
 	if in.SeccompProfile != nil {
 		errs = append(errs, Validate_SeccompProfile(in.SeccompProfile, fldPath.Child("seccompProfile"))...)
@@ -578,8 +578,8 @@ func Validate_PodSpec(in *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList
 		c := &in.EphemeralContainers[k]
 		errs = append(errs, Validate_EphemeralContainer(c, fldPath.Index(k))...)
 	}
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("restartPolicy"), in.RestartPolicy, "Always", "Never", "OnFailure")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("dnsPolicy"), in.DNSPolicy, "ClusterFirst", "ClusterFirstWithHostNet", "Default", "None")...)
+	errs = append(errs, validate.Enum(fldPath.Child("restartPolicy"), in.RestartPolicy, "Always", "Never", "OnFailure")...)
+	errs = append(errs, validate.Enum(fldPath.Child("dnsPolicy"), in.DNSPolicy, "ClusterFirst", "ClusterFirstWithHostNet", "Default", "None")...)
 	if in.SecurityContext != nil {
 		errs = append(errs, Validate_PodSecurityContext(in.SecurityContext, fldPath.Child("securityContext"))...)
 	}
@@ -591,7 +591,7 @@ func Validate_PodSpec(in *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList
 		errs = append(errs, Validate_Toleration(c, fldPath.Index(k))...)
 	}
 	if in.PreemptionPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("preemptionPolicy"), *in.PreemptionPolicy, "Never", "PreemptLowerPriority")...)
+		errs = append(errs, validate.Enum(fldPath.Child("preemptionPolicy"), *in.PreemptionPolicy, "Never", "PreemptLowerPriority")...)
 	}
 	for k := range in.TopologySpreadConstraints {
 		c := &in.TopologySpreadConstraints[k]
@@ -601,8 +601,8 @@ func Validate_PodSpec(in *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList
 }
 
 func Validate_PodStatus(in *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("phase"), in.Phase, "Failed", "Pending", "Running", "Succeeded", "Unknown")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("qosClass"), in.QOSClass, "BestEffort", "Burstable", "Guaranteed")...)
+	errs = append(errs, validate.Enum(fldPath.Child("phase"), in.Phase, "Failed", "Pending", "Running", "Succeeded", "Unknown")...)
+	errs = append(errs, validate.Enum(fldPath.Child("qosClass"), in.QOSClass, "BestEffort", "Burstable", "Guaranteed")...)
 	return errs
 }
 
@@ -630,7 +630,7 @@ func Validate_PodTemplateSpec(in *v1.PodTemplateSpec, fldPath *field.Path) (errs
 }
 
 func Validate_PortStatus(in *v1.PortStatus, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
+	errs = append(errs, validate.Enum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
 	return errs
 }
 
@@ -700,19 +700,19 @@ func Validate_ScopeSelector(in *v1.ScopeSelector, fldPath *field.Path) (errs fie
 }
 
 func Validate_ScopedResourceSelectorRequirement(in *v1.ScopedResourceSelectorRequirement, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("scopeName"), in.ScopeName, "BestEffort", "CrossNamespacePodAffinity", "NotBestEffort", "NotTerminating", "PriorityClass", "Terminating")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("operator"), in.Operator, "DoesNotExist", "Exists", "In", "NotIn")...)
+	errs = append(errs, validate.Enum(fldPath.Child("scopeName"), in.ScopeName, "BestEffort", "CrossNamespacePodAffinity", "NotBestEffort", "NotTerminating", "PriorityClass", "Terminating")...)
+	errs = append(errs, validate.Enum(fldPath.Child("operator"), in.Operator, "DoesNotExist", "Exists", "In", "NotIn")...)
 	return errs
 }
 
 func Validate_SeccompProfile(in *v1.SeccompProfile, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "Localhost", "RuntimeDefault", "Unconfined")...)
+	errs = append(errs, validate.Enum(fldPath.Child("type"), in.Type, "Localhost", "RuntimeDefault", "Unconfined")...)
 	return errs
 }
 
 func Validate_SecurityContext(in *v1.SecurityContext, fldPath *field.Path) (errs field.ErrorList) {
 	if in.ProcMount != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("procMount"), *in.ProcMount, "Default", "Unmasked")...)
+		errs = append(errs, validate.Enum(fldPath.Child("procMount"), *in.ProcMount, "Default", "Unmasked")...)
 	}
 	if in.SeccompProfile != nil {
 		errs = append(errs, Validate_SeccompProfile(in.SeccompProfile, fldPath.Child("seccompProfile"))...)
@@ -738,7 +738,7 @@ func Validate_ServiceList(in *v1.ServiceList, fldPath *field.Path) (errs field.E
 }
 
 func Validate_ServicePort(in *v1.ServicePort, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
+	errs = append(errs, validate.Enum(fldPath.Child("protocol"), in.Protocol, "SCTP", "TCP", "UDP")...)
 	return errs
 }
 
@@ -747,14 +747,14 @@ func Validate_ServiceSpec(in *v1.ServiceSpec, fldPath *field.Path) (errs field.E
 		c := &in.Ports[k]
 		errs = append(errs, Validate_ServicePort(c, fldPath.Index(k))...)
 	}
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("type"), in.Type, "ClusterIP", "ExternalName", "LoadBalancer", "NodePort")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("sessionAffinity"), in.SessionAffinity, "ClientIP", "None")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("externalTrafficPolicy"), in.ExternalTrafficPolicy, "Cluster", "Local")...)
+	errs = append(errs, validate.Enum(fldPath.Child("type"), in.Type, "ClusterIP", "ExternalName", "LoadBalancer", "NodePort")...)
+	errs = append(errs, validate.Enum(fldPath.Child("sessionAffinity"), in.SessionAffinity, "ClientIP", "None")...)
+	errs = append(errs, validate.Enum(fldPath.Child("externalTrafficPolicy"), in.ExternalTrafficPolicy, "Cluster", "Local")...)
 	if in.IPFamilyPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("ipFamilyPolicy"), *in.IPFamilyPolicy, "PreferDualStack", "RequireDualStack", "SingleStack")...)
+		errs = append(errs, validate.Enum(fldPath.Child("ipFamilyPolicy"), *in.IPFamilyPolicy, "PreferDualStack", "RequireDualStack", "SingleStack")...)
 	}
 	if in.InternalTrafficPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("internalTrafficPolicy"), *in.InternalTrafficPolicy, "Cluster", "Local")...)
+		errs = append(errs, validate.Enum(fldPath.Child("internalTrafficPolicy"), *in.InternalTrafficPolicy, "Cluster", "Local")...)
 	}
 	return errs
 }
@@ -765,23 +765,23 @@ func Validate_ServiceStatus(in *v1.ServiceStatus, fldPath *field.Path) (errs fie
 }
 
 func Validate_Taint(in *v1.Taint, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("effect"), in.Effect, "NoExecute", "NoSchedule", "PreferNoSchedule")...)
+	errs = append(errs, validate.Enum(fldPath.Child("effect"), in.Effect, "NoExecute", "NoSchedule", "PreferNoSchedule")...)
 	return errs
 }
 
 func Validate_Toleration(in *v1.Toleration, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("operator"), in.Operator, "Equal", "Exists")...)
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("effect"), in.Effect, "NoExecute", "NoSchedule", "PreferNoSchedule")...)
+	errs = append(errs, validate.Enum(fldPath.Child("operator"), in.Operator, "Equal", "Exists")...)
+	errs = append(errs, validate.Enum(fldPath.Child("effect"), in.Effect, "NoExecute", "NoSchedule", "PreferNoSchedule")...)
 	return errs
 }
 
 func Validate_TopologySpreadConstraint(in *v1.TopologySpreadConstraint, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validation.ValidateEnum(fldPath.Child("whenUnsatisfiable"), in.WhenUnsatisfiable, "DoNotSchedule", "ScheduleAnyway")...)
+	errs = append(errs, validate.Enum(fldPath.Child("whenUnsatisfiable"), in.WhenUnsatisfiable, "DoNotSchedule", "ScheduleAnyway")...)
 	if in.NodeAffinityPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("nodeAffinityPolicy"), *in.NodeAffinityPolicy, "Honor", "Ignore")...)
+		errs = append(errs, validate.Enum(fldPath.Child("nodeAffinityPolicy"), *in.NodeAffinityPolicy, "Honor", "Ignore")...)
 	}
 	if in.NodeTaintsPolicy != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("nodeTaintsPolicy"), *in.NodeTaintsPolicy, "Honor", "Ignore")...)
+		errs = append(errs, validate.Enum(fldPath.Child("nodeTaintsPolicy"), *in.NodeTaintsPolicy, "Honor", "Ignore")...)
 	}
 	return errs
 }
@@ -793,7 +793,7 @@ func Validate_Volume(in *v1.Volume, fldPath *field.Path) (errs field.ErrorList) 
 
 func Validate_VolumeMount(in *v1.VolumeMount, fldPath *field.Path) (errs field.ErrorList) {
 	if in.MountPropagation != nil {
-		errs = append(errs, validation.ValidateEnum(fldPath.Child("mountPropagation"), *in.MountPropagation, "Bidirectional", "HostToContainer", "None")...)
+		errs = append(errs, validate.Enum(fldPath.Child("mountPropagation"), *in.MountPropagation, "Bidirectional", "HostToContainer", "None")...)
 	}
 	return errs
 }

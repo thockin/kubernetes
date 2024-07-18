@@ -27,7 +27,7 @@ import (
 	"k8s.io/gengo/v2/types"
 )
 
-var enumValidator = types.Name{Package: utilValidationPkg, Name: "ValidateEnum"}
+var enumValidator = types.Name{Package: libValidationPkg, Name: "Enum"}
 
 func init() {
 	AddToRegistry(InitEnumDeclarativeValidator)
