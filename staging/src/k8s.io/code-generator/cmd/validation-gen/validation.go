@@ -241,6 +241,9 @@ func (c *callTreeForType) findValidationFunction(t *types.Type) (types.Name, boo
 // structs today).
 func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 	if v, ok := c.visited[t]; ok {
+		if v == nil {
+			return nil, nil
+		}
 		return v.copy(root), nil
 	}
 	parent := &callNode{}
@@ -264,7 +267,6 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		c.currentlyBuildingTypes[t] = false
 	}()
 
-	baseT, _ := resolveTypeAndDepth(t)
 	switch t.Kind {
 	case types.Pointer:
 		child, err := c.build(t.Elem, false)
@@ -304,11 +306,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 		parent.validatorFunction = fn
 		parent.underlyingType = t
-		parent.t = baseT
-		_, err := c.populateValidations(parent, t, t.CommentLines)
-		if err != nil {
-			return nil, err
-		}
+
 		for _, field := range t.Members {
 			name := field.Name
 			if len(name) == 0 {
@@ -327,16 +325,26 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 			if err != nil {
 				return nil, err
 			}
-			child, err = c.populateValidations(child, field.Type, field.CommentLines)
-			if err != nil {
-				return nil, err
+			if len(field.CommentLines) > 0 {
+				validations, err := c.declarativeValidator.ExtractValidations(field.Type, field.CommentLines)
+				if err != nil {
+					return nil, err
+				}
+				if len(validations) > 0 {
+					child = &callNode{
+						isPrimitive:    field.Type.IsPrimitive(),
+						underlyingType: field.Type,
+						elem:           field.Type.Kind == types.Pointer,
+						validations:    validations,
+					}
+				}
 			}
+
 			if child != nil {
 				child.field = name
 				child.jsonName = jsonName
 				// TODO: Add more information to the node about field correlation for use with ValidateUpdate.
 				//       In particular, we need to track associative list keys.
-				//if isAssociativeList() {}
 				parent.children = append(parent.children, *child)
 			}
 		}
@@ -350,82 +358,12 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 	}
 	if len(parent.children) == 0 && len(parent.validations) == 0 {
+		c.visited[t] = nil
 		return nil, nil
 	}
 
+	c.visited[t] = parent
 	return parent, nil
-}
-
-func (c *callTreeForType) populateValidations(node *callNode, t *types.Type, commentLines []string) (*callNode, error) {
-	valueValidations, err := c.declarativeValidator.ExtractValidations(t, commentLines)
-	if err != nil {
-		return nil, err
-	}
-
-	baseT, depth := resolveTypeAndDepth(t)
-	if depth > 0 && len(valueValidations) == 0 {
-		valueValidations, err = c.getNestedValidations(t)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if len(valueValidations) == 0 {
-		return node, nil
-	}
-
-	// callNodes are not automatically visited for primitive types. Generate one if the callNode does not exist
-	if node == nil {
-		node = &callNode{}
-	}
-
-	node.isPrimitive = baseT.IsPrimitive()
-	node.underlyingType = baseT
-	node.t = t
-	node.elem = t.Kind == types.Pointer
-
-	node.validations = valueValidations
-	return node, nil
-}
-
-// getNestedValidations returns the first validation when resolving alias types
-func (c *callTreeForType) getNestedValidations(t *types.Type) ([]validators.FunctionGen, error) {
-	var prev *types.Type
-	var validations []validators.FunctionGen
-	for prev != t {
-		prev = t
-		v, err := c.declarativeValidator.ExtractValidations(t, t.CommentLines)
-		if err != nil {
-			return nil, err
-		}
-		// TODO: Find and return all validations?
-		if len(v) > 0 {
-			return v, nil
-		}
-		if t.Kind == types.Alias {
-			t = t.Underlying
-		} else if t.Kind == types.Pointer {
-			t = t.Elem
-		}
-	}
-	return validations, nil
-}
-
-// resolveType follows pointers and aliases of `t` until reaching the first
-// non-pointer type in `t's` hierarchy
-func resolveTypeAndDepth(t *types.Type) (*types.Type, int) {
-	var prev *types.Type
-	depth := 0
-	for prev != t {
-		prev = t
-		if t.Kind == types.Alias {
-			t = t.Underlying
-		} else if t.Kind == types.Pointer {
-			t = t.Elem
-			depth += 1
-		}
-	}
-	return t, depth
 }
 
 // callNode represents an entry in a tree of Go type accessors - the path from the root to a leaf represents
@@ -489,10 +427,6 @@ type callNode struct {
 	underlyingType *types.Type
 
 	validatorFunction types.Name
-
-	// t is the final type the value should resolve to
-	// This is in contrast to the default type, which resolves aliases and pointers.
-	t *types.Type
 }
 
 // CallNodeVisitorFunc is a function for visiting a call tree. ancestors is the list of all parents
