@@ -50,3 +50,4 @@
 - Pass field name to ExtractValidations
 - Add debug logging in generator
 - Decide test regimen for validators lib
+- make InitRequiredDeclarativeValidator() non-exported?

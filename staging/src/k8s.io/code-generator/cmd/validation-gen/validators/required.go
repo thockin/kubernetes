@@ -23,7 +23,7 @@ import (
 )
 
 func init() {
-	AddToRegistry(InitRequiredDeclarativeValidator)
+	AddToRegistryPriority(InitRequiredDeclarativeValidator)
 }
 
 func InitRequiredDeclarativeValidator(c *generator.Context) DeclarativeValidator {
@@ -45,5 +45,5 @@ func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	if !required {
 		return nil, nil
 	}
-	return []FunctionGen{Function(requiredTagName, requiredValidator)}, nil
+	return []FunctionGen{FatalFunction(requiredTagName, requiredValidator)}, nil
 }

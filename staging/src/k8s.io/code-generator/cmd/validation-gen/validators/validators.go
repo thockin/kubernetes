@@ -42,10 +42,24 @@ type FunctionGen interface {
 	// If validation function to be called does not have a signature of this form, please introduce
 	// a function that does and use that function to call the validation function.
 	SignatureAndArgs() (function types.Name, extraArgs []any)
+
+	// IsFatal indicates whether this particular validation function should be
+	// considered fatal, or whether further validations may proceed.
+	IsFatal() bool
 }
 
 // Function creates a FunctionGen for a given function name and extraArgs.
 func Function(tagName string, function types.Name, extraArgs ...any) FunctionGen {
+	return makeFunction(tagName, false, function, extraArgs...)
+}
+
+// FatalFunction creates a fatal-failure FunctionGen for a given function name
+// and extraArgs.
+func FatalFunction(tagName string, function types.Name, extraArgs ...any) FunctionGen {
+	return makeFunction(tagName, true, function, extraArgs...)
+}
+
+func makeFunction(tagName string, fatal bool, function types.Name, extraArgs ...any) FunctionGen {
 	// Callers of Signature don't care if the args are all of a known type, it just
 	// makes it easier to declare validators.
 	var anyArgs []any
@@ -55,13 +69,14 @@ func Function(tagName string, function types.Name, extraArgs ...any) FunctionGen
 			anyArgs[i] = arg
 		}
 	}
-	return &functionGen{tagName: tagName, function: function, extraArgs: anyArgs}
+	return &functionGen{tagName: tagName, fatal: fatal, function: function, extraArgs: anyArgs}
 }
 
 type functionGen struct {
 	tagName   string
 	function  types.Name
 	extraArgs []any
+	fatal     bool
 }
 
 func (v *functionGen) TagName() string {
@@ -70,4 +85,8 @@ func (v *functionGen) TagName() string {
 
 func (v *functionGen) SignatureAndArgs() (function types.Name, args []any) {
 	return v.function, v.extraArgs
+}
+
+func (v *functionGen) IsFatal() bool {
+	return v.fatal
 }

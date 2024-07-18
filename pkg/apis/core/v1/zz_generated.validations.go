@@ -796,8 +796,11 @@ func Validate_TopologySpreadConstraint(in *v1.TopologySpreadConstraint, fldPath 
 }
 
 func Validate_Volume(in *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.DNSLabel(fldPath.Child("name"), in.Name)...)
-	errs = append(errs, validate.Required(fldPath.Child("name"), in.Name)...)
+	if e := validate.Required(fldPath.Child("name"), in.Name); len(e) != 0 {
+		errs = append(errs, e...)
+	} else {
+		errs = append(errs, validate.DNSLabel(fldPath.Child("name"), in.Name)...)
+	}
 	errs = append(errs, Validate_VolumeSource(&in.VolumeSource, fldPath.Child("VolumeSource"))...)
 	return errs
 }
