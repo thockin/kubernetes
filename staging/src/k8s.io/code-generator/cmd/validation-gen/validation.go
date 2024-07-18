@@ -605,7 +605,10 @@ func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName st
 		return
 	}
 
-	for _, v := range n.validations {
+	nFatal := 0
+	for i, v := range n.validations {
+		moreValidations := i != len(n.validations)-1
+
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
 			"varName":      accessor,
@@ -613,23 +616,39 @@ func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName st
 			"validationFn": c.Universe.Type(fn),
 		}
 
-		// If default value is a literal then it can be assigned via var stmt
-		sw.Do("errs = append(errs, $.validationFn|raw$(", targs)
-		if len(path.Key) > 0 {
-			sw.Do("fldPath.Key($.path.Key$)", targs)
-		} else if len(path.Name) > 0 {
-			sw.Do("fldPath.Child(\"$.path.Name$\")", targs)
-		} else if len(path.Index) > 0 {
-			sw.Do("fldPath.Index($.path.Index$)", targs)
+		emitCall := func() {
+			sw.Do("$.validationFn|raw$(", targs)
+			if len(path.Key) > 0 {
+				sw.Do("fldPath.Key($.path.Key$)", targs)
+			} else if len(path.Name) > 0 {
+				sw.Do("fldPath.Child(\"$.path.Name$\")", targs)
+			} else if len(path.Index) > 0 {
+				sw.Do("fldPath.Index($.path.Index$)", targs)
+			} else {
+				sw.Do("<no-path-part>", targs)
+			}
+			sw.Do(", $.varName$", targs)
+			for _, extraArg := range extraArgs {
+				// TODO: We should skip any templating and instead write these values directly. How?
+				sw.Do(", "+toGolangSourceDataLiteral(extraArg), nil)
+			}
+			sw.Do(")", targs)
+		}
+		if v.IsFatal() && moreValidations {
+			nFatal++
+			sw.Do("if e := ", nil)
+			emitCall()
+			sw.Do("; len(e) != 0 {\n", nil)
+			sw.Do("errs = append(errs, e...)\n", nil)
+			sw.Do("} else {\n", nil)
 		} else {
-			sw.Do("<no-path-part>", targs)
+			sw.Do("errs = append(errs, ", nil)
+			emitCall()
+			sw.Do("...)\n", nil)
 		}
-		sw.Do(", $.varName$", targs)
-		for _, extraArg := range extraArgs {
-			// TODO: We should skip any templating and instead write these values directly. How?
-			sw.Do(", "+toGolangSourceDataLiteral(extraArg), nil)
-		}
-		sw.Do(")...)\n", targs)
+	}
+	for i := 0; i < nFatal; i++ {
+		sw.Do("}\n", nil)
 	}
 }
 
