@@ -165,7 +165,7 @@ func (rsStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, newReplicaSet)...) // TODO: Call update when implemented
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
 
 	return allErrs
 }
@@ -240,7 +240,7 @@ func (rsStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.O
 
 func (rsStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := appsvalidation.ValidateReplicaSetStatusUpdate(obj.(*apps.ReplicaSet), old.(*apps.ReplicaSet))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...) // TODO: Call update when implemented
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old, "status")...)
 	return allErrs
 }
 

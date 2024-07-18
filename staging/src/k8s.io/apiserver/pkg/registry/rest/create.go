@@ -235,3 +235,20 @@ func ValidateDeclaratively(ctx context.Context, obj runtime.Object, subresources
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}
 }
+
+func ValidateUpdateDeclaratively(ctx context.Context, obj, oldObj runtime.Object, subresources ...string) field.ErrorList {
+	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
+		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
+		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		if err != nil {
+			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+		}
+		versionedOldObj, err := legacyscheme.Scheme.ConvertToVersion(oldObj, groupVersion)
+		if err != nil {
+			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
+		}
+		return legacyscheme.Scheme.ValidateUpdate(versionedObj, versionedOldObj, subresources...)
+	} else {
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
+	}
+}
