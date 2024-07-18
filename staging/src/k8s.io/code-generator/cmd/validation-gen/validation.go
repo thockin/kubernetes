@@ -353,6 +353,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		return nil, nil
 	}
 
+	c.visited[t] = parent
 	return parent, nil
 }
 
