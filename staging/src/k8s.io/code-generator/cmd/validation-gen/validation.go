@@ -241,6 +241,9 @@ func (c *callTreeForType) findValidationFunction(t *types.Type) (types.Name, boo
 // structs today).
 func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 	if v, ok := c.visited[t]; ok {
+		if v == nil {
+			return nil, nil
+		}
 		return v.copy(root), nil
 	}
 	parent := &callNode{}
@@ -263,7 +266,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		// We can now build the tree for it safely.
 		c.currentlyBuildingTypes[t] = false
 	}()
-	
+
 	switch t.Kind {
 	case types.Pointer:
 		child, err := c.build(t.Elem, false)
@@ -322,17 +325,18 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 			if err != nil {
 				return nil, err
 			}
-			validations, err := c.declarativeValidator.ExtractValidations(field.Type, field.CommentLines)
-			if err != nil {
-				return nil, err
-			}
-			if len(validations) > 0 {
-				baseT, _ := resolveType(field.Type)
-				child = &callNode{
-					isPrimitive:    baseT.IsPrimitive(),
-					underlyingType: baseT,
-					elem:           field.Type.Kind == types.Pointer,
-					validations:    validations,
+			if len(field.CommentLines) > 0 {
+				validations, err := c.declarativeValidator.ExtractValidations(field.Type, field.CommentLines)
+				if err != nil {
+					return nil, err
+				}
+				if len(validations) > 0 {
+					child = &callNode{
+						isPrimitive:    field.Type.IsPrimitive(),
+						underlyingType: field.Type,
+						elem:           field.Type.Kind == types.Pointer,
+						validations:    validations,
+					}
 				}
 			}
 
@@ -341,7 +345,6 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 				child.jsonName = jsonName
 				// TODO: Add more information to the node about field correlation for use with ValidateUpdate.
 				//       In particular, we need to track associative list keys.
-				//if isAssociativeList() {}
 				parent.children = append(parent.children, *child)
 			}
 		}
@@ -355,28 +358,12 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 	}
 	if len(parent.children) == 0 && len(parent.validations) == 0 {
+		c.visited[t] = nil
 		return nil, nil
 	}
 
 	c.visited[t] = parent
 	return parent, nil
-}
-
-// resolveType follows pointers and aliases of `t` until reaching the first
-// non-pointer type in `t's` hierarchy and returns true if a different is returned than the given t.
-func resolveType(t *types.Type) (*types.Type, bool) {
-	var prev *types.Type
-	depth := 0
-	for prev != t {
-		prev = t
-		if t.Kind == types.Alias {
-			t = t.Underlying
-		} else if t.Kind == types.Pointer {
-			t = t.Elem
-			depth += 1
-		}
-	}
-	return t, depth > 0
 }
 
 // callNode represents an entry in a tree of Go type accessors - the path from the root to a leaf represents
