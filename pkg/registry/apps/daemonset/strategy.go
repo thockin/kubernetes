@@ -169,7 +169,7 @@ func (daemonSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Ob
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, newDaemonSet)...) // TODO: Call update when implemented
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
 
 	return allErrs
 }
@@ -215,7 +215,7 @@ func (daemonSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old ru
 
 func (daemonSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateDaemonSetStatusUpdate(obj.(*apps.DaemonSet), old.(*apps.DaemonSet))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj, "status")...) // TODO: Call update when implemented
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old, "status")...)
 	return allErrs
 }
 
