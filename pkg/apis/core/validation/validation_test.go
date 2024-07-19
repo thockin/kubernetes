@@ -31,9 +31,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtimetesting "k8s.io/apimachinery/pkg/runtime/testing"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -48,6 +50,8 @@ import (
 	"k8s.io/kubernetes/pkg/features"
 	utilpointer "k8s.io/utils/pointer"
 	"k8s.io/utils/ptr"
+
+	_ "k8s.io/kubernetes/pkg/apis/core/install"
 )
 
 const (
@@ -562,13 +566,18 @@ func TestValidatePersistentVolumes(t *testing.T) {
 			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.VolumeAttributesClass, scenario.enableVolumeAttributesClass)
 
 			opts := ValidationOptionsForPersistentVolume(scenario.volume, nil)
-			errs := ValidatePersistentVolume(scenario.volume, opts)
-			if len(errs) == 0 && scenario.isExpectedFailure {
-				t.Errorf("Unexpected success for scenario: %s", name)
-			}
-			if len(errs) > 0 && !scenario.isExpectedFailure {
-				t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, scenario.volume, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePersistentVolume(scenario.volume, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if len(errs) == 0 && scenario.isExpectedFailure {
+					t.Errorf("Unexpected success for scenario: %s", name)
+				}
+				if len(errs) > 0 && !scenario.isExpectedFailure {
+					t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
+				}
+			})
 		})
 	}
 
@@ -2188,19 +2197,37 @@ func testValidatePVC(t *testing.T, ephemeral bool) {
 							},
 						},
 					},
-				},
-				}
+				}}
 				opts := PodValidationOptions{}
-				_, errs = ValidateVolumes(volumes, nil, field.NewPath(""), opts)
+				obj := mkPod(tweakVolumes(volumes))
+				runtimetesting.RunValidationForEachVersion(t, &obj, func(t *testing.T, versionValidationErrors field.ErrorList) {
+					// Continue to run handwritten validation until migration to declarative validation is complete.
+					errs = ValidatePodCreate(&obj, opts)
+					// Run declarative validation for the version
+					errs = append(errs, versionValidationErrors...)
+
+					if len(errs) == 0 && scenario.isExpectedFailure {
+						t.Error("Unexpected success for scenario")
+					}
+					if len(errs) > 0 && !scenario.isExpectedFailure {
+						t.Errorf("Unexpected failure: %+v", errs)
+					}
+				})
 			} else {
-				opts := ValidationOptionsForPersistentVolumeClaim(scenario.claim, nil)
-				errs = ValidatePersistentVolumeClaim(scenario.claim, opts)
-			}
-			if len(errs) == 0 && scenario.isExpectedFailure {
-				t.Error("Unexpected success for scenario")
-			}
-			if len(errs) > 0 && !scenario.isExpectedFailure {
-				t.Errorf("Unexpected failure: %+v", errs)
+				runtimetesting.RunValidationForEachVersion(t, scenario.claim, func(t *testing.T, versionValidationErrors field.ErrorList) {
+					// Continue to run handwritten validation until migration to declarative validation is complete.
+					opts := ValidationOptionsForPersistentVolumeClaim(scenario.claim, nil)
+					errs = ValidatePersistentVolumeClaim(scenario.claim, opts)
+					// Run declarative validation for the version
+					errs = append(errs, versionValidationErrors...)
+
+					if len(errs) == 0 && scenario.isExpectedFailure {
+						t.Error("Unexpected success for scenario")
+					}
+					if len(errs) > 0 && !scenario.isExpectedFailure {
+						t.Errorf("Unexpected failure: %+v", errs)
+					}
+				})
 			}
 		})
 	}
@@ -2278,14 +2305,22 @@ func TestAlphaPVVolumeModeUpdate(t *testing.T) {
 	for name, scenario := range scenarios {
 		t.Run(name, func(t *testing.T) {
 			opts := ValidationOptionsForPersistentVolume(scenario.newPV, scenario.oldPV)
-			// ensure we have a resource version specified for updates
-			errs := ValidatePersistentVolumeUpdate(scenario.newPV, scenario.oldPV, opts)
-			if len(errs) == 0 && scenario.isExpectedFailure {
-				t.Errorf("Unexpected success for scenario: %s", name)
-			}
-			if len(errs) > 0 && !scenario.isExpectedFailure {
-				t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
-			}
+
+			runtimetesting.RunUpdateValidationForEachVersion(t, scenario.newPV, scenario.oldPV, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+
+				// ensure we have a resource version specified for updates
+				errs := ValidatePersistentVolumeUpdate(scenario.newPV, scenario.oldPV, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) == 0 && scenario.isExpectedFailure {
+					t.Errorf("Unexpected success for scenario: %s", name)
+				}
+				if len(errs) > 0 && !scenario.isExpectedFailure {
+					t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
+				}
+			})
 		})
 	}
 }
@@ -3029,13 +3064,19 @@ func TestValidatePersistentVolumeClaimUpdate(t *testing.T) {
 			scenario.oldClaim.ResourceVersion = "1"
 			scenario.newClaim.ResourceVersion = "1"
 			opts := ValidationOptionsForPersistentVolumeClaim(scenario.newClaim, scenario.oldClaim)
-			errs := ValidatePersistentVolumeClaimUpdate(scenario.newClaim, scenario.oldClaim, opts)
-			if len(errs) == 0 && scenario.isExpectedFailure {
-				t.Errorf("Unexpected success for scenario: %s", name)
-			}
-			if len(errs) > 0 && !scenario.isExpectedFailure {
-				t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
-			}
+
+			runtimetesting.RunUpdateValidationForEachVersion(t, scenario.newClaim, scenario.oldClaim, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePersistentVolumeClaimUpdate(scenario.newClaim, scenario.oldClaim, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if len(errs) == 0 && scenario.isExpectedFailure {
+					t.Errorf("Unexpected success for scenario: %s", name)
+				}
+				if len(errs) > 0 && !scenario.isExpectedFailure {
+					t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
+				}
+			})
 		})
 	}
 }
@@ -5356,25 +5397,32 @@ func TestValidateVolumes(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			names, errs := ValidateVolumes([]core.Volume{tc.vol}, nil, field.NewPath("field"), tc.opts)
-			if len(errs) != len(tc.errs) {
-				t.Fatalf("unexpected error(s): got %d, want %d: %v", len(tc.errs), len(errs), errs)
-			}
-			if len(errs) == 0 && (len(names) > 1 || !IsMatchedVolume(tc.vol.Name, names)) {
-				t.Errorf("wrong names result: %v", names)
-			}
-			for i, err := range errs {
-				expErr := tc.errs[i]
-				if err.Type != expErr.etype {
-					t.Errorf("unexpected error type:\n\twant: %q\n\t got: %q", expErr.etype, err.Type)
+			obj := &core.Pod{Spec: core.PodSpec{Volumes: []core.Volume{tc.vol}}}
+			runtimetesting.RunValidationForEachVersion(t, obj, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				names, errs := ValidateVolumes([]core.Volume{tc.vol}, nil, field.NewPath("field"), tc.opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...) // TODO: How to handle this name testing declaratively?
+
+				if len(errs) != len(tc.errs) {
+					t.Fatalf("unexpected error(s): got %d, want %d: %v", len(tc.errs), len(errs), errs)
 				}
-				if !strings.HasSuffix(err.Field, "."+expErr.field) {
-					t.Errorf("unexpected error field:\n\twant: %q\n\t got: %q", expErr.field, err.Field)
+				if len(errs) == 0 && (len(names) > 1 || !IsMatchedVolume(tc.vol.Name, names)) {
+					t.Errorf("wrong names result: %v", names)
 				}
-				if !strings.Contains(err.Detail, expErr.detail) {
-					t.Errorf("unexpected error detail:\n\twant: %q\n\t got: %q", expErr.detail, err.Detail)
+				for i, err := range errs {
+					expErr := tc.errs[i]
+					if err.Type != expErr.etype {
+						t.Errorf("unexpected error type:\n\twant: %q\n\t got: %q", expErr.etype, err.Type)
+					}
+					if !strings.HasSuffix(err.Field, "."+expErr.field) {
+						t.Errorf("unexpected error field:\n\twant: %q\n\t got: %q", expErr.field, err.Field)
+					}
+					if !strings.Contains(err.Detail, expErr.detail) {
+						t.Errorf("unexpected error detail:\n\twant: %q\n\t got: %q", expErr.detail, err.Detail)
+					}
 				}
-			}
+			})
 		})
 	}
 
@@ -5488,13 +5536,19 @@ func TestHugePagesIsolation(t *testing.T) {
 	}
 	for tcName, tc := range testCases {
 		t.Run(tcName, func(t *testing.T) {
-			errs := ValidatePodCreate(tc.pod, PodValidationOptions{})
-			if tc.expectError && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if !tc.expectError && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, tc.pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(tc.pod, PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if tc.expectError && len(errs) == 0 {
+					t.Errorf("Unexpected success")
+				}
+				if !tc.expectError && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
+
 		})
 	}
 }
@@ -5840,9 +5894,17 @@ func TestHugePagesEnv(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 			opts := PodValidationOptions{}
-			if errs := validateEnvVarValueFrom(testCase, field.NewPath("field"), opts); len(errs) != 0 {
-				t.Errorf("expected success, got: %v", errs)
-			}
+			pod := mkPod(tweakEnvVars([]core.EnvVar{testCase}))
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&pod, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != 0 {
+					t.Errorf("expected success, got: %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -6161,7 +6223,7 @@ func TestRelaxedValidateEnv(t *testing.T) {
 				},
 			},
 		}},
-		expectedError: `field[0].valueFrom.fieldRef: Invalid value: "invalid~key"`,
+		expectedError: `spec.containers[0].env[0].valueFrom.fieldRef: Invalid value: "invalid~key"`,
 	}, {
 		name: "metadata.labels with invalid key",
 		envs: []core.EnvVar{{
@@ -6173,7 +6235,7 @@ func TestRelaxedValidateEnv(t *testing.T) {
 				},
 			},
 		}},
-		expectedError: `field[0].valueFrom.fieldRef: Invalid value: "Www.k8s.io/test"`,
+		expectedError: `spec.containers[0].env[0].valueFrom.fieldRef: Invalid value: "Www.k8s.io/test"`,
 	}, {
 		name: "unsupported fieldPath",
 		envs: []core.EnvVar{{
@@ -6189,16 +6251,25 @@ func TestRelaxedValidateEnv(t *testing.T) {
 	},
 	}
 	for _, tc := range errorCases {
-		if errs := ValidateEnv(tc.envs, field.NewPath("field"), PodValidationOptions{AllowRelaxedEnvironmentVariableValidation: true}); len(errs) == 0 {
-			t.Errorf("expected failure for %s", tc.name)
-		} else {
-			for i := range errs {
-				str := errs[i].Error()
-				if str != "" && !strings.Contains(str, tc.expectedError) {
-					t.Errorf("%s: expected error detail either empty or %q, got %q", tc.name, tc.expectedError, str)
+		opts := PodValidationOptions{AllowRelaxedEnvironmentVariableValidation: true}
+		pod := mkPod(tweakEnvVars(tc.envs))
+		runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+			// Continue to run handwritten validation until migration to declarative validation is complete.
+			errs := ValidatePodCreate(&pod, opts)
+			// Run declarative validation for the version
+			errs = append(errs, versionValidationErrors...)
+
+			if len(errs) == 0 {
+				t.Errorf("expected failure for %s", tc.name)
+			} else {
+				for i := range errs {
+					str := errs[i].Error()
+					if str != "" && !strings.Contains(str, tc.expectedError) {
+						t.Errorf("%s: expected error detail either empty or %q, got %q", tc.name, tc.expectedError, str)
+					}
 				}
 			}
-		}
+		})
 	}
 }
 
@@ -7358,10 +7429,13 @@ func TestValidateProbe(t *testing.T) {
 }
 
 func Test_validateProbe(t *testing.T) {
-	fldPath := field.NewPath("test")
+	fldPath := field.NewPath("spec", "containers[0]")
+	readinessProbe := "readinessProbe"
+	livenessProbe := "livenessProbe"
 	type args struct {
-		probe   *core.Probe
-		fldPath *field.Path
+		probe          *core.Probe
+		fldPath        *field.Path
+		containerProbe string
 	}
 	tests := []struct {
 		name string
@@ -7369,16 +7443,18 @@ func Test_validateProbe(t *testing.T) {
 		want field.ErrorList
 	}{{
 		args: args{
-			probe:   &core.Probe{},
-			fldPath: fldPath,
+			probe:          &core.Probe{},
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
-		want: field.ErrorList{field.Required(fldPath, "must specify a handler type")},
+		want: field.ErrorList{field.Required(fldPath.Child(readinessProbe), "must specify a handler type")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler: core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
 		want: field.ErrorList{},
 	}, {
@@ -7387,87 +7463,114 @@ func Test_validateProbe(t *testing.T) {
 				ProbeHandler:        core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				InitialDelaySeconds: -1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("initialDelaySeconds"), -1, "must be greater than or equal to 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(readinessProbe).Child("initialDelaySeconds"), -1, "must be greater than or equal to 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:   core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				TimeoutSeconds: -1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("timeoutSeconds"), -1, "must be greater than or equal to 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(readinessProbe).Child("timeoutSeconds"), -1, "must be greater than or equal to 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:  core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				PeriodSeconds: -1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("periodSeconds"), -1, "must be greater than or equal to 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(readinessProbe).Child("periodSeconds"), -1, "must be greater than or equal to 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:     core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				SuccessThreshold: -1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("successThreshold"), -1, "must be greater than or equal to 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(readinessProbe).Child("successThreshold"), -1, "must be greater than or equal to 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:     core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				FailureThreshold: -1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(readinessProbe),
+			containerProbe: readinessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("failureThreshold"), -1, "must be greater than or equal to 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(readinessProbe).Child("failureThreshold"), -1, "must be greater than or equal to 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:                  core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				TerminationGracePeriodSeconds: utilpointer.Int64(-1),
+				SuccessThreshold:              1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(livenessProbe),
+			containerProbe: livenessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("terminationGracePeriodSeconds"), -1, "must be greater than 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(livenessProbe).Child("terminationGracePeriodSeconds"), -1, "must be greater than 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:                  core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				TerminationGracePeriodSeconds: utilpointer.Int64(0),
+				SuccessThreshold:              1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(livenessProbe),
+			containerProbe: livenessProbe,
 		},
-		want: field.ErrorList{field.Invalid(fldPath.Child("terminationGracePeriodSeconds"), 0, "must be greater than 0")},
+		want: field.ErrorList{field.Invalid(fldPath.Child(livenessProbe).Child("terminationGracePeriodSeconds"), 0, "must be greater than 0")},
 	}, {
 		args: args{
 			probe: &core.Probe{
 				ProbeHandler:                  core.ProbeHandler{Exec: &core.ExecAction{Command: []string{"echo"}}},
 				TerminationGracePeriodSeconds: utilpointer.Int64(1),
+				SuccessThreshold:              1,
 			},
-			fldPath: fldPath,
+			fldPath:        fldPath.Child(livenessProbe),
+			containerProbe: livenessProbe,
 		},
 		want: field.ErrorList{},
 	},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := validateProbe(tt.args.probe, defaultGracePeriod, tt.args.fldPath)
-			if len(got) != len(tt.want) {
-				t.Errorf("validateProbe() = %v, want %v", got, tt.want)
-				return
+			opts := PodValidationOptions{}
+
+			var pod core.Pod
+			switch tt.args.containerProbe {
+			case readinessProbe:
+				pod = mkPod(tweakReadinessProbe(tt.args.probe))
+			case livenessProbe:
+				pod = mkPod(tweakLivenessProbe(tt.args.probe))
 			}
-			for i := range got {
-				if got[i].Type != tt.want[i].Type ||
-					got[i].Field != tt.want[i].Field {
-					t.Errorf("validateProbe()[%d] = %v, want %v", i, got[i], tt.want[i])
+
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&pod, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != len(tt.want) {
+					t.Errorf("validateProbe() = %v, want %v", errs, tt.want)
+					return
 				}
-			}
+				for i := range errs {
+					if errs[i].Type != tt.want[i].Type ||
+						errs[i].Field != tt.want[i].Field {
+						t.Errorf("validateProbe()[%d] = %v, want %v", i, errs[i], tt.want[i])
+					}
+				}
+			})
 		})
 	}
 }
@@ -7711,9 +7814,15 @@ func getResources(cpu, memory, storage string) core.ResourceList {
 func TestValidateEphemeralContainers(t *testing.T) {
 	containers := []core.Container{{Name: "ctr", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}}
 	initContainers := []core.Container{{Name: "ictr", Image: "iimage", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}}
-	vols := map[string]core.VolumeSource{
-		"blk": {PersistentVolumeClaim: &core.PersistentVolumeClaimVolumeSource{ClaimName: "pvc"}},
-		"vol": {EmptyDir: &core.EmptyDirVolumeSource{}},
+	vols := []core.Volume{
+		{
+			Name:         "blk",
+			VolumeSource: core.VolumeSource{PersistentVolumeClaim: &core.PersistentVolumeClaimVolumeSource{ClaimName: "pvc"}},
+		},
+		{
+			Name:         "vol",
+			VolumeSource: core.VolumeSource{EmptyDir: &core.EmptyDirVolumeSource{}},
+		},
 	}
 
 	// Success Cases
@@ -7767,20 +7876,25 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			},
 		}},
 	} {
-		var PodRestartPolicy core.RestartPolicy
-		PodRestartPolicy = "Never"
-		if errs := validateEphemeralContainers(ephemeralContainers, containers, initContainers, vols, nil, field.NewPath("ephemeralContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace); len(errs) != 0 {
-			t.Errorf("expected success for '%s' but got errors: %v", title, errs)
-		}
+		for _, restartPolicy := range []core.RestartPolicy{core.RestartPolicyNever, core.RestartPolicyAlways, core.RestartPolicyOnFailure} {
+			opts := PodValidationOptions{}
+			pod := mkPod(
+				tweakContainers(containers),
+				tweakInitContainers(initContainers),
+				tweakEphemeralContainers(ephemeralContainers),
+				tweakVolumes(vols),
+				tweakRestartPolicy(restartPolicy))
 
-		PodRestartPolicy = "Always"
-		if errs := validateEphemeralContainers(ephemeralContainers, containers, initContainers, vols, nil, field.NewPath("ephemeralContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace); len(errs) != 0 {
-			t.Errorf("expected success for '%s' but got errors: %v", title, errs)
-		}
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodSpec(&pod.Spec, nil, field.NewPath("spec"), opts) // ephemeralContainers can not be set on create
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
 
-		PodRestartPolicy = "OnFailure"
-		if errs := validateEphemeralContainers(ephemeralContainers, containers, initContainers, vols, nil, field.NewPath("ephemeralContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace); len(errs) != 0 {
-			t.Errorf("expected success for '%s' but got errors: %v", title, errs)
+				if len(errs) > 0 {
+					t.Errorf("expected success for '%s' but got errors: %v", title, errs)
+				}
+			})
 		}
 	}
 
@@ -7796,7 +7910,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "ctr", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug1", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 		},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "ephemeralContainers[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.ephemeralContainers[0].name"}},
 	}, {
 		"Name Collision with Container.InitContainers",
 		line(),
@@ -7804,7 +7918,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "ictr", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug1", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 		},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "ephemeralContainers[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.ephemeralContainers[0].name"}},
 	}, {
 		"Name Collision with EphemeralContainers",
 		line(),
@@ -7812,7 +7926,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug1", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug1", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 		},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "ephemeralContainers[1].name"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.ephemeralContainers[1].name"}},
 	}, {
 		"empty Container",
 		line(),
@@ -7820,10 +7934,10 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{}},
 		},
 		field.ErrorList{
-			{Type: field.ErrorTypeRequired, Field: "ephemeralContainers[0].name"},
-			{Type: field.ErrorTypeRequired, Field: "ephemeralContainers[0].image"},
-			{Type: field.ErrorTypeRequired, Field: "ephemeralContainers[0].terminationMessagePolicy"},
-			{Type: field.ErrorTypeRequired, Field: "ephemeralContainers[0].imagePullPolicy"},
+			{Type: field.ErrorTypeRequired, Field: "spec.ephemeralContainers[0].name"},
+			{Type: field.ErrorTypeRequired, Field: "spec.ephemeralContainers[0].image"},
+			{Type: field.ErrorTypeRequired, Field: "spec.ephemeralContainers[0].terminationMessagePolicy"},
+			{Type: field.ErrorTypeRequired, Field: "spec.ephemeralContainers[0].imagePullPolicy"},
 		},
 	}, {
 		"empty Container Name",
@@ -7831,21 +7945,21 @@ func TestValidateEphemeralContainers(t *testing.T) {
 		[]core.EphemeralContainer{
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 		},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "ephemeralContainers[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.ephemeralContainers[0].name"}},
 	}, {
 		"whitespace padded image name",
 		line(),
 		[]core.EphemeralContainer{
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug", Image: " image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 		},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "ephemeralContainers[0].image"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.ephemeralContainers[0].image"}},
 	}, {
 		"invalid image pull policy",
 		line(),
 		[]core.EphemeralContainer{
 			{EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug", Image: "image", ImagePullPolicy: "PullThreeTimes", TerminationMessagePolicy: "File"}},
 		},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "ephemeralContainers[0].imagePullPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.ephemeralContainers[0].imagePullPolicy"}},
 	}, {
 		"TargetContainerName doesn't exist",
 		line(),
@@ -7853,7 +7967,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debug", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 			TargetContainerName:      "bogus",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotFound, Field: "ephemeralContainers[0].targetContainerName"}},
+		field.ErrorList{{Type: field.ErrorTypeNotFound, Field: "spec.ephemeralContainers[0].targetContainerName"}},
 	}, {
 		"Targets an ephemeral container",
 		line(),
@@ -7863,7 +7977,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 			EphemeralContainerCommon: core.EphemeralContainerCommon{Name: "debugception", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 			TargetContainerName:      "debug",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotFound, Field: "ephemeralContainers[1].targetContainerName"}},
+		field.ErrorList{{Type: field.ErrorTypeNotFound, Field: "spec.ephemeralContainers[1].targetContainerName"}},
 	}, {
 		"Container uses disallowed field: Lifecycle",
 		line(),
@@ -7880,7 +7994,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].lifecycle"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].lifecycle"}},
 	}, {
 		"Container uses disallowed field: LivenessProbe",
 		line(),
@@ -7898,7 +8012,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].livenessProbe"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].livenessProbe"}},
 	}, {
 		"Container uses disallowed field: Ports",
 		line(),
@@ -7913,7 +8027,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].ports"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].ports"}},
 	}, {
 		"Container uses disallowed field: ReadinessProbe",
 		line(),
@@ -7930,7 +8044,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].readinessProbe"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].readinessProbe"}},
 	}, {
 		"Container uses disallowed field: StartupProbe",
 		line(),
@@ -7948,7 +8062,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].startupProbe"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].startupProbe"}},
 	}, {
 		"Container uses disallowed field: Resources",
 		line(),
@@ -7965,7 +8079,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].resources"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].resources"}},
 	}, {
 		"Container uses disallowed field: VolumeMount.SubPath",
 		line(),
@@ -7981,7 +8095,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].volumeMounts[1].subPath"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].volumeMounts[1].subPath"}},
 	}, {
 		"Container uses disallowed field: VolumeMount.SubPathExpr",
 		line(),
@@ -7997,7 +8111,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].volumeMounts[1].subPathExpr"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].volumeMounts[1].subPathExpr"}},
 	}, {
 		"Disallowed field with other errors should only return a single Forbidden",
 		line(),
@@ -8014,7 +8128,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].lifecycle"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].lifecycle"}},
 	}, {
 		"Container uses disallowed field: ResizePolicy",
 		line(),
@@ -8029,7 +8143,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].resizePolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].resizePolicy"}},
 	}, {
 		"Forbidden RestartPolicy: Always",
 		line(),
@@ -8042,7 +8156,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				RestartPolicy:            &containerRestartPolicyAlways,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: OnFailure",
 		line(),
@@ -8055,7 +8169,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				RestartPolicy:            &containerRestartPolicyOnFailure,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: Never",
 		line(),
@@ -8068,7 +8182,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				RestartPolicy:            &containerRestartPolicyNever,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: invalid",
 		line(),
@@ -8081,7 +8195,7 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				RestartPolicy:            &containerRestartPolicyInvalid,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: empty",
 		line(),
@@ -8094,36 +8208,32 @@ func TestValidateEphemeralContainers(t *testing.T) {
 				RestartPolicy:            &containerRestartPolicyEmpty,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "ephemeralContainers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.ephemeralContainers[0].restartPolicy"}},
 	},
 	}
 
-	var PodRestartPolicy core.RestartPolicy
-
 	for _, tc := range tcs {
 		t.Run(tc.title+"__@L"+tc.line, func(t *testing.T) {
+			for _, restartPolicy := range []core.RestartPolicy{core.RestartPolicyNever, core.RestartPolicyAlways, core.RestartPolicyOnFailure} {
+				opts := PodValidationOptions{}
+				pod := mkPod(
+					tweakContainers(containers),
+					tweakInitContainers(initContainers),
+					tweakEphemeralContainers(tc.ephemeralContainers),
+					tweakVolumes(vols),
+					tweakRestartPolicy(restartPolicy))
 
-			PodRestartPolicy = "Never"
-			errs := validateEphemeralContainers(tc.ephemeralContainers, containers, initContainers, vols, nil, field.NewPath("ephemeralContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace)
-			if len(errs) == 0 {
-				t.Fatal("expected error but received none")
-			}
+				runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+					// Continue to run handwritten validation until migration to declarative validation is complete.
+					errs := ValidatePodSpec(&pod.Spec, nil, field.NewPath("spec"), opts) // ephemeral containers can not be set one create
+					// Run declarative validation for the version
+					errs = append(errs, versionValidationErrors...)
 
-			PodRestartPolicy = "Always"
-			errs = validateEphemeralContainers(tc.ephemeralContainers, containers, initContainers, vols, nil, field.NewPath("ephemeralContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace)
-			if len(errs) == 0 {
-				t.Fatal("expected error but received none")
-			}
-
-			PodRestartPolicy = "OnFailure"
-			errs = validateEphemeralContainers(tc.ephemeralContainers, containers, initContainers, vols, nil, field.NewPath("ephemeralContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace)
-			if len(errs) == 0 {
-				t.Fatal("expected error but received none")
-			}
-
-			if diff := cmp.Diff(tc.expectedErrors, errs, cmpopts.IgnoreFields(field.Error{}, "BadValue", "Detail")); diff != "" {
-				t.Errorf("unexpected diff in errors (-want, +got):\n%s", diff)
-				t.Errorf("INFO: all errors:\n%s", prettyErrorList(errs))
+					if diff := cmp.Diff(tc.expectedErrors, errs, cmpopts.IgnoreFields(field.Error{}, "BadValue", "Detail")); diff != "" {
+						t.Errorf("unexpected diff in errors (-want, +got):\n%s", diff)
+						t.Errorf("INFO: all errors:\n%s", prettyErrorList(errs))
+					}
+				})
 			}
 		})
 	}
@@ -8151,17 +8261,23 @@ func TestValidateWindowsPodSecurityContext(t *testing.T) {
 	}
 	for k, v := range cases {
 		t.Run(k, func(t *testing.T) {
-			errs := validateWindows(v.podSec, field.NewPath("field"))
-			if v.expectErr && len(errs) > 0 {
-				if errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
-					t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *v.podSec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateWindows(v.podSec, field.NewPath("field"))
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if v.expectErr && len(errs) > 0 {
+					if errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
+						t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
+					}
+				} else if v.expectErr && len(errs) == 0 {
+					t.Errorf("Unexpected success")
 				}
-			} else if v.expectErr && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if !v.expectErr && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+				if !v.expectErr && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -8200,17 +8316,23 @@ func TestValidateLinuxPodSecurityContext(t *testing.T) {
 	}
 	for k, v := range cases {
 		t.Run(k, func(t *testing.T) {
-			errs := validateLinux(v.podSpec, field.NewPath("field"))
-			if v.expectErr && len(errs) > 0 {
-				if errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
-					t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *v.podSpec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateLinux(v.podSpec, field.NewPath("field"))
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if v.expectErr && len(errs) > 0 {
+					if errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
+						t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
+					}
+				} else if v.expectErr && len(errs) == 0 {
+					t.Errorf("Unexpected success")
 				}
-			} else if v.expectErr && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if !v.expectErr && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+				if !v.expectErr && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -8431,22 +8553,22 @@ func TestValidateContainers(t *testing.T) {
 		"zero-length name",
 		line(),
 		[]core.Container{{Name: "", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].name"}},
 	}, {
 		"zero-length-image",
 		line(),
 		[]core.Container{{Name: "abc", Image: "", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].image"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].image"}},
 	}, {
 		"name > 63 characters",
 		line(),
 		[]core.Container{{Name: strings.Repeat("a", 64), Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].name"}},
 	}, {
 		"name not a DNS label",
 		line(),
 		[]core.Container{{Name: "a.b.c", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].name"}},
 	}, {
 		"name not unique",
 		line(),
@@ -8454,12 +8576,12 @@ func TestValidateContainers(t *testing.T) {
 			{Name: "abc", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 			{Name: "abc", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 		},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "containers[1].name"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.containers[1].name"}},
 	}, {
 		"zero-length image",
 		line(),
 		[]core.Container{{Name: "abc", Image: "", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].image"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].image"}},
 	}, {
 		"host port not unique",
 		line(),
@@ -8469,14 +8591,14 @@ func TestValidateContainers(t *testing.T) {
 			{Name: "def", Image: "image", Ports: []core.ContainerPort{{ContainerPort: 81, HostPort: 80, Protocol: "TCP"}},
 				ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 		},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "containers[1].ports[0].hostPort"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.containers[1].ports[0].hostPort"}},
 	}, {
 		"invalid env var name",
 		line(),
 		[]core.Container{
 			{Name: "abc", Image: "image", Env: []core.EnvVar{{Name: "ev!1"}}, ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 		},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].env[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].env[0].name"}},
 	}, {
 		"unknown volume name",
 		line(),
@@ -8484,7 +8606,7 @@ func TestValidateContainers(t *testing.T) {
 			{Name: "abc", Image: "image", VolumeMounts: []core.VolumeMount{{Name: "anything", MountPath: "/foo"}},
 				ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"},
 		},
-		field.ErrorList{{Type: field.ErrorTypeNotFound, Field: "containers[0].volumeMounts[0].name"}},
+		field.ErrorList{{Type: field.ErrorTypeNotFound, Field: "spec.containers[0].volumeMounts[0].name"}},
 	}, {
 		"invalid lifecycle, no exec command.",
 		line(),
@@ -8499,7 +8621,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].lifecycle.preStop.exec.command"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].lifecycle.preStop.exec.command"}},
 	}, {
 		"invalid lifecycle, no http path.",
 		line(),
@@ -8517,7 +8639,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].lifecycle.preStop.httpGet.path"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].lifecycle.preStop.httpGet.path"}},
 	}, {
 		"invalid lifecycle, no http port.",
 		line(),
@@ -8535,7 +8657,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].lifecycle.preStop.httpGet.port"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].lifecycle.preStop.httpGet.port"}},
 	}, {
 		"invalid lifecycle, no http scheme.",
 		line(),
@@ -8553,7 +8675,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "containers[0].lifecycle.preStop.httpGet.scheme"}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.containers[0].lifecycle.preStop.httpGet.scheme"}},
 	}, {
 		"invalid lifecycle, no tcp socket port.",
 		line(),
@@ -8568,7 +8690,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].lifecycle.preStop.tcpSocket.port"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].lifecycle.preStop.tcpSocket.port"}},
 	}, {
 		"invalid lifecycle, zero tcp socket port.",
 		line(),
@@ -8585,7 +8707,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].lifecycle.preStop.tcpSocket.port"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].lifecycle.preStop.tcpSocket.port"}},
 	}, {
 		"invalid lifecycle, no action.",
 		line(),
@@ -8598,7 +8720,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].lifecycle.preStop"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].lifecycle.preStop"}},
 	}, {
 		"invalid readiness probe, terminationGracePeriodSeconds set.",
 		line(),
@@ -8616,7 +8738,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.terminationGracePeriodSeconds"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.terminationGracePeriodSeconds"}},
 	}, {
 		"invalid liveness probe, no tcp socket port.",
 		line(),
@@ -8632,7 +8754,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.tcpSocket.port"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.tcpSocket.port"}},
 	}, {
 		"invalid liveness probe, no action.",
 		line(),
@@ -8646,7 +8768,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].livenessProbe"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].livenessProbe"}},
 	}, {
 		"invalid liveness probe, successThreshold != 1",
 		line(),
@@ -8664,7 +8786,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.successThreshold"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.successThreshold"}},
 	}, {
 		"invalid startup probe, successThreshold != 1",
 		line(),
@@ -8682,7 +8804,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.successThreshold"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.successThreshold"}},
 	}, {
 		"invalid liveness probe, negative numbers",
 		line(),
@@ -8706,13 +8828,13 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 		}},
 		field.ErrorList{
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.initialDelaySeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.timeoutSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.periodSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.successThreshold"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.failureThreshold"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.terminationGracePeriodSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].livenessProbe.successThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.initialDelaySeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.timeoutSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.periodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.successThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.failureThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.terminationGracePeriodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].livenessProbe.successThreshold"},
 		},
 	}, {
 		"invalid readiness probe, negative numbers",
@@ -8737,16 +8859,16 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 		}},
 		field.ErrorList{
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.initialDelaySeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.timeoutSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.periodSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.successThreshold"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.failureThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.initialDelaySeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.timeoutSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.periodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.successThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.failureThreshold"},
 			// terminationGracePeriodSeconds returns multiple validation errors here:
 			// containers[0].readinessProbe.terminationGracePeriodSeconds: Invalid value: -1: must be greater than 0
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.terminationGracePeriodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.terminationGracePeriodSeconds"},
 			// containers[0].readinessProbe.terminationGracePeriodSeconds: Invalid value: -1: must not be set for readinessProbes
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].readinessProbe.terminationGracePeriodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].readinessProbe.terminationGracePeriodSeconds"},
 		},
 	}, {
 		"invalid startup probe, negative numbers",
@@ -8771,13 +8893,13 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 		}},
 		field.ErrorList{
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.initialDelaySeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.timeoutSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.periodSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.successThreshold"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.failureThreshold"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.terminationGracePeriodSeconds"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].startupProbe.successThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.initialDelaySeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.timeoutSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.periodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.successThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.failureThreshold"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.terminationGracePeriodSeconds"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].startupProbe.successThreshold"},
 		},
 	}, {
 		"invalid message termination policy",
@@ -8788,7 +8910,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "Unknown",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "containers[0].terminationMessagePolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.containers[0].terminationMessagePolicy"}},
 	}, {
 		"empty message termination policy",
 		line(),
@@ -8798,7 +8920,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "containers[0].terminationMessagePolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.containers[0].terminationMessagePolicy"}},
 	}, {
 		"privilege disabled",
 		line(),
@@ -8809,7 +8931,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "containers[0].securityContext.privileged"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.containers[0].securityContext.privileged"}},
 	}, {
 		"invalid compute resource",
 		line(),
@@ -8825,8 +8947,8 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 		}},
 		field.ErrorList{
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.limits[disk]"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.limits[disk]"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.limits[disk]"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.limits[disk]"},
 		},
 	}, {
 		"Resource CPU invalid",
@@ -8840,7 +8962,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.limits[cpu]"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.limits[cpu]"}},
 	}, {
 		"Resource Requests CPU invalid",
 		line(),
@@ -8853,7 +8975,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.requests[cpu]"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.requests[cpu]"}},
 	}, {
 		"Resource Memory invalid",
 		line(),
@@ -8866,7 +8988,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.limits[memory]"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.limits[memory]"}},
 	}, {
 		"Request limit simple invalid",
 		line(),
@@ -8880,7 +9002,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.requests"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.requests"}},
 	}, {
 		"Invalid storage limit request",
 		line(),
@@ -8896,8 +9018,8 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 		}},
 		field.ErrorList{
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.limits[attachable-volumes-aws-ebs]"},
-			{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.limits[attachable-volumes-aws-ebs]"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.limits[attachable-volumes-aws-ebs]"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.limits[attachable-volumes-aws-ebs]"},
 		},
 	}, {
 		"CPU request limit multiple invalid",
@@ -8912,7 +9034,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.requests"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.requests"}},
 	}, {
 		"Memory request limit multiple invalid",
 		line(),
@@ -8926,7 +9048,7 @@ func TestValidateContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].resources.requests"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resources.requests"}},
 	}, {
 		"Invalid env from",
 		line(),
@@ -8943,7 +9065,7 @@ func TestValidateContainers(t *testing.T) {
 				},
 			}},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "containers[0].envFrom[0].configMapRef.name"}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].envFrom[0].configMapRef.name"}},
 	}, {
 		"Unsupported resize policy for memory",
 		line(),
@@ -8956,7 +9078,8 @@ func TestValidateContainers(t *testing.T) {
 				{ResourceName: "memory", RestartPolicy: "RestartContainerrrr"},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "containers[0].resizePolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.containers[0].resizePolicy"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resizePolicy"}},
 	}, {
 		"Unsupported resize policy for CPU",
 		line(),
@@ -8969,7 +9092,8 @@ func TestValidateContainers(t *testing.T) {
 				{ResourceName: "cpu", RestartPolicy: "RestartNotRequired"},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "containers[0].resizePolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.containers[0].resizePolicy"},
+			{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].resizePolicy"}},
 	}, {
 		"Forbidden RestartPolicy: Always",
 		line(),
@@ -8980,7 +9104,7 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyAlways,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "containers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.containers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: OnFailure",
 		line(),
@@ -8991,7 +9115,7 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyOnFailure,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "containers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.containers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: Never",
 		line(),
@@ -9002,7 +9126,7 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyNever,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "containers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.containers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: invalid",
 		line(),
@@ -9013,7 +9137,7 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyInvalid,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "containers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.containers[0].restartPolicy"}},
 	}, {
 		"Forbidden RestartPolicy: empty",
 		line(),
@@ -9024,21 +9148,30 @@ func TestValidateContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyEmpty,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "containers[0].restartPolicy"}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.containers[0].restartPolicy"}},
 	},
 	}
 
 	for _, tc := range errorCases {
 		t.Run(tc.title+"__@L"+tc.line, func(t *testing.T) {
-			errs := validateContainers(tc.containers, volumeDevices, nil, defaultGracePeriod, field.NewPath("containers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace)
-			if len(errs) == 0 {
-				t.Fatal("expected error but received none")
-			}
+			opts := PodValidationOptions{}
+			pod := mkPod(tweakContainers(tc.containers))
 
-			if diff := cmp.Diff(tc.expectedErrors, errs, cmpopts.IgnoreFields(field.Error{}, "BadValue", "Detail")); diff != "" {
-				t.Errorf("unexpected diff in errors (-want, +got):\n%s", diff)
-				t.Errorf("INFO: all errors:\n%s", prettyErrorList(errs))
-			}
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&pod, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) == 0 {
+					t.Fatal("expected error but received none")
+				}
+
+				if diff := cmp.Diff(tc.expectedErrors, errs, cmpopts.IgnoreFields(field.Error{}, "BadValue", "Detail")); diff != "" {
+					t.Errorf("unexpected diff in errors (-want, +got):\n%s", diff)
+					t.Errorf("INFO: all errors:\n%s", prettyErrorList(errs))
+				}
+			})
 		})
 	}
 }
@@ -9139,7 +9272,7 @@ func TestValidateInitContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "initContainers[0].name", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.initContainers[0].name", BadValue: ""}},
 	}, {
 		"name collision with regular container",
 		line(),
@@ -9149,7 +9282,7 @@ func TestValidateInitContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "initContainers[0].name", BadValue: "app"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.initContainers[0].name", BadValue: "app"}},
 	}, {
 		"invalid termination message policy",
 		line(),
@@ -9159,7 +9292,7 @@ func TestValidateInitContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "Unknown",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "initContainers[0].terminationMessagePolicy", BadValue: core.TerminationMessagePolicy("Unknown")}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.initContainers[0].terminationMessagePolicy", BadValue: core.TerminationMessagePolicy("Unknown")}},
 	}, {
 		"duplicate names",
 		line(),
@@ -9174,7 +9307,7 @@ func TestValidateInitContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "initContainers[1].name", BadValue: "init"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.initContainers[1].name", BadValue: "init"}},
 	}, {
 		"duplicate ports",
 		line(),
@@ -9189,7 +9322,7 @@ func TestValidateInitContainers(t *testing.T) {
 			ImagePullPolicy:          "IfNotPresent",
 			TerminationMessagePolicy: "File",
 		}},
-		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "initContainers[0].ports[1].hostPort", BadValue: "TCP//8080"}},
+		field.ErrorList{{Type: field.ErrorTypeDuplicate, Field: "spec.initContainers[0].ports[1].hostPort", BadValue: "TCP//8080"}},
 	}, {
 		"uses disallowed field: Lifecycle",
 		line(),
@@ -9204,7 +9337,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "initContainers[0].lifecycle", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.initContainers[0].lifecycle", BadValue: ""}},
 	}, {
 		"uses disallowed field: LivenessProbe",
 		line(),
@@ -9220,7 +9353,7 @@ func TestValidateInitContainers(t *testing.T) {
 				SuccessThreshold: 1,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "initContainers[0].livenessProbe", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.initContainers[0].livenessProbe", BadValue: ""}},
 	}, {
 		"uses disallowed field: ReadinessProbe",
 		line(),
@@ -9235,7 +9368,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "initContainers[0].readinessProbe", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.initContainers[0].readinessProbe", BadValue: ""}},
 	}, {
 		"Container uses disallowed field: StartupProbe",
 		line(),
@@ -9251,7 +9384,7 @@ func TestValidateInitContainers(t *testing.T) {
 				SuccessThreshold: 1,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "initContainers[0].startupProbe", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.initContainers[0].startupProbe", BadValue: ""}},
 	}, {
 		"Disallowed field with other errors should only return a single Forbidden",
 		line(),
@@ -9272,7 +9405,7 @@ func TestValidateInitContainers(t *testing.T) {
 				TerminationGracePeriodSeconds: utilpointer.Int64(-1),
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "initContainers[0].startupProbe", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeForbidden, Field: "spec.initContainers[0].startupProbe", BadValue: ""}},
 	}, {
 		"Not supported RestartPolicy: OnFailure",
 		line(),
@@ -9283,7 +9416,7 @@ func TestValidateInitContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyOnFailure,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "initContainers[0].restartPolicy", BadValue: containerRestartPolicyOnFailure}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.initContainers[0].restartPolicy", BadValue: containerRestartPolicyOnFailure}},
 	}, {
 		"Not supported RestartPolicy: Never",
 		line(),
@@ -9294,7 +9427,7 @@ func TestValidateInitContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyNever,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "initContainers[0].restartPolicy", BadValue: containerRestartPolicyNever}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.initContainers[0].restartPolicy", BadValue: containerRestartPolicyNever}},
 	}, {
 		"Not supported RestartPolicy: invalid",
 		line(),
@@ -9305,7 +9438,7 @@ func TestValidateInitContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyInvalid,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "initContainers[0].restartPolicy", BadValue: containerRestartPolicyInvalid}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.initContainers[0].restartPolicy", BadValue: containerRestartPolicyInvalid}},
 	}, {
 		"Not supported RestartPolicy: empty",
 		line(),
@@ -9316,7 +9449,7 @@ func TestValidateInitContainers(t *testing.T) {
 			TerminationMessagePolicy: "File",
 			RestartPolicy:            &containerRestartPolicyEmpty,
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "initContainers[0].restartPolicy", BadValue: containerRestartPolicyEmpty}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.initContainers[0].restartPolicy", BadValue: containerRestartPolicyEmpty}},
 	}, {
 		"invalid startup probe in restartable container, successThreshold != 1",
 		line(),
@@ -9333,7 +9466,7 @@ func TestValidateInitContainers(t *testing.T) {
 				SuccessThreshold: 2,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "initContainers[0].startupProbe.successThreshold", BadValue: int32(2)}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.initContainers[0].startupProbe.successThreshold", BadValue: int32(2)}},
 	}, {
 		"invalid readiness probe, terminationGracePeriodSeconds set.",
 		line(),
@@ -9352,7 +9485,7 @@ func TestValidateInitContainers(t *testing.T) {
 				TerminationGracePeriodSeconds: utilpointer.Int64(10),
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "initContainers[0].readinessProbe.terminationGracePeriodSeconds", BadValue: utilpointer.Int64(10)}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.initContainers[0].readinessProbe.terminationGracePeriodSeconds", BadValue: utilpointer.Int64(10)}},
 	}, {
 		"invalid liveness probe, successThreshold != 1",
 		line(),
@@ -9371,7 +9504,7 @@ func TestValidateInitContainers(t *testing.T) {
 				SuccessThreshold: 2,
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "initContainers[0].livenessProbe.successThreshold", BadValue: int32(2)}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.initContainers[0].livenessProbe.successThreshold", BadValue: int32(2)}},
 	}, {
 		"invalid lifecycle, no exec command.",
 		line(),
@@ -9387,7 +9520,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "initContainers[0].lifecycle.preStop.exec.command", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.initContainers[0].lifecycle.preStop.exec.command", BadValue: ""}},
 	}, {
 		"invalid lifecycle, no http path.",
 		line(),
@@ -9406,7 +9539,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "initContainers[0].lifecycle.preStop.httpGet.path", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.initContainers[0].lifecycle.preStop.httpGet.path", BadValue: ""}},
 	}, {
 		"invalid lifecycle, no http port.",
 		line(),
@@ -9425,7 +9558,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "initContainers[0].lifecycle.preStop.httpGet.port", BadValue: 0}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.initContainers[0].lifecycle.preStop.httpGet.port", BadValue: 0}},
 	}, {
 		"invalid lifecycle, no http scheme.",
 		line(),
@@ -9444,7 +9577,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "initContainers[0].lifecycle.preStop.httpGet.scheme", BadValue: core.URIScheme("")}},
+		field.ErrorList{{Type: field.ErrorTypeNotSupported, Field: "spec.initContainers[0].lifecycle.preStop.httpGet.scheme", BadValue: core.URIScheme("")}},
 	}, {
 		"invalid lifecycle, no tcp socket port.",
 		line(),
@@ -9460,7 +9593,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "initContainers[0].lifecycle.preStop.tcpSocket.port", BadValue: 0}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.initContainers[0].lifecycle.preStop.tcpSocket.port", BadValue: 0}},
 	}, {
 		"invalid lifecycle, zero tcp socket port.",
 		line(),
@@ -9478,7 +9611,7 @@ func TestValidateInitContainers(t *testing.T) {
 				},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "initContainers[0].lifecycle.preStop.tcpSocket.port", BadValue: 0}},
+		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.initContainers[0].lifecycle.preStop.tcpSocket.port", BadValue: 0}},
 	}, {
 		"invalid lifecycle, no action.",
 		line(),
@@ -9492,21 +9625,32 @@ func TestValidateInitContainers(t *testing.T) {
 				PreStop: &core.LifecycleHandler{},
 			},
 		}},
-		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "initContainers[0].lifecycle.preStop", BadValue: ""}},
+		field.ErrorList{{Type: field.ErrorTypeRequired, Field: "spec.initContainers[0].lifecycle.preStop", BadValue: ""}},
 	},
 	}
 
 	for _, tc := range errorCases {
 		t.Run(tc.title+"__@L"+tc.line, func(t *testing.T) {
-			errs := validateInitContainers(tc.initContainers, containers, volumeDevices, nil, defaultGracePeriod, field.NewPath("initContainers"), PodValidationOptions{}, &PodRestartPolicy, noUserNamespace)
-			if len(errs) == 0 {
-				t.Fatal("expected error but received none")
-			}
+			opts := PodValidationOptions{}
+			pod := mkPod(
+				tweakContainers(containers),
+				tweakInitContainers(tc.initContainers))
 
-			if diff := cmp.Diff(tc.expectedErrors, errs, cmpopts.IgnoreFields(field.Error{}, "Detail")); diff != "" {
-				t.Errorf("unexpected diff in errors (-want, +got):\n%s", diff)
-				t.Errorf("INFO: all errors:\n%s", prettyErrorList(errs))
-			}
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodSpec(&pod.Spec, nil, field.NewPath("spec"), opts) // ephemeral containers can not be set one create
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) == 0 {
+					t.Fatal("expected error but received none")
+				}
+
+				if diff := cmp.Diff(tc.expectedErrors, errs, cmpopts.IgnoreFields(field.Error{}, "Detail")); diff != "" {
+					t.Errorf("unexpected diff in errors (-want, +got):\n%s", diff)
+					t.Errorf("INFO: all errors:\n%s", prettyErrorList(errs))
+				}
+			})
 		})
 	}
 }
@@ -10020,9 +10164,17 @@ func TestValidatePodSpec(t *testing.T) {
 			opts := PodValidationOptions{
 				ResourceIsPod: true,
 			}
-			if errs := ValidatePodSpec(&v.Spec, nil, field.NewPath("field"), opts); len(errs) != 0 {
-				t.Errorf("expected success: %v", errs)
-			}
+
+			runtimetesting.RunValidationForEachVersion(t, v, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodSpec(&v.Spec, nil, field.NewPath("field"), opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != 0 {
+					t.Errorf("expected success: %v", errs)
+				}
+			})
 		})
 	}
 
@@ -10816,9 +10968,16 @@ func TestValidatePod(t *testing.T) {
 
 	for k, v := range successCases {
 		t.Run(k, func(t *testing.T) {
-			if errs := ValidatePodCreate(&v, PodValidationOptions{}); len(errs) != 0 {
-				t.Errorf("expected success: %v", errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &v, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&v, PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != 0 {
+					t.Errorf("expected success: %v", errs)
+				}
+			})
 		})
 	}
 
@@ -12138,13 +12297,20 @@ func TestValidatePod(t *testing.T) {
 
 	for k, v := range errorCases {
 		t.Run(k, func(t *testing.T) {
-			if errs := ValidatePodCreate(&v.spec, PodValidationOptions{}); len(errs) == 0 {
-				t.Errorf("expected failure")
-			} else if v.expectedError == "" {
-				t.Errorf("missing expectedError, got %q", errs.ToAggregate().Error())
-			} else if actualError := errs.ToAggregate().Error(); !strings.Contains(actualError, v.expectedError) {
-				t.Errorf("expected error to contain %q, got %q", v.expectedError, actualError)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &v.spec, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&v.spec, PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) == 0 {
+					t.Errorf("expected failure")
+				} else if v.expectedError == "" {
+					t.Errorf("missing expectedError, got %q", errs.ToAggregate().Error())
+				} else if actualError := errs.ToAggregate().Error(); !strings.Contains(actualError, v.expectedError) {
+					t.Errorf("expected error to contain %q, got %q", v.expectedError, actualError)
+				}
+			})
 		})
 	}
 }
@@ -12182,10 +12348,16 @@ func TestValidatePodCreateWithSchedulingGates(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			applyEssentials(tt.pod)
-			errs := ValidatePodCreate(tt.pod, PodValidationOptions{})
-			if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
-				t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-			}
+			runtimetesting.RunValidationForEachVersion(t, tt.pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(tt.pod, PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
+					t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
+				}
+			})
 		})
 	}
 }
@@ -15960,10 +16132,17 @@ func TestValidateServiceCreate(t *testing.T) {
 			}
 			svc := makeValidService()
 			tc.tweakSvc(&svc)
-			errs := ValidateServiceCreate(&svc)
-			if len(errs) != tc.numErrs {
-				t.Errorf("Unexpected error list for case %q(expected:%v got %v) - Errors:\n %v", tc.name, tc.numErrs, len(errs), errs.ToAggregate())
-			}
+
+			runtimetesting.RunValidationForEachVersion(t, &svc, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateServiceCreate(&svc)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != tc.numErrs {
+					t.Errorf("Unexpected error list for case %q(expected:%v got %v) - Errors:\n %v", tc.name, tc.numErrs, len(errs), errs.ToAggregate())
+				}
+			})
 		})
 	}
 }
@@ -18500,10 +18679,17 @@ func TestValidateServiceUpdate(t *testing.T) {
 			oldSvc := makeValidService()
 			newSvc := makeValidService()
 			tc.tweakSvc(&oldSvc, &newSvc)
-			errs := ValidateServiceUpdate(&newSvc, &oldSvc)
-			if len(errs) != tc.numErrs {
-				t.Errorf("Expected %d errors, got %d: %v", tc.numErrs, len(errs), errs.ToAggregate())
-			}
+
+			runtimetesting.RunUpdateValidationForEachVersion(t, &newSvc, &oldSvc, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateServiceUpdate(&newSvc, &oldSvc)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != tc.numErrs {
+					t.Errorf("Expected %d errors, got %d: %v", tc.numErrs, len(errs), errs.ToAggregate())
+				}
+			})
 		})
 	}
 }
@@ -19208,13 +19394,20 @@ func TestValidatePersistentVolumeClaimStatusUpdate(t *testing.T) {
 			// ensure we have a resource version specified for updates
 			scenario.oldClaim.ResourceVersion = "1"
 			scenario.newClaim.ResourceVersion = "1"
-			errs := ValidatePersistentVolumeClaimStatusUpdate(scenario.newClaim, scenario.oldClaim, validateOpts)
-			if len(errs) == 0 && scenario.isExpectedFailure {
-				t.Errorf("Unexpected success for scenario: %s", name)
-			}
-			if len(errs) > 0 && !scenario.isExpectedFailure {
-				t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
-			}
+
+			runtimetesting.RunUpdateValidationForEachVersion(t, scenario.newClaim, scenario.oldClaim, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePersistentVolumeClaimStatusUpdate(scenario.newClaim, scenario.oldClaim, validateOpts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) == 0 && scenario.isExpectedFailure {
+					t.Errorf("Unexpected success for scenario: %s", name)
+				}
+				if len(errs) > 0 && !scenario.isExpectedFailure {
+					t.Errorf("Unexpected failure for scenario: %s - %+v", name, errs)
+				}
+			})
 		})
 	}
 }
@@ -19474,18 +19667,25 @@ func TestValidateResourceQuota(t *testing.T) {
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			errs := ValidateResourceQuota(&tc.rq)
-			if len(tc.errDetail) == 0 && len(tc.errField) == 0 && len(errs) != 0 {
-				t.Errorf("expected success: %v", errs)
-			} else if (len(tc.errDetail) != 0 || len(tc.errField) != 0) && len(errs) == 0 {
-				t.Errorf("expected failure")
-			} else {
-				for i := range errs {
-					if !strings.Contains(errs[i].Detail, tc.errDetail) {
-						t.Errorf("expected error detail either empty or %s, got %s", tc.errDetail, errs[i].Detail)
+
+			runtimetesting.RunValidationForEachVersion(t, &tc.rq, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateResourceQuota(&tc.rq)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(tc.errDetail) == 0 && len(tc.errField) == 0 && len(errs) != 0 {
+					t.Errorf("expected success: %v", errs)
+				} else if (len(tc.errDetail) != 0 || len(tc.errField) != 0) && len(errs) == 0 {
+					t.Errorf("expected failure")
+				} else {
+					for i := range errs {
+						if !strings.Contains(errs[i].Detail, tc.errDetail) {
+							t.Errorf("expected error detail either empty or %s, got %s", tc.errDetail, errs[i].Detail)
+						}
 					}
 				}
-			}
+			})
 		})
 	}
 }
@@ -19926,13 +20126,18 @@ func TestValidateSecretUpdate(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateSecretUpdate(&tc.newSecret, &tc.oldSecret)
-			if tc.valid && len(errs) > 0 {
-				t.Errorf("Unexpected error: %v", errs)
-			}
-			if !tc.valid && len(errs) == 0 {
-				t.Errorf("Unexpected lack of error")
-			}
+			runtimetesting.RunUpdateValidationForEachVersion(t, &tc.newSecret, &tc.oldSecret, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateSecretUpdate(&tc.newSecret, &tc.oldSecret)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if tc.valid && len(errs) > 0 {
+					t.Errorf("Unexpected error: %v", errs)
+				}
+				if !tc.valid && len(errs) == 0 {
+					t.Errorf("Unexpected lack of error")
+				}
+			})
 		})
 	}
 }
@@ -20121,11 +20326,15 @@ func TestValidateEndpointsCreate(t *testing.T) {
 
 	for name, tc := range successCases {
 		t.Run(name, func(t *testing.T) {
-			errs := ValidateEndpointsCreate(&tc.endpoints)
-			if len(errs) != 0 {
-				t.Errorf("Expected no validation errors, got %v", errs)
-			}
-
+			runtimetesting.RunValidationForEachVersion(t, &tc.endpoints, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateEndpointsCreate(&tc.endpoints)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if len(errs) != 0 {
+					t.Errorf("Expected no validation errors, got %v", errs)
+				}
+			})
 		})
 	}
 
@@ -20283,9 +20492,15 @@ func TestValidateEndpointsCreate(t *testing.T) {
 
 	for k, v := range errorCases {
 		t.Run(k, func(t *testing.T) {
-			if errs := ValidateEndpointsCreate(&v.endpoints); len(errs) == 0 || errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
-				t.Errorf("Expected error type %s with detail %q, got %v", v.errorType, v.errorDetail, errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &v.endpoints, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateEndpointsCreate(&v.endpoints)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if len(errs) == 0 || errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
+					t.Errorf("Expected error type %s with detail %q, got %v", v.errorType, v.errorDetail, errs)
+				}
+			})
 		})
 	}
 }
@@ -20330,11 +20545,15 @@ func TestValidateEndpointsUpdate(t *testing.T) {
 			newEndpoints := baseEndpoints.DeepCopy()
 			tc.tweakNewEndpoints(newEndpoints)
 
-			errs := ValidateEndpointsUpdate(newEndpoints, oldEndpoints)
-			if len(errs) != tc.numExpectedErrors {
-				t.Errorf("Expected %d validation errors, got %d: %v", tc.numExpectedErrors, len(errs), errs)
-			}
-
+			runtimetesting.RunUpdateValidationForEachVersion(t, newEndpoints, oldEndpoints, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateEndpointsUpdate(newEndpoints, oldEndpoints)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if len(errs) != tc.numExpectedErrors {
+					t.Errorf("Expected %d validation errors, got %d: %v", tc.numExpectedErrors, len(errs), errs)
+				}
+			})
 		})
 	}
 }
@@ -20372,20 +20591,26 @@ func TestValidateWindowsSecurityContext(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			errs := validateWindows(test.sc, field.NewPath("field"))
-			if test.expectError && len(errs) > 0 {
-				if errs[0].Type != test.errorType {
-					t.Errorf("expected error type %q got %q", test.errorType, errs[0].Type)
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *test.sc}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateWindows(test.sc, field.NewPath("field"))
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if test.expectError && len(errs) > 0 {
+					if errs[0].Type != test.errorType {
+						t.Errorf("expected error type %q got %q", test.errorType, errs[0].Type)
+					}
+					if errs[0].Detail != test.errorMsg {
+						t.Errorf("expected error detail %q, got %q", test.errorMsg, errs[0].Detail)
+					}
+				} else if test.expectError && len(errs) == 0 {
+					t.Error("Unexpected success")
 				}
-				if errs[0].Detail != test.errorMsg {
-					t.Errorf("expected error detail %q, got %q", test.errorMsg, errs[0].Detail)
+				if !test.expectError && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
 				}
-			} else if test.expectError && len(errs) == 0 {
-				t.Error("Unexpected success")
-			}
-			if !test.expectError && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+			})
 		})
 	}
 }
@@ -20584,7 +20809,7 @@ func TestValidateOSFields(t *testing.T) {
 }
 
 func TestValidateSchedulingGates(t *testing.T) {
-	fieldPath := field.NewPath("field")
+	fieldPath := field.NewPath("spec.schedulingGates")
 
 	tests := []struct {
 		name            string
@@ -20645,10 +20870,19 @@ func TestValidateSchedulingGates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errs := validateSchedulingGates(tt.schedulingGates, fieldPath)
-			if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
-				t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-			}
+			opts := PodValidationOptions{}
+			pod := mkPod(tweakSchedulingGates(tt.schedulingGates))
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				errs := field.ErrorList{}
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs = append(errs, ValidatePodCreate(&pod, opts)...)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
+					t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
+				}
+			})
 		})
 	}
 }
@@ -20763,17 +20997,23 @@ func TestValidateLinuxSecurityContext(t *testing.T) {
 	}
 	for k, v := range cases {
 		t.Run(k, func(t *testing.T) {
-			errs := validateLinux(v.sc, field.NewPath("field"))
-			if v.expectErr && len(errs) > 0 {
-				if errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
-					t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *v.sc}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateLinux(v.sc, field.NewPath("field"))
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if v.expectErr && len(errs) > 0 {
+					if errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
+						t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
+					}
+				} else if v.expectErr && len(errs) == 0 {
+					t.Errorf("Unexpected success")
 				}
-			} else if v.expectErr && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if !v.expectErr && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+				if !v.expectErr && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -21100,13 +21340,18 @@ func TestValidateConfigMapUpdate(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateConfigMapUpdate(&tc.newCfg, &tc.oldCfg)
-			if tc.valid && len(errs) > 0 {
-				t.Errorf("Unexpected error: %v", errs)
-			}
-			if !tc.valid && len(errs) == 0 {
-				t.Errorf("Unexpected lack of error")
-			}
+			runtimetesting.RunUpdateValidationForEachVersion(t, &tc.newCfg, &tc.oldCfg, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateConfigMapUpdate(&tc.newCfg, &tc.oldCfg)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+				if tc.valid && len(errs) > 0 {
+					t.Errorf("Unexpected error: %v", errs)
+				}
+				if !tc.valid && len(errs) == 0 {
+					t.Errorf("Unexpected lack of error")
+				}
+			})
 		})
 	}
 }
@@ -21974,7 +22219,7 @@ func TestVolumeAttributesClass(t *testing.T) {
 }
 
 func TestValidateTopologySpreadConstraints(t *testing.T) {
-	fieldPath := field.NewPath("field")
+	fieldPath := field.NewPath("spec.topologySpreadConstraints")
 	subFldPath0 := fieldPath.Index(0)
 	fieldPathMinDomains := subFldPath0.Child("minDomains")
 	fieldPathMaxSkew := subFldPath0.Child("maxSkew")
@@ -22204,10 +22449,18 @@ func TestValidateTopologySpreadConstraints(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			errs := validateTopologySpreadConstraints(tc.constraints, fieldPath, tc.opts)
-			if diff := cmp.Diff(tc.wantFieldErrors, errs); diff != "" {
-				t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-			}
+			pod := mkPod(tweakTopologySpreadConstraints(tc.constraints))
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				errs := field.ErrorList{}
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs = append(errs, ValidatePodCreate(&pod, tc.opts)...)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if diff := cmp.Diff(tc.wantFieldErrors, errs); diff != "" {
+					t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
+				}
+			})
 		})
 	}
 }
@@ -22323,14 +22576,18 @@ func TestPodIPsValidation(t *testing.T) {
 				oldPod.ResourceVersion = "1"
 				oldPod.Name = newPod.Name
 
-				errs := ValidatePodStatusUpdate(newPod, oldPod, PodValidationOptions{})
-
-				if len(errs) == 0 && testCase.expectError {
-					t.Fatalf("expected failure for %s, but there were none", testCase.pod.Name)
-				}
-				if len(errs) != 0 && !testCase.expectError {
-					t.Fatalf("expected success for %s, but there were errors: %v", testCase.pod.Name, errs)
-				}
+				runtimetesting.RunUpdateValidationForEachVersion(t, newPod, oldPod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+					// Continue to run handwritten validation until migration to declarative validation is complete.
+					errs := ValidatePodStatusUpdate(newPod, oldPod, PodValidationOptions{})
+					// Run declarative validation for the version
+					errs = append(errs, versionValidationErrors...)
+					if len(errs) == 0 && testCase.expectError {
+						t.Fatalf("expected failure for %s, but there were none", testCase.pod.Name)
+					}
+					if len(errs) != 0 && !testCase.expectError {
+						t.Fatalf("expected success for %s, but there were errors: %v", testCase.pod.Name, errs)
+					}
+				})
 			}
 		})
 	}
@@ -22430,14 +22687,18 @@ func TestHostIPsValidation(t *testing.T) {
 				oldPod.ResourceVersion = "1"
 				oldPod.Name = newPod.Name
 
-				errs := ValidatePodStatusUpdate(newPod, oldPod, PodValidationOptions{})
-
-				if len(errs) == 0 && testCase.expectError {
-					t.Fatalf("expected failure for %s, but there were none", testCase.pod.Name)
-				}
-				if len(errs) != 0 && !testCase.expectError {
-					t.Fatalf("expected success for %s, but there were errors: %v", testCase.pod.Name, errs)
-				}
+				runtimetesting.RunUpdateValidationForEachVersion(t, newPod, oldPod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+					// Continue to run handwritten validation until migration to declarative validation is complete.
+					errs := ValidatePodStatusUpdate(newPod, oldPod, PodValidationOptions{})
+					// Run declarative validation for the version
+					errs = append(errs, versionValidationErrors...)
+					if len(errs) == 0 && testCase.expectError {
+						t.Fatalf("expected failure for %s, but there were none", testCase.pod.Name)
+					}
+					if len(errs) != 0 && !testCase.expectError {
+						t.Fatalf("expected success for %s, but there were errors: %v", testCase.pod.Name, errs)
+					}
+				})
 			}
 		})
 	}
@@ -22917,7 +23178,6 @@ func TestValidatePodTemplateSpecSeccomp(t *testing.T) {
 }
 
 func TestValidateResourceRequirements(t *testing.T) {
-	path := field.NewPath("resources")
 	tests := []struct {
 		name         string
 		requirements core.ResourceRequirements
@@ -22962,9 +23222,19 @@ func TestValidateResourceRequirements(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if errs := ValidateResourceRequirements(&tc.requirements, nil, path, tc.opts); len(errs) != 0 {
-				t.Errorf("unexpected errors: %v", errs)
-			}
+
+			opts := PodValidationOptions{}
+			pod := mkPod(tweakContainerResources(tc.requirements))
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&pod, opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != 0 {
+					t.Errorf("unexpected errors: %v", errs)
+				}
+			})
 		})
 	}
 
@@ -22988,9 +23258,17 @@ func TestValidateResourceRequirements(t *testing.T) {
 
 	for _, tc := range errTests {
 		t.Run(tc.name, func(t *testing.T) {
-			if errs := ValidateResourceRequirements(&tc.requirements, nil, path, tc.opts); len(errs) == 0 {
-				t.Error("expected errors")
-			}
+			pod := mkPod(tweakContainerResources(tc.requirements))
+			runtimetesting.RunValidationForEachVersion(t, &pod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodCreate(&pod, tc.opts)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) == 0 {
+					t.Error("expected errors")
+				}
+			})
 		})
 	}
 }
@@ -23008,7 +23286,7 @@ func TestValidateNonSpecialIP(t *testing.T) {
 		{"ipv6", "2000::1"},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			errs := ValidateNonSpecialIP(tc.ip, fp)
+			errs := ValidateNonSpecialIP(tc.ip, fp) // TODO: Migrate to declarative validator
 			if len(errs) != 0 {
 				t.Errorf("ValidateNonSpecialIP(%q, ...) = %v; want nil", tc.ip, errs)
 			}
@@ -23028,7 +23306,7 @@ func TestValidateNonSpecialIP(t *testing.T) {
 		{"ipv6 local multicast", "ff02::"},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			errs := ValidateNonSpecialIP(tc.ip, fp)
+			errs := ValidateNonSpecialIP(tc.ip, fp) // TODO: Migrate to declarative validator
 			if len(errs) == 0 {
 				t.Errorf("ValidateNonSpecialIP(%q, ...) = nil; want non-nil (errors)", tc.ip)
 			}
@@ -23170,13 +23448,19 @@ func TestValidateHostUsers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			fPath := field.NewPath("spec")
 
-			allErrs := validateHostUsers(tc.spec, fPath)
-			if !tc.success && len(allErrs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if tc.success && len(allErrs) != 0 {
-				t.Errorf("Unexpected error(s): %v", allErrs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *tc.spec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				allErrs := validateHostUsers(tc.spec, fPath)
+				// Run declarative validation for the version
+				allErrs = append(allErrs, versionValidationErrors...)
+
+				if !tc.success && len(allErrs) == 0 {
+					t.Errorf("Unexpected success")
+				}
+				if tc.success && len(allErrs) != 0 {
+					t.Errorf("Unexpected error(s): %v", allErrs)
+				}
+			})
 		})
 	}
 }
@@ -23544,13 +23828,19 @@ func TestValidateWindowsHostProcessPod(t *testing.T) {
 				AllowPrivileged: testCase.allowPrivileged,
 			})
 
-			errs := validateWindowsHostProcessPod(testCase.podSpec, field.NewPath("spec"))
-			if testCase.expectError && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if !testCase.expectError && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *testCase.podSpec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateWindowsHostProcessPod(testCase.podSpec, field.NewPath("spec"))
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if testCase.expectError && len(errs) == 0 {
+					t.Errorf("Unexpected success")
+				}
+				if !testCase.expectError && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -23588,13 +23878,19 @@ func TestValidateOS(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			errs := validateOS(testCase.podSpec, field.NewPath("spec"), PodValidationOptions{})
-			if testCase.expectError && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if !testCase.expectError && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: *testCase.podSpec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateOS(testCase.podSpec, field.NewPath("spec"), PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if testCase.expectError && len(errs) == 0 {
+					t.Errorf("Unexpected success")
+				}
+				if !testCase.expectError && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -23646,6 +23942,7 @@ func TestValidateDownwardAPIHostIPs(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.PodHostIPs, testCase.featureEnabled)
 
+			// TODO: Migrate to declarative validator
 			errs := validateDownwardAPIHostIPs(testCase.fieldSel, field.NewPath("fieldSel"), PodValidationOptions{AllowHostIPsField: testCase.featureEnabled})
 			if testCase.expectError && len(errs) == 0 {
 				t.Errorf("Unexpected success")
@@ -23658,7 +23955,7 @@ func TestValidateDownwardAPIHostIPs(t *testing.T) {
 }
 
 func TestValidatePVSecretReference(t *testing.T) {
-	rootFld := field.NewPath("name")
+	rootFld := field.NewPath("spec.csi.nodeExpandSecretRef")
 	type args struct {
 		secretRef *core.SecretReference
 		fldPath   *field.Path
@@ -23672,22 +23969,22 @@ func TestValidatePVSecretReference(t *testing.T) {
 		name:          "invalid secret ref name",
 		args:          args{&core.SecretReference{Name: "$%^&*#", Namespace: "default"}, rootFld},
 		expectError:   true,
-		expectedError: "name.name: Invalid value: \"$%^&*#\": " + dnsSubdomainLabelErrMsg,
+		expectedError: "spec.csi.nodeExpandSecretRef.name: Invalid value: \"$%^&*#\": " + dnsSubdomainLabelErrMsg,
 	}, {
 		name:          "invalid secret ref namespace",
 		args:          args{&core.SecretReference{Name: "valid", Namespace: "$%^&*#"}, rootFld},
 		expectError:   true,
-		expectedError: "name.namespace: Invalid value: \"$%^&*#\": " + dnsLabelErrMsg,
+		expectedError: "spec.csi.nodeExpandSecretRef.namespace: Invalid value: \"$%^&*#\": " + dnsLabelErrMsg,
 	}, {
 		name:          "invalid secret: missing namespace",
 		args:          args{&core.SecretReference{Name: "valid"}, rootFld},
 		expectError:   true,
-		expectedError: "name.namespace: Required value",
+		expectedError: "spec.csi.nodeExpandSecretRef.namespace: Required value",
 	}, {
 		name:          "invalid secret : missing name",
 		args:          args{&core.SecretReference{Namespace: "default"}, rootFld},
 		expectError:   true,
-		expectedError: "name.name: Required value",
+		expectedError: "spec.csi.nodeExpandSecretRef.name: Required value",
 	}, {
 		name:          "valid secret",
 		args:          args{&core.SecretReference{Name: "valid", Namespace: "default"}, rootFld},
@@ -23697,19 +23994,42 @@ func TestValidatePVSecretReference(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errs := validatePVSecretReference(tt.args.secretRef, tt.args.fldPath)
-			if tt.expectError && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if tt.expectError && len(errs) != 0 {
-				str := errs[0].Error()
-				if str != "" && !strings.Contains(str, tt.expectedError) {
-					t.Errorf("%s: expected error detail either empty or %q, got %q", tt.name, tt.expectedError, str)
+
+			volume := testVolume("foo", "", core.PersistentVolumeSpec{
+				Capacity: core.ResourceList{
+					core.ResourceStorage: resource.MustParse("10G"),
+				},
+				AccessModes: []core.PersistentVolumeAccessMode{core.ReadWriteOnce},
+				PersistentVolumeSource: core.PersistentVolumeSource{
+					CSI: &core.CSIPersistentVolumeSource{
+						Driver:              "test-driver",
+						VolumeHandle:        "test-123",
+						NodeExpandSecretRef: tt.args.secretRef,
+						// NodeStageSecretRef: tt.args.secretRef, // TODO: Why is this field not validated at all?
+					},
+				},
+				StorageClassName:          "valid",
+				VolumeAttributesClassName: ptr.To("valid"),
+			})
+			runtimetesting.RunValidationForEachVersion(t, volume, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePersistentVolume(volume, PersistentVolumeSpecValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if tt.expectError && len(errs) == 0 {
+					t.Errorf("Unexpected success")
 				}
-			}
-			if !tt.expectError && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+				if tt.expectError && len(errs) != 0 {
+					str := errs[0].Error()
+					if str != "" && !strings.Contains(str, tt.expectedError) {
+						t.Errorf("%s: expected error detail either empty or %q, got %q", tt.name, tt.expectedError, str)
+					}
+				}
+				if !tt.expectError && len(errs) != 0 {
+					t.Errorf("Unexpected error(s): %v", errs)
+				}
+			})
 		})
 	}
 }
@@ -23762,9 +24082,16 @@ func TestValidateDynamicResourceAllocation(t *testing.T) {
 	}
 	for k, v := range successCases {
 		t.Run(k, func(t *testing.T) {
-			if errs := ValidatePodSpec(&v.Spec, shortPodName, field.NewPath("field"), PodValidationOptions{}); len(errs) != 0 {
-				t.Errorf("expected success: %v", errs)
-			}
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: v.Spec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodSpec(&v.Spec, shortPodName, field.NewPath("field"), PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != 0 {
+					t.Errorf("expected success: %v", errs)
+				}
+			})
 		})
 	}
 
@@ -23982,10 +24309,18 @@ func TestValidateLoadBalancerStatus(t *testing.T) {
 			if tc.tweakSvcSpec != nil {
 				tc.tweakSvcSpec(&spec)
 			}
-			errs := ValidateLoadBalancerStatus(&status, field.NewPath("status"), &spec)
-			if len(errs) != tc.numErrs {
-				t.Errorf("Unexpected error list for case %q(expected:%v got %v) - Errors:\n %v", tc.name, tc.numErrs, len(errs), errs.ToAggregate())
-			}
+			svc := &core.Service{Spec: spec, Status: core.ServiceStatus{LoadBalancer: status}}
+			svc.ObjectMeta.ResourceVersion = "1"
+			runtimetesting.RunValidationForEachVersion(t, svc, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidateServiceStatusUpdate(svc, svc)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if len(errs) != tc.numErrs {
+					t.Errorf("Unexpected error list for case %q(expected:%v got %v) - Errors:\n %v", tc.name, tc.numErrs, len(errs), errs.ToAggregate())
+				}
+			})
 		})
 	}
 }
@@ -24029,6 +24364,7 @@ func TestValidateSleepAction(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			// TODO: Migrate to declarative validator
 			errs := validateSleepAction(tc.action, &tc.gracePeriod, fldPath)
 
 			if len(tc.expectErr) > 0 && len(errs) == 0 {
@@ -24098,10 +24434,17 @@ func TestValidatePodSpecWithSupplementalGroupsPolicy(t *testing.T) {
 			if tt.wantFieldErrors == nil {
 				tt.wantFieldErrors = field.ErrorList{}
 			}
-			errs := ValidatePodSpec(&podSpec, nil, fldPath, PodValidationOptions{})
-			if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
-				t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-			}
+
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: podSpec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := ValidatePodSpec(&podSpec, nil, fldPath, PodValidationOptions{})
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
+					t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
+				}
+			})
 		})
 	}
 }
@@ -24138,10 +24481,17 @@ func TestValidateWindowsPodSecurityContextSupplementalGroupsPolicy(t *testing.T)
 			if tt.wantFieldErrors == nil {
 				tt.wantFieldErrors = field.ErrorList{}
 			}
-			errs := validateWindows(&podSpec, fldPath)
-			if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
-				t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-			}
+
+			runtimetesting.RunValidationForEachVersion(t, &core.Pod{Spec: podSpec}, func(t *testing.T, versionValidationErrors field.ErrorList) {
+				// Continue to run handwritten validation until migration to declarative validation is complete.
+				errs := validateWindows(&podSpec, fldPath)
+				// Run declarative validation for the version
+				errs = append(errs, versionValidationErrors...)
+
+				if diff := cmp.Diff(tt.wantFieldErrors, errs); diff != "" {
+					t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
+				}
+			})
 		})
 	}
 }
@@ -24250,12 +24600,110 @@ func TestValidatePodStatusUpdateWithSupplementalGroupsPolicy(t *testing.T) {
 							Detail:   err.Detail,
 						})
 					}
-					errs := ValidatePodStatusUpdate(newPod, oldPod, PodValidationOptions{})
-					if diff := cmp.Diff(expectedFieldErrors, errs); diff != "" {
-						t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-					}
+
+					runtimetesting.RunUpdateValidationForEachVersion(t, newPod, oldPod, func(t *testing.T, versionValidationErrors field.ErrorList) {
+						// Continue to run handwritten validation until migration to declarative validation is complete.
+						errs := ValidatePodStatusUpdate(newPod, oldPod, PodValidationOptions{})
+						// Run declarative validation for the version
+						errs = append(errs, versionValidationErrors...)
+
+						if diff := cmp.Diff(expectedFieldErrors, errs); diff != "" {
+							t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
+						}
+					})
 				})
 			}
 		}
+	}
+}
+
+func mkPod(tweaks ...podTweak) core.Pod {
+	p := core.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: metav1.NamespaceDefault},
+		Spec: core.PodSpec{
+			RestartPolicy: core.RestartPolicyNever,
+			DNSPolicy:     core.DNSDefault,
+			Containers: []core.Container{{
+				Name:                     "k8s-test",
+				Image:                    "k8s-test:1.0",
+				TerminationMessagePolicy: core.TerminationMessageReadFile,
+				ImagePullPolicy:          core.PullAlways,
+			}},
+			TerminationGracePeriodSeconds: defaultGracePeriod,
+		},
+	}
+
+	for _, tw := range tweaks {
+		tw(&p)
+	}
+
+	return p
+}
+
+type podTweak func(p *core.Pod)
+
+func tweakVolumes(volumes []core.Volume) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.Volumes = volumes
+	}
+}
+
+func tweakEnvVars(envVars []core.EnvVar) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.Containers[0].Env = envVars
+	}
+}
+
+func tweakReadinessProbe(probe *core.Probe) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.Containers[0].ReadinessProbe = probe
+	}
+}
+
+func tweakLivenessProbe(probe *core.Probe) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.Containers[0].LivenessProbe = probe
+	}
+}
+
+func tweakContainerResources(requirements core.ResourceRequirements) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.Containers[0].Resources = requirements
+	}
+}
+
+func tweakContainers(containers []core.Container) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.Containers = containers
+	}
+}
+
+func tweakInitContainers(initContainers []core.Container) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.InitContainers = initContainers
+	}
+}
+
+func tweakEphemeralContainers(ephemeralContainers []core.EphemeralContainer) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.EphemeralContainers = ephemeralContainers
+	}
+}
+
+func tweakRestartPolicy(restartPolicy core.RestartPolicy) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.RestartPolicy = restartPolicy
+	}
+}
+
+func tweakSchedulingGates(schedulingGates []core.PodSchedulingGate) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.SchedulingGates = schedulingGates
+	}
+}
+
+func tweakTopologySpreadConstraints(topologySpreadConstraints []core.TopologySpreadConstraint) podTweak {
+	return func(p *core.Pod) {
+		p.Spec.TopologySpreadConstraints = topologySpreadConstraints
 	}
 }
