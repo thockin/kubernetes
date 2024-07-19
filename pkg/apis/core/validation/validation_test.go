@@ -55,7 +55,7 @@ import (
 )
 
 const (
-	dnsLabelErrMsg                    = "a lowercase RFC 1123 label must consist of"
+	dnsLabelErrMsg                    = "must consist of lower-case alphanumeric characters or '-'"
 	dnsSubdomainLabelErrMsg           = "a lowercase RFC 1123 subdomain"
 	envVarNameErrMsg                  = "a valid environment variable name must consist of"
 	relaxedEnvVarNameFmtErrMsg string = "a valid environment variable name must consist only of printable ASCII characters other than '='"
@@ -1126,6 +1126,7 @@ func TestValidateLocalVolumes(t *testing.T) {
 
 	for name, scenario := range scenarios {
 		opts := ValidationOptionsForPersistentVolume(scenario.volume, nil)
+
 		errs := ValidatePersistentVolume(scenario.volume, opts)
 		if len(errs) == 0 && scenario.isExpectedFailure {
 			t.Errorf("Unexpected success for scenario: %s", name)
@@ -1587,6 +1588,7 @@ func TestValidatePeristentVolumeAttributesClassUpdate(t *testing.T) {
 		originalNewPV := scenario.newPV.DeepCopy()
 		originalOldPV := scenario.oldPV.DeepCopy()
 		opts := ValidationOptionsForPersistentVolume(scenario.newPV, scenario.oldPV)
+		// TODO: migrate
 		errs := ValidatePersistentVolumeUpdate(scenario.newPV, scenario.oldPV, opts)
 		if len(errs) == 0 && scenario.isExpectedFailure {
 			t.Errorf("Unexpected success for scenario: %s", name)
@@ -3222,6 +3224,7 @@ func TestValidateKeyToPath(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
+		// TODO: migrate
 		errs := validateKeyToPath(&tc.kp, field.NewPath("field"))
 		if tc.ok && len(errs) > 0 {
 			t.Errorf("[%d] unexpected errors: %v", i, errs)
@@ -3264,6 +3267,7 @@ func TestValidateNFSVolumeSource(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
+		// TODO: migrate
 		errs := validateNFSVolumeSource(tc.nfs, field.NewPath("field"))
 
 		if len(errs) > 0 && tc.errtype == "" {
@@ -3307,6 +3311,7 @@ func TestValidateGlusterfs(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
+		// TODO: migrate
 		errs := validateGlusterfsVolumeSource(tc.gfs, field.NewPath("field"))
 
 		if len(errs) > 0 && tc.errtype == "" {
@@ -3357,6 +3362,7 @@ func TestValidateGlusterfsPersistentVolumeSource(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
+		// TODO: migrate
 		errs := validateGlusterfsPersistentVolumeSource(tc.gfs, field.NewPath("field"))
 
 		if len(errs) > 0 && tc.errtype == "" {
@@ -3454,6 +3460,7 @@ func TestValidateCSIVolumeSource(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
+		// TODO: migrate
 		errs := validateCSIVolumeSource(tc.csi, field.NewPath("field"))
 
 		if len(errs) > 0 && tc.errtype == "" {
@@ -3645,6 +3652,7 @@ func TestValidateCSIPersistentVolumeSource(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
+		// TODO: migrate
 		errs := validateCSIPersistentVolumeSource(tc.csi, field.NewPath("field"))
 
 		if len(errs) > 0 && tc.errtype == "" {
@@ -3743,12 +3751,12 @@ func TestValidateVolumes(t *testing.T) {
 			errs: []verr{{
 				etype:  field.ErrorTypeInvalid,
 				field:  "name",
-				detail: "must not contain dots",
+				detail: "must consist of lower-case alphanumeric characters or '-'",
 			}},
 		}, {
 			name: "name not a DNS label",
 			vol: core.Volume{
-				Name:         "Not a DNS label!",
+				Name:         "invalid.dnslabel",
 				VolumeSource: core.VolumeSource{EmptyDir: &core.EmptyDirVolumeSource{}},
 			},
 			errs: []verr{{
@@ -5402,10 +5410,11 @@ func TestValidateVolumes(t *testing.T) {
 				// Continue to run handwritten validation until migration to declarative validation is complete.
 				names, errs := ValidateVolumes([]core.Volume{tc.vol}, nil, field.NewPath("field"), tc.opts)
 				// Run declarative validation for the version
-				errs = append(errs, versionValidationErrors...) // TODO: How to handle this name testing declaratively?
+				// TODO: How to handle this name testing declaratively?
+				// errs = append(errs, versionValidationErrors...) // TODO: migrate required value change
 
 				if len(errs) != len(tc.errs) {
-					t.Fatalf("unexpected error(s): got %d, want %d: %v", len(tc.errs), len(errs), errs)
+					t.Fatalf("unexpected error(s): got %d, want %d: %v", len(errs), len(tc.errs), errs)
 				}
 				if len(errs) == 0 && (len(names) > 1 || !IsMatchedVolume(tc.vol.Name, names)) {
 					t.Errorf("wrong names result: %v", names)
@@ -5443,6 +5452,7 @@ func TestValidateVolumes(t *testing.T) {
 	hugePagesCase := core.VolumeSource{EmptyDir: &core.EmptyDirVolumeSource{Medium: core.StorageMediumHugePages}}
 
 	// Enable HugePages
+	// TODO: migrate
 	if errs := validateVolumeSource(&hugePagesCase, field.NewPath("field").Index(0), "working", nil, PodValidationOptions{}); len(errs) != 0 {
 		t.Errorf("Unexpected error when HugePages feature is enabled.")
 	}
@@ -5579,6 +5589,7 @@ func TestPVCVolumeMode(t *testing.T) {
 	}
 	for k, v := range errorCasesPVC {
 		opts := ValidationOptionsForPersistentVolumeClaim(v, nil)
+		// TODO: migrate
 		if errs := ValidatePersistentVolumeClaim(v, opts); len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
 		}
@@ -5611,6 +5622,7 @@ func TestPVVolumeMode(t *testing.T) {
 	}
 	for k, v := range errorCasesPV {
 		opts := ValidationOptionsForPersistentVolume(v, nil)
+		// TODO: migrate
 		if errs := ValidatePersistentVolume(v, opts); len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
 		}
@@ -5742,6 +5754,7 @@ func TestValidateResourceQuotaWithAlphaLocalStorageCapacityIsolation(t *testing.
 		Spec: spec,
 	}
 
+	// TODO: migrate
 	if errs := ValidateResourceQuota(resourceQuota); len(errs) != 0 {
 		t.Errorf("expected success: %v", errs)
 	}
@@ -5827,6 +5840,7 @@ func TestValidatePorts(t *testing.T) {
 		},
 	}
 	for k, v := range errorCases {
+		// TODO: migrate
 		errs := validateContainerPorts(v.P, field.NewPath("field"))
 		if len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
@@ -5865,6 +5879,7 @@ func TestLocalStorageEnvWithFeatureGate(t *testing.T) {
 	},
 	}
 	for _, testCase := range testCases {
+		// TODO: migrate
 		if errs := validateEnvVarValueFrom(testCase, field.NewPath("field"), PodValidationOptions{}); len(errs) != 0 {
 			t.Errorf("expected success, got: %v", errs)
 		}
@@ -6670,6 +6685,7 @@ func TestValidateEnv(t *testing.T) {
 	},
 	}
 	for _, tc := range errorCases {
+		// TODO: migrate
 		if errs := ValidateEnv(tc.envs, field.NewPath("field"), PodValidationOptions{}); len(errs) == 0 {
 			t.Errorf("expected failure for %s", tc.name)
 		} else {
@@ -6884,6 +6900,7 @@ func TestValidateEnvFrom(t *testing.T) {
 	},
 	}
 	for _, tc := range errorCases {
+		// TODO: migrate
 		if errs := ValidateEnvFrom(tc.envs, field.NewPath("field"), PodValidationOptions{}); len(errs) == 0 {
 			t.Errorf("expected failure for %s", tc.name)
 		} else {
@@ -7031,6 +7048,7 @@ func TestValidateVolumeMounts(t *testing.T) {
 			},
 		}}}},
 	}
+	// TODO: migrate
 	vols, v1err := ValidateVolumes(volumes, nil, field.NewPath("field"), PodValidationOptions{})
 	if len(v1err) > 0 {
 		t.Errorf("Invalid test volume - expected success %v", v1err)
@@ -7090,6 +7108,7 @@ func TestValidateVolumeMounts(t *testing.T) {
 	}
 
 	for k, v := range errorCases {
+		// TODO: migrate
 		if errs := ValidateVolumeMounts(v, GetVolumeDeviceMap(badVolumeDevice), vols, &container, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
 		}
@@ -7156,6 +7175,7 @@ func TestValidateSubpathMutuallyExclusive(t *testing.T) {
 	}
 
 	for name, test := range cases {
+		// TODO: migrate
 		errs := ValidateVolumeMounts(test.mounts, GetVolumeDeviceMap(goodVolumeDevices), vols, &container, field.NewPath("field"))
 
 		if len(errs) != 0 && !test.expectError {
@@ -7212,6 +7232,7 @@ func TestValidateDisabledSubpathExpr(t *testing.T) {
 	}
 
 	for name, test := range cases {
+		// TODO: migrate
 		errs := ValidateVolumeMounts(test.mounts, GetVolumeDeviceMap(goodVolumeDevices), vols, &container, field.NewPath("field"))
 
 		if len(errs) != 0 && !test.expectError {
@@ -7320,6 +7341,7 @@ func TestValidateMountPropagation(t *testing.T) {
 		return
 	}
 	for i, test := range tests {
+		// TODO: migrate
 		errs := ValidateVolumeMounts([]core.VolumeMount{test.mount}, nil, vols2, test.container, field.NewPath("field"))
 		if test.expectError && len(errs) == 0 {
 			t.Errorf("test %d expected error, got none", i)
@@ -7385,6 +7407,7 @@ func TestAlphaValidateVolumeDevices(t *testing.T) {
 
 	// Success Cases:
 	// Validate normal success cases - only PVC volumeSource or generic ephemeral volume
+	// TODO: migrate
 	if errs := ValidateVolumeDevices(successCase, GetVolumeMountMap(goodVolumeMounts), vols, field.NewPath("field")); len(errs) != 0 {
 		t.Errorf("expected success: %v", errs)
 	}
@@ -7392,6 +7415,7 @@ func TestAlphaValidateVolumeDevices(t *testing.T) {
 	// Error Cases:
 	// Validate normal error cases - only PVC volumeSource
 	for k, v := range errorCases {
+		// TODO: migrate
 		if errs := ValidateVolumeDevices(v, GetVolumeMountMap(badVolumeMounts), vols, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
 		}
@@ -7422,6 +7446,7 @@ func TestValidateProbe(t *testing.T) {
 		errorCases = append(errorCases, probe)
 	}
 	for _, p := range errorCases {
+		// TODO: migrate
 		if errs := validateProbe(p, defaultGracePeriod, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected failure for %v", p)
 		}
@@ -7600,6 +7625,7 @@ func TestValidateHandler(t *testing.T) {
 		{HTTPGet: &core.HTTPGetAction{Path: "/", Port: intstr.FromString("port"), Host: "", Scheme: "HTTP", HTTPHeaders: []core.HTTPHeader{{Name: "X_Forwarded_For", Value: "foo.example.com"}}}},
 	}
 	for _, h := range errorCases {
+		// TODO: migrate
 		if errs := validateHandler(handlerFromProbe(&h), defaultGracePeriod, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected failure for %#v", h)
 		}
@@ -7639,6 +7665,7 @@ func TestValidatePullPolicy(t *testing.T) {
 	}
 	for k, v := range testCases {
 		ctr := &v.Container
+		// TODO: migrate
 		errs := validatePullPolicy(ctr.ImagePullPolicy, field.NewPath("field"))
 		if len(errs) != 0 {
 			t.Errorf("case[%s] expected success, got %#v", k, errs)
@@ -7774,6 +7801,7 @@ func TestValidateResizePolicy(t *testing.T) {
 		},
 	}
 	for k, v := range testCases {
+		// TODO: migrate
 		errs := validateResizePolicy(v.PolicyList, field.NewPath("field"), &v.PodRestartPolicy)
 		if !v.ExpectError && len(errs) > 0 {
 			t.Errorf("Testcase %s - expected success, got error: %+v", k, errs)
@@ -8567,7 +8595,7 @@ func TestValidateContainers(t *testing.T) {
 	}, {
 		"name not a DNS label",
 		line(),
-		[]core.Container{{Name: "a.b.c", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
+		[]core.Container{{Name: "invalid.dnslabel", Image: "image", ImagePullPolicy: "IfNotPresent", TerminationMessagePolicy: "File"}},
 		field.ErrorList{{Type: field.ErrorTypeInvalid, Field: "spec.containers[0].name"}},
 	}, {
 		"name not unique",
@@ -9662,6 +9690,7 @@ func TestValidateRestartPolicy(t *testing.T) {
 		core.RestartPolicyNever,
 	}
 	for _, policy := range successCases {
+		// TODO: migrate
 		if errs := validateRestartPolicy(&policy, field.NewPath("field")); len(errs) != 0 {
 			t.Errorf("expected success: %v", errs)
 		}
@@ -9670,6 +9699,7 @@ func TestValidateRestartPolicy(t *testing.T) {
 	errorCases := []core.RestartPolicy{"", "newpolicy"}
 
 	for k, policy := range errorCases {
+		// TODO: migrate
 		if errs := validateRestartPolicy(&policy, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected failure for %d", k)
 		}
@@ -9679,6 +9709,7 @@ func TestValidateRestartPolicy(t *testing.T) {
 func TestValidateDNSPolicy(t *testing.T) {
 	successCases := []core.DNSPolicy{core.DNSClusterFirst, core.DNSDefault, core.DNSClusterFirstWithHostNet, core.DNSNone}
 	for _, policy := range successCases {
+		// TODO: migrate
 		if errs := validateDNSPolicy(&policy, field.NewPath("field")); len(errs) != 0 {
 			t.Errorf("expected success: %v", errs)
 		}
@@ -9686,6 +9717,7 @@ func TestValidateDNSPolicy(t *testing.T) {
 
 	errorCases := []core.DNSPolicy{core.DNSPolicy("invalid"), core.DNSPolicy("")}
 	for _, policy := range errorCases {
+		// TODO: migrate
 		if errs := validateDNSPolicy(&policy, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected failure for %v", policy)
 		}
@@ -9926,6 +9958,7 @@ func TestValidatePodDNSConfig(t *testing.T) {
 			tc.dnsPolicy = &testDNSClusterFirst
 		}
 
+		// TODO: migrate
 		errs := validatePodDNSConfig(tc.dnsConfig, tc.dnsPolicy, field.NewPath("dnsConfig"), tc.opts)
 		if len(errs) != 0 && !tc.expectedError {
 			t.Errorf("%v: validatePodDNSConfig(%v) = %v, want nil", tc.desc, tc.dnsConfig, errs)
@@ -9973,6 +10006,7 @@ func TestValidatePodReadinessGates(t *testing.T) {
 	},
 	}
 	for _, tc := range errorCases {
+		// TODO: migrate
 		if errs := validateReadinessGates(tc.readinessGates, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected tc %q to fail", tc.desc)
 		}
@@ -10034,6 +10068,7 @@ func TestValidatePodConditions(t *testing.T) {
 	},
 	}
 	for _, tc := range errorCases {
+		// TODO: migrate
 		if errs := validatePodConditions(tc.podConditions, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("expected tc %q to fail", tc.desc)
 		}
@@ -10291,6 +10326,7 @@ func TestValidatePodSpec(t *testing.T) {
 		opts := PodValidationOptions{
 			ResourceIsPod: true,
 		}
+		// TODO: migrate
 		if errs := ValidatePodSpec(&v.Spec, nil, field.NewPath("field"), opts); len(errs) == 0 {
 			t.Errorf("expected failure for %q", k)
 		}
@@ -13761,6 +13797,7 @@ func TestValidatePodUpdate(t *testing.T) {
 			test.old.Spec.RestartPolicy = "Always"
 		}
 
+		// TODO: migrate
 		errs := ValidatePodUpdate(&test.new, &test.old, PodValidationOptions{})
 		if test.err == "" {
 			if len(errs) != 0 {
@@ -14522,6 +14559,7 @@ func TestValidatePodStatusUpdate(t *testing.T) {
 	for _, test := range tests {
 		test.new.ObjectMeta.ResourceVersion = "1"
 		test.old.ObjectMeta.ResourceVersion = "1"
+		// TODO: migrate
 		errs := ValidatePodStatusUpdate(&test.new, &test.old, PodValidationOptions{})
 		if test.err == "" {
 			if len(errs) != 0 {
@@ -14904,6 +14942,7 @@ func TestValidatePodEphemeralContainersUpdate(t *testing.T) {
 	}
 
 	for _, tc := range tests {
+		// TODO: migrate
 		errs := ValidatePodEphemeralContainersUpdate(tc.new, tc.old, PodValidationOptions{})
 		if tc.err == "" {
 			if len(errs) != 0 {
@@ -14938,7 +14977,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}, {
 		name: "invalid namespace",
 		tweakSvc: func(s *core.Service) {
-			s.Namespace = "-123"
+			s.Namespace = "invalid.dnslabel"
 		},
 		numErrs: 1,
 	}, {
@@ -15043,7 +15082,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}, {
 		name: "invalid port name",
 		tweakSvc: func(s *core.Service) {
-			s.Spec.Ports[0].Name = "INVALID"
+			s.Spec.Ports[0].Name = "invalid.dnslabel"
 		},
 		numErrs: 1,
 	}, {
@@ -15055,7 +15094,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}, {
 		name: "invalid protocol",
 		tweakSvc: func(s *core.Service) {
-			s.Spec.Ports[0].Protocol = "INVALID"
+			s.Spec.Ports[0].Protocol = "Invalid"
 		},
 		numErrs: 1,
 	}, {
@@ -16137,7 +16176,7 @@ func TestValidateServiceCreate(t *testing.T) {
 				// Continue to run handwritten validation until migration to declarative validation is complete.
 				errs := ValidateServiceCreate(&svc)
 				// Run declarative validation for the version
-				errs = append(errs, versionValidationErrors...)
+				errs = append(errs, versionValidationErrors...) // TODO: migrate
 
 				if len(errs) != tc.numErrs {
 					t.Errorf("Unexpected error list for case %q(expected:%v got %v) - Errors:\n %v", tc.name, tc.numErrs, len(errs), errs.ToAggregate())
@@ -16231,6 +16270,7 @@ func TestValidateServiceExternalTrafficPolicy(t *testing.T) {
 	for _, tc := range testCases {
 		svc := makeValidService()
 		tc.tweakSvc(&svc)
+		// TODO: migrate
 		errs := validateServiceExternalTrafficPolicy(&svc)
 		if len(errs) != tc.numErrs {
 			t.Errorf("Unexpected error list for case %q: %v", tc.name, errs.ToAggregate())
@@ -16340,7 +16380,7 @@ func TestValidateReplicationControllerStatus(t *testing.T) {
 			AvailableReplicas:    test.availableReplicas,
 			ObservedGeneration:   test.observedGeneration,
 		}
-
+		// TODO: migrate
 		if hasErr := len(ValidateReplicationControllerStatus(status, field.NewPath("status"))) > 0; hasErr != test.expectedErr {
 			t.Errorf("%s: expected error: %t, got error: %t", test.name, test.expectedErr, hasErr)
 		}
@@ -16422,6 +16462,7 @@ func TestValidateReplicationControllerStatusUpdate(t *testing.T) {
 		},
 	}
 	for testName, errorCase := range errorCases {
+		// TODO: migrate
 		if errs := ValidateReplicationControllerStatusUpdate(&errorCase.update, &errorCase.old); len(errs) == 0 {
 			t.Errorf("expected failure: %s", testName)
 		}
@@ -16574,6 +16615,7 @@ func TestValidateReplicationControllerUpdate(t *testing.T) {
 		},
 	}
 	for testName, errorCase := range errorCases {
+		// TODO: migrate
 		if errs := ValidateReplicationControllerUpdate(&errorCase.update, &errorCase.old, PodValidationOptions{}); len(errs) == 0 {
 			t.Errorf("expected failure: %s", testName)
 		}
@@ -16793,6 +16835,7 @@ func TestValidateReplicationController(t *testing.T) {
 		},
 	}
 	for k, v := range errorCases {
+		// TODO: migrate
 		errs := ValidateReplicationController(&v, PodValidationOptions{})
 		if len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
@@ -17141,6 +17184,7 @@ func TestValidateNode(t *testing.T) {
 		},
 	}
 	for k, v := range errorCases {
+		// TODO: migrate
 		errs := ValidateNode(&v)
 		if len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
@@ -17592,6 +17636,7 @@ func TestValidateNodeUpdate(t *testing.T) {
 	for i, test := range tests {
 		test.oldNode.ObjectMeta.ResourceVersion = "1"
 		test.node.ObjectMeta.ResourceVersion = "1"
+		// TODO: migrate
 		errs := ValidateNodeUpdate(&test.node, &test.oldNode)
 		if test.valid && len(errs) > 0 {
 			t.Errorf("%d: Unexpected error: %v", i, errs)
@@ -18902,7 +18947,7 @@ func TestValidateLimitRange(t *testing.T) {
 			dnsSubdomainLabelErrMsg,
 		},
 		"invalid-namespace": {
-			core.LimitRange{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: core.LimitRangeSpec{}},
+			core.LimitRange{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "invalid.dnslabel"}, Spec: core.LimitRangeSpec{}},
 			dnsLabelErrMsg,
 		},
 		"duplicate-limit-type": {
@@ -19038,18 +19083,21 @@ func TestValidateLimitRange(t *testing.T) {
 	}
 
 	for k, v := range errorCases {
-		errs := ValidateLimitRange(&v.R)
-		if len(errs) == 0 {
-			t.Errorf("expected failure for %s", k)
-		}
-		for i := range errs {
-			detail := errs[i].Detail
-			if !strings.Contains(detail, v.D) {
-				t.Errorf("[%s]: expected error detail either empty or %q, got %q", k, v.D, detail)
+		t.Run(k, func(t *testing.T) {
+			// TODO: migrate
+			errs := ValidateLimitRange(&v.R)
+			if len(errs) == 0 {
+				t.Errorf("expected failure for %s", k)
 			}
-		}
-	}
+			for i := range errs {
 
+				detail := errs[i].Detail
+				if !strings.Contains(detail, v.D) {
+					t.Errorf("[%s]: expected error detail either empty or %q, got %q", k, v.D, detail)
+				}
+			}
+		})
+	}
 }
 
 func TestValidatePersistentVolumeClaimStatusUpdate(t *testing.T) {
@@ -19633,7 +19681,7 @@ func TestValidateResourceQuota(t *testing.T) {
 			errDetail: dnsSubdomainLabelErrMsg,
 		},
 		"invalid Namespace": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: spec},
+			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "invalid.dnslabel"}, Spec: spec},
 			errDetail: dnsLabelErrMsg,
 		},
 		"negative-limits": {
@@ -19725,6 +19773,7 @@ func TestValidateNamespace(t *testing.T) {
 		},
 	}
 	for k, v := range errorCases {
+		// TODO: migrate
 		errs := ValidateNamespace(&v.R)
 		if len(errs) == 0 {
 			t.Errorf("expected failure for %s", k)
@@ -19781,6 +19830,7 @@ func TestValidateNamespaceFinalizeUpdate(t *testing.T) {
 	for i, test := range tests {
 		test.namespace.ObjectMeta.ResourceVersion = "1"
 		test.oldNamespace.ObjectMeta.ResourceVersion = "1"
+		// TODO: migrate
 		errs := ValidateNamespaceFinalizeUpdate(&test.namespace, &test.oldNamespace)
 		if test.valid && len(errs) > 0 {
 			t.Errorf("%d: Unexpected error: %v", i, errs)
@@ -19854,6 +19904,7 @@ func TestValidateNamespaceStatusUpdate(t *testing.T) {
 	for i, test := range tests {
 		test.namespace.ObjectMeta.ResourceVersion = "1"
 		test.oldNamespace.ObjectMeta.ResourceVersion = "1"
+		// TODO: migrate
 		errs := ValidateNamespaceStatusUpdate(&test.namespace, &test.oldNamespace)
 		if test.valid && len(errs) > 0 {
 			t.Errorf("%d: Unexpected error: %v", i, errs)
@@ -19943,6 +19994,7 @@ func TestValidateNamespaceUpdate(t *testing.T) {
 	for i, test := range tests {
 		test.namespace.ObjectMeta.ResourceVersion = "1"
 		test.oldNamespace.ObjectMeta.ResourceVersion = "1"
+		// TODO: migrate
 		errs := ValidateNamespaceUpdate(&test.namespace, &test.oldNamespace)
 		if test.valid && len(errs) > 0 {
 			t.Errorf("%d: Unexpected error: %v", i, errs)
@@ -20036,6 +20088,7 @@ func TestValidateSecret(t *testing.T) {
 	}
 
 	for name, tc := range tests {
+		// TODO: migrate
 		errs := ValidateSecret(&tc.secret)
 		if tc.valid && len(errs) > 0 {
 			t.Errorf("%v: Unexpected error: %v", name, errs)
@@ -20193,6 +20246,7 @@ func TestValidateDockerConfigSecret(t *testing.T) {
 	}
 
 	for name, tc := range tests {
+		// TODO: migrate
 		errs := ValidateSecret(&tc.secret)
 		if tc.valid && len(errs) > 0 {
 			t.Errorf("%v: Unexpected error: %v", name, errs)
@@ -20231,6 +20285,7 @@ func TestValidateBasicAuthSecret(t *testing.T) {
 	}
 
 	for name, tc := range tests {
+		// TODO: migrate
 		errs := ValidateSecret(&tc.secret)
 		if tc.valid && len(errs) > 0 {
 			t.Errorf("%v: Unexpected error: %v", name, errs)
@@ -20265,6 +20320,7 @@ func TestValidateSSHAuthSecret(t *testing.T) {
 	}
 
 	for name, tc := range tests {
+		// TODO: migrate
 		errs := ValidateSecret(&tc.secret)
 		if tc.valid && len(errs) > 0 {
 			t.Errorf("%v: Unexpected error: %v", name, errs)
@@ -20352,7 +20408,7 @@ func TestValidateEndpointsCreate(t *testing.T) {
 			errorType: "FieldValueRequired",
 		},
 		"invalid namespace": {
-			endpoints:   core.Endpoints{ObjectMeta: metav1.ObjectMeta{Name: "mysvc", Namespace: "no@#invalid.;chars\"allowed"}},
+			endpoints:   core.Endpoints{ObjectMeta: metav1.ObjectMeta{Name: "mysvc", Namespace: "invalid.dnslabel"}},
 			errorType:   "FieldValueInvalid",
 			errorDetail: dnsLabelErrMsg,
 		},
@@ -20496,7 +20552,7 @@ func TestValidateEndpointsCreate(t *testing.T) {
 				// Continue to run handwritten validation until migration to declarative validation is complete.
 				errs := ValidateEndpointsCreate(&v.endpoints)
 				// Run declarative validation for the version
-				errs = append(errs, versionValidationErrors...)
+				errs = append(errs, versionValidationErrors...) // TODO: migrate
 				if len(errs) == 0 || errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
 					t.Errorf("Expected error type %s with detail %q, got %v", v.errorType, v.errorDetail, errs)
 				}
@@ -20924,6 +20980,7 @@ func TestValidateTLSSecret(t *testing.T) {
 		},
 	}
 	for k, v := range successCases {
+		// TODO: migrate
 		if errs := ValidateSecret(&v); len(errs) != 0 {
 			t.Errorf("Expected success for %s, got %v", k, errs)
 		}
@@ -20953,6 +21010,7 @@ func TestValidateTLSSecret(t *testing.T) {
 		},
 	}
 	for k, v := range errorCases {
+		// TODO: migrate
 		if errs := ValidateSecret(&v.secrets); len(errs) == 0 || errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
 			t.Errorf("[%s] Expected error type %s with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
 		}
@@ -21131,6 +21189,7 @@ func TestValidateSecurityContext(t *testing.T) {
 		})
 		// note the unconditional `true` here for hostUsers. The failure case to test for ProcMount only includes it being true,
 		// and the field is ignored if ProcMount isn't set. Thus, we can unconditionally set to `true` and simplify the test matrix setup.
+		// TODO: migrate
 		if errs := ValidateSecurityContext(v.sc, field.NewPath("field"), true); len(errs) == 0 || errs[0].Type != v.errorType || !strings.Contains(errs[0].Detail, v.errorDetail) {
 			t.Errorf("[%s] Expected error type %q with detail %q, got %v", k, v.errorType, v.errorDetail, errs)
 		}
@@ -21167,6 +21226,7 @@ func TestValidPodLogOptions(t *testing.T) {
 		{core.PodLogOptions{SinceTime: &now}, 0},
 	}
 	for i, test := range tests {
+		// TODO: migrate
 		errs := ValidatePodLogOptions(&test.opt)
 		if test.errs != len(errs) {
 			t.Errorf("%d: Unexpected errors: %v", i, errs)
@@ -21237,6 +21297,7 @@ func TestValidateConfigMap(t *testing.T) {
 	}
 
 	for name, tc := range tests {
+		// TODO: migrate
 		errs := ValidateConfigMap(&tc.cfg)
 		if tc.isValid && len(errs) > 0 {
 			t.Errorf("%v: unexpected error: %v", name, errs)
@@ -21365,6 +21426,7 @@ func TestValidateHasLabel(t *testing.T) {
 			"foo":   "bar",
 		},
 	}
+	// TODO: migrate
 	if errs := ValidateHasLabel(successCase, field.NewPath("field"), "foo", "bar"); len(errs) != 0 {
 		t.Errorf("expected success: %v", errs)
 	}
@@ -21376,6 +21438,7 @@ func TestValidateHasLabel(t *testing.T) {
 			"other": "blah",
 		},
 	}
+	// TODO: migrate
 	if errs := ValidateHasLabel(missingCase, field.NewPath("field"), "foo", "bar"); len(errs) == 0 {
 		t.Errorf("expected failure")
 	}
@@ -21388,6 +21451,7 @@ func TestValidateHasLabel(t *testing.T) {
 			"foo":   "notbar",
 		},
 	}
+	// TODO: migrate
 	if errs := ValidateHasLabel(wrongValueCase, field.NewPath("field"), "foo", "bar"); len(errs) == 0 {
 		t.Errorf("expected failure")
 	}
@@ -21441,11 +21505,13 @@ func TestIsValidSysctlName(t *testing.T) {
 	}
 
 	for _, s := range valid {
+		// TODO: migrate
 		if !IsValidSysctlName(s) {
 			t.Errorf("%q expected to be a valid sysctl name", s)
 		}
 	}
 	for _, s := range invalid {
+		// TODO: migrate
 		if IsValidSysctlName(s) {
 			t.Errorf("%q expected to be an invalid sysctl name", s)
 		}
@@ -21589,6 +21655,7 @@ func TestEndpointAddressNodeNameUpdateRestrictions(t *testing.T) {
 	updatedEndpoint := newNodeNameEndpoint("kubernetes-changed-nodename")
 	// Check that NodeName can be changed during update, this is to accommodate the case where nodeIP or PodCIDR is reused.
 	// The same ip will now have a different nodeName.
+	// TODO: migrate
 	errList := ValidateEndpoints(updatedEndpoint)
 	errList = append(errList, ValidateEndpointsUpdate(updatedEndpoint, oldEndpoint)...)
 	if len(errList) != 0 {
@@ -21599,6 +21666,7 @@ func TestEndpointAddressNodeNameUpdateRestrictions(t *testing.T) {
 func TestEndpointAddressNodeNameInvalidDNSSubdomain(t *testing.T) {
 	// Check NodeName DNS validation
 	endpoint := newNodeNameEndpoint("illegal*.nodename")
+	// TODO: migrate
 	errList := ValidateEndpoints(endpoint)
 	if len(errList) == 0 {
 		t.Error("Endpoint should reject invalid NodeName")
@@ -21607,6 +21675,7 @@ func TestEndpointAddressNodeNameInvalidDNSSubdomain(t *testing.T) {
 
 func TestEndpointAddressNodeNameCanBeAnIPAddress(t *testing.T) {
 	endpoint := newNodeNameEndpoint("10.10.1.1")
+	// TODO: migrate
 	errList := ValidateEndpoints(endpoint)
 	if len(errList) != 0 {
 		t.Error("Endpoint should accept a NodeName that is an IP address")
@@ -21677,6 +21746,7 @@ func TestValidateFlexVolumeSource(t *testing.T) {
 	}
 
 	for k, tc := range testcases {
+		// TODO: migrate
 		errs := validateFlexVolumeSource(tc.source, nil)
 		for _, err := range errs {
 			expectedErr, ok := tc.expectedErrs[err.Field]
@@ -21716,6 +21786,7 @@ func TestValidateOrSetClientIPAffinityConfig(t *testing.T) {
 	}
 
 	for name, test := range successCases {
+		// TODO: migrate
 		if errs := validateClientIPAffinityConfig(test, field.NewPath("field")); len(errs) != 0 {
 			t.Errorf("case: %s, expected success: %v", name, errs)
 		}
@@ -21749,6 +21820,7 @@ func TestValidateOrSetClientIPAffinityConfig(t *testing.T) {
 	}
 
 	for name, test := range errorCases {
+		// TODO: migrate
 		if errs := validateClientIPAffinityConfig(test, field.NewPath("field")); len(errs) == 0 {
 			t.Errorf("case: %v, expected failures: %v", name, errs)
 		}
@@ -21909,6 +21981,7 @@ func TestValidateWindowsSecurityContextOptions(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run("validateWindowsSecurityContextOptions with"+testCase.testName, func(t *testing.T) {
+			// TODO: migrate
 			errs := validateWindowsSecurityContextOptions(testCase.windowsOptions, field.NewPath("field"))
 
 			switch len(errs) {
@@ -21986,11 +22059,13 @@ func TestAlphaVolumePVCDataSource(t *testing.T) {
 	for _, tc := range testCases {
 		opts := PersistentVolumeClaimSpecValidationOptions{}
 		if tc.expectedFail {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(&tc.claimSpec, field.NewPath("spec"), opts); len(errs) == 0 {
 				t.Errorf("expected failure: %v", errs)
 			}
 
 		} else {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(&tc.claimSpec, field.NewPath("spec"), opts); len(errs) != 0 {
 				t.Errorf("expected success: %v", errs)
 			}
@@ -22040,10 +22115,12 @@ func testAnyDataSource(t *testing.T, ds, dsRef bool) {
 		}
 		opts := PersistentVolumeClaimSpecValidationOptions{}
 		if tc.expectedFail {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(&tc.claimSpec, field.NewPath("spec"), opts); len(errs) == 0 {
 				t.Errorf("expected failure: %v", errs)
 			}
 		} else {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(&tc.claimSpec, field.NewPath("spec"), opts); len(errs) != 0 {
 				t.Errorf("expected success: %v", errs)
 			}
@@ -22142,10 +22219,12 @@ func TestCrossNamespaceSource(t *testing.T) {
 		featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.CrossNamespaceVolumeDataSource, true)
 		opts := PersistentVolumeClaimSpecValidationOptions{}
 		if tc.expectedFail {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(tc.claimSpec, field.NewPath("spec"), opts); len(errs) == 0 {
 				t.Errorf("%s: expected failure: %v", tc.testName, errs)
 			}
 		} else {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(tc.claimSpec, field.NewPath("spec"), opts); len(errs) != 0 {
 				t.Errorf("%s: expected success: %v", tc.testName, errs)
 			}
@@ -22207,10 +22286,12 @@ func TestVolumeAttributesClass(t *testing.T) {
 			EnableVolumeAttributesClass: tc.enableVolumeAttributesClass,
 		}
 		if tc.expectedFail {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(tc.claimSpec, field.NewPath("spec"), opts); len(errs) == 0 {
 				t.Errorf("%s: expected failure: %v", tc.testName, errs)
 			}
 		} else {
+			// TODO: migrate
 			if errs := ValidatePersistentVolumeClaimSpec(tc.claimSpec, field.NewPath("spec"), opts); len(errs) != 0 {
 				t.Errorf("%s: expected success: %v", tc.testName, errs)
 			}
@@ -22494,6 +22575,7 @@ func TestValidateOverhead(t *testing.T) {
 	},
 	}
 	for _, tc := range errorCase {
+		// TODO: migrate
 		if errs := validateOverhead(tc.overhead, field.NewPath("resources"), PodValidationOptions{}); len(errs) == 0 {
 			t.Errorf("%q expected error", tc.Name)
 		}
@@ -22774,6 +22856,7 @@ func TestValidateNodeCIDRs(t *testing.T) {
 		},
 	}
 	for _, testCase := range testCases {
+		// TODO: migrate
 		errs := ValidateNode(&testCase.node)
 		if len(errs) == 0 && testCase.expectError {
 			t.Errorf("expected failure for %s, but there were none", testCase.node.Name)
@@ -23022,6 +23105,7 @@ func TestValidateSeccompAnnotationAndField(t *testing.T) {
 				}
 			}
 		}
+		// TODO: migrate
 		errList := validateSeccompAnnotationsAndFields(test.pod.ObjectMeta, &test.pod.Spec, field.NewPath(""))
 		test.validation(t, test.description, errList, output)
 	}
@@ -23086,6 +23170,7 @@ func TestValidateSeccompAnnotationsAndFieldsMatch(t *testing.T) {
 	}
 
 	for i, test := range tests {
+		// TODO: migrate
 		err := validateSeccompAnnotationsAndFieldsMatch(test.annotationValue, test.seccompField, test.fldPath)
 		assert.Equal(t, test.expectedErr, err, "TestCase[%d]: %s", i, test.description)
 	}
@@ -23172,6 +23257,7 @@ func TestValidatePodTemplateSpecSeccomp(t *testing.T) {
 	}
 
 	for i, test := range tests {
+		// TODO: migrate
 		err := ValidatePodTemplateSpec(test.spec, rootFld, PodValidationOptions{})
 		assert.Equal(t, test.expectedErr, err, "TestCase[%d]: %s", i, test.description)
 	}
@@ -23306,7 +23392,8 @@ func TestValidateNonSpecialIP(t *testing.T) {
 		{"ipv6 local multicast", "ff02::"},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			errs := ValidateNonSpecialIP(tc.ip, fp) // TODO: Migrate to declarative validator
+			// TODO: migrate
+			errs := ValidateNonSpecialIP(tc.ip, fp)
 			if len(errs) == 0 {
 				t.Errorf("ValidateNonSpecialIP(%q, ...) = nil; want non-nil (errors)", tc.ip)
 			}
@@ -23909,6 +23996,7 @@ func TestValidateAppArmorProfileFormat(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		// TODO: migrate
 		err := ValidateAppArmorProfileFormat(test.profile)
 		if test.expectValid {
 			assert.NoError(t, err, "Profile %s should be valid", test.profile)
@@ -23942,7 +24030,7 @@ func TestValidateDownwardAPIHostIPs(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.PodHostIPs, testCase.featureEnabled)
 
-			// TODO: Migrate to declarative validator
+			// TODO: migrate
 			errs := validateDownwardAPIHostIPs(testCase.fieldSel, field.NewPath("fieldSel"), PodValidationOptions{AllowHostIPsField: testCase.featureEnabled})
 			if testCase.expectError && len(errs) == 0 {
 				t.Errorf("Unexpected success")
@@ -23972,9 +24060,9 @@ func TestValidatePVSecretReference(t *testing.T) {
 		expectedError: "spec.csi.nodeExpandSecretRef.name: Invalid value: \"$%^&*#\": " + dnsSubdomainLabelErrMsg,
 	}, {
 		name:          "invalid secret ref namespace",
-		args:          args{&core.SecretReference{Name: "valid", Namespace: "$%^&*#"}, rootFld},
+		args:          args{&core.SecretReference{Name: "valid", Namespace: "invalid.dnslabel"}, rootFld},
 		expectError:   true,
-		expectedError: "spec.csi.nodeExpandSecretRef.namespace: Invalid value: \"$%^&*#\": " + dnsLabelErrMsg,
+		expectedError: "spec.csi.nodeExpandSecretRef.namespace: Invalid value: \"invalid.dnslabel\": " + dnsLabelErrMsg,
 	}, {
 		name:          "invalid secret: missing namespace",
 		args:          args{&core.SecretReference{Name: "valid"}, rootFld},
@@ -24197,6 +24285,7 @@ func TestValidateDynamicResourceAllocation(t *testing.T) {
 		}(),
 	}
 	for k, v := range failureCases {
+		// TODO: migrate
 		if errs := ValidatePodSpec(&v.Spec, nil, field.NewPath("field"), PodValidationOptions{}); len(errs) == 0 {
 			t.Errorf("expected failure for %q", k)
 		}
@@ -24364,7 +24453,7 @@ func TestValidateSleepAction(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// TODO: Migrate to declarative validator
+			// TODO: migrate
 			errs := validateSleepAction(tc.action, &tc.gracePeriod, fldPath)
 
 			if len(tc.expectErr) > 0 && len(errs) == 0 {
