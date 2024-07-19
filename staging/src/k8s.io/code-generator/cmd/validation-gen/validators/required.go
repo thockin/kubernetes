@@ -40,7 +40,7 @@ var (
 	requiredValidator = types.Name{Package: libValidationPkg, Name: "Required"}
 )
 
-func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
+func (requiredDeclarativeValidator) ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error) {
 	_, required := gengo.ExtractCommentTags("+", comments)[requiredTagName]
 	if !required {
 		return nil, nil
