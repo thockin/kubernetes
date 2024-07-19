@@ -51,3 +51,6 @@
 - Add debug logging in generator
 - Decide test regimen for validators lib
 - make InitRequiredDeclarativeValidator() non-exported?
+- Fix bug where generating apps API group enables enum generation on core API group
+- Clear ou 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
+  for scalar testing that should be put in declarative validator test code
