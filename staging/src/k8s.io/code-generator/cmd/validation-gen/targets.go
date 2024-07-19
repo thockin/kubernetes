@@ -95,12 +95,13 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	// it is MUCH faster.
 	inputPkgs := make([]string, 0, len(context.Inputs))
 	pkgToInput := map[string]string{}
-	for _, i := range context.Inputs {
-		klog.V(5).Infof("considering pkg %q", i)
+	for _, input := range context.Inputs {
+		klog.V(5).Infof("considering pkg %q", input)
 
-		pkg := context.Universe[i]
+		pkg := context.Universe[input]
 
-		// if the types are not in the same package where the validation functions are to be visited
+		// if the types are not in the same package where the validation
+		// functions are to be emitted
 		inputTags := extractInputTag(pkg.Comments)
 		if len(inputTags) > 1 {
 			panic(fmt.Sprintf("there may only be one input tag, got %#v", inputTags))
@@ -110,15 +111,14 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			if strings.HasPrefix(inputPath, "./") || strings.HasPrefix(inputPath, "../") {
 				// this is a relative dir, which will not work under gomodules.
 				// join with the local package path, but warn
-				klog.Warningf("relative path %s=%s will not work under gomodule mode; use full package path (as used by 'import') instead", inputTagName, inputPath)
-				inputPath = path.Join(pkg.Path, inputTags[0])
+				klog.Fatalf("relative path (%s=%s) is not supported; use full package path (as used by 'import') instead", inputTagName, inputPath)
 			}
 
 			klog.V(5).Infof("  input pkg %v", inputPath)
 			inputPkgs = append(inputPkgs, inputPath)
-			pkgToInput[i] = inputPath
+			pkgToInput[input] = inputPath
 		} else {
-			pkgToInput[i] = i
+			pkgToInput[input] = input
 		}
 	}
 
@@ -155,8 +155,10 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	}
 
 	visited := map[*types.Type]*callNode{}
-	for _, i := range context.Inputs {
-		pkg := context.Universe[i]
+	for _, input := range context.Inputs {
+		klog.V(2).InfoS("processing", "pkg", input)
+
+		pkg := context.Universe[input]
 
 		// typesPkg is where the types that need validation are defined.
 		// Sometimes it is different from pkg. For example, kubernetes core/v1
@@ -186,7 +188,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		}
 
 		// Find the right input pkg, which might not be this one.
-		inputPath := pkgToInput[i]
+		inputPath := pkgToInput[input]
 		typesPkg = context.Universe[inputPath]
 
 		var rootTypes []*types.Type
@@ -201,6 +203,8 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			if _, ok := validationFunctionTypes[t]; ok { // already found
 				continue
 			}
+			klog.V(4).InfoS("processing", "type", t)
+
 			callTree, err := buildCallTree(declarativeValidator, inputToPkg, t, visited)
 			if err != nil {
 				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)

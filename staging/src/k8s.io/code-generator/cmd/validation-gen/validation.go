@@ -246,6 +246,9 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 		return v.copy(root), nil
 	}
+
+	klog.V(5).InfoS("building call tree", "type", t)
+
 	parent := &callNode{}
 
 	if root {
@@ -269,6 +272,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 
 	switch t.Kind {
 	case types.Pointer:
+		klog.V(5).InfoS("  is a pointer", "type", t.Elem)
 		child, err := c.build(t.Elem, false)
 		if err != nil {
 			return nil, err
@@ -278,6 +282,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 			parent.children = append(parent.children, *child)
 		}
 	case types.Slice, types.Array:
+		klog.V(5).InfoS("  is a list", "type", t.Elem)
 		child, err := c.build(t.Elem, false)
 		if err != nil {
 			return nil, err
@@ -290,6 +295,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 			parent.children = append(parent.children, *child)
 		}
 	case types.Map:
+		klog.V(5).InfoS("  is a map", "type", t.Elem)
 		child, err := c.build(t.Elem, false)
 		if err != nil {
 			return nil, err
@@ -300,6 +306,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 		}
 
 	case types.Struct:
+		klog.V(5).InfoS("  is a struct")
 		fn, ok := c.findValidationFunction(t)
 		if !ok {
 			return nil, nil
@@ -316,6 +323,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 					name = field.Type.Name.Name
 				}
 			}
+			klog.V(5).InfoS("  field", "name", name)
 
 			jsonName := "<unknown>"
 			if tags, ok := lookupJSONTags(field); ok {
@@ -326,11 +334,12 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 				return nil, err
 			}
 			if len(field.CommentLines) > 0 {
-				validations, err := c.declarativeValidator.ExtractValidations(field.Type, field.CommentLines)
+				validations, err := c.declarativeValidator.ExtractValidations(name, field.Type, field.CommentLines)
 				if err != nil {
 					return nil, err
 				}
 				if len(validations) > 0 {
+					klog.V(5).InfoS("  found validations", "n", len(validations))
 					child = &callNode{
 						isPrimitive:    field.Type.IsPrimitive(),
 						underlyingType: field.Type,
@@ -349,6 +358,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 			}
 		}
 	case types.Alias:
+		klog.V(5).InfoS("  is a map", "type", t.Underlying)
 		child, err := c.build(t.Underlying, false)
 		if err != nil {
 			return nil, err
