@@ -52,59 +52,67 @@ func RunStatusValidationForEachVersion(t *testing.T, unversioned, unversionedOld
 }
 
 func runValidation(t *testing.T, unversioned runtime.Object, fn VersionValidationRunner, subresources ...string) {
-	gvks, _, err := legacyscheme.Scheme.ObjectKinds(unversioned)
+	unversionedGVKs, _, err := legacyscheme.Scheme.ObjectKinds(unversioned)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, gvk := range gvks {
-		t.Run(gvk.String(), func(t *testing.T) {
-			if gvk.Version != runtime.APIVersionInternal { // skip internal
-				versioned, err := legacyscheme.Scheme.New(gvk)
-				if err != nil {
-					t.Fatal(err)
+	for _, unversionedGVK := range unversionedGVKs {
+		gvs := legacyscheme.Scheme.VersionsForGroupKind(unversionedGVK.GroupKind())
+		for _, gv := range gvs {
+			gvk := gv.WithKind(unversionedGVK.Kind)
+			t.Run(gvk.String(), func(t *testing.T) {
+				if gvk.Version != runtime.APIVersionInternal { // skip internal
+					versioned, err := legacyscheme.Scheme.New(gvk)
+					if err != nil {
+						t.Fatal(err)
+					}
+					err = legacyscheme.Scheme.Convert(unversioned, versioned, nil)
+					if err != nil {
+						t.Fatal(err)
+					}
+					fn(t, legacyscheme.Scheme.Validate(versioned, subresources...))
 				}
-				err = legacyscheme.Scheme.Convert(unversioned, versioned, nil)
-				if err != nil {
-					t.Fatal(err)
-				}
-				fn(t, legacyscheme.Scheme.Validate(versioned, subresources...))
-			}
-		})
+			})
+		}
 	}
 }
 
-func runUpdateValidation(t *testing.T, unversionedOld, unversionedNew runtime.Object, fn VersionValidationRunner, subresources ...string) {
-	gvks, _, err := legacyscheme.Scheme.ObjectKinds(unversionedOld)
+func runUpdateValidation(t *testing.T, unversionedNew, unversionedOld runtime.Object, fn VersionValidationRunner, subresources ...string) {
+	unversionedGVKs, _, err := legacyscheme.Scheme.ObjectKinds(unversionedNew)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, gvk := range gvks {
-		t.Run(gvk.String(), func(t *testing.T) {
-			if gvk.Version != runtime.APIVersionInternal { // skip internal
-				versionedNew, err := legacyscheme.Scheme.New(gvk)
-				if err != nil {
-					t.Fatal(err)
-				}
-				err = legacyscheme.Scheme.Convert(unversionedNew, versionedNew, nil)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				var versionedOld runtime.Object
-				if unversionedOld != nil {
-					versionedOld, err = legacyscheme.Scheme.New(gvk)
+	for _, unversionedGVK := range unversionedGVKs {
+		gvs := legacyscheme.Scheme.VersionsForGroupKind(unversionedGVK.GroupKind())
+		for _, gv := range gvs {
+			gvk := gv.WithKind(unversionedGVK.Kind)
+			t.Run(gvk.String(), func(t *testing.T) {
+				if gvk.Version != runtime.APIVersionInternal { // skip internal
+					versionedNew, err := legacyscheme.Scheme.New(gvk)
+					if err != nil {
+						t.Fatal(err)
+					}
+					err = legacyscheme.Scheme.Convert(unversionedNew, versionedNew, nil)
 					if err != nil {
 						t.Fatal(err)
 					}
 
-					err = legacyscheme.Scheme.Convert(unversionedOld, versionedOld, nil)
-					if err != nil {
-						t.Fatal(err)
-					}
-				}
+					var versionedOld runtime.Object
+					if unversionedOld != nil {
+						versionedOld, err = legacyscheme.Scheme.New(gvk)
+						if err != nil {
+							t.Fatal(err)
+						}
 
-				fn(t, legacyscheme.Scheme.ValidateUpdate(versionedNew, versionedOld, subresources...))
-			}
-		})
+						err = legacyscheme.Scheme.Convert(unversionedOld, versionedOld, nil)
+						if err != nil {
+							t.Fatal(err)
+						}
+					}
+
+					fn(t, legacyscheme.Scheme.ValidateUpdate(versionedNew, versionedOld, subresources...))
+				}
+			})
+		}
 	}
 }

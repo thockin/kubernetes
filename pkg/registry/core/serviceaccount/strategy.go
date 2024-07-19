@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
@@ -46,7 +47,9 @@ func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 }
 
 func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return validation.ValidateServiceAccount(obj.(*api.ServiceAccount))
+	allErrs := validation.ValidateServiceAccount(obj.(*api.ServiceAccount))
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	return allErrs
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
@@ -71,7 +74,9 @@ func cleanSecretReferences(serviceAccount *api.ServiceAccount) {
 }
 
 func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return validation.ValidateServiceAccountUpdate(obj.(*api.ServiceAccount), old.(*api.ServiceAccount))
+	allErrs := validation.ValidateServiceAccountUpdate(obj.(*api.ServiceAccount), old.(*api.ServiceAccount))
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	return allErrs
 }
 
 // WarningsOnUpdate returns warnings for the given update.
