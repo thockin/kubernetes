@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strconv"
 	"strings"
 
 	"k8s.io/code-generator/cmd/validation-gen/validators"
@@ -671,7 +672,12 @@ func toGolangSourceDataLiteral(value any) string {
 	case uint, uint8, uint16, uint32, uint64, int8, int16, int32, int64, float32, float64, bool:
 		return fmt.Sprintf("%v", value)
 	case string:
-		return fmt.Sprintf("%q", value)
+		// If the incoming string was quoted, we still do it ourselves, JIC.
+		str := value.(string)
+		if s, err := strconv.Unquote(str); err == nil {
+			str = s
+		}
+		return fmt.Sprintf("%q", str)
 	default:
 		panic(fmt.Sprintf("Unsupported extraArg type: %T", value)) // TODO: handle error
 	}

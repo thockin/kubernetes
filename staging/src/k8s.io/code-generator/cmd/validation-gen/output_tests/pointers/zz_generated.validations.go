@@ -45,16 +45,16 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 	if in.PS != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "\"field T1.PS\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "field T1.PS")...)
 	}
 	if in.PI != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pi"), *in.PI, true, "\"field T1.PI\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("pi"), *in.PI, true, "field T1.PI")...)
 	}
 	if in.PB != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pb"), *in.PB, true, "\"field T1.PB\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("pb"), *in.PB, true, "field T1.PB")...)
 	}
 	if in.PF != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pf"), *in.PF, true, "\"field T1.PF\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("pf"), *in.PF, true, "field T1.PF")...)
 	}
 	if in.PT2 != nil {
 		errs = append(errs, Validate_T2(in.PT2, fldPath.Child("pt2"))...)
@@ -64,16 +64,16 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
 	if in.PS != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "\"field T2.PS\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "field T2.PS")...)
 	}
 	if in.PI != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pi"), *in.PI, true, "\"field T2.PI\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("pi"), *in.PI, true, "field T2.PI")...)
 	}
 	if in.PB != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pb"), *in.PB, true, "\"field T2.PB\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("pb"), *in.PB, true, "field T2.PB")...)
 	}
 	if in.PF != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pf"), *in.PF, true, "\"field T2.PF\"")...)
+		errs = append(errs, validate.FixedResult(fldPath.Child("pf"), *in.PF, true, "field T2.PF")...)
 	}
 	return errs
 }
