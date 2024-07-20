@@ -57,14 +57,14 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(field string, t *typ
 		vals, fixedTrue := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
 		if fixedTrue {
 			for _, v := range vals {
-				result = append(result, Function(validateTrueTagName, fixedResultValidator, true, v))
+				result = append(result, Function(validateTrueTagName, DefaultFlags, fixedResultValidator, true, v))
 			}
 		}
 	} else {
 		vals, fixedFalse := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
 		if fixedFalse {
 			for _, v := range vals {
-				result = append(result, Function(validateFalseTagName, fixedResultValidator, false, v))
+				result = append(result, Function(validateFalseTagName, DefaultFlags, fixedResultValidator, false, v))
 			}
 		}
 	}

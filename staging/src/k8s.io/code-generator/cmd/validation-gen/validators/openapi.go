@@ -52,7 +52,7 @@ func (openAPIDeclarativeValidator) ExtractValidations(field string, t *types.Typ
 		return nil, err
 	}
 	if schema.MaxLength != nil {
-		v = append(v, Function(maxLengthTagName, maxLengthValidator, *schema.MaxLength))
+		v = append(v, Function(maxLengthTagName, DefaultFlags, maxLengthValidator, *schema.MaxLength))
 	}
 	if len(schema.Format) > 0 {
 		formatFunction := FormatValidationFunction(schema.Format)
@@ -70,10 +70,10 @@ func FormatValidationFunction(format string) FunctionGen {
 	// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
 	// for more examples.
 	if format == "ip" {
-		return Function(formatTagName, ipValidator)
+		return Function(formatTagName, DefaultFlags, ipValidator)
 	}
 	if format == "dns-label" {
-		return Function(formatTagName, dnsLabelValidator)
+		return Function(formatTagName, DefaultFlags, dnsLabelValidator)
 	}
 	// TODO: Flesh out the list of validation functions
 

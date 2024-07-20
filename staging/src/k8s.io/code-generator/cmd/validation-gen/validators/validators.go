@@ -26,9 +26,28 @@ type DeclarativeValidator interface {
 	ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error)
 }
 
+// FunctionFlags define optional properties of a validator.  Most validators
+// can just use DefaultFlags.
+type FunctionFlags uint32
+
+const (
+	// DefaultFlags is defined for clarity.
+	DefaultFlags FunctionFlags = 0
+
+	// IsFatal indicates that further validations should be skipped if this
+	// validator fails. Most validators are not fatal.
+	IsFatal FunctionFlags = 1 << iota
+
+	// PtrOK indicates that when validating a pointer fiel, this validator
+	// wants the pointer value, rather than the dereferenced value.  Most
+	// validators want the value, not the pointer.
+	PtrOK
+)
+
 // FunctionGen provides validation-gen with the information needed to generate a
 // validation function invocation.
 type FunctionGen interface {
+	// TagName returns the tag which triggers this validator.
 	TagName() string
 
 	// SignatureAndArgs returns the function name and all extraArg value literals that are passed when the function
@@ -43,23 +62,12 @@ type FunctionGen interface {
 	// a function that does and use that function to call the validation function.
 	SignatureAndArgs() (function types.Name, extraArgs []any)
 
-	// IsFatal indicates whether this particular validation function should be
-	// considered fatal, or whether further validations may proceed.
-	IsFatal() bool
+	// Flags returns the options for this validator function.
+	Flags() FunctionFlags
 }
 
 // Function creates a FunctionGen for a given function name and extraArgs.
-func Function(tagName string, function types.Name, extraArgs ...any) FunctionGen {
-	return makeFunction(tagName, false, function, extraArgs...)
-}
-
-// FatalFunction creates a fatal-failure FunctionGen for a given function name
-// and extraArgs.
-func FatalFunction(tagName string, function types.Name, extraArgs ...any) FunctionGen {
-	return makeFunction(tagName, true, function, extraArgs...)
-}
-
-func makeFunction(tagName string, fatal bool, function types.Name, extraArgs ...any) FunctionGen {
+func Function(tagName string, flags FunctionFlags, function types.Name, extraArgs ...any) FunctionGen {
 	// Callers of Signature don't care if the args are all of a known type, it just
 	// makes it easier to declare validators.
 	var anyArgs []any
@@ -69,14 +77,14 @@ func makeFunction(tagName string, fatal bool, function types.Name, extraArgs ...
 			anyArgs[i] = arg
 		}
 	}
-	return &functionGen{tagName: tagName, fatal: fatal, function: function, extraArgs: anyArgs}
+	return &functionGen{tagName: tagName, flags: flags, function: function, extraArgs: anyArgs}
 }
 
 type functionGen struct {
 	tagName   string
 	function  types.Name
 	extraArgs []any
-	fatal     bool
+	flags     FunctionFlags
 }
 
 func (v *functionGen) TagName() string {
@@ -87,6 +95,6 @@ func (v *functionGen) SignatureAndArgs() (function types.Name, args []any) {
 	return v.function, v.extraArgs
 }
 
-func (v *functionGen) IsFatal() bool {
-	return v.fatal
+func (v *functionGen) Flags() FunctionFlags {
+	return v.flags
 }
