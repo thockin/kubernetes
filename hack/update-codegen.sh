@@ -387,12 +387,13 @@ function codegen::defaults() {
 #     // +k8s:validation-gen=<VALUE>
 #
 # The <VALUE> depends on context:
+#     on packages:
+#       *: all exported types are candidates for having validation generated
+#       FIELDNAME: any type with a field of this name is a candidate for
+#                  having validation generated
 #     on types:
 #       true:  always generate validation for this type
 #       false: never generate validation for this type
-#     on packages:
-#       FIELDNAME: any object with a field of this name is a candidate
-#                  for having conversion generated
 function codegen::validation() {
     # Build the tool.
     GOPROXY=off go install \

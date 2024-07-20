@@ -179,6 +179,12 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			if checkTag(t.SecondClosestCommentLines, "true") {
 				return true
 			}
+			// all types
+			for _, v := range typesWith {
+				if v == "*" && !namer.IsPrivateGoName(t.Name.Name) {
+					return true
+				}
+			}
 			// For every k8s:validation-gen tag at the package level, interpret the value as a
 			// field name (like TypeMeta, ListMeta, ObjectMeta) and trigger validation generation
 			// for any type with any of the matching field names. Provides a more useful package
