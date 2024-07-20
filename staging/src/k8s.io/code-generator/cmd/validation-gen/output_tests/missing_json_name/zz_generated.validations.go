@@ -44,6 +44,6 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 }
 
 func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath.Child("<unknown-json-name>"), in.S, true, "\"field T1.S\"")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("<unknown-json-name>"), in.S, true, "field T1.S")...)
 	return errs
 }

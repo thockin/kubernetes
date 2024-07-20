@@ -44,18 +44,18 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 }
 
 func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "\"field T1.S\"")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("i"), in.I, true, "\"field T1.I\"")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("b"), in.B, true, "\"field T1.B\"")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "\"field T1.F\"")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("i"), in.I, true, "field T1.I")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("b"), in.B, true, "field T1.B")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "field T1.F")...)
 	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
 	return errs
 }
 
 func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "\"field T2.S\"")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("i"), in.I, true, "\"field T2.I\"")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("b"), in.B, true, "\"field T2.B\"")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "\"field T2.F\"")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("i"), in.I, true, "field T2.I")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("b"), in.B, true, "field T2.B")...)
+	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "field T2.F")...)
 	return errs
 }
