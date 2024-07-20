@@ -157,17 +157,12 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		inputToPkg[v] = k
 	}
 
-	visited := map[*types.Type]*callNode{}
+	// Build a cache of type->callNode for every type we need.
+	typeNodes := map[*types.Type]*typeNode{}
 	for _, input := range context.Inputs {
 		klog.V(2).InfoS("processing", "pkg", input)
 
 		pkg := context.Universe[input]
-
-		// typesPkg is where the types that need validation are defined.
-		// Sometimes it is different from pkg. For example, kubernetes core/v1
-		// types are defined in k8s.io/api/core/v1, while the pkg which holds
-		// defaulter code is at k/k/pkg/api/v1.
-		typesPkg := pkg
 
 		enabledTags, disabledTags := extractFiltersTags(pkg.Comments)
 		declarativeValidator := validators.NewValidator(context, enabledTags, disabledTags)
@@ -205,13 +200,19 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 		// Find the right input pkg, which might not be this one.
 		inputPath := pkgToInput[input]
-		typesPkg = context.Universe[inputPath]
+		// typesPkg is where the types that need validation are defined.
+		// Sometimes it is different from pkg. For example, kubernetes core/v1
+		// types are defined in k8s.io/api/core/v1, while the pkg which holds
+		// defaulter code is at k/k/pkg/api/v1.
+		typesPkg := context.Universe[inputPath]
 
 		// Figure out which types we should be considering further.
 		var rootTypes []*types.Type
 		for _, t := range typesPkg.Types {
 			if shouldCreateObjectValidationFn(t) {
 				rootTypes = append(rootTypes, t)
+			} else {
+				klog.V(6).InfoS("skipping type", "type", t)
 			}
 		}
 		// Deterministic ordering helps in logs and debugging.
@@ -219,33 +220,20 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
-		validationFunctionTypes := map[*types.Type]*callNode{}
+		// Deterministic ordering helps in logs and debugging.
+		slices.SortFunc(rootTypes, func(a, b *types.Type) int {
+			return cmp.Compare(a.Name.String(), b.Name.String())
+		})
+
 		for _, t := range rootTypes {
-			if _, ok := validationFunctionTypes[t]; ok { // already found
-				continue
+			if _, ok := typeNodes[t]; ok {
+				continue // already did this one
 			}
-			klog.V(4).InfoS("processing", "type", t)
+			klog.V(4).InfoS("pre-processing", "type", t)
 
-			callTree, err := buildCallTree(declarativeValidator, inputToPkg, t, visited)
-			if err != nil {
-				klog.Fatalf("Failed to build call tree to generate validations for type: %v: %v", t.Name, err)
+			if err := discoverTypes(declarativeValidator, inputToPkg, t, typeNodes); err != nil {
+				klog.Fatalf("failed to discover validations for type %v: %v", t.Name, err)
 			}
-			if callTree == nil {
-				continue
-			}
-			callTree.VisitInOrder(func(ancestors []*callNode, current *callNode) {
-				if _, ok := validationFunctionTypes[current.underlyingType]; ok {
-					return
-				}
-				// Generate a validation function for each struct.
-				if current.underlyingType != nil && current.underlyingType.Kind == types.Struct {
-					validationFunctionTypes[current.underlyingType] = current.copy(true)
-				}
-			})
-		}
-
-		if len(validationFunctionTypes) == 0 {
-			klog.V(5).Infof("no validations in package %s", pkg.Name)
 		}
 
 		targets = append(targets,
@@ -261,7 +249,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypes, validationFunctionTypes, peerPkgs, inputToPkg, declarativeValidator),
+						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypes, typeNodes, peerPkgs, inputToPkg, declarativeValidator),
 					}
 				},
 			})

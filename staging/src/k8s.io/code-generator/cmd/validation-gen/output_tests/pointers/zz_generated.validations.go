@@ -34,7 +34,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&T1{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(T1), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T1(obj.(*T1), nil)
 		}
@@ -44,36 +44,56 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 }
 
 func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// TypeMeta
+
+	// PS
 	if in.PS != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "field T1.PS")...)
 	}
+
+	// PI
 	if in.PI != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("pi"), *in.PI, true, "field T1.PI")...)
 	}
+
+	// PB
 	if in.PB != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("pb"), *in.PB, true, "field T1.PB")...)
 	}
+
+	// PF
 	if in.PF != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("pf"), *in.PF, true, "field T1.PF")...)
 	}
+
+	// PT2
 	if in.PT2 != nil {
 		errs = append(errs, Validate_T2(in.PT2, fldPath.Child("pt2"))...)
 	}
+
 	return errs
 }
 
 func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// PS
 	if in.PS != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "field T2.PS")...)
 	}
+
+	// PI
 	if in.PI != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("pi"), *in.PI, true, "field T2.PI")...)
 	}
+
+	// PB
 	if in.PB != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("pb"), *in.PB, true, "field T2.PB")...)
 	}
+
+	// PF
 	if in.PF != nil {
 		errs = append(errs, validate.FixedResult(fldPath.Child("pf"), *in.PF, true, "field T2.PF")...)
 	}
+
 	return errs
 }

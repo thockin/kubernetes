@@ -14,36 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=*
+// +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package alltypesmatch
+package recursvie
 
+// +validateTrue="type T1"
 type T1 struct {
-	// +validateTrue="field T1.S"
-	S  string `json:"s"`
-	T2 T2     `json:"t2"`
-	T3 T3     `json:"t3"`
+	TypeMeta int
+
+	// +validateTrue="field T1.PT1"
+	PT1 *T1 `json:"pt1"`
+
+	// +validateTrue="field T1.T2"
+	T2 T2 `json:"t2"`
+	// +validateTrue="field T1.PT2"
+	PT2 *T2 `json:"pt2"`
 }
 
+// +validateTrue="type T2"
 type T2 struct {
-	// +validateTrue="field T2.S"
-	S string `json:"s"`
+	// +validateTrue="field T2.PT1"
+	PT1 *T1 `json:"pt1"`
+
+	// +validateTrue="field T2.PT2"
+	PT2 *T2 `json:"pt2"`
 }
-
-type T3 struct {
-	// Note: no validations on this one.
-	S string `json:"s"`
-}
-
-// Note: not linked into T1 at all.
-type T4 struct {
-	// Note: no validations.
-	S string `json:"s"`
-}
-
-// +validateTrue="type ES"
-type ES string
-
-// Note: no validations.
-type ET1 T1
