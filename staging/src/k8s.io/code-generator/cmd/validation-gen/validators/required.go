@@ -45,5 +45,5 @@ func (requiredDeclarativeValidator) ExtractValidations(field string, t *types.Ty
 	if !required {
 		return nil, nil
 	}
-	return []FunctionGen{FatalFunction(requiredTagName, requiredValidator)}, nil
+	return []FunctionGen{Function(requiredTagName, IsFatal|PtrOK, requiredValidator)}, nil
 }

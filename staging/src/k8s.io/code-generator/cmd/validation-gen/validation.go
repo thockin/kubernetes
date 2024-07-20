@@ -518,13 +518,13 @@ func (n *callNode) writeValidationFunctionBody(c *generator.Context, varName str
 	}
 
 	if len(ancestors) > 0 {
-		if isPointer {
-			sw.Do("if $.var$ != nil {\n", targs)
-			defer func() {
-				sw.Do("}\n", nil)
-			}()
-		}
 		if isCallable(*n) {
+			if isPointer {
+				sw.Do("if $.var$ != nil {\n", targs)
+				defer func() {
+					sw.Do("}\n", nil)
+				}()
+			}
 			n.writeChildValidatorCall(c, varName, path, isPointer, sw)
 			return
 		}
@@ -609,11 +609,6 @@ func (n *callNode) writeChildValidatorCall(c *generator.Context, varName string,
 // writeValidationFunctionCalls generates calls to validation functions, that is, functions that are called by
 // the generated validation functions to perform actual validations.
 func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName string, path pathPart, isVarPointer bool, sw *generator.SnippetWriter) {
-	accessor := varName
-	if isVarPointer {
-		accessor = "*" + accessor
-	}
-
 	if len(n.validations) == 0 {
 		return
 	}
@@ -624,9 +619,20 @@ func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName st
 
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
-			"varName":      accessor,
+			"varName":      varName,
 			"path":         path,
 			"validationFn": c.Universe.Type(fn),
+		}
+		closeThisValidation := func() {}
+		if n.underlyingType.Kind == types.Pointer && (v.Flags()&validators.PtrOK == 0) {
+			// TODO: This test will be emitted for each validation. We could
+			// restructure this to collect all of the calls, sort by PtrOK, and
+			// emit this one time.
+			sw.Do("if $.varName$ != nil {\n", targs)
+			closeThisValidation = func() {
+				sw.Do("}\n", nil)
+			}
+			targs["varName"] = "*" + varName
 		}
 
 		emitCall := func() {
@@ -647,7 +653,7 @@ func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName st
 			}
 			sw.Do(")", targs)
 		}
-		if v.IsFatal() && moreValidations {
+		if (v.Flags()&validators.IsFatal) != 0 && moreValidations {
 			nFatal++
 			sw.Do("if e := ", nil)
 			emitCall()
@@ -659,6 +665,7 @@ func (n *callNode) writeValidationFunctionCalls(c *generator.Context, varName st
 			emitCall()
 			sw.Do("...)\n", nil)
 		}
+		closeThisValidation()
 	}
 	for i := 0; i < nFatal; i++ {
 		sw.Do("}\n", nil)
