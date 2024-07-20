@@ -19,7 +19,6 @@ package main
 import (
 	"cmp"
 	"fmt"
-	"path"
 	"reflect"
 	"slices"
 	"strings"
@@ -251,7 +250,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 		targets = append(targets,
 			&generator.SimpleTarget{
-				PkgName:       path.Base(pkg.Path),
+				PkgName:       pkg.Name,
 				PkgPath:       pkg.Path,
 				PkgDir:        pkg.Dir, // output pkg is the same as the input
 				HeaderComment: boilerplate,
