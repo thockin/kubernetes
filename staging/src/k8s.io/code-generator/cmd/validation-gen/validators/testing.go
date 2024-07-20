@@ -17,8 +17,6 @@ limitations under the License.
 package validators
 
 import (
-	"strings"
-
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
@@ -58,12 +56,16 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(field string, t *typ
 	if v.result {
 		vals, fixedTrue := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
 		if fixedTrue {
-			result = append(result, Function(validateTrueTagName, fixedResultValidator, true, strings.Join(vals, ",")))
+			for _, v := range vals {
+				result = append(result, Function(validateTrueTagName, fixedResultValidator, true, v))
+			}
 		}
 	} else {
 		vals, fixedFalse := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
 		if fixedFalse {
-			result = append(result, Function(validateFalseTagName, fixedResultValidator, false, strings.Join(vals, ",")))
+			for _, v := range vals {
+				result = append(result, Function(validateFalseTagName, fixedResultValidator, false, v))
+			}
 		}
 	}
 
