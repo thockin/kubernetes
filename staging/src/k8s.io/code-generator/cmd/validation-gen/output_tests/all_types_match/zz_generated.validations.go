@@ -34,39 +34,91 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&T1{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(ES), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_ES(obj.(*ES), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(new(ET1), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_ET1(obj.(*ET1), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(new(T1), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T1(obj.(*T1), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&T2{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(T2), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T2(obj.(*T2), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&T3{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(T3), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T3(obj.(*T3), nil)
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+	})
+	scheme.AddValidationFunc(new(T4), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+		if len(subresources) == 0 {
+			return Validate_T4(obj.(*T4), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
+func Validate_ES(in *ES, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validate.FixedResult(fldPath, in, true, "type ES")...)
+	return errs
+}
+
+func Validate_ET1(in *ET1, fldPath *field.Path) (errs field.ErrorList) {
+	// S
 	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
+
+	// T2
 	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
+
+	// T3
+	errs = append(errs, Validate_T3(&in.T3, fldPath.Child("t3"))...)
+
+	return errs
+}
+
+func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// S
+	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
+
+	// T2
+	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
+
+	// T3
+	errs = append(errs, Validate_T3(&in.T3, fldPath.Child("t3"))...)
+
 	return errs
 }
 
 func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// S
 	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
+
 	return errs
 }
 
 func Validate_T3(in *T3, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T3.S")...)
+	// S
+
+	return errs
+}
+
+func Validate_T4(in *T4, fldPath *field.Path) (errs field.ErrorList) {
+	// S
+
 	return errs
 }

@@ -56,4 +56,4 @@
   for scalar testing that should be put in declarative validator test code
 - rename "disabled-tags" to "disabled-tag" and document as repeated
 - emit empty funcs for types with no validations
-
+- don't buyild the same fieldpath over and over: `if fp := fldPath.Child("x"); true { call(fp, ...), call(fp, ...) }`

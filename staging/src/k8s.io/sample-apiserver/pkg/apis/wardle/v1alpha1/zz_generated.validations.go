@@ -34,19 +34,19 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(&Fischer{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(Fischer), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_Fischer(obj.(*Fischer), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&FischerList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(FischerList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_FischerList(obj.(*FischerList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&Flunder{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(Flunder), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			root := obj.(*Flunder)
 			return Validate_FlunderSpec(&root.Spec, nil)
@@ -57,7 +57,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(&FlunderList{}, func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(FlunderList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_FlunderList(obj.(*FlunderList), nil)
 		}
@@ -67,77 +67,143 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 }
 
 func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
+	// TypeMeta
+	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
+
+	// ObjectMeta
+	errs = append(errs, unnameable_(&in.ObjectMeta, fldPath.Child("metadata"))...)
+
+	// DisallowedFlunders
+	for i, val := range in.DisallowedFlunders {
+		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
+		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
+	}
+
+	// Reference
 	errs = append(errs, validate.IP(fldPath.Child("reference"), in.Reference)...)
+
+	// Primary
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
+
 	return errs
 }
 
 func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.ErrorList) {
-	for k := range in.Items {
-		c := &in.Items[k]
-		errs = append(errs, Validate_Fischer(c, fldPath.Index(k))...)
+	// TypeMeta
+	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
+
+	// ListMeta
+	errs = append(errs, unnameable_(&in.ListMeta, fldPath.Child("metadata"))...)
+
+	// Items
+	for i, val := range in.Items {
+		errs = append(errs, Validate_Fischer(&val, fldPath.Index(i))...)
 	}
+
 	return errs
 }
 
 func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
+	// TypeMeta
+	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
+
+	// ObjectMeta
+	errs = append(errs, unnameable_(&in.ObjectMeta, fldPath.Child("metadata"))...)
+
+	// Spec
 	errs = append(errs, Validate_FlunderSpec(&in.Spec, fldPath.Child("spec"))...)
+
+	// Status
 	errs = append(errs, Validate_FlunderStatus(&in.Status, fldPath.Child("status"))...)
+
 	return errs
 }
 
 func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
-	for k := range in.Items {
-		c := &in.Items[k]
-		errs = append(errs, Validate_Flunder(c, fldPath.Index(k))...)
+	// TypeMeta
+	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
+
+	// ListMeta
+	errs = append(errs, unnameable_(&in.ListMeta, fldPath.Child("metadata"))...)
+
+	// Items
+	for i, val := range in.Items {
+		errs = append(errs, Validate_Flunder(&val, fldPath.Index(i))...)
 	}
+
 	return errs
 }
 
 func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// Reference
 	errs = append(errs, validate.MaxLength(fldPath.Child("reference"), in.Reference, 128)...)
 	errs = append(errs, validate.IP(fldPath.Child("reference"), in.Reference)...)
+
+	// ReferenceType
 	if in.ReferenceType != nil {
 		errs = append(errs, validate.Enum(fldPath.Child("referenceType"), *in.ReferenceType, "Fischer", "Flunder")...)
 	}
+	if in.ReferenceType != nil {
+		errs = append(errs, Validate_ReferenceType(in.ReferenceType, fldPath.Child("referenceType"))...)
+	}
+
+	// Primary
 	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
-	for k := range in.Extras {
-		c := &in.Extras[k]
-		errs = append(errs, Validate_Widget(c, fldPath.Index(k))...)
+
+	// Extras
+	for i, val := range in.Extras {
+		errs = append(errs, Validate_Widget(&val, fldPath.Index(i))...)
 	}
-	for k_More_idx, k_More := range in.More {
-		errs = append(errs, Validate_Widget(&k_More, fldPath.Key(k_More_idx))...)
-		errs = append(errs, Validate_Widget(&k_More, fldPath.Key(k_More_idx))...)
+
+	// More
+	for key, val := range in.More {
+		errs = append(errs, Validate_Widget(&val, fldPath.Key(key))...)
 	}
+
+	// Layer
 	if in.Layer != nil {
 		errs = append(errs, Validate_Layer(in.Layer, fldPath.Child("layer"))...)
 	}
+
 	return errs
 }
 
 func Validate_FlunderStatus(in *FlunderStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// Name
 	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
+
 	return errs
 }
 
 func Validate_Layer(in *Layer, fldPath *field.Path) (errs field.ErrorList) {
-	for k := range in.Extras {
-		c := &in.Extras[k]
-		errs = append(errs, Validate_Widget(c, fldPath.Index(k))...)
+	// Extras
+	for i, val := range in.Extras {
+		errs = append(errs, Validate_Widget(&val, fldPath.Index(i))...)
 	}
+
+	return errs
+}
+
+func Validate_ReferenceType(in *ReferenceType, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validate.Enum(fldPath, in, "Fischer", "Flunder")...)
 	return errs
 }
 
 func Validate_Something(in *Something, fldPath *field.Path) (errs field.ErrorList) {
+	// Name
 	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
+
 	return errs
 }
 
 func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
+	// Name
 	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
-	for k := range in.Something {
-		c := &in.Something[k]
-		errs = append(errs, Validate_Something(c, fldPath.Index(k))...)
+
+	// Something
+	for i, val := range in.Something {
+		errs = append(errs, Validate_Something(&val, fldPath.Index(i))...)
 	}
+
 	return errs
 }
