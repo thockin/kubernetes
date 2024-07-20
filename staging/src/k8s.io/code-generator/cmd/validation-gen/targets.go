@@ -40,8 +40,10 @@ const (
 	disabledTagName = "k8s:validation-gen-disabled-tags"
 )
 
-func extractTag(comments []string) []string {
-	return gengo.ExtractCommentTags("+", comments)[tagName]
+func extractTag(comments []string) ([]string, bool) {
+	m := gengo.ExtractCommentTags("+", comments)
+	v, found := m[tagName]
+	return v, found
 }
 
 func extractInputTag(comments []string) []string {
@@ -171,7 +173,14 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		enabledTags, disabledTags := extractFiltersTags(pkg.Comments)
 		declarativeValidator := validators.NewValidator(context, enabledTags, disabledTags)
 
-		typesWith := extractTag(pkg.Comments)
+		typesWith, found := extractTag(pkg.Comments)
+		if !found {
+			klog.V(2).InfoS("  did not find required tag", "tag", tagName)
+			continue
+		}
+		if len(typesWith) == 0 {
+			klog.Fatalf("found package tag %q with no value", tagName)
+		}
 		shouldCreateObjectValidationFn := func(t *types.Type) bool {
 			// opt-out
 			if checkTag(t.SecondClosestCommentLines, "false") {
