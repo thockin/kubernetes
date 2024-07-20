@@ -17,9 +17,11 @@ limitations under the License.
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"path"
 	"reflect"
+	"slices"
 	"strings"
 
 	"k8s.io/code-generator/cmd/validation-gen/validators"
@@ -197,12 +199,17 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		inputPath := pkgToInput[input]
 		typesPkg = context.Universe[inputPath]
 
+		// Figure out which types we should be considering further.
 		var rootTypes []*types.Type
 		for _, t := range typesPkg.Types {
 			if shouldCreateObjectValidationFn(t) {
 				rootTypes = append(rootTypes, t)
 			}
 		}
+		// Deterministic ordering helps in logs and debugging.
+		slices.SortFunc(rootTypes, func(a, b *types.Type) int {
+			return cmp.Compare(a.Name.String(), b.Name.String())
+		})
 
 		validationFunctionTypes := map[*types.Type]*callNode{}
 		for _, t := range rootTypes {
