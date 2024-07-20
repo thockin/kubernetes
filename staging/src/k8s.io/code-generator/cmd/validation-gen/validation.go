@@ -327,7 +327,7 @@ func (c *callTreeForType) build(t *types.Type, root bool) (*callNode, error) {
 			}
 			klog.V(5).InfoS("  field", "name", name)
 
-			jsonName := "<unknown>"
+			jsonName := "<unknown-json-name>"
 			if tags, ok := lookupJSONTags(field); ok {
 				jsonName = tags.name
 			}
