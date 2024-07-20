@@ -54,3 +54,6 @@
 - Fix bug where generating apps API group enables enum generation on core API group
 - Clear ou 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
   for scalar testing that should be put in declarative validator test code
+- rename "disabled-tags" to "disabled-tag" and document as repeated
+- emit empty funcs for types with no validations
+
