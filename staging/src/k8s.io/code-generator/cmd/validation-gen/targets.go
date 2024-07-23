@@ -220,11 +220,6 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
-		// Deterministic ordering helps in logs and debugging.
-		slices.SortFunc(rootTypes, func(a, b *types.Type) int {
-			return cmp.Compare(a.Name.String(), b.Name.String())
-		})
-
 		for _, t := range rootTypes {
 			if _, ok := typeNodes[t]; ok {
 				continue // already did this one
