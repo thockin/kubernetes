@@ -476,8 +476,6 @@ func Validate_CSIPersistentVolumeSource(in *v1.CSIPersistentVolumeSource, fldPat
 
 	// VolumeAttributes
 	for key, val := range in.VolumeAttributes {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// ControllerPublishSecretRef
@@ -517,8 +515,6 @@ func Validate_CSIVolumeSource(in *v1.CSIVolumeSource, fldPath *field.Path) (errs
 
 	// VolumeAttributes
 	for key, val := range in.VolumeAttributes {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// NodePublishSecretRef
@@ -550,8 +546,6 @@ func Validate_Capability(in *v1.Capability, fldPath *field.Path) (errs field.Err
 func Validate_CephFSPersistentVolumeSource(in *v1.CephFSPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	// Monitors
 	for i, val := range in.Monitors {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Path
@@ -573,8 +567,6 @@ func Validate_CephFSPersistentVolumeSource(in *v1.CephFSPersistentVolumeSource, 
 func Validate_CephFSVolumeSource(in *v1.CephFSVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	// Monitors
 	for i, val := range in.Monitors {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Path
@@ -713,8 +705,6 @@ func Validate_ConfigMap(in *v1.ConfigMap, fldPath *field.Path) (errs field.Error
 
 	// Data
 	for key, val := range in.Data {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// BinaryData
@@ -811,14 +801,10 @@ func Validate_Container(in *v1.Container, fldPath *field.Path) (errs field.Error
 
 	// Command
 	for i, val := range in.Command {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Args
 	for i, val := range in.Args {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// WorkingDir
@@ -906,8 +892,6 @@ func Validate_Container(in *v1.Container, fldPath *field.Path) (errs field.Error
 func Validate_ContainerImage(in *v1.ContainerImage, fldPath *field.Path) (errs field.ErrorList) {
 	// Names
 	for i, val := range in.Names {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// SizeBytes
@@ -1255,14 +1239,10 @@ func Validate_EphemeralContainerCommon(in *v1.EphemeralContainerCommon, fldPath 
 
 	// Command
 	for i, val := range in.Command {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Args
 	for i, val := range in.Args {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// WorkingDir
@@ -1440,8 +1420,6 @@ func Validate_EventSource(in *v1.EventSource, fldPath *field.Path) (errs field.E
 func Validate_ExecAction(in *v1.ExecAction, fldPath *field.Path) (errs field.ErrorList) {
 	// Command
 	for i, val := range in.Command {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -1450,8 +1428,6 @@ func Validate_ExecAction(in *v1.ExecAction, fldPath *field.Path) (errs field.Err
 func Validate_FCVolumeSource(in *v1.FCVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	// TargetWWNs
 	for i, val := range in.TargetWWNs {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Lun
@@ -1462,8 +1438,6 @@ func Validate_FCVolumeSource(in *v1.FCVolumeSource, fldPath *field.Path) (errs f
 
 	// WWIDs
 	for i, val := range in.WWIDs {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -1487,8 +1461,6 @@ func Validate_FlexPersistentVolumeSource(in *v1.FlexPersistentVolumeSource, fldP
 
 	// Options
 	for key, val := range in.Options {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	return errs
@@ -1508,8 +1480,6 @@ func Validate_FlexVolumeSource(in *v1.FlexVolumeSource, fldPath *field.Path) (er
 
 	// Options
 	for key, val := range in.Options {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	return errs
@@ -1608,8 +1578,6 @@ func Validate_HostAlias(in *v1.HostAlias, fldPath *field.Path) (errs field.Error
 
 	// Hostnames
 	for i, val := range in.Hostnames {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -1659,8 +1627,6 @@ func Validate_ISCSIPersistentVolumeSource(in *v1.ISCSIPersistentVolumeSource, fl
 
 	// Portals
 	for i, val := range in.Portals {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// DiscoveryCHAPAuth
@@ -1692,8 +1658,6 @@ func Validate_ISCSIVolumeSource(in *v1.ISCSIVolumeSource, fldPath *field.Path) (
 
 	// Portals
 	for i, val := range in.Portals {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// DiscoveryCHAPAuth
@@ -2167,8 +2131,6 @@ func Validate_NodeSelectorRequirement(in *v1.NodeSelectorRequirement, fldPath *f
 
 	// Values
 	for i, val := range in.Values {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -2193,8 +2155,6 @@ func Validate_NodeSpec(in *v1.NodeSpec, fldPath *field.Path) (errs field.ErrorLi
 
 	// PodCIDRs
 	for i, val := range in.PodCIDRs {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// ProviderID
@@ -2665,8 +2625,6 @@ func Validate_PersistentVolumeSpec(in *v1.PersistentVolumeSpec, fldPath *field.P
 
 	// MountOptions
 	for i, val := range in.MountOptions {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// VolumeMode
@@ -2746,8 +2704,6 @@ func Validate_PodAffinityTerm(in *v1.PodAffinityTerm, fldPath *field.Path) (errs
 
 	// Namespaces
 	for i, val := range in.Namespaces {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// TopologyKey
@@ -2759,14 +2715,10 @@ func Validate_PodAffinityTerm(in *v1.PodAffinityTerm, fldPath *field.Path) (errs
 
 	// MatchLabelKeys
 	for i, val := range in.MatchLabelKeys {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// MismatchLabelKeys
 	for i, val := range in.MismatchLabelKeys {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -2830,14 +2782,10 @@ func Validate_PodConditionType(in *v1.PodConditionType, fldPath *field.Path) (er
 func Validate_PodDNSConfig(in *v1.PodDNSConfig, fldPath *field.Path) (errs field.ErrorList) {
 	// Nameservers
 	for i, val := range in.Nameservers {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Searches
 	for i, val := range in.Searches {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Options
@@ -2872,8 +2820,6 @@ func Validate_PodExecOptions(in *v1.PodExecOptions, fldPath *field.Path) (errs f
 
 	// Command
 	for i, val := range in.Command {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -3086,8 +3032,6 @@ func Validate_PodSpec(in *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList
 
 	// NodeSelector
 	for key, val := range in.NodeSelector {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// ServiceAccountName
@@ -3423,8 +3367,6 @@ func Validate_QuobyteVolumeSource(in *v1.QuobyteVolumeSource, fldPath *field.Pat
 func Validate_RBDPersistentVolumeSource(in *v1.RBDPersistentVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	// CephMonitors
 	for i, val := range in.CephMonitors {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// RBDImage
@@ -3450,8 +3392,6 @@ func Validate_RBDPersistentVolumeSource(in *v1.RBDPersistentVolumeSource, fldPat
 func Validate_RBDVolumeSource(in *v1.RBDVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
 	// CephMonitors
 	for i, val := range in.CephMonitors {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// RBDImage
@@ -3553,8 +3493,6 @@ func Validate_ReplicationControllerSpec(in *v1.ReplicationControllerSpec, fldPat
 
 	// Selector
 	for key, val := range in.Selector {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// Template
@@ -3782,8 +3720,6 @@ func Validate_ScopedResourceSelectorRequirement(in *v1.ScopedResourceSelectorReq
 
 	// Values
 	for i, val := range in.Values {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
@@ -3817,8 +3753,6 @@ func Validate_Secret(in *v1.Secret, fldPath *field.Path) (errs field.ErrorList) 
 
 	// StringData
 	for key, val := range in.StringData {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// Type
@@ -4084,16 +4018,12 @@ func Validate_ServiceSpec(in *v1.ServiceSpec, fldPath *field.Path) (errs field.E
 
 	// Selector
 	for key, val := range in.Selector {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
 	}
 
 	// ClusterIP
 
 	// ClusterIPs
 	for i, val := range in.ClusterIPs {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Type
@@ -4101,8 +4031,6 @@ func Validate_ServiceSpec(in *v1.ServiceSpec, fldPath *field.Path) (errs field.E
 
 	// ExternalIPs
 	for i, val := range in.ExternalIPs {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// SessionAffinity
@@ -4112,8 +4040,6 @@ func Validate_ServiceSpec(in *v1.ServiceSpec, fldPath *field.Path) (errs field.E
 
 	// LoadBalancerSourceRanges
 	for i, val := range in.LoadBalancerSourceRanges {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// ExternalName
@@ -4315,8 +4241,6 @@ func Validate_TopologySpreadConstraint(in *v1.TopologySpreadConstraint, fldPath 
 
 	// MatchLabelKeys
 	for i, val := range in.MatchLabelKeys {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	return errs
