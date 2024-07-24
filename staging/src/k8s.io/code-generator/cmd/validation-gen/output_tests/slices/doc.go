@@ -40,6 +40,9 @@ type T1 struct {
 	// +eachVal=+validateTrue="field T1.LPT2[*]"
 	// +eachVal=+required
 	LPT2 []*T2 `json:"lpt2"`
+
+	// +validateTrue="field Z"
+	Z []string `json:"z"` // Should not have any eachKey, eachVal tags applied
 }
 
 // +validateTrue="type T2"
