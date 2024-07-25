@@ -50,57 +50,16 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
 
 	// T2
+	errs = append(errs, validate.FixedResult(fldPath.Child("t2"), in.T2, true, "field T1.T2")...)
 	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
-
-	// T3
-	errs = append(errs, Validate_T3(&in.T3, fldPath.Child("t3"))...)
-
-	// T4
-	errs = append(errs, Validate_T4(&in.T4, fldPath.Child("t4"))...)
-
-	// T5
-	errs = append(errs, Validate_T5(&in.T5, fldPath.Child("t5"))...)
-
-	// T6
-	errs = append(errs, Validate_T6(&in.T6, fldPath.Child("t6"))...)
 
 	return errs
 }
 
 func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validate.FixedResult(fldPath, in, true, "type T2")...)
 	// S
 	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
-
-	return errs
-}
-
-func Validate_T3(in *T3, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-
-	return errs
-}
-
-func Validate_T4(in *T4, fldPath *field.Path) (errs field.ErrorList) {
-	// t2
-	errs = append(errs, Validate_T2(&in.t2, fldPath.Child("t2"))...)
-
-	return errs
-}
-
-func Validate_T5(in *T5, fldPath *field.Path) (errs field.ErrorList) {
-	// t2
-	for key, val := range in.t2 {
-		errs = append(errs, Validate_T2(&val, fldPath.Key(key))...)
-	}
-
-	return errs
-}
-
-func Validate_T6(in *T6, fldPath *field.Path) (errs field.ErrorList) {
-	// t2
-	for i, val := range in.t2 {
-		errs = append(errs, Validate_T2(&val, fldPath.Index(i))...)
-	}
 
 	return errs
 }

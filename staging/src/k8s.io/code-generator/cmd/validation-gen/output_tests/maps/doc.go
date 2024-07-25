@@ -60,6 +60,16 @@ type T1 struct {
 	// +eachKey=+validateTrue="key T1.ME1S[*]"
 	// +eachVal=+validateTrue="val T1.ME1S[*]"
 	ME1S map[E1]string
+
+	// Duplicate types with no validation.
+	AnotherMSS   map[string]string   `json:"anothermss"`
+	AnotherMSPS  map[string]*string  `json:"anothermsps"`
+	AnotherMPSS  map[*string]string  `json:"anothermpss"`
+	AnotherMPSPS map[*string]*string `json:"anothermpsps"`
+	AnotherMST2  map[string]string   `json:"anothermst2"`
+	AnotherMSPT2 map[string]*string  `json:"anothermspt2"`
+	AnotherMSE1  map[string]E1       `json:"anothermse1"`
+	AnotherME1S  map[E1]string
 }
 
 // +validateTrue="type T2"

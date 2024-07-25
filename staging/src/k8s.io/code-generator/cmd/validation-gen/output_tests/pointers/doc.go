@@ -21,6 +21,7 @@ package pointers
 
 type T1 struct {
 	TypeMeta int
+
 	// +validateTrue="field T1.PS"
 	PS *string `json:"ps"`
 	// +validateTrue="field T1.PI"
@@ -30,8 +31,15 @@ type T1 struct {
 	// +validateTrue="field T1.PF"
 	PF *float64 `json:"pf"`
 
-	// Note: not tag here because of a bug.
+	// +validateTrue="field T1.PT2"
 	PT2 *T2 `json:"pt2"`
+
+	// Duplicate types with no validation.
+	AnotherPS  *string  `json:"aotherps"`
+	AnotherPI  *int     `json:"aotherpi"`
+	AnotherPB  *bool    `json:"aotherpb"`
+	AnotherPF  *float64 `json:"aotherpf"`
+	AnotherPT2 *T2      `json:"aotherpt2"`
 }
 
 type T2 struct {

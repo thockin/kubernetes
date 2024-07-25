@@ -68,7 +68,23 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 
 	// PT2
 	if in.PT2 != nil {
+		errs = append(errs, validate.FixedResult(fldPath.Child("pt2"), *in.PT2, true, "field T1.PT2")...)
+	}
+	if in.PT2 != nil {
 		errs = append(errs, Validate_T2(in.PT2, fldPath.Child("pt2"))...)
+	}
+
+	// AnotherPS
+
+	// AnotherPI
+
+	// AnotherPB
+
+	// AnotherPF
+
+	// AnotherPT2
+	if in.AnotherPT2 != nil {
+		errs = append(errs, Validate_T2(in.AnotherPT2, fldPath.Child("aotherpt2"))...)
 	}
 
 	return errs
