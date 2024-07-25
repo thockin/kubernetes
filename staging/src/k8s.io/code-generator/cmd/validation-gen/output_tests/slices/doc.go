@@ -24,20 +24,20 @@ type T1 struct {
 	TypeMeta int
 
 	// +validateTrue="field T1.LS"
-	// +eachVal=+validateTrue="field T1.LS[*]"
+	// +eachVal=+validateTrue="val T1.LS[*]"
 	// +eachVal=+required
 	LS []string `json:"ls"`
 	// +validateTrue="field T1.LPS"
-	// +eachVal=+validateTrue="field T1.LPS[*]"
+	// +eachVal=+validateTrue="val T1.LPS[*]"
 	// +eachVal=+required
 	LPS []*string `json:"lps"`
 
 	// +validateTrue="field T1.LT2"
-	// +eachVal=+validateTrue="field T1.LT2[*]"
+	// +eachVal=+validateTrue="val T1.LT2[*]"
 	// +eachVal=+required
 	LT2 []T2 `json:"lt2"`
 	// +validateTrue="field T1.LPT2"
-	// +eachVal=+validateTrue="field T1.LPT2[*]"
+	// +eachVal=+validateTrue="val T1.LPT2[*]"
 	// +eachVal=+required
 	LPT2 []*T2 `json:"lpt2"`
 
