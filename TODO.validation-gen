@@ -24,9 +24,6 @@
 - Add SMD/SSA validation (+listType, +listMapKey, +patchMergeKey, +patchStrategy)
 - Add CEL validation rules
 - Fix enum generator to generate refs to enum constants instead of string literals.  Also generate a sets.Set for each enum?
-- Add generator support for tags on pointers/type aliases.
-- Fix `childPath == (pathPart{})` hack in `writeValidationFunctionBody` (see todo)
-- Replace panics with error plumbing in validation-gen `validation.go`.
 - Deduplicate `jsontagutil.go`. It was copy-pasted in from applyconfig-gen
 - Deduplicate most of enum.go, it was copy-pasted in from kube-openapi
 - Add opt-in/opt-out controls
@@ -47,13 +44,12 @@
     - cross field validations
     - update validations
 - Use Go-standard-style names for generated functions
-- Pass field name to ExtractValidations
 - Add debug logging in generator
 - Decide test regimen for validators lib
-- make InitRequiredDeclarativeValidator() non-exported?
 - Fix bug where generating apps API group enables enum generation on core API group
-- Clear ou 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
+- Clear out 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
   for scalar testing that should be put in declarative validator test code
 - rename "disabled-tags" to "disabled-tag" and document as repeated
-- emit empty funcs for types with no validations
-- don't buyild the same fieldpath over and over: `if fp := fldPath.Child("x"); true { call(fp, ...), call(fp, ...) }`
+- don't build the same fieldpath over and over: `if fp := fldPath.Child("x"); true { call(fp, ...), call(fp, ...) }`
+- Error when calling eachVal on non-list types.
+- Don't emit functions for non-root-types with no transitive validations.
