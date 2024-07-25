@@ -218,7 +218,7 @@ func discoverTypes(validator validators.DeclarativeValidator, inputToPkg map[str
 		inputToPkg: inputToPkg,
 		knownTypes: results,
 	}
-	return td.discover(t, nil)
+	return td.discover(t)
 }
 
 // typeNode carries validation informatiuon for a single type.
@@ -258,12 +258,11 @@ const (
 	eachValTag = "eachVal"
 )
 
-// FIXME: passing comments here is nasty
 // discover walks the type graph, starting at t, and registers all types into
 // knownTypes.  The specified comments represent the parent context for this
 // type - the type comments for a type definition or the field comments for a
 // field.
-func (td *typeDiscoverer) discover(t *types.Type, comments []string) error {
+func (td *typeDiscoverer) discover(t *types.Type) error {
 	// If we already know this type, we are done.
 	if _, ok := td.knownTypes[t]; ok {
 		return nil
@@ -299,12 +298,12 @@ func (td *typeDiscoverer) discover(t *types.Type, comments []string) error {
 		if t.Elem.Kind == types.Pointer {
 			klog.Fatalf("type %v: pointers to pointers are not supported", t)
 		}
-		if err := td.discover(t.Elem, nil); err != nil {
+		if err := td.discover(t.Elem); err != nil {
 			return err
 		}
 	case types.Slice, types.Array:
 		klog.V(5).InfoS("  type is a list", "type", t.Elem)
-		if err := td.discover(t.Elem, nil); err != nil {
+		if err := td.discover(t.Elem); err != nil {
 			return err
 		}
 		child := &childNode{
@@ -313,10 +312,10 @@ func (td *typeDiscoverer) discover(t *types.Type, comments []string) error {
 		thisNode.elem = child
 	case types.Map:
 		klog.V(5).InfoS("  type is a map", "type", t.Elem)
-		if err := td.discover(t.Key, nil); err != nil {
+		if err := td.discover(t.Key); err != nil {
 			return err
 		}
-		if err := td.discover(t.Elem, nil); err != nil {
+		if err := td.discover(t.Elem); err != nil {
 			return err
 		}
 		kchild := &childNode{
@@ -357,7 +356,7 @@ func (td *typeDiscoverer) discover(t *types.Type, comments []string) error {
 			//FIXME: only do exported fields, add a test
 			klog.V(5).InfoS("  field", "name", name)
 
-			if err := td.discover(field.Type, field.CommentLines); err != nil {
+			if err := td.discover(field.Type); err != nil {
 				return err
 			}
 
@@ -385,7 +384,7 @@ func (td *typeDiscoverer) discover(t *types.Type, comments []string) error {
 					}
 				}
 				//TODO: also support +k8s:eachVal
-				if tagVals, found := gengo.ExtractCommentTags("+", comments)[eachValTag]; found {
+				if tagVals, found := gengo.ExtractCommentTags("+", field.CommentLines)[eachValTag]; found {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
@@ -434,7 +433,7 @@ func (td *typeDiscoverer) discover(t *types.Type, comments []string) error {
 		if t.Underlying.Kind == types.Pointer {
 			klog.Fatalf("type %v: aliases to pointers are not supported", t)
 		}
-		if err := td.discover(t.Underlying, t.CommentLines); err != nil {
+		if err := td.discover(t.Underlying); err != nil {
 			return err
 		}
 		fn, ok := td.getValidationFunctionName(t)
@@ -532,8 +531,10 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 		//FIXME: figure out if we can make this a wrapper-function and do it in one call to validate.ValuesInSlice()
 		sw.Do("for i, val := range $.var$ {\n", targs)
 
-		// Validate the value.
-		if len(child.validations) > 0 {
+		// Validate each value.
+		validations := child.validations
+		validations = append(validations, eachVal...)
+		if len(validations) > 0 {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
 			// we pass string, and if the field's type is *string, we also
@@ -542,7 +543,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			// means that large structs will be passed by value.  If this
 			// turns out to be a real problem, we could change this to pass
 			// everything by pointer.
-			g.emitCallsToValidators(c, append(child.validations, eachVal...), "val", elemPath, elemIsPtr, sw)
+			g.emitCallsToValidators(c, validations, "val", elemPath, elemIsPtr, sw)
 		}
 
 		// Get to the real type.
@@ -574,8 +575,10 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 
 		sw.Do("for key, val := range $.var$ {\n", targs)
 
-		// Validate the key.
-		if len(keyChild.validations) > 0 {
+		// Validate each key.
+		keyValidations := keyChild.validations
+		keyValidations = append(keyValidations, eachKey...)
+		if len(keyValidations) > 0 {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
 			// we pass string, and if the field's type is *string, we also
@@ -584,7 +587,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			// means that large structs will be passed by value.  If this
 			// turns out to be a real problem, we could change this to pass
 			// everything by pointer.
-			g.emitCallsToValidators(c, append(keyChild.validations, eachKey...), "key", keyPath, keyIsPtr, sw)
+			g.emitCallsToValidators(c, keyValidations, "key", keyPath, keyIsPtr, sw)
 		}
 
 		// Get to the real type.
@@ -604,8 +607,10 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			// validations.
 		}
 
-		// Validate the value.
-		if len(valChild.validations) > 0 {
+		// Validate each value.
+		valValidations := valChild.validations
+		valValidations = append(valValidations, eachVal...)
+		if len(valValidations) > 0 {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
 			// we pass string, and if the field's type is *string, we also
@@ -614,7 +619,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			// means that large structs will be passed by value.  If this
 			// turns out to be a real problem, we could change this to pass
 			// everything by pointer.
-			g.emitCallsToValidators(c, append(valChild.validations, eachVal...), "val", valPath, valIsPtr, sw)
+			g.emitCallsToValidators(c, valValidations, "val", valPath, valIsPtr, sw)
 		}
 
 		// Get to the real type.
