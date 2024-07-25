@@ -248,8 +248,7 @@ type childNode struct {
 	underlyingType *types.Type
 	validations    []validators.FunctionGen
 
-	// eachVal and eachKey validation is tracked here since attaching it directly to the
-	// validation of a field's type would share field specific validation with other fields of the same type.
+	// iterated validation has to be tracked separately from field's validations.
 	eachKey, eachVal []validators.FunctionGen
 }
 
@@ -267,7 +266,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 	if _, ok := td.knownTypes[t]; ok {
 		return nil
 	}
-	//FIXME: add test for recursive type use
 
 	klog.V(5).InfoS("discovering", "type", t)
 
@@ -280,7 +278,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 	td.knownTypes[t] = thisNode
 
 	// Extract any type-attached validation rules.
-	if validations, err := td.validator.ExtractValidations("FIXME:name", t, t.CommentLines); err != nil {
+	if validations, err := td.validator.ExtractValidations(t.Name.Name, t, t.CommentLines); err != nil {
 		return err
 	} else {
 		if len(validations) > 0 {
@@ -306,30 +304,24 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 		if err := td.discover(t.Elem); err != nil {
 			return err
 		}
-		child := &childNode{
+		thisNode.elem = &childNode{
 			underlyingType: t.Elem,
 		}
-		thisNode.elem = child
 	case types.Map:
 		klog.V(5).InfoS("  type is a map", "type", t.Elem)
 		if err := td.discover(t.Key); err != nil {
 			return err
 		}
+		thisNode.key = &childNode{
+			underlyingType: t.Elem,
+		}
+
 		if err := td.discover(t.Elem); err != nil {
 			return err
 		}
-		kchild := &childNode{
+		thisNode.elem = &childNode{
 			underlyingType: t.Elem,
 		}
-
-		thisNode.key = kchild
-
-		//FIXME: functionize this, it's a dup with lists
-		vchild := &childNode{
-			underlyingType: t.Elem,
-		}
-
-		thisNode.elem = vchild
 	case types.Struct:
 		klog.V(5).InfoS("  type is a struct")
 		fn, ok := td.getValidationFunctionName(t)
@@ -373,7 +365,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded key-validation rules.
-						if validations, err := td.validator.ExtractValidations("FIXME:name[x]", field.Type.Key, fakeComments); err != nil {
+						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", field.Name), field.Type.Key, fakeComments); err != nil {
 							return err
 						} else {
 							if len(validations) > 0 {
@@ -388,7 +380,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
-						if validations, err := td.validator.ExtractValidations("FIXME:name[x]", field.Type.Elem, fakeComments); err != nil {
+						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", field.Name), field.Type.Elem, fakeComments); err != nil {
 							return err
 						} else {
 							if len(validations) > 0 {
@@ -398,13 +390,13 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 						}
 					}
 				}
-			case types.Slice:
+			case types.Slice, types.Array:
 				//TODO: also support +k8s:eachVal
 				if tagVals, found := gengo.ExtractCommentTags("+", field.CommentLines)[eachValTag]; found {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
-						if validations, err := td.validator.ExtractValidations("FIXME:name[x]", field.Type.Elem, fakeComments); err != nil {
+						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", field.Name), field.Type.Elem, fakeComments); err != nil {
 							return err
 						} else {
 							if len(validations) > 0 {
@@ -518,13 +510,16 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 				g.emitCallToOtherTypeFunc(c, t, childVarName, childPath, childIsPtr, sw)
 			} else {
 				// Descend into this field.
-				// Pass eachKey and eachVal on the stack to avoid accidental sharing with other fields or same tyep
 				g.emitValidationForType(c, t, childVarName, childPath, sw, child.eachKey, child.eachVal)
 			}
 			sw.Do("\n", nil)
 		}
 	case types.Slice, types.Array:
+		// TODO: get rid of tn.elem and tn.key - redundant with underlyingType.Elem/Key
 		child := tn.elem
+		if tn.elem.underlyingType != inType.Elem {
+			panic("oops")
+		}
 		elemPath := pathPart{Index: "i"}
 		elemIsPtr := inType.Elem.Kind == types.Pointer
 
