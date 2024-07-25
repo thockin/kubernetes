@@ -24,11 +24,35 @@ type T1 struct {
 	// +validateTrue="field T1.S"
 	S  string `json:"s"`
 	T2 T2     `json:"t2"`
+	T3 T3     `json:"t3"`
+	T4 T4     `json:"t4"`
+	T5 T5     `json:"t5"`
+	T6 T6     `json:"t6"`
 }
 
 type T2 struct {
 	// +validateTrue="field T2.S"
 	S string `json:"s"`
+}
+
+// This type should not be generated. It has no validations.
+type T3 struct {
+	S string `json:"s"`
+}
+
+// This type should be generated, it has a child type that has validations.
+type T4 struct {
+	t2 T2 `json:"t2"`
+}
+
+// This type should be generated, it has a map value type that has validations.
+type T5 struct {
+	t2 map[string]T2 `json:"t2"`
+}
+
+// This type should be generated, it has a list items that has validations.
+type T6 struct {
+	t2 []T2 `json:"t2"`
 }
 
 type private struct {

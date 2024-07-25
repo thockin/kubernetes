@@ -75,8 +75,6 @@ func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 
 	// DisallowedFlunders
 	for i, val := range in.DisallowedFlunders {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "field T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// Reference
