@@ -21,6 +21,7 @@ package primitives
 
 type T1 struct {
 	TypeMeta int
+
 	// +validateTrue="field T1.S"
 	S string `json:"s"`
 	// +validateTrue="field T1.I"
@@ -30,8 +31,15 @@ type T1 struct {
 	// +validateTrue="field T1.F"
 	F float64 `json:"f"`
 
-	// Note: not tag here because of a bug.
+	// +validateTrue="field T1.T2"
 	T2 T2 `json:"t2"`
+
+	// Duplicate types with no validation.
+	AnotherS  string  `json:"anothers"`
+	AnotherI  int     `json:"anotheri"`
+	AnotherB  bool    `json:"anotherb"`
+	AnotherF  float64 `json:"anotherf"`
+	AnotherT2 T2      `json:"anothert2"`
 }
 
 type T2 struct {

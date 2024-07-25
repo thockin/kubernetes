@@ -59,7 +59,19 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "field T1.F")...)
 
 	// T2
+	errs = append(errs, validate.FixedResult(fldPath.Child("t2"), in.T2, true, "field T1.T2")...)
 	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
+
+	// AnotherS
+
+	// AnotherI
+
+	// AnotherB
+
+	// AnotherF
+
+	// AnotherT2
+	errs = append(errs, Validate_T2(&in.AnotherT2, fldPath.Child("anothert2"))...)
 
 	return errs
 }

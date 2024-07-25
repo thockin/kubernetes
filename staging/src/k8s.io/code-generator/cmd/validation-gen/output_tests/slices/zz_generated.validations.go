@@ -71,9 +71,24 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 		}
 	}
 
-	// Z
-	errs = append(errs, validate.FixedResult(fldPath.Child("z"), in.Z, true, "field Z")...)
-	for i, val := range in.Z {
+	// AnotherLS
+	for i, val := range in.AnotherLS {
+	}
+
+	// AnotherLPS
+	for i, val := range in.AnotherLPS {
+	}
+
+	// AnotherLT2
+	for i, val := range in.AnotherLT2 {
+		errs = append(errs, Validate_T2(&val, fldPath.Index(i))...)
+	}
+
+	// AnotherLPT2
+	for i, val := range in.AnotherLPT2 {
+		if val != nil {
+			errs = append(errs, Validate_T2(val, fldPath.Index(i))...)
+		}
 	}
 
 	return errs

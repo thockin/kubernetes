@@ -41,8 +41,11 @@ type T1 struct {
 	// +eachVal=+required
 	LPT2 []*T2 `json:"lpt2"`
 
-	// +validateTrue="field Z"
-	Z []string `json:"z"` // Should not have any eachKey, eachVal tags applied
+	// Duplicate types with no validation.
+	AnotherLS   []string  `json:"anotherls"`
+	AnotherLPS  []*string `json:"anotherlps"`
+	AnotherLT2  []T2      `json:"anotherlt2"`
+	AnotherLPT2 []*T2     `json:"anotherlpt2"`
 }
 
 // +validateTrue="type T2"
