@@ -5,6 +5,9 @@
 - Fix subresources
   - "spec" and "status" are hard coded in generator, drive them off of a `+subresource=status` tag?
   - Do we need to do anything special for "scale"?
+- When calling a validation function in another pkg, we need to make sure it exists
+  - by name convention + fingerprint
+  - by explicit tag (e.g. // +validation-func-for=...
 - ValidateUpdate support [LARGE CHANGE!]
   - Plumb oldObject in through all the validation calls
   - Define how update validators are authored (CEL transition rules have explored WHEN a update rule should trigger)

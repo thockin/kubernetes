@@ -38,7 +38,7 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 		if len(subresources) == 0 {
 			return Validate_T1(obj.(*T1), nil)
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
