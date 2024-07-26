@@ -420,8 +420,19 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			thisNode.children = append(thisNode.children, child)
 		}
 	case types.Alias:
-		//FIXME: currently emitting identical code for a struct and an alias (to that struct).  See alias test E3
 		klog.V(5).InfoS("  type is an alias", "type", t.Underlying)
+		// Note: By the language definition, what gengo calls "Aliases" (really
+		// just "type definitions") have underlying types of the type literal.
+		// In other words, if we define `type T1 string` and `type T2 T1`, the
+		// underlying type of T2 is string, not T1.  This means that:
+		//    1) We will emit code for both underlying types. If the underlying
+		//       type is a struct with many fields, we will emit two identical
+		//       functions.
+		//    2) Validating a field of type T2 will NOT call any validation
+		//       defined on the type T1.
+		//    3) In the case of a type definition whose RHS is a struct which
+		//       has fields with validation tags, the validation for those fields
+		//       WILL be called from the generated for for the new type.
 		if t.Underlying.Kind == types.Pointer {
 			klog.Fatalf("type %v: aliases to pointers are not supported", t)
 		}
