@@ -33,34 +33,17 @@ func AddToRegistry(validator DeclarativeValidatorInit) {
 	registry.Add(validator)
 }
 
-// AddToRegistryPriority adds a high-priority DeclarativeValidator to the
-// registry by providing the registry with an initializer it can use to
-// construct a DeclarativeValidator for each generator context.  High-priority
-// validations run before other validations and if any high-priority validation
-// fails, all further validation of the field is bypassed.
-func AddToRegistryPriority(validator DeclarativeValidatorInit) {
-	registry.AddPriority(validator)
-}
-
 type Registry struct {
-	priorityInits []DeclarativeValidatorInit
-	regularInits  []DeclarativeValidatorInit
+	inits []DeclarativeValidatorInit
 }
 
 func (r *Registry) Add(validator DeclarativeValidatorInit) {
-	r.regularInits = append(r.regularInits, validator)
-}
-
-func (r *Registry) AddPriority(validator DeclarativeValidatorInit) {
-	r.priorityInits = append(r.priorityInits, validator)
+	r.inits = append(r.inits, validator)
 }
 
 func NewValidator(c *generator.Context, enabledTags, disabledTags []string) DeclarativeValidator {
-	validators := make([]DeclarativeValidator, 0, len(registry.priorityInits)+len(registry.regularInits))
-	for _, init := range registry.priorityInits {
-		validators = append(validators, init(c))
-	}
-	for _, init := range registry.regularInits {
+	validators := make([]DeclarativeValidator, 0, len(registry.inits))
+	for _, init := range registry.inits {
 		validators = append(validators, init(c))
 	}
 	return &compositeValidator{validators: validators, enabledTags: sets.New(enabledTags...), disabledTags: sets.New(disabledTags...)}

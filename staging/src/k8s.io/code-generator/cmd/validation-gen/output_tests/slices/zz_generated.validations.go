@@ -50,34 +50,46 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// LS
 	errs = append(errs, validate.FixedResult(fldPath.Child("ls"), in.LS, true, "field T1.LS")...)
 	for i, val := range in.LS {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "val T1.LS[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
+		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
+			errs = append(errs, e...)
+		} else {
+			errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "val T1.LS[*]")...)
+		}
 	}
 
 	// LPS
 	errs = append(errs, validate.FixedResult(fldPath.Child("lps"), in.LPS, true, "field T1.LPS")...)
 	for i, val := range in.LPS {
-		if val != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Index(i), *val, true, "val T1.LPS[*]")...)
+		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
+			errs = append(errs, e...)
+		} else {
+			if val != nil {
+				errs = append(errs, validate.FixedResult(fldPath.Index(i), *val, true, "val T1.LPS[*]")...)
+			}
 		}
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 	}
 
 	// LT2
 	errs = append(errs, validate.FixedResult(fldPath.Child("lt2"), in.LT2, true, "field T1.LT2")...)
 	for i, val := range in.LT2 {
-		errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "val T1.LT2[*]")...)
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
+		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
+			errs = append(errs, e...)
+		} else {
+			errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "val T1.LT2[*]")...)
+		}
 		errs = append(errs, Validate_T2(&val, fldPath.Index(i))...)
 	}
 
 	// LPT2
 	errs = append(errs, validate.FixedResult(fldPath.Child("lpt2"), in.LPT2, true, "field T1.LPT2")...)
 	for i, val := range in.LPT2 {
-		if val != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Index(i), *val, true, "val T1.LPT2[*]")...)
+		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
+			errs = append(errs, e...)
+		} else {
+			if val != nil {
+				errs = append(errs, validate.FixedResult(fldPath.Index(i), *val, true, "val T1.LPT2[*]")...)
+			}
 		}
-		errs = append(errs, validate.Required(fldPath.Index(i), val)...)
 		if val != nil {
 			errs = append(errs, Validate_T2(val, fldPath.Index(i))...)
 		}

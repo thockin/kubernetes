@@ -26,8 +26,8 @@ import (
 )
 
 func init() {
-	AddToRegistryPriority(InitValidateTrueDeclarativeValidator)
-	AddToRegistryPriority(InitValidateFalseDeclarativeValidator)
+	AddToRegistry(InitValidateTrueDeclarativeValidator)
+	AddToRegistry(InitValidateFalseDeclarativeValidator)
 }
 
 func InitValidateTrueDeclarativeValidator(c *generator.Context) DeclarativeValidator {

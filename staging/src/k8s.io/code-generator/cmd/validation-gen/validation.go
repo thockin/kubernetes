@@ -731,10 +731,39 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, inType *t
 // path is used to build the field.Path for the call.  isVarPtr indicates that
 // the value  was a pointer in the parent context.
 func (g *genValidations) emitCallsToValidators(c *generator.Context, validations []validators.FunctionGen, varName string, path pathPart, isVarPtr bool, sw *generator.SnippetWriter) {
+	// Helper func
+	sort := func(in []validators.FunctionGen) []validators.FunctionGen {
+		fatal := make([]validators.FunctionGen, 0, len(in))
+		fatalPtr := make([]validators.FunctionGen, 0, len(in))
+		nonfatal := make([]validators.FunctionGen, 0, len(in))
+		nonfatalPtr := make([]validators.FunctionGen, 0, len(in))
+
+		for _, fg := range in {
+			flags := fg.Flags()
+			if flags&validators.IsFatal > 0 {
+				if flags&validators.PtrOK > 0 {
+					fatalPtr = append(fatalPtr, fg)
+				} else {
+					fatal = append(fatal, fg)
+				}
+			} else {
+				if flags&validators.PtrOK > 0 {
+					nonfatalPtr = append(nonfatalPtr, fg)
+				} else {
+					nonfatal = append(nonfatal, fg)
+				}
+			}
+		}
+		result := fatal
+		result = append(result, fatalPtr...)
+		result = append(result, nonfatal...)
+		result = append(result, nonfatalPtr...)
+		return result
+	}
+
+	validations = sort(validations)
+
 	nFatal := 0
-	// TODO: We previously relied on Fatal validators also being priority, but
-	// when we have forEach, the ordering can be messed up.  Instead, we should
-	// sort by fatalness before running them, or do two passes.
 	for i, v := range validations {
 		moreValidations := i != len(validations)-1
 

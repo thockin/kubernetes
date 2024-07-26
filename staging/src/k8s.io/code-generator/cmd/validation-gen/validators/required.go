@@ -23,7 +23,7 @@ import (
 )
 
 func init() {
-	AddToRegistryPriority(InitRequiredDeclarativeValidator)
+	AddToRegistry(InitRequiredDeclarativeValidator)
 }
 
 func InitRequiredDeclarativeValidator(c *generator.Context) DeclarativeValidator {
