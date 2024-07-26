@@ -26,7 +26,10 @@ type E1 string
 type E2 int
 
 // +validateTrue="type E3"
-type E3 T2
+type E3 E1
+
+// +validateTrue="type E4"
+type E4 T2
 
 // +validateTrue="type T1"
 type T1 struct {
@@ -46,6 +49,11 @@ type T1 struct {
 	E3 E3 `json:"e3"`
 	// +validateTrue="field T1.PE3"
 	PE3 *E3 `json:"pe3"`
+
+	// +validateTrue="field T1.E4"
+	E4 E4 `json:"e4"`
+	// +validateTrue="field T1.PE4"
+	PE4 *E4 `json:"pe4"`
 
 	// +validateTrue="field T1.T2"
 	T2 T2 `json:"t2"`

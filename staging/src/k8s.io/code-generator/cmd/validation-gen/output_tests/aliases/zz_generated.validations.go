@@ -55,6 +55,11 @@ func Validate_E2(in *E2, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_E3(in *E3, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E3")...)
+	return errs
+}
+
+func Validate_E4(in *E4, fldPath *field.Path) (errs field.ErrorList) {
+	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E4")...)
 	// S
 	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
 
@@ -99,6 +104,18 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 	}
 	if in.PE3 != nil {
 		errs = append(errs, Validate_E3(in.PE3, fldPath.Child("pe3"))...)
+	}
+
+	// E4
+	errs = append(errs, validate.FixedResult(fldPath.Child("e4"), in.E4, true, "field T1.E4")...)
+	errs = append(errs, Validate_E4(&in.E4, fldPath.Child("e4"))...)
+
+	// PE4
+	if in.PE4 != nil {
+		errs = append(errs, validate.FixedResult(fldPath.Child("pe4"), *in.PE4, true, "field T1.PE4")...)
+	}
+	if in.PE4 != nil {
+		errs = append(errs, Validate_E4(in.PE4, fldPath.Child("pe4"))...)
 	}
 
 	// T2
