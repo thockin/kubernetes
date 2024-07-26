@@ -68,10 +68,8 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 
 func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 	// TypeMeta
-	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
 
 	// ObjectMeta
-	errs = append(errs, unnameable_(&in.ObjectMeta, fldPath.Child("metadata"))...)
 
 	// DisallowedFlunders
 	for i, val := range in.DisallowedFlunders {
@@ -88,10 +86,8 @@ func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.ErrorList) {
 	// TypeMeta
-	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
 
 	// ListMeta
-	errs = append(errs, unnameable_(&in.ListMeta, fldPath.Child("metadata"))...)
 
 	// Items
 	for i, val := range in.Items {
@@ -103,10 +99,8 @@ func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.Erro
 
 func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
 	// TypeMeta
-	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
 
 	// ObjectMeta
-	errs = append(errs, unnameable_(&in.ObjectMeta, fldPath.Child("metadata"))...)
 
 	// Spec
 	errs = append(errs, Validate_FlunderSpec(&in.Spec, fldPath.Child("spec"))...)
@@ -119,10 +113,8 @@ func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
 	// TypeMeta
-	errs = append(errs, unnameable_(&in.TypeMeta, fldPath.Child("TypeMeta"))...)
 
 	// ListMeta
-	errs = append(errs, unnameable_(&in.ListMeta, fldPath.Child("metadata"))...)
 
 	// Items
 	for i, val := range in.Items {

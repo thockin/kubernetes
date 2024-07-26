@@ -86,7 +86,6 @@ func Validate_ET1(in *ET1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
 
 	// T3
-	errs = append(errs, Validate_T3(&in.T3, fldPath.Child("t3"))...)
 
 	return errs
 }
@@ -99,7 +98,6 @@ func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
 
 	// T3
-	errs = append(errs, Validate_T3(&in.T3, fldPath.Child("t3"))...)
 
 	return errs
 }
