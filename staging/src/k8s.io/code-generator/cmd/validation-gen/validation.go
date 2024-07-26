@@ -564,11 +564,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			sw.Do("\n", nil)
 		}
 	case types.Slice, types.Array:
-		// TODO: get rid of tn.elem and tn.key - redundant with underlyingType.Elem/Key
 		child := tn.elem
-		if tn.elem.underlyingType != inType.Elem {
-			panic("oops")
-		}
 		elemPath := pathPart{Index: "i"}
 		elemIsPtr := inType.Elem.Kind == types.Pointer
 
@@ -810,7 +806,7 @@ func toGolangSourceDataLiteral(value any) string {
 		}
 		return fmt.Sprintf("%q", str)
 	}
-	klog.Fatalf("Unsupported extraArg type: %T", value) // TODO: handle error
+	klog.Fatalf("Unsupported extraArg type: %T", value)
 	return ""
 }
 

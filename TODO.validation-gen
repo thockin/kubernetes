@@ -47,12 +47,14 @@
     - cross field validations
     - update validations
 - Use Go-standard-style names for generated functions
-- Add debug logging in generator
 - Decide test regimen for validators lib
 - Fix bug where generating apps API group enables enum generation on core API group
 - Clear out 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
   for scalar testing that should be put in declarative validator test code
 - rename "disabled-tags" to "disabled-tag" and document as repeated
-- don't build the same fieldpath over and over: `if fp := fldPath.Child("x"); true { call(fp, ...), call(fp, ...) }`
 - Error when calling eachVal on non-list types.
-- Don't emit functions for non-root-types with no transitive validations.
+- Add conditional validation (cross-field)
+- Rename PtrOK - it's an awkward name
+- Test cross-pkg fields
+- Generator unit tests need updating
+- Catalog all varieties of validations (conditional, mutually-excluysive, numeric, string format, etc)
