@@ -22,6 +22,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"k8s.io/code-generator/cmd/validation-gen/validators"
 	"k8s.io/gengo/v2"
@@ -342,7 +343,10 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			if tags, ok := lookupJSONTags(field); ok {
 				jsonName = tags.name
 			}
-			//FIXME: only do exported fields, add a test
+			// Only do exported fields.
+			if unicode.IsLower([]rune(field.Name)[0]) {
+				continue
+			}
 			klog.V(5).InfoS("  field", "name", name)
 
 			if err := td.discover(field.Type); err != nil {
