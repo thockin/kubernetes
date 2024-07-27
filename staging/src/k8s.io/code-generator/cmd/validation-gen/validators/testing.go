@@ -17,6 +17,9 @@ limitations under the License.
 package validators
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
@@ -40,8 +43,12 @@ type fixedResultDeclarativeValidator struct {
 }
 
 const (
-	// These tags can take no value or a string, which will be used in the
-	// error message.
+	// These tags can take no value or a quoted string or a JSON object, which will be used in the
+	// error message.  The JSON object schema is:
+	//   {
+	//     "flags": <list-of-string>  # optional: "PtrOK" or "IsFatal"
+	//     "msg":   <string>          # required
+	//   }
 	validateTrueTagName  = "validateTrue"  // TODO: also support k8s:...
 	validateFalseTagName = "validateFalse" // TODO: also support k8s:...
 )
@@ -54,10 +61,14 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(field string, t *typ
 	var result []FunctionGen
 
 	if v.result {
-		vals, fixedTrue := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
+		tagVals, fixedTrue := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
 		if fixedTrue {
-			for _, v := range vals {
-				result = append(result, Function(validateTrueTagName, DefaultFlags, fixedResultValidator, true, v))
+			for _, val := range tagVals {
+				flags, msg, err := v.parseTagVal(val)
+				if err != nil {
+					return nil, err
+				}
+				result = append(result, Function(validateTrueTagName, flags, fixedResultValidator, true, msg))
 			}
 		}
 	} else {
@@ -70,4 +81,37 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(field string, t *typ
 	}
 
 	return result, nil
+}
+
+func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (FunctionFlags, string, error) {
+	type payload struct {
+		Flags []string `json:"flags"`
+		Msg   string   `json:"msg"`
+	}
+	// We expect either a string or a JSON object.
+	var pl payload
+	if err := json.Unmarshal([]byte(in), &pl); err != nil {
+		s := ""
+		if err := json.Unmarshal([]byte(in), &s); err != nil {
+			return 0, "", fmt.Errorf("error parsing JSON value: %v (%q)", err, in)
+		}
+		return 0, s, nil
+	}
+	// The msg field is required in JSON mode.
+	if pl.Msg == "" {
+		return 0, "", fmt.Errorf("JSON msg is required")
+	}
+	var flags FunctionFlags
+	for _, fl := range pl.Flags {
+		switch fl {
+		case "IsFatal":
+			flags |= IsFatal
+		case "PtrOK":
+			flags |= PtrOK
+		default:
+			return 0, "", fmt.Errorf("unknown flag: %q", fl)
+		}
+	}
+
+	return flags, pl.Msg, nil
 }
