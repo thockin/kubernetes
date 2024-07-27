@@ -43,9 +43,13 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// Public
-	errs = append(errs, validate.FixedResult(fldPath.Child("public"), in.Public, true, "field T1.S")...)
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// field T1.Public
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
+			return
+		}(obj.Public, fldPath.Child("public"))...)
 
 	return errs
 }

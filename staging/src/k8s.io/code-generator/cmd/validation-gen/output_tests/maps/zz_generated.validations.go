@@ -43,116 +43,219 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_E1(in *E1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E1")...)
+func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
+	// type E1
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E1")...)
+	}
+
 	return errs
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type T1")...)
-	// TypeMeta
-
-	// MSS
-	errs = append(errs, validate.FixedResult(fldPath.Child("mss"), in.MSS, true, "field T1.MSS")...)
-	for key, val := range in.MSS {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSS[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSS[*]")...)
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// type T1
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
 	}
 
-	// MSPS
-	errs = append(errs, validate.FixedResult(fldPath.Child("msps"), in.MSPS, true, "field T1.MSPS")...)
-	for key, val := range in.MSPS {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSPS[*]")...)
-		if val != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Key(key), *val, true, "val T1.MSPS[*]")...)
-		}
-	}
+	// field T1.TypeMeta has no validation
 
-	// MPSS
-	errs = append(errs, validate.FixedResult(fldPath.Child("mpss"), in.MPSS, true, "field T1.MPSS")...)
-	for key, val := range in.MPSS {
-		if key != nil {
-			errs = append(errs, validate.FixedResult(fldPath, *key, true, "key T1.MPSS[*]")...)
-		}
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MPSS[*]")...)
-	}
+	// field T1.MSS
+	errs = append(errs,
+		func(obj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MSS")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "key T1.MSS[*]")...)
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.MSS[*]")...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MSS, fldPath.Child("mss"))...)
 
-	// MPSPS
-	errs = append(errs, validate.FixedResult(fldPath.Child("mpsps"), in.MPSPS, true, "field T1.MPSPS")...)
-	for key, val := range in.MPSPS {
-		if key != nil {
-			errs = append(errs, validate.FixedResult(fldPath, *key, true, "key T1.MPSPS[*]")...)
-		}
-		if val != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Key(key), *val, true, "val T1.MPSPS[*]")...)
-		}
-	}
+	// field T1.MSPS
+	errs = append(errs,
+		func(obj map[string]*string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MSPS")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "key T1.MSPS[*]")...)
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "val T1.MSPS[*]")...)
+						}
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MSPS, fldPath.Child("msps"))...)
 
-	// MST2
-	errs = append(errs, validate.FixedResult(fldPath.Child("mst2"), in.MST2, true, "field T1.MST2")...)
-	for key, val := range in.MST2 {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MST2[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MST2[*]")...)
-	}
+	// field T1.MPSS
+	errs = append(errs,
+		func(obj map[*string]string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MPSS")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "key T1.MPSS[*]")...)
+						}
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.MPSS[*]")...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MPSS, fldPath.Child("mpss"))...)
 
-	// MSPT2
-	errs = append(errs, validate.FixedResult(fldPath.Child("mspt2"), in.MSPT2, true, "field T1.MSPT2")...)
-	for key, val := range in.MSPT2 {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSPT2[*]")...)
-		if val != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Key(key), *val, true, "val T1.MSPT2[*]")...)
-		}
-	}
+	// field T1.MPSPS
+	errs = append(errs,
+		func(obj map[*string]*string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MPSPS")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "key T1.MPSPS[*]")...)
+						}
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "val T1.MPSPS[*]")...)
+						}
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MPSPS, fldPath.Child("mpsps"))...)
 
-	// MSE1
-	errs = append(errs, validate.FixedResult(fldPath.Child("mse1"), in.MSE1, true, "field T1.MSE1")...)
-	for key, val := range in.MSE1 {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.MSE1[*]")...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.MSE1[*]")...)
-		errs = append(errs, Validate_E1(&val, fldPath.Key(key))...)
-	}
+	// field T1.MST2
+	errs = append(errs,
+		func(obj map[string]string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MST2")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "key T1.MST2[*]")...)
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.MST2[*]")...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MST2, fldPath.Child("mst2"))...)
 
-	// ME1S
-	errs = append(errs, validate.FixedResult(fldPath.Child("<unknown-json-name>"), in.ME1S, true, "field T1.ME1S")...)
-	for key, val := range in.ME1S {
-		errs = append(errs, validate.FixedResult(fldPath, key, true, "key T1.ME1S[*]")...)
-		errs = append(errs, Validate_E1(&key, fldPath)...)
-		errs = append(errs, validate.FixedResult(fldPath.Key(key), val, true, "val T1.ME1S[*]")...)
-	}
+	// field T1.MSPT2
+	errs = append(errs,
+		func(obj map[string]*string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MSPT2")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "key T1.MSPT2[*]")...)
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "val T1.MSPT2[*]")...)
+						}
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MSPT2, fldPath.Child("mspt2"))...)
 
-	// AnotherMSS
-	for key, val := range in.AnotherMSS {
-	}
+	// field T1.MSE1
+	errs = append(errs,
+		func(obj map[string]E1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.MSE1")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "key T1.MSE1[*]")...)
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.MSE1[*]")...)
+						errs = append(errs, Validate_E1(&obj, fldPath)...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.MSE1, fldPath.Child("mse1"))...)
 
-	// AnotherMSPS
-	for key, val := range in.AnotherMSPS {
-	}
+	// field T1.ME1S
+	errs = append(errs,
+		func(obj map[E1]string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.ME1S")...)
+			for key, val := range obj {
+				errs = append(errs,
+					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "key T1.ME1S[*]")...)
+						errs = append(errs, Validate_E1(&obj, fldPath)...)
+						return
+					}(key, fldPath)...)
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.ME1S[*]")...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.ME1S, fldPath.Child("<unknown-json-name>"))...)
 
-	// AnotherMPSS
-	for key, val := range in.AnotherMPSS {
-	}
+	// field T1.AnotherMSS has no validation
+	// field T1.AnotherMSPS has no validation
+	// field T1.AnotherMPSS has no validation
+	// field T1.AnotherMPSPS has no validation
+	// field T1.AnotherMST2 has no validation
+	// field T1.AnotherMSPT2 has no validation
 
-	// AnotherMPSPS
-	for key, val := range in.AnotherMPSPS {
-	}
+	// field T1.AnotherMSE1
+	errs = append(errs,
+		func(obj map[string]E1, fldPath *field.Path) (errs field.ErrorList) {
+			for _, val := range obj {
+				errs = append(errs,
+					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_E1(&obj, fldPath)...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.AnotherMSE1, fldPath.Child("anothermse1"))...)
 
-	// AnotherMST2
-	for key, val := range in.AnotherMST2 {
-	}
-
-	// AnotherMSPT2
-	for key, val := range in.AnotherMSPT2 {
-	}
-
-	// AnotherMSE1
-	for key, val := range in.AnotherMSE1 {
-		errs = append(errs, Validate_E1(&val, fldPath.Key(key))...)
-	}
-
-	// AnotherME1S
-	for key, val := range in.AnotherME1S {
-		errs = append(errs, Validate_E1(&key, fldPath)...)
-	}
+	// field T1.AnotherME1S
+	errs = append(errs,
+		func(obj map[E1]string, fldPath *field.Path) (errs field.ErrorList) {
+			for key, _ := range obj {
+				errs = append(errs,
+					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_E1(&obj, fldPath)...)
+						return
+					}(key, fldPath)...)
+			}
+			return
+		}(obj.AnotherME1S, fldPath.Child("<unknown-json-name>"))...)
 
 	return errs
 }

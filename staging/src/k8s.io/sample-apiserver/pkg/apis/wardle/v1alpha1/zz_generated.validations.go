@@ -66,134 +66,223 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_Fischer(in *Fischer, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_Fischer(obj *Fischer, fldPath *field.Path) (errs field.ErrorList) {
+	// field Fischer.TypeMeta has no validation
+	// field Fischer.ObjectMeta has no validation
+	// field Fischer.DisallowedFlunders has no validation
 
-	// ObjectMeta
+	// field Fischer.Reference
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.IP(fldPath, obj)...)
+			return
+		}(obj.Reference, fldPath.Child("reference"))...)
 
-	// DisallowedFlunders
-	for i, val := range in.DisallowedFlunders {
-	}
-
-	// Reference
-	errs = append(errs, validate.IP(fldPath.Child("reference"), in.Reference)...)
-
-	// Primary
-	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
-
-	return errs
-}
-
-func Validate_FischerList(in *FischerList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-		errs = append(errs, Validate_Fischer(&val, fldPath.Index(i))...)
-	}
+	// field Fischer.Primary
+	errs = append(errs,
+		func(obj Widget, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_Widget(&obj, fldPath)...)
+			return
+		}(obj.Primary, fldPath.Child("primary"))...)
 
 	return errs
 }
 
-func Validate_Flunder(in *Flunder, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_FischerList(obj *FischerList, fldPath *field.Path) (errs field.ErrorList) {
+	// field FischerList.TypeMeta has no validation
+	// field FischerList.ListMeta has no validation
 
-	// ObjectMeta
-
-	// Spec
-	errs = append(errs, Validate_FlunderSpec(&in.Spec, fldPath.Child("spec"))...)
-
-	// Status
-	errs = append(errs, Validate_FlunderStatus(&in.Status, fldPath.Child("status"))...)
-
-	return errs
-}
-
-func Validate_FlunderList(in *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-		errs = append(errs, Validate_Flunder(&val, fldPath.Index(i))...)
-	}
+	// field FischerList.Items
+	errs = append(errs,
+		func(obj []Fischer, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj Fischer, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Fischer(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, fldPath.Child("items"))...)
 
 	return errs
 }
 
-func Validate_FlunderSpec(in *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// Reference
-	errs = append(errs, validate.MaxLength(fldPath.Child("reference"), in.Reference, 128)...)
-	errs = append(errs, validate.IP(fldPath.Child("reference"), in.Reference)...)
+func Validate_Flunder(obj *Flunder, fldPath *field.Path) (errs field.ErrorList) {
+	// field Flunder.TypeMeta has no validation
+	// field Flunder.ObjectMeta has no validation
 
-	// ReferenceType
-	if in.ReferenceType != nil {
-		errs = append(errs, validate.Enum(fldPath.Child("referenceType"), *in.ReferenceType, "Fischer", "Flunder")...)
-	}
-	if in.ReferenceType != nil {
-		errs = append(errs, Validate_ReferenceType(in.ReferenceType, fldPath.Child("referenceType"))...)
-	}
+	// field Flunder.Spec
+	errs = append(errs,
+		func(obj FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_FlunderSpec(&obj, fldPath)...)
+			return
+		}(obj.Spec, fldPath.Child("spec"))...)
 
-	// Primary
-	errs = append(errs, Validate_Widget(&in.Primary, fldPath.Child("primary"))...)
+	// field Flunder.Status
+	errs = append(errs,
+		func(obj FlunderStatus, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_FlunderStatus(&obj, fldPath)...)
+			return
+		}(obj.Status, fldPath.Child("status"))...)
 
-	// Extras
-	for i, val := range in.Extras {
-		errs = append(errs, Validate_Widget(&val, fldPath.Index(i))...)
-	}
+	return errs
+}
 
-	// More
-	for key, val := range in.More {
-		errs = append(errs, Validate_Widget(&val, fldPath.Key(key))...)
-	}
+func Validate_FlunderList(obj *FlunderList, fldPath *field.Path) (errs field.ErrorList) {
+	// field FlunderList.TypeMeta has no validation
+	// field FlunderList.ListMeta has no validation
 
-	// Layer
-	if in.Layer != nil {
-		errs = append(errs, Validate_Layer(in.Layer, fldPath.Child("layer"))...)
+	// field FlunderList.Items
+	errs = append(errs,
+		func(obj []Flunder, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj Flunder, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Flunder(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_FlunderSpec(obj *FlunderSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field FlunderSpec.Reference
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.MaxLength(fldPath, obj, 128)...)
+			errs = append(errs, validate.IP(fldPath, obj)...)
+			return
+		}(obj.Reference, fldPath.Child("reference"))...)
+
+	// field FlunderSpec.ReferenceType
+	errs = append(errs,
+		func(obj *ReferenceType, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, validate.Enum(fldPath, *obj, "Fischer", "Flunder")...)
+			}
+			if obj != nil {
+				errs = append(errs, Validate_ReferenceType(obj, fldPath)...)
+			}
+			return
+		}(obj.ReferenceType, fldPath.Child("referenceType"))...)
+
+	// field FlunderSpec.Primary
+	errs = append(errs,
+		func(obj Widget, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_Widget(&obj, fldPath)...)
+			return
+		}(obj.Primary, fldPath.Child("primary"))...)
+
+	// field FlunderSpec.Extras
+	errs = append(errs,
+		func(obj []Widget, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj Widget, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Widget(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Extras, fldPath.Child("extras"))...)
+
+	// field FlunderSpec.More
+	errs = append(errs,
+		func(obj map[string]Widget, fldPath *field.Path) (errs field.ErrorList) {
+			for _, val := range obj {
+				errs = append(errs,
+					func(obj Widget, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Widget(&obj, fldPath)...)
+						return
+					}(val, fldPath.Key(key))...)
+			}
+			return
+		}(obj.More, fldPath.Child("more"))...)
+
+	// field FlunderSpec.Layer
+	errs = append(errs,
+		func(obj *Layer, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_Layer(obj, fldPath)...)
+			}
+			return
+		}(obj.Layer, fldPath.Child("layer"))...)
+
+	return errs
+}
+
+func Validate_FlunderStatus(obj *FlunderStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field FlunderStatus.Name
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.IP(fldPath, obj)...)
+			return
+		}(obj.Name, fldPath.Child("name"))...)
+
+	return errs
+}
+
+func Validate_Layer(obj *Layer, fldPath *field.Path) (errs field.ErrorList) {
+	// field Layer.Extras
+	errs = append(errs,
+		func(obj []Widget, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj Widget, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Widget(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Extras, fldPath.Child("extras"))...)
+
+	return errs
+}
+
+func Validate_ReferenceType(obj *ReferenceType, fldPath *field.Path) (errs field.ErrorList) {
+	// type ReferenceType
+	if obj != nil {
+		errs = append(errs, validate.Enum(fldPath, *obj, "Fischer", "Flunder")...)
 	}
 
 	return errs
 }
 
-func Validate_FlunderStatus(in *FlunderStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// Name
-	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
+func Validate_Something(obj *Something, fldPath *field.Path) (errs field.ErrorList) {
+	// field Something.Name
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.IP(fldPath, obj)...)
+			return
+		}(obj.Name, fldPath.Child("name"))...)
 
 	return errs
 }
 
-func Validate_Layer(in *Layer, fldPath *field.Path) (errs field.ErrorList) {
-	// Extras
-	for i, val := range in.Extras {
-		errs = append(errs, Validate_Widget(&val, fldPath.Index(i))...)
-	}
+func Validate_Widget(obj *Widget, fldPath *field.Path) (errs field.ErrorList) {
+	// field Widget.Name
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.IP(fldPath, obj)...)
+			return
+		}(obj.Name, fldPath.Child("name"))...)
 
-	return errs
-}
-
-func Validate_ReferenceType(in *ReferenceType, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.Enum(fldPath, in, "Fischer", "Flunder")...)
-	return errs
-}
-
-func Validate_Something(in *Something, fldPath *field.Path) (errs field.ErrorList) {
-	// Name
-	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
-
-	return errs
-}
-
-func Validate_Widget(in *Widget, fldPath *field.Path) (errs field.ErrorList) {
-	// Name
-	errs = append(errs, validate.IP(fldPath.Child("name"), in.Name)...)
-
-	// Something
-	for i, val := range in.Something {
-		errs = append(errs, Validate_Something(&val, fldPath.Index(i))...)
-	}
+	// field Widget.Something
+	errs = append(errs,
+		func(obj []Something, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj Something, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Something(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Something, fldPath.Child("something"))...)
 
 	return errs
 }

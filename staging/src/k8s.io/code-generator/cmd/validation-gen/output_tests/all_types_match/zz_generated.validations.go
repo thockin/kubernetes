@@ -73,50 +73,70 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_ES(in *ES, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type ES")...)
-	return errs
-}
-
-func Validate_ET1(in *ET1, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
-
-	// T2
-	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
-
-	// T3
+func Validate_ES(obj *ES, fldPath *field.Path) (errs field.ErrorList) {
+	// type ES
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type ES")...)
+	}
 
 	return errs
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
+func Validate_ET1(obj *ET1, fldPath *field.Path) (errs field.ErrorList) {
+	// field ET1.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
-	// T2
-	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
+	// field ET1.T2
+	errs = append(errs,
+		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			return
+		}(obj.T2, fldPath.Child("t2"))...)
 
-	// T3
+	// field ET1.T3 has no validation
+	return errs
+}
+
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// field T1.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
+
+	// field T1.T2
+	errs = append(errs,
+		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			return
+		}(obj.T2, fldPath.Child("t2"))...)
+
+	// field T1.T3 has no validation
+	return errs
+}
+
+func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// field T2.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
 	return errs
 }
 
-func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
-
+func Validate_T3(obj *T3, fldPath *field.Path) (errs field.ErrorList) {
+	// field T3.S has no validation
 	return errs
 }
 
-func Validate_T3(in *T3, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-
-	return errs
-}
-
-func Validate_T4(in *T4, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-
+func Validate_T4(obj *T4, fldPath *field.Path) (errs field.ErrorList) {
+	// field T4.S has no validation
 	return errs
 }
