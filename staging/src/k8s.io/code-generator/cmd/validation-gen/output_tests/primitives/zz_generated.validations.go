@@ -43,51 +43,88 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// field T1.TypeMeta has no validation
 
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S")...)
+	// field T1.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
-	// I
-	errs = append(errs, validate.FixedResult(fldPath.Child("i"), in.I, true, "field T1.I")...)
+	// field T1.I
+	errs = append(errs,
+		func(obj int, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.I")...)
+			return
+		}(obj.I, fldPath.Child("i"))...)
 
-	// B
-	errs = append(errs, validate.FixedResult(fldPath.Child("b"), in.B, true, "field T1.B")...)
+	// field T1.B
+	errs = append(errs,
+		func(obj bool, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.B")...)
+			return
+		}(obj.B, fldPath.Child("b"))...)
 
-	// F
-	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "field T1.F")...)
+	// field T1.F
+	errs = append(errs,
+		func(obj float64, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.F")...)
+			return
+		}(obj.F, fldPath.Child("f"))...)
 
-	// T2
-	errs = append(errs, validate.FixedResult(fldPath.Child("t2"), in.T2, true, "field T1.T2")...)
-	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
+	// field T1.T2
+	errs = append(errs,
+		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.T2")...)
+			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			return
+		}(obj.T2, fldPath.Child("t2"))...)
 
-	// AnotherS
+	// field T1.AnotherS has no validation
+	// field T1.AnotherI has no validation
+	// field T1.AnotherB has no validation
+	// field T1.AnotherF has no validation
 
-	// AnotherI
-
-	// AnotherB
-
-	// AnotherF
-
-	// AnotherT2
-	errs = append(errs, Validate_T2(&in.AnotherT2, fldPath.Child("anothert2"))...)
+	// field T1.AnotherT2
+	errs = append(errs,
+		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			return
+		}(obj.AnotherT2, fldPath.Child("anothert2"))...)
 
 	return errs
 }
 
-func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
+func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// field T2.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
-	// I
-	errs = append(errs, validate.FixedResult(fldPath.Child("i"), in.I, true, "field T2.I")...)
+	// field T2.I
+	errs = append(errs,
+		func(obj int, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.I")...)
+			return
+		}(obj.I, fldPath.Child("i"))...)
 
-	// B
-	errs = append(errs, validate.FixedResult(fldPath.Child("b"), in.B, true, "field T2.B")...)
+	// field T2.B
+	errs = append(errs,
+		func(obj bool, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.B")...)
+			return
+		}(obj.B, fldPath.Child("b"))...)
 
-	// F
-	errs = append(errs, validate.FixedResult(fldPath.Child("f"), in.F, true, "field T2.F")...)
+	// field T2.F
+	errs = append(errs,
+		func(obj float64, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.F")...)
+			return
+		}(obj.F, fldPath.Child("f"))...)
 
 	return errs
 }

@@ -43,11 +43,15 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// field T1.TypeMeta has no validation
 
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("<unknown-json-name>"), in.S, true, "field T1.S")...)
+	// field T1.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
+			return
+		}(obj.S, fldPath.Child("<unknown-json-name>"))...)
 
 	return errs
 }

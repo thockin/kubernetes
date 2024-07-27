@@ -43,100 +43,172 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_E1(in *E1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E1")...)
-	return errs
-}
-
-func Validate_E2(in *E2, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E2")...)
-	return errs
-}
-
-func Validate_E3(in *E3, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E3")...)
-	return errs
-}
-
-func Validate_E4(in *E4, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type E4")...)
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
-
-	return errs
-}
-
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type T1")...)
-	// TypeMeta
-
-	// E1
-	errs = append(errs, validate.FixedResult(fldPath.Child("e1"), in.E1, true, "field T1.E1")...)
-	errs = append(errs, Validate_E1(&in.E1, fldPath.Child("e1"))...)
-
-	// PE1
-	if in.PE1 != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pe1"), *in.PE1, true, "field T1.PE1")...)
-	}
-	if in.PE1 != nil {
-		errs = append(errs, Validate_E1(in.PE1, fldPath.Child("pe1"))...)
-	}
-
-	// E2
-	errs = append(errs, validate.FixedResult(fldPath.Child("e2"), in.E2, true, "field T1.E2")...)
-	errs = append(errs, Validate_E2(&in.E2, fldPath.Child("e2"))...)
-
-	// PE2
-	if in.PE2 != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pe2"), *in.PE2, true, "field T1.PE2")...)
-	}
-	if in.PE2 != nil {
-		errs = append(errs, Validate_E2(in.PE2, fldPath.Child("pe2"))...)
-	}
-
-	// E3
-	errs = append(errs, validate.FixedResult(fldPath.Child("e3"), in.E3, true, "field T1.E3")...)
-	errs = append(errs, Validate_E3(&in.E3, fldPath.Child("e3"))...)
-
-	// PE3
-	if in.PE3 != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pe3"), *in.PE3, true, "field T1.PE3")...)
-	}
-	if in.PE3 != nil {
-		errs = append(errs, Validate_E3(in.PE3, fldPath.Child("pe3"))...)
-	}
-
-	// E4
-	errs = append(errs, validate.FixedResult(fldPath.Child("e4"), in.E4, true, "field T1.E4")...)
-	errs = append(errs, Validate_E4(&in.E4, fldPath.Child("e4"))...)
-
-	// PE4
-	if in.PE4 != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pe4"), *in.PE4, true, "field T1.PE4")...)
-	}
-	if in.PE4 != nil {
-		errs = append(errs, Validate_E4(in.PE4, fldPath.Child("pe4"))...)
-	}
-
-	// T2
-	errs = append(errs, validate.FixedResult(fldPath.Child("t2"), in.T2, true, "field T1.T2")...)
-	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
-
-	// PT2
-	if in.PT2 != nil {
-		errs = append(errs, validate.FixedResult(fldPath.Child("pt2"), *in.PT2, true, "field T1.PT2")...)
-	}
-	if in.PT2 != nil {
-		errs = append(errs, Validate_T2(in.PT2, fldPath.Child("pt2"))...)
+func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
+	// type E1
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E1")...)
 	}
 
 	return errs
 }
 
-func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type T2")...)
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
+func Validate_E2(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
+	// type E2
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E2")...)
+	}
+
+	return errs
+}
+
+func Validate_E3(obj *E3, fldPath *field.Path) (errs field.ErrorList) {
+	// type E3
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E3")...)
+	}
+
+	return errs
+}
+
+func Validate_E4(obj *E4, fldPath *field.Path) (errs field.ErrorList) {
+	// type E4
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E4")...)
+	}
+
+	// field E4.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
+
+	return errs
+}
+
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// type T1
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
+	}
+
+	// field T1.TypeMeta has no validation
+
+	// field T1.E1
+	errs = append(errs,
+		func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.E1")...)
+			errs = append(errs, Validate_E1(&obj, fldPath)...)
+			return
+		}(obj.E1, fldPath.Child("e1"))...)
+
+	// field T1.PE1
+	errs = append(errs,
+		func(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PE1")...)
+			}
+			if obj != nil {
+				errs = append(errs, Validate_E1(obj, fldPath)...)
+			}
+			return
+		}(obj.PE1, fldPath.Child("pe1"))...)
+
+	// field T1.E2
+	errs = append(errs,
+		func(obj E2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.E2")...)
+			errs = append(errs, Validate_E2(&obj, fldPath)...)
+			return
+		}(obj.E2, fldPath.Child("e2"))...)
+
+	// field T1.PE2
+	errs = append(errs,
+		func(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PE2")...)
+			}
+			if obj != nil {
+				errs = append(errs, Validate_E2(obj, fldPath)...)
+			}
+			return
+		}(obj.PE2, fldPath.Child("pe2"))...)
+
+	// field T1.E3
+	errs = append(errs,
+		func(obj E3, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.E3")...)
+			errs = append(errs, Validate_E3(&obj, fldPath)...)
+			return
+		}(obj.E3, fldPath.Child("e3"))...)
+
+	// field T1.PE3
+	errs = append(errs,
+		func(obj *E3, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PE3")...)
+			}
+			if obj != nil {
+				errs = append(errs, Validate_E3(obj, fldPath)...)
+			}
+			return
+		}(obj.PE3, fldPath.Child("pe3"))...)
+
+	// field T1.E4
+	errs = append(errs,
+		func(obj E4, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.E4")...)
+			errs = append(errs, Validate_E4(&obj, fldPath)...)
+			return
+		}(obj.E4, fldPath.Child("e4"))...)
+
+	// field T1.PE4
+	errs = append(errs,
+		func(obj *E4, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PE4")...)
+			}
+			if obj != nil {
+				errs = append(errs, Validate_E4(obj, fldPath)...)
+			}
+			return
+		}(obj.PE4, fldPath.Child("pe4"))...)
+
+	// field T1.T2
+	errs = append(errs,
+		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.T2")...)
+			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			return
+		}(obj.T2, fldPath.Child("t2"))...)
+
+	// field T1.PT2
+	errs = append(errs,
+		func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PT2")...)
+			}
+			if obj != nil {
+				errs = append(errs, Validate_T2(obj, fldPath)...)
+			}
+			return
+		}(obj.PT2, fldPath.Child("pt2"))...)
+
+	return errs
+}
+
+func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// type T2
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T2")...)
+	}
+
+	// field T2.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
 	return errs
 }

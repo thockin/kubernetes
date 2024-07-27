@@ -43,85 +43,140 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type T1")...)
-	// TypeMeta
-
-	// LS
-	errs = append(errs, validate.FixedResult(fldPath.Child("ls"), in.LS, true, "field T1.LS")...)
-	for i, val := range in.LS {
-		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
-			errs = append(errs, e...)
-		} else {
-			errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "val T1.LS[*]")...)
-		}
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// type T1
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
 	}
 
-	// LPS
-	errs = append(errs, validate.FixedResult(fldPath.Child("lps"), in.LPS, true, "field T1.LPS")...)
-	for i, val := range in.LPS {
-		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
-			errs = append(errs, e...)
-		} else {
-			if val != nil {
-				errs = append(errs, validate.FixedResult(fldPath.Index(i), *val, true, "val T1.LPS[*]")...)
+	// field T1.TypeMeta has no validation
+
+	// field T1.LS
+	errs = append(errs,
+		func(obj []string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LS")...)
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+						if e := validate.Required(fldPath, obj); len(e) != 0 {
+							errs = append(errs, e...)
+							return // fatal
+						}
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.LS[*]")...)
+						return
+					}(val, fldPath.Index(i))...)
 			}
-		}
-	}
+			return
+		}(obj.LS, fldPath.Child("ls"))...)
 
-	// LT2
-	errs = append(errs, validate.FixedResult(fldPath.Child("lt2"), in.LT2, true, "field T1.LT2")...)
-	for i, val := range in.LT2 {
-		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
-			errs = append(errs, e...)
-		} else {
-			errs = append(errs, validate.FixedResult(fldPath.Index(i), val, true, "val T1.LT2[*]")...)
-		}
-		errs = append(errs, Validate_T2(&val, fldPath.Index(i))...)
-	}
-
-	// LPT2
-	errs = append(errs, validate.FixedResult(fldPath.Child("lpt2"), in.LPT2, true, "field T1.LPT2")...)
-	for i, val := range in.LPT2 {
-		if e := validate.Required(fldPath.Index(i), val); len(e) != 0 {
-			errs = append(errs, e...)
-		} else {
-			if val != nil {
-				errs = append(errs, validate.FixedResult(fldPath.Index(i), *val, true, "val T1.LPT2[*]")...)
+	// field T1.LPS
+	errs = append(errs,
+		func(obj []*string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LPS")...)
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+						if e := validate.Required(fldPath, obj); len(e) != 0 {
+							errs = append(errs, e...)
+							return // fatal
+						}
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "val T1.LPS[*]")...)
+						}
+						return
+					}(val, fldPath.Index(i))...)
 			}
-		}
-		if val != nil {
-			errs = append(errs, Validate_T2(val, fldPath.Index(i))...)
-		}
-	}
+			return
+		}(obj.LPS, fldPath.Child("lps"))...)
 
-	// AnotherLS
-	for i, val := range in.AnotherLS {
-	}
+	// field T1.LT2
+	errs = append(errs,
+		func(obj []T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LT2")...)
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+						if e := validate.Required(fldPath, obj); len(e) != 0 {
+							errs = append(errs, e...)
+							return // fatal
+						}
+						errs = append(errs, validate.FixedResult(fldPath, obj, true, "val T1.LT2[*]")...)
+						errs = append(errs, Validate_T2(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.LT2, fldPath.Child("lt2"))...)
 
-	// AnotherLPS
-	for i, val := range in.AnotherLPS {
-	}
+	// field T1.LPT2
+	errs = append(errs,
+		func(obj []*T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.LPT2")...)
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+						if e := validate.Required(fldPath, obj); len(e) != 0 {
+							errs = append(errs, e...)
+							return // fatal
+						}
+						if obj != nil {
+							errs = append(errs, validate.FixedResult(fldPath, *obj, true, "val T1.LPT2[*]")...)
+						}
+						if obj != nil {
+							errs = append(errs, Validate_T2(obj, fldPath)...)
+						}
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.LPT2, fldPath.Child("lpt2"))...)
 
-	// AnotherLT2
-	for i, val := range in.AnotherLT2 {
-		errs = append(errs, Validate_T2(&val, fldPath.Index(i))...)
-	}
+	// field T1.AnotherLS has no validation
+	// field T1.AnotherLPS has no validation
 
-	// AnotherLPT2
-	for i, val := range in.AnotherLPT2 {
-		if val != nil {
-			errs = append(errs, Validate_T2(val, fldPath.Index(i))...)
-		}
-	}
+	// field T1.AnotherLT2
+	errs = append(errs,
+		func(obj []T2, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_T2(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.AnotherLT2, fldPath.Child("anotherlt2"))...)
+
+	// field T1.AnotherLPT2
+	errs = append(errs,
+		func(obj []*T2, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+						if obj != nil {
+							errs = append(errs, Validate_T2(obj, fldPath)...)
+						}
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.AnotherLPT2, fldPath.Child("anotherlpt2"))...)
 
 	return errs
 }
 
-func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
-	errs = append(errs, validate.FixedResult(fldPath, in, true, "type T2")...)
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S")...)
+func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// type T2
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T2")...)
+	}
+
+	// field T2.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
 	return errs
 }

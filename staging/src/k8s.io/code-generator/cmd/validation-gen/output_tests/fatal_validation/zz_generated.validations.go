@@ -43,28 +43,36 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// field T1.TypeMeta has no validation
 
-	// S
-	if e := validate.Required(fldPath.Child("s"), in.S); len(e) != 0 {
-		errs = append(errs, e...)
-	} else {
-		errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S #1")...)
-		errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S #2")...)
-	}
+	// field T1.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S #1")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S #2")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
-	// PS
-	if e := validate.Required(fldPath.Child("ps"), in.PS); len(e) != 0 {
-		errs = append(errs, e...)
-	} else {
-		if in.PS != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "field T1.PS #1")...)
-		}
-		if in.PS != nil {
-			errs = append(errs, validate.FixedResult(fldPath.Child("ps"), *in.PS, true, "field T1.PS #2")...)
-		}
-	}
+	// field T1.PS
+	errs = append(errs,
+		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PS #1")...)
+			}
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "field T1.PS #2")...)
+			}
+			return
+		}(obj.PS, fldPath.Child("ps"))...)
 
 	return errs
 }

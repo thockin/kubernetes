@@ -43,24 +43,36 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_T1(in *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
+	// field T1.TypeMeta has no validation
 
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S #1")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S #2")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T1.S #3")...)
+	// field T1.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S #1")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S #2")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S #3")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
-	// T2
-	errs = append(errs, Validate_T2(&in.T2, fldPath.Child("t2"))...)
+	// field T1.T2
+	errs = append(errs,
+		func(obj T2, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_T2(&obj, fldPath)...)
+			return
+		}(obj.T2, fldPath.Child("t2"))...)
 
 	return errs
 }
 
-func Validate_T2(in *T2, fldPath *field.Path) (errs field.ErrorList) {
-	// S
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S #1")...)
-	errs = append(errs, validate.FixedResult(fldPath.Child("s"), in.S, true, "field T2.S #2")...)
+func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
+	// field T2.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S #1")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.S #2")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
 
 	return errs
 }

@@ -331,838 +331,671 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 	return nil
 }
 
-func Validate_Binding(in *v1.Binding, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_Binding(obj *v1.Binding, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Binding.TypeMeta has no validation
+	// field v1.Binding.ObjectMeta has no validation
+	// field v1.Binding.Target has no validation
+	return errs
+}
 
-	// ObjectMeta
+func Validate_ComponentStatus(obj *v1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ComponentStatus.TypeMeta has no validation
+	// field v1.ComponentStatus.ObjectMeta has no validation
+	// field v1.ComponentStatus.Conditions has no validation
+	return errs
+}
 
-	// Target
+func Validate_ComponentStatusList(obj *v1.ComponentStatusList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ComponentStatusList.TypeMeta has no validation
+	// field v1.ComponentStatusList.ListMeta has no validation
+	// field v1.ComponentStatusList.Items has no validation
+	return errs
+}
+
+func Validate_ConfigMap(obj *v1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMap.TypeMeta has no validation
+	// field v1.ConfigMap.ObjectMeta has no validation
+	// field v1.ConfigMap.Immutable has no validation
+	// field v1.ConfigMap.Data has no validation
+	// field v1.ConfigMap.BinaryData has no validation
+	return errs
+}
+
+func Validate_ConfigMapList(obj *v1.ConfigMapList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ConfigMapList.TypeMeta has no validation
+	// field v1.ConfigMapList.ListMeta has no validation
+	// field v1.ConfigMapList.Items has no validation
+	return errs
+}
+
+func Validate_ContainerStatus(obj *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ContainerStatus.Name has no validation
+	// field v1.ContainerStatus.State has no validation
+	// field v1.ContainerStatus.LastTerminationState has no validation
+	// field v1.ContainerStatus.Ready has no validation
+	// field v1.ContainerStatus.RestartCount has no validation
+	// field v1.ContainerStatus.Image has no validation
+	// field v1.ContainerStatus.ImageID has no validation
+	// field v1.ContainerStatus.ContainerID has no validation
+	// field v1.ContainerStatus.Started has no validation
+	// field v1.ContainerStatus.AllocatedResources has no validation
+	// field v1.ContainerStatus.Resources has no validation
+	// field v1.ContainerStatus.VolumeMounts has no validation
+	// field v1.ContainerStatus.User has no validation
+
+	// field v1.ContainerStatus.AllocatedResourcesStatus
+	errs = append(errs,
+		func(obj []v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ResourceStatus(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.AllocatedResourcesStatus, fldPath.Child("allocatedResourcesStatus"))...)
 
 	return errs
 }
 
-func Validate_ComponentStatus(in *v1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_Endpoints(obj *v1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Endpoints.TypeMeta has no validation
+	// field v1.Endpoints.ObjectMeta has no validation
+	// field v1.Endpoints.Subsets has no validation
+	return errs
+}
 
-	// ObjectMeta
+func Validate_EndpointsList(obj *v1.EndpointsList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EndpointsList.TypeMeta has no validation
+	// field v1.EndpointsList.ListMeta has no validation
+	// field v1.EndpointsList.Items has no validation
+	return errs
+}
 
-	// Conditions
-	for i, val := range in.Conditions {
-	}
+func Validate_Event(obj *v1.Event, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Event.TypeMeta has no validation
+	// field v1.Event.ObjectMeta has no validation
+	// field v1.Event.InvolvedObject has no validation
+	// field v1.Event.Reason has no validation
+	// field v1.Event.Message has no validation
+	// field v1.Event.Source has no validation
+	// field v1.Event.FirstTimestamp has no validation
+	// field v1.Event.LastTimestamp has no validation
+	// field v1.Event.Count has no validation
+	// field v1.Event.Type has no validation
+	// field v1.Event.EventTime has no validation
+	// field v1.Event.Series has no validation
+	// field v1.Event.Action has no validation
+	// field v1.Event.Related has no validation
+	// field v1.Event.ReportingController has no validation
+	// field v1.Event.ReportingInstance has no validation
+	return errs
+}
+
+func Validate_EventList(obj *v1.EventList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.EventList.TypeMeta has no validation
+	// field v1.EventList.ListMeta has no validation
+	// field v1.EventList.Items has no validation
+	return errs
+}
+
+func Validate_HostAlias(obj *v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.HostAlias.IP
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			return
+		}(obj.IP, fldPath.Child("ip"))...)
+
+	// field v1.HostAlias.Hostnames has no validation
+	return errs
+}
+
+func Validate_HostIP(obj *v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.HostIP.IP
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			return
+		}(obj.IP, fldPath.Child("ip"))...)
 
 	return errs
 }
 
-func Validate_ComponentStatusList(in *v1.ComponentStatusList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_LimitRange(obj *v1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LimitRange.TypeMeta has no validation
+	// field v1.LimitRange.ObjectMeta has no validation
+	// field v1.LimitRange.Spec has no validation
+	return errs
+}
 
-	// ListMeta
+func Validate_LimitRangeList(obj *v1.LimitRangeList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.LimitRangeList.TypeMeta has no validation
+	// field v1.LimitRangeList.ListMeta has no validation
+	// field v1.LimitRangeList.Items has no validation
+	return errs
+}
 
-	// Items
-	for i, val := range in.Items {
-	}
+func Validate_List(obj *v1.List, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.List.TypeMeta has no validation
+	// field v1.List.ListMeta has no validation
+	// field v1.List.Items has no validation
+	return errs
+}
+
+func Validate_Namespace(obj *v1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Namespace.TypeMeta has no validation
+	// field v1.Namespace.ObjectMeta has no validation
+	// field v1.Namespace.Spec has no validation
+	// field v1.Namespace.Status has no validation
+	return errs
+}
+
+func Validate_NamespaceList(obj *v1.NamespaceList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NamespaceList.TypeMeta has no validation
+	// field v1.NamespaceList.ListMeta has no validation
+	// field v1.NamespaceList.Items has no validation
+	return errs
+}
+
+func Validate_Node(obj *v1.Node, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Node.TypeMeta has no validation
+	// field v1.Node.ObjectMeta has no validation
+	// field v1.Node.Spec has no validation
+	// field v1.Node.Status has no validation
+	return errs
+}
+
+func Validate_NodeList(obj *v1.NodeList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeList.TypeMeta has no validation
+	// field v1.NodeList.ListMeta has no validation
+	// field v1.NodeList.Items has no validation
+	return errs
+}
+
+func Validate_NodeProxyOptions(obj *v1.NodeProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.NodeProxyOptions.TypeMeta has no validation
+	// field v1.NodeProxyOptions.Path has no validation
+	return errs
+}
+
+func Validate_PersistentVolume(obj *v1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolume.TypeMeta has no validation
+	// field v1.PersistentVolume.ObjectMeta has no validation
+	// field v1.PersistentVolume.Spec has no validation
+	// field v1.PersistentVolume.Status has no validation
+	return errs
+}
+
+func Validate_PersistentVolumeClaim(obj *v1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaim.TypeMeta has no validation
+	// field v1.PersistentVolumeClaim.ObjectMeta has no validation
+	// field v1.PersistentVolumeClaim.Spec has no validation
+	// field v1.PersistentVolumeClaim.Status has no validation
+	return errs
+}
+
+func Validate_PersistentVolumeClaimList(obj *v1.PersistentVolumeClaimList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeClaimList.TypeMeta has no validation
+	// field v1.PersistentVolumeClaimList.ListMeta has no validation
+	// field v1.PersistentVolumeClaimList.Items has no validation
+	return errs
+}
+
+func Validate_PersistentVolumeList(obj *v1.PersistentVolumeList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PersistentVolumeList.TypeMeta has no validation
+	// field v1.PersistentVolumeList.ListMeta has no validation
+	// field v1.PersistentVolumeList.Items has no validation
+	return errs
+}
+
+func Validate_Pod(obj *v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Pod.TypeMeta has no validation
+	// field v1.Pod.ObjectMeta has no validation
+
+	// field v1.Pod.Spec
+	errs = append(errs,
+		func(obj v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodSpec(&obj, fldPath)...)
+			return
+		}(obj.Spec, fldPath.Child("spec"))...)
+
+	// field v1.Pod.Status
+	errs = append(errs,
+		func(obj v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodStatus(&obj, fldPath)...)
+			return
+		}(obj.Status, fldPath.Child("status"))...)
 
 	return errs
 }
 
-func Validate_ConfigMap(in *v1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_PodAttachOptions(obj *v1.PodAttachOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodAttachOptions.TypeMeta has no validation
+	// field v1.PodAttachOptions.Stdin has no validation
+	// field v1.PodAttachOptions.Stdout has no validation
+	// field v1.PodAttachOptions.Stderr has no validation
+	// field v1.PodAttachOptions.TTY has no validation
+	// field v1.PodAttachOptions.Container has no validation
+	return errs
+}
 
-	// ObjectMeta
+func Validate_PodExecOptions(obj *v1.PodExecOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodExecOptions.TypeMeta has no validation
+	// field v1.PodExecOptions.Stdin has no validation
+	// field v1.PodExecOptions.Stdout has no validation
+	// field v1.PodExecOptions.Stderr has no validation
+	// field v1.PodExecOptions.TTY has no validation
+	// field v1.PodExecOptions.Container has no validation
+	// field v1.PodExecOptions.Command has no validation
+	return errs
+}
 
-	// Immutable
-
-	// Data
-	for key, val := range in.Data {
-	}
-
-	// BinaryData
-	for key, val := range in.BinaryData {
-	}
+func Validate_PodIP(obj *v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodIP.IP
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			return
+		}(obj.IP, fldPath.Child("ip"))...)
 
 	return errs
 }
 
-func Validate_ConfigMapList(in *v1.ConfigMapList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_PodList(obj *v1.PodList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodList.TypeMeta has no validation
+	// field v1.PodList.ListMeta has no validation
 
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_ContainerStatus(in *v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// Name
-
-	// State
-
-	// LastTerminationState
-
-	// Ready
-
-	// RestartCount
-
-	// Image
-
-	// ImageID
-
-	// ContainerID
-
-	// Started
-
-	// AllocatedResources
-
-	// Resources
-
-	// VolumeMounts
-	for i, val := range in.VolumeMounts {
-	}
-
-	// User
-
-	// AllocatedResourcesStatus
-	for i, val := range in.AllocatedResourcesStatus {
-		errs = append(errs, Validate_ResourceStatus(&val, fldPath.Index(i))...)
-	}
+	// field v1.PodList.Items
+	errs = append(errs,
+		func(obj []v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Pod(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, fldPath.Child("items"))...)
 
 	return errs
 }
 
-func Validate_Endpoints(in *v1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_PodLogOptions(obj *v1.PodLogOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodLogOptions.TypeMeta has no validation
+	// field v1.PodLogOptions.Container has no validation
+	// field v1.PodLogOptions.Follow has no validation
+	// field v1.PodLogOptions.Previous has no validation
+	// field v1.PodLogOptions.SinceSeconds has no validation
+	// field v1.PodLogOptions.SinceTime has no validation
+	// field v1.PodLogOptions.Timestamps has no validation
+	// field v1.PodLogOptions.TailLines has no validation
+	// field v1.PodLogOptions.LimitBytes has no validation
+	// field v1.PodLogOptions.InsecureSkipTLSVerifyBackend has no validation
+	return errs
+}
 
-	// ObjectMeta
+func Validate_PodPortForwardOptions(obj *v1.PodPortForwardOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodPortForwardOptions.TypeMeta has no validation
+	// field v1.PodPortForwardOptions.Ports has no validation
+	return errs
+}
 
-	// Subsets
-	for i, val := range in.Subsets {
-	}
+func Validate_PodProxyOptions(obj *v1.PodProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodProxyOptions.TypeMeta has no validation
+	// field v1.PodProxyOptions.Path has no validation
+	return errs
+}
+
+func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodSpec.Volumes
+	errs = append(errs,
+		func(obj []v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_Volume(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Volumes, fldPath.Child("volumes"))...)
+
+	// field v1.PodSpec.InitContainers has no validation
+	// field v1.PodSpec.Containers has no validation
+	// field v1.PodSpec.EphemeralContainers has no validation
+	// field v1.PodSpec.RestartPolicy has no validation
+	// field v1.PodSpec.TerminationGracePeriodSeconds has no validation
+	// field v1.PodSpec.ActiveDeadlineSeconds has no validation
+	// field v1.PodSpec.DNSPolicy has no validation
+	// field v1.PodSpec.NodeSelector has no validation
+	// field v1.PodSpec.ServiceAccountName has no validation
+	// field v1.PodSpec.DeprecatedServiceAccount has no validation
+	// field v1.PodSpec.AutomountServiceAccountToken has no validation
+	// field v1.PodSpec.NodeName has no validation
+	// field v1.PodSpec.HostNetwork has no validation
+	// field v1.PodSpec.HostPID has no validation
+	// field v1.PodSpec.HostIPC has no validation
+	// field v1.PodSpec.ShareProcessNamespace has no validation
+	// field v1.PodSpec.SecurityContext has no validation
+	// field v1.PodSpec.ImagePullSecrets has no validation
+	// field v1.PodSpec.Hostname has no validation
+	// field v1.PodSpec.Subdomain has no validation
+	// field v1.PodSpec.Affinity has no validation
+	// field v1.PodSpec.SchedulerName has no validation
+	// field v1.PodSpec.Tolerations has no validation
+
+	// field v1.PodSpec.HostAliases
+	errs = append(errs,
+		func(obj []v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_HostAlias(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.HostAliases, fldPath.Child("hostAliases"))...)
+
+	// field v1.PodSpec.PriorityClassName has no validation
+	// field v1.PodSpec.Priority has no validation
+	// field v1.PodSpec.DNSConfig has no validation
+	// field v1.PodSpec.ReadinessGates has no validation
+	// field v1.PodSpec.RuntimeClassName has no validation
+	// field v1.PodSpec.EnableServiceLinks has no validation
+	// field v1.PodSpec.PreemptionPolicy has no validation
+	// field v1.PodSpec.Overhead has no validation
+	// field v1.PodSpec.TopologySpreadConstraints has no validation
+	// field v1.PodSpec.SetHostnameAsFQDN has no validation
+	// field v1.PodSpec.OS has no validation
+	// field v1.PodSpec.HostUsers has no validation
+	// field v1.PodSpec.SchedulingGates has no validation
+	// field v1.PodSpec.ResourceClaims has no validation
+	return errs
+}
+
+func Validate_PodStatus(obj *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodStatus.Phase has no validation
+	// field v1.PodStatus.Conditions has no validation
+	// field v1.PodStatus.Message has no validation
+	// field v1.PodStatus.Reason has no validation
+	// field v1.PodStatus.NominatedNodeName has no validation
+	// field v1.PodStatus.HostIP has no validation
+
+	// field v1.PodStatus.HostIPs
+	errs = append(errs,
+		func(obj []v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_HostIP(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.HostIPs, fldPath.Child("hostIPs"))...)
+
+	// field v1.PodStatus.PodIP has no validation
+
+	// field v1.PodStatus.PodIPs
+	errs = append(errs,
+		func(obj []v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodIP(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.PodIPs, fldPath.Child("podIPs"))...)
+
+	// field v1.PodStatus.StartTime has no validation
+
+	// field v1.PodStatus.InitContainerStatuses
+	errs = append(errs,
+		func(obj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerStatus(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.InitContainerStatuses, fldPath.Child("initContainerStatuses"))...)
+
+	// field v1.PodStatus.ContainerStatuses
+	errs = append(errs,
+		func(obj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerStatus(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.ContainerStatuses, fldPath.Child("containerStatuses"))...)
+
+	// field v1.PodStatus.QOSClass has no validation
+
+	// field v1.PodStatus.EphemeralContainerStatuses
+	errs = append(errs,
+		func(obj []v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.ContainerStatus, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ContainerStatus(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.EphemeralContainerStatuses, fldPath.Child("ephemeralContainerStatuses"))...)
+
+	// field v1.PodStatus.Resize has no validation
+	// field v1.PodStatus.ResourceClaimStatuses has no validation
+	return errs
+}
+
+func Validate_PodStatusResult(obj *v1.PodStatusResult, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodStatusResult.TypeMeta has no validation
+	// field v1.PodStatusResult.ObjectMeta has no validation
+
+	// field v1.PodStatusResult.Status
+	errs = append(errs,
+		func(obj v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodStatus(&obj, fldPath)...)
+			return
+		}(obj.Status, fldPath.Child("status"))...)
 
 	return errs
 }
 
-func Validate_EndpointsList(in *v1.EndpointsList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_PodTemplate(obj *v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodTemplate.TypeMeta has no validation
+	// field v1.PodTemplate.ObjectMeta has no validation
 
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_Event(in *v1.Event, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// InvolvedObject
-
-	// Reason
-
-	// Message
-
-	// Source
-
-	// FirstTimestamp
-
-	// LastTimestamp
-
-	// Count
-
-	// Type
-
-	// EventTime
-
-	// Series
-
-	// Action
-
-	// Related
-
-	// ReportingController
-
-	// ReportingInstance
+	// field v1.PodTemplate.Template
+	errs = append(errs,
+		func(obj v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodTemplateSpec(&obj, fldPath)...)
+			return
+		}(obj.Template, fldPath.Child("template"))...)
 
 	return errs
 }
 
-func Validate_EventList(in *v1.EventList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_PodTemplateList(obj *v1.PodTemplateList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodTemplateList.TypeMeta has no validation
+	// field v1.PodTemplateList.ListMeta has no validation
 
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_HostAlias(in *v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
-	// IP
-	errs = append(errs, validate.Required(fldPath.Child("ip"), in.IP)...)
-
-	// Hostnames
-	for i, val := range in.Hostnames {
-	}
+	// field v1.PodTemplateList.Items
+	errs = append(errs,
+		func(obj []v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_PodTemplate(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, fldPath.Child("items"))...)
 
 	return errs
 }
 
-func Validate_HostIP(in *v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
-	// IP
-	errs = append(errs, validate.Required(fldPath.Child("ip"), in.IP)...)
+func Validate_PodTemplateSpec(obj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.PodTemplateSpec.ObjectMeta has no validation
+
+	// field v1.PodTemplateSpec.Spec
+	errs = append(errs,
+		func(obj v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_PodSpec(&obj, fldPath)...)
+			return
+		}(obj.Spec, fldPath.Child("spec"))...)
 
 	return errs
 }
 
-func Validate_LimitRange(in *v1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
+func Validate_RangeAllocation(obj *v1.RangeAllocation, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.RangeAllocation.TypeMeta has no validation
+	// field v1.RangeAllocation.ObjectMeta has no validation
+	// field v1.RangeAllocation.Range has no validation
+	// field v1.RangeAllocation.Data has no validation
 	return errs
 }
 
-func Validate_LimitRangeList(in *v1.LimitRangeList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
+func Validate_ReplicationController(obj *v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ReplicationController.TypeMeta has no validation
+	// field v1.ReplicationController.ObjectMeta has no validation
+	// field v1.ReplicationController.Spec has no validation
+	// field v1.ReplicationController.Status has no validation
 	return errs
 }
 
-func Validate_List(in *v1.List, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
+func Validate_ReplicationControllerList(obj *v1.ReplicationControllerList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ReplicationControllerList.TypeMeta has no validation
+	// field v1.ReplicationControllerList.ListMeta has no validation
+	// field v1.ReplicationControllerList.Items has no validation
 	return errs
 }
 
-func Validate_Namespace(in *v1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
+func Validate_ResourceQuota(obj *v1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceQuota.TypeMeta has no validation
+	// field v1.ResourceQuota.ObjectMeta has no validation
+	// field v1.ResourceQuota.Spec has no validation
+	// field v1.ResourceQuota.Status has no validation
 	return errs
 }
 
-func Validate_NamespaceList(in *v1.NamespaceList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
+func Validate_ResourceQuotaList(obj *v1.ResourceQuotaList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceQuotaList.TypeMeta has no validation
+	// field v1.ResourceQuotaList.ListMeta has no validation
+	// field v1.ResourceQuotaList.Items has no validation
 	return errs
 }
 
-func Validate_Node(in *v1.Node, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
+func Validate_ResourceStatus(obj *v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ResourceStatus.Name
+	errs = append(errs,
+		func(obj v1.ResourceName, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			return
+		}(obj.Name, fldPath.Child("name"))...)
 
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
+	// field v1.ResourceStatus.Resources has no validation
 	return errs
 }
 
-func Validate_NodeList(in *v1.NodeList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
+func Validate_Secret(obj *v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Secret.TypeMeta has no validation
+	// field v1.Secret.ObjectMeta has no validation
+	// field v1.Secret.Immutable has no validation
+	// field v1.Secret.Data has no validation
+	// field v1.Secret.StringData has no validation
+	// field v1.Secret.Type has no validation
 	return errs
 }
 
-func Validate_NodeProxyOptions(in *v1.NodeProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Path
-
+func Validate_SecretList(obj *v1.SecretList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SecretList.TypeMeta has no validation
+	// field v1.SecretList.ListMeta has no validation
+	// field v1.SecretList.Items has no validation
 	return errs
 }
 
-func Validate_PersistentVolume(in *v1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
+func Validate_SerializedReference(obj *v1.SerializedReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.SerializedReference.TypeMeta has no validation
+	// field v1.SerializedReference.Reference has no validation
 	return errs
 }
 
-func Validate_PersistentVolumeClaim(in *v1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
+func Validate_Service(obj *v1.Service, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Service.TypeMeta has no validation
+	// field v1.Service.ObjectMeta has no validation
+	// field v1.Service.Spec has no validation
+	// field v1.Service.Status has no validation
 	return errs
 }
 
-func Validate_PersistentVolumeClaimList(in *v1.PersistentVolumeClaimList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
+func Validate_ServiceAccount(obj *v1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceAccount.TypeMeta has no validation
+	// field v1.ServiceAccount.ObjectMeta has no validation
+	// field v1.ServiceAccount.Secrets has no validation
+	// field v1.ServiceAccount.ImagePullSecrets has no validation
+	// field v1.ServiceAccount.AutomountServiceAccountToken has no validation
 	return errs
 }
 
-func Validate_PersistentVolumeList(in *v1.PersistentVolumeList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
+func Validate_ServiceAccountList(obj *v1.ServiceAccountList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceAccountList.TypeMeta has no validation
+	// field v1.ServiceAccountList.ListMeta has no validation
+	// field v1.ServiceAccountList.Items has no validation
 	return errs
 }
 
-func Validate_Pod(in *v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-	errs = append(errs, Validate_PodSpec(&in.Spec, fldPath.Child("spec"))...)
-
-	// Status
-	errs = append(errs, Validate_PodStatus(&in.Status, fldPath.Child("status"))...)
-
+func Validate_ServiceList(obj *v1.ServiceList, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceList.TypeMeta has no validation
+	// field v1.ServiceList.ListMeta has no validation
+	// field v1.ServiceList.Items has no validation
 	return errs
 }
 
-func Validate_PodAttachOptions(in *v1.PodAttachOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Stdin
-
-	// Stdout
-
-	// Stderr
-
-	// TTY
-
-	// Container
-
+func Validate_ServiceProxyOptions(obj *v1.ServiceProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ServiceProxyOptions.TypeMeta has no validation
+	// field v1.ServiceProxyOptions.Path has no validation
 	return errs
 }
 
-func Validate_PodExecOptions(in *v1.PodExecOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Stdin
-
-	// Stdout
-
-	// Stderr
-
-	// TTY
-
-	// Container
-
-	// Command
-	for i, val := range in.Command {
-	}
-
-	return errs
-}
-
-func Validate_PodIP(in *v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
-	// IP
-	errs = append(errs, validate.Required(fldPath.Child("ip"), in.IP)...)
-
-	return errs
-}
-
-func Validate_PodList(in *v1.PodList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-		errs = append(errs, Validate_Pod(&val, fldPath.Index(i))...)
-	}
-
-	return errs
-}
-
-func Validate_PodLogOptions(in *v1.PodLogOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Container
-
-	// Follow
-
-	// Previous
-
-	// SinceSeconds
-
-	// SinceTime
-
-	// Timestamps
-
-	// TailLines
-
-	// LimitBytes
-
-	// InsecureSkipTLSVerifyBackend
-
-	return errs
-}
-
-func Validate_PodPortForwardOptions(in *v1.PodPortForwardOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Ports
-	for i, val := range in.Ports {
-	}
-
-	return errs
-}
-
-func Validate_PodProxyOptions(in *v1.PodProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Path
-
-	return errs
-}
-
-func Validate_PodSpec(in *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// Volumes
-	for i, val := range in.Volumes {
-		errs = append(errs, Validate_Volume(&val, fldPath.Index(i))...)
-	}
-
-	// InitContainers
-	for i, val := range in.InitContainers {
-	}
-
-	// Containers
-	for i, val := range in.Containers {
-	}
-
-	// EphemeralContainers
-	for i, val := range in.EphemeralContainers {
-	}
-
-	// RestartPolicy
-
-	// TerminationGracePeriodSeconds
-
-	// ActiveDeadlineSeconds
-
-	// DNSPolicy
-
-	// NodeSelector
-	for key, val := range in.NodeSelector {
-	}
-
-	// ServiceAccountName
-
-	// DeprecatedServiceAccount
-
-	// AutomountServiceAccountToken
-
-	// NodeName
-
-	// HostNetwork
-
-	// HostPID
-
-	// HostIPC
-
-	// ShareProcessNamespace
-
-	// SecurityContext
-
-	// ImagePullSecrets
-	for i, val := range in.ImagePullSecrets {
-	}
-
-	// Hostname
-
-	// Subdomain
-
-	// Affinity
-
-	// SchedulerName
-
-	// Tolerations
-	for i, val := range in.Tolerations {
-	}
-
-	// HostAliases
-	for i, val := range in.HostAliases {
-		errs = append(errs, Validate_HostAlias(&val, fldPath.Index(i))...)
-	}
-
-	// PriorityClassName
-
-	// Priority
-
-	// DNSConfig
-
-	// ReadinessGates
-	for i, val := range in.ReadinessGates {
-	}
-
-	// RuntimeClassName
-
-	// EnableServiceLinks
-
-	// PreemptionPolicy
-
-	// Overhead
-
-	// TopologySpreadConstraints
-	for i, val := range in.TopologySpreadConstraints {
-	}
-
-	// SetHostnameAsFQDN
-
-	// OS
-
-	// HostUsers
-
-	// SchedulingGates
-	for i, val := range in.SchedulingGates {
-	}
-
-	// ResourceClaims
-	for i, val := range in.ResourceClaims {
-	}
-
-	return errs
-}
-
-func Validate_PodStatus(in *v1.PodStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// Phase
-
-	// Conditions
-	for i, val := range in.Conditions {
-	}
-
-	// Message
-
-	// Reason
-
-	// NominatedNodeName
-
-	// HostIP
-
-	// HostIPs
-	for i, val := range in.HostIPs {
-		errs = append(errs, Validate_HostIP(&val, fldPath.Index(i))...)
-	}
-
-	// PodIP
-
-	// PodIPs
-	for i, val := range in.PodIPs {
-		errs = append(errs, Validate_PodIP(&val, fldPath.Index(i))...)
-	}
-
-	// StartTime
-
-	// InitContainerStatuses
-	for i, val := range in.InitContainerStatuses {
-		errs = append(errs, Validate_ContainerStatus(&val, fldPath.Index(i))...)
-	}
-
-	// ContainerStatuses
-	for i, val := range in.ContainerStatuses {
-		errs = append(errs, Validate_ContainerStatus(&val, fldPath.Index(i))...)
-	}
-
-	// QOSClass
-
-	// EphemeralContainerStatuses
-	for i, val := range in.EphemeralContainerStatuses {
-		errs = append(errs, Validate_ContainerStatus(&val, fldPath.Index(i))...)
-	}
-
-	// Resize
-
-	// ResourceClaimStatuses
-	for i, val := range in.ResourceClaimStatuses {
-	}
-
-	return errs
-}
-
-func Validate_PodStatusResult(in *v1.PodStatusResult, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Status
-	errs = append(errs, Validate_PodStatus(&in.Status, fldPath.Child("status"))...)
-
-	return errs
-}
-
-func Validate_PodTemplate(in *v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Template
-	errs = append(errs, Validate_PodTemplateSpec(&in.Template, fldPath.Child("template"))...)
-
-	return errs
-}
-
-func Validate_PodTemplateList(in *v1.PodTemplateList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-		errs = append(errs, Validate_PodTemplate(&val, fldPath.Index(i))...)
-	}
-
-	return errs
-}
-
-func Validate_PodTemplateSpec(in *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// ObjectMeta
-
-	// Spec
-	errs = append(errs, Validate_PodSpec(&in.Spec, fldPath.Child("spec"))...)
-
-	return errs
-}
-
-func Validate_RangeAllocation(in *v1.RangeAllocation, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Range
-
-	// Data
-	for i, val := range in.Data {
-	}
-
-	return errs
-}
-
-func Validate_ReplicationController(in *v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
-	return errs
-}
-
-func Validate_ReplicationControllerList(in *v1.ReplicationControllerList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_ResourceQuota(in *v1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
-	return errs
-}
-
-func Validate_ResourceQuotaList(in *v1.ResourceQuotaList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_ResourceStatus(in *v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// Name
-	errs = append(errs, validate.Required(fldPath.Child("name"), in.Name)...)
-
-	// Resources
-	for i, val := range in.Resources {
-	}
-
-	return errs
-}
-
-func Validate_Secret(in *v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Immutable
-
-	// Data
-	for key, val := range in.Data {
-	}
-
-	// StringData
-	for key, val := range in.StringData {
-	}
-
-	// Type
-
-	return errs
-}
-
-func Validate_SecretList(in *v1.SecretList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_SerializedReference(in *v1.SerializedReference, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Reference
-
-	return errs
-}
-
-func Validate_Service(in *v1.Service, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Spec
-
-	// Status
-
-	return errs
-}
-
-func Validate_ServiceAccount(in *v1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ObjectMeta
-
-	// Secrets
-	for i, val := range in.Secrets {
-	}
-
-	// ImagePullSecrets
-	for i, val := range in.ImagePullSecrets {
-	}
-
-	// AutomountServiceAccountToken
-
-	return errs
-}
-
-func Validate_ServiceAccountList(in *v1.ServiceAccountList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_ServiceList(in *v1.ServiceList, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// ListMeta
-
-	// Items
-	for i, val := range in.Items {
-	}
-
-	return errs
-}
-
-func Validate_ServiceProxyOptions(in *v1.ServiceProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// TypeMeta
-
-	// Path
-
-	return errs
-}
-
-func Validate_Volume(in *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
-	// Name
-	if e := validate.Required(fldPath.Child("name"), in.Name); len(e) != 0 {
-		errs = append(errs, e...)
-	} else {
-		errs = append(errs, validate.DNSLabel(fldPath.Child("name"), in.Name)...)
-	}
-
-	// VolumeSource
-
+func Validate_Volume(obj *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.Volume.Name
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
+			errs = append(errs, validate.DNSLabel(fldPath, obj)...)
+			return
+		}(obj.Name, fldPath.Child("name"))...)
+
+	// field v1.Volume.VolumeSource has no validation
 	return errs
 }
