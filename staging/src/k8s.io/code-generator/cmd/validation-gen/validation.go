@@ -377,8 +377,9 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 					name = field.Type.Name.Name
 				}
 			}
-			jsonName := "<unknown-json-name>"
-			//TODO: maybe abort if we hit this?  Or if we try to use it?
+			// If we try to emit code for this field and find no JSON name, we
+			// will abort.
+			jsonName := ""
 			if tags, ok := lookupJSONTags(field); ok {
 				jsonName = tags.name
 			}
@@ -537,6 +538,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			if len(child.name) == 0 {
 				klog.Fatalf("missing child name for field in %v", inType)
 			}
+			// Missing JSON name is checked iff we have code to emit.
 
 			targs := targs.WithArgs(generator.Args{
 				"fieldName": child.name,
@@ -578,6 +580,10 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			}
 
 			if buf.Len() > 0 {
+				if len(child.jsonName) == 0 {
+					klog.Fatalf("missing child JSON name for field %v.%s", inType, child.name)
+				}
+
 				if didSome {
 					sw.Do("\n", nil)
 				}
