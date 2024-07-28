@@ -222,7 +222,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 					}(val, fldPath.Key(key))...)
 			}
 			return
-		}(obj.ME1S, fldPath.Child("<unknown-json-name>"))...)
+		}(obj.ME1S, fldPath.Child("me1s"))...)
 
 	// field T1.AnotherMSS has no validation
 	// field T1.AnotherMSPS has no validation
@@ -255,7 +255,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 					}(key, fldPath)...)
 			}
 			return
-		}(obj.AnotherME1S, fldPath.Child("<unknown-json-name>"))...)
+		}(obj.AnotherME1S, fldPath.Child("anotherme1s"))...)
 
 	return errs
 }

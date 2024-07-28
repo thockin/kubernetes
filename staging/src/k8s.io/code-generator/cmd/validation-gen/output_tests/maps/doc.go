@@ -59,7 +59,7 @@ type T1 struct {
 	// +validateTrue="field T1.ME1S"
 	// +eachKey=+validateTrue="key T1.ME1S[*]"
 	// +eachVal=+validateTrue="val T1.ME1S[*]"
-	ME1S map[E1]string
+	ME1S map[E1]string `json:"me1s"`
 
 	// Duplicate types with no validation.
 	AnotherMSS   map[string]string   `json:"anothermss"`
@@ -69,7 +69,7 @@ type T1 struct {
 	AnotherMST2  map[string]string   `json:"anothermst2"`
 	AnotherMSPT2 map[string]*string  `json:"anothermspt2"`
 	AnotherMSE1  map[string]E1       `json:"anothermse1"`
-	AnotherME1S  map[E1]string
+	AnotherME1S  map[E1]string       `json:"anotherme1s"`
 }
 
 // +validateTrue="type T2"
