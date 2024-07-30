@@ -188,8 +188,6 @@ func Validate_E05(obj *E05, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, e...)
 			return // fatal
 		}
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "E05, no flags")...)
 	}
 
@@ -300,8 +298,6 @@ func Validate_E13(obj *E13, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, e...)
 			return // fatal
 		}
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "E13, no flags")...)
 	}
 
@@ -360,8 +356,6 @@ func Validate_EMultiple(obj *EMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, e...)
 			return // fatal
 		}
-	}
-	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "EMultiple, IsFatal 2"); len(e) != 0 {
 			errs = append(errs, e...)
 			return // fatal
@@ -371,11 +365,7 @@ func Validate_EMultiple(obj *EMultiple, fldPath *field.Path) (errs field.ErrorLi
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "EMultiple, PtrOK 2")...)
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "EMultiple, no flags 1")...)
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "E0, string payload")...)
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "EMultiple, no flags 2")...)
 	}
 

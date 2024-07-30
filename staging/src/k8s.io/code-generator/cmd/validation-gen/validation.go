@@ -835,6 +835,7 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 
 	validations = sort(validations)
 
+	insideNilCheck := false
 	for _, v := range validations {
 		ptrOK := (v.Flags()&validators.PtrOK != 0)
 
@@ -843,16 +844,17 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 			"funcName": c.Universe.Type(fn),
 			"deref":    "", // updated below if needed
 		}
-		closeThisValidation := func() {}
 		if isVarPtr && !ptrOK {
-			// TODO: This test will be emitted for each validation. We could
-			// restructure this to collect all of the calls, sort by PtrOK, and
-			// emit this one time.
-			sw.Do("if obj != nil {\n", targs)
-			closeThisValidation = func() {
-				sw.Do("}\n", nil)
+			if !insideNilCheck {
+				sw.Do("if obj != nil {\n", targs)
+				insideNilCheck = true
 			}
 			targs["deref"] = "*"
+		} else {
+			if insideNilCheck {
+				sw.Do("}\n", nil)
+				insideNilCheck = false
+			}
 		}
 
 		emitCall := func() {
@@ -875,7 +877,9 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 			emitCall()
 			sw.Do("...)\n", nil)
 		}
-		closeThisValidation()
+	}
+	if insideNilCheck {
+		sw.Do("}\n", nil)
 	}
 }
 

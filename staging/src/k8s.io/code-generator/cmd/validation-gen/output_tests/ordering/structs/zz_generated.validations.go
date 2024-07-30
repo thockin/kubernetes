@@ -372,8 +372,6 @@ func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, e...)
 			return // fatal
 		}
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T05, no flags")...)
 	}
 
@@ -398,8 +396,6 @@ func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, e...)
 					return // fatal
 				}
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T05.PS, no flags")...)
 			}
 			return
@@ -425,8 +421,6 @@ func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, e...)
 					return // fatal
 				}
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T05.PT, no flags")...)
 			}
 			if obj != nil {
@@ -932,8 +926,6 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, e...)
 			return // fatal
 		}
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13, no flags")...)
 	}
 
@@ -966,8 +958,6 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, e...)
 					return // fatal
 				}
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13.PS, no flags")...)
 			}
 			return
@@ -1001,8 +991,6 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, e...)
 					return // fatal
 				}
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13.PT, no flags")...)
 			}
 			if obj != nil {
@@ -1214,8 +1202,6 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, e...)
 			return // fatal
 		}
-	}
-	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "TMultiple, IsFatal 2"); len(e) != 0 {
 			errs = append(errs, e...)
 			return // fatal
@@ -1225,11 +1211,7 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK 2")...)
 	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 1")...)
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
-	}
-	if obj != nil {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 2")...)
 	}
 
@@ -1278,8 +1260,6 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 					errs = append(errs, e...)
 					return // fatal
 				}
-			}
-			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, IsFatal 2"); len(e) != 0 {
 					errs = append(errs, e...)
 					return // fatal
@@ -1289,11 +1269,7 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK 2")...)
 			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 1")...)
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 2")...)
 			}
 			return
@@ -1343,8 +1319,6 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 					errs = append(errs, e...)
 					return // fatal
 				}
-			}
-			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, IsFatal 2"); len(e) != 0 {
 					errs = append(errs, e...)
 					return // fatal
@@ -1354,11 +1328,7 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK 2")...)
 			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 1")...)
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
-			}
-			if obj != nil {
 				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 2")...)
 			}
 			if obj != nil {
