@@ -817,15 +817,17 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 		nonfatalPtr := make([]validators.FunctionGen, 0, len(in))
 
 		for _, fg := range in {
-			flags := fg.Flags()
-			if flags&validators.IsFatal > 0 {
-				if flags&validators.PtrOK > 0 {
+			isFatal := (fg.Flags()&validators.IsFatal != 0)
+			isPtrOK := (fg.Flags()&validators.PtrOK != 0)
+
+			if isFatal {
+				if isPtrOK {
 					fatalPtr = append(fatalPtr, fg)
 				} else {
 					fatal = append(fatal, fg)
 				}
 			} else {
-				if flags&validators.PtrOK > 0 {
+				if isPtrOK {
 					nonfatalPtr = append(nonfatalPtr, fg)
 				} else {
 					nonfatal = append(nonfatal, fg)
@@ -844,6 +846,7 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 	insideNilCheck := false
 	for _, v := range validations {
 		ptrOK := (v.Flags()&validators.PtrOK != 0)
+		isFatal := (v.Flags()&validators.IsFatal != 0)
 
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
@@ -871,7 +874,7 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 			sw.Do(")", targs)
 		}
 
-		if (v.Flags() & validators.IsFatal) != 0 {
+		if isFatal {
 			sw.Do("if e := ", nil)
 			emitCall()
 			sw.Do("; len(e) != 0 {\n", nil)
