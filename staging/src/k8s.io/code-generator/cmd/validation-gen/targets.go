@@ -244,7 +244,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, typesPkg.Path, pkg.Path, rootTypes, typeNodes, peerPkgs, inputToPkg, declarativeValidator),
+						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, typeNodes, inputToPkg, declarativeValidator),
 					}
 				},
 			})
