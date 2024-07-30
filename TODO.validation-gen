@@ -58,3 +58,19 @@
 - Test cross-pkg fields
 - Generator unit tests need updating
 - Catalog all varieties of validations (conditional, mutually-excluysive, numeric, string format, etc)
+- Try to link typedef-of-typedef to chain validations?
+    Get pos in walkType()
+    for each file in pkg.Syntax[] (ast.File)
+        for each decl in file.Decls[] (ast.Decl -> ast.GenDecl)
+            for each spec in decl.Specs[] (ast.Spec -> ast.TypeSpec)
+                if Name.NamePos matches {
+                    Look at spec.Type
+                    if is ast.Ident
+                        look at ident.Obj
+                        if nil
+                            builtin?
+                        if obj.Kind = Typ
+                            look at obj.Name and obj.Decl.(TypeSpec).Name.NamePos
+                            match that to another type?
+
+
