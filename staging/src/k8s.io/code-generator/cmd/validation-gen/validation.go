@@ -241,7 +241,6 @@ func (n typeNode) lookupField(jsonName string) *childNode {
 }
 
 // childNode represents a field in a struct.
-// FIXME: merge this back into typeNode
 type childNode struct {
 	name           string
 	jsonName       string
@@ -274,7 +273,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 	}
 
 	// Publish it right away in case we hit it recursively.
-	//FIXME: don't store Builtins?
 	td.knownTypes[t] = thisNode
 
 	// Extract any type-attached validation rules.
@@ -287,10 +285,9 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 		}
 	}
 
-	// FIXME: don't descend into other pkgs - add test for cross-pkgs
 	switch t.Kind {
 	case types.Builtin:
-		//FIXME: nothing to do?  return early?
+		// Nothing more to do.
 	case types.Pointer:
 		klog.V(5).InfoS("  type is a pointer", "type", t.Elem)
 		if t.Elem.Kind == types.Pointer {
