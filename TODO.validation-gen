@@ -52,22 +52,29 @@
 - Error when calling eachVal on non-list types.
 - Add conditional validation (cross-field)
 - Rename PtrOK - it's an awkward name
+
+Airplane:
+- Registration calls functions which were elided - uh oh!
 - Test cross-pkg fields
 - Generator unit tests need updating
 - Catalog all varieties of validations (conditional, mutually-excluysive, numeric, string format, etc)
+- Look at core tests
+- Walk thru hand-written code and enumerate more varieties
+- Port Joe's variable stuff to my branch
+- Think about contingent fields (only validate obj.X if this validation passes)
+- Think about conditional validation (if obj.X is value Y, then validate obj.Z)
+- Think about feature gates and options
 - Try to link typedef-of-typedef to chain validations?
-    Get pos in walkType()
-    for each file in pkg.Syntax[] (ast.File)
-        for each decl in file.Decls[] (ast.Decl -> ast.GenDecl)
-            for each spec in decl.Specs[] (ast.Spec -> ast.TypeSpec)
-                if Name.NamePos matches {
-                    Look at spec.Type
-                    if is ast.Ident
-                        look at ident.Obj
-                        if nil
-                            builtin?
-                        if obj.Kind = Typ
-                            look at obj.Name and obj.Decl.(TypeSpec).Name.NamePos
-                            match that to another type?
-
-
+  Get pos in walkType
+  for each file in pkg.Syntax[] (ast.File)
+        for each decl in file.Decls[] (ast.Decl -> ast.GenDecl)
+                for each spec in decl.Specs[] (ast.Spec -> ast.TypeSpec)
+                        if Name.NamePos matches {
+                                Look at spec.Type
+                                if is ast.Ident
+                                        look at ident.Obj
+                                        if nil
+                                                builtin?
+                                        if obj.Kind = Typ
+                                                look at obj.Name and obj.Decl.(TypeSpec).Name.NamePos
+                                                match that to another type?
