@@ -34,6 +34,9 @@ type T1 struct {
 	// +validateTrue="field T1.T2"
 	T2 T2 `json:"t2"`
 
+	// No internal validations.
+	T3 T3 `json:"t3"`
+
 	// Duplicate types with no validation.
 	AnotherS  string  `json:"anothers"`
 	AnotherI  int     `json:"anotheri"`
@@ -42,6 +45,7 @@ type T1 struct {
 	AnotherT2 T2      `json:"anothert2"`
 }
 
+// Note: This has validations and is linked into the type-graph of T1.
 type T2 struct {
 	// +validateTrue="field T2.S"
 	S string `json:"s"`
@@ -50,5 +54,33 @@ type T2 struct {
 	// +validateTrue="field T2.B"
 	B bool `json:"b"`
 	// +validateTrue="field T2.F"
+	F float64 `json:"f"`
+}
+
+// Note: This has no validations and is linked into the type-graph of T1.
+type T3 struct {
+	S string  `json:"s"`
+	I int     `json:"i"`
+	B bool    `json:"b"`
+	F float64 `json:"f"`
+}
+
+// Note: This has validations and is not linked into the type-graph of T1.
+type T4 struct {
+	// +validateTrue="field T4.S"
+	S string `json:"s"`
+	// +validateTrue="field T4.I"
+	I int `json:"i"`
+	// +validateTrue="field T4.B"
+	B bool `json:"b"`
+	// +validateTrue="field T4.F"
+	F float64 `json:"f"`
+}
+
+// Note: This has no validations and is not linked into the type-graph of T1.
+type T5 struct {
+	S string  `json:"s"`
+	I int     `json:"i"`
+	B bool    `json:"b"`
 	F float64 `json:"f"`
 }

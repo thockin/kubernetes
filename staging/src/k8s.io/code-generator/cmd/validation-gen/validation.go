@@ -781,6 +781,10 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, inType *t
 		addr = "&"
 	}
 
+	// TODO: Currently this is a "blind" call - we hope that the expected
+	// function exists, but we don't verify that.  For cross-package calls we
+	// will need to verify the target, either by naming convention +
+	// fingerprint or by explicit comment-tags or something.
 	tn := g.typeNodes[inType]
 	targs := generator.Args{
 		"addr":     addr,
