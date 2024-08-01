@@ -82,6 +82,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 			return
 		}(obj.T2, fldPath.Child("t2"))...)
 
+	// field T1.T3 has no validation
 	// field T1.AnotherS has no validation
 	// field T1.AnotherI has no validation
 	// field T1.AnotherB has no validation
@@ -123,6 +124,38 @@ func Validate_T2(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
 	errs = append(errs,
 		func(obj float64, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T2.F")...)
+			return
+		}(obj.F, fldPath.Child("f"))...)
+
+	return errs
+}
+
+func Validate_T4(obj *T4, fldPath *field.Path) (errs field.ErrorList) {
+	// field T4.S
+	errs = append(errs,
+		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T4.S")...)
+			return
+		}(obj.S, fldPath.Child("s"))...)
+
+	// field T4.I
+	errs = append(errs,
+		func(obj int, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T4.I")...)
+			return
+		}(obj.I, fldPath.Child("i"))...)
+
+	// field T4.B
+	errs = append(errs,
+		func(obj bool, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T4.B")...)
+			return
+		}(obj.B, fldPath.Child("b"))...)
+
+	// field T4.F
+	errs = append(errs,
+		func(obj float64, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T4.F")...)
 			return
 		}(obj.F, fldPath.Child("f"))...)
 

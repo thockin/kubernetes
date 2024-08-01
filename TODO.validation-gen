@@ -54,8 +54,8 @@
 - Rename PtrOK - it's an awkward name
 
 Airplane:
+- Go thru all output_tests and clean up, simplify, focus
 - Registration calls functions which were elided - uh oh!
-- Test cross-pkg fields
 - Generator unit tests need updating
 - Catalog all varieties of validations (conditional, mutually-excluysive, numeric, string format, etc)
 - Look at core tests
