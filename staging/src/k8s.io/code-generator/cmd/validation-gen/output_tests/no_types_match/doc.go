@@ -18,7 +18,7 @@ limitations under the License.
 // +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package notypesselected
+package notypesmatch
 
 type T1 struct {
 	// +validateTrue="from field T1.S"
@@ -29,10 +29,5 @@ type T1 struct {
 
 type T2 struct {
 	// +validateTrue="from field T2.S"
-	S string
-}
-
-type private struct {
-	// +validateTrue="from field private.S"
 	S string
 }
