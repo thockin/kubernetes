@@ -14,36 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Note: this selects all types in the package.
 // +k8s:validation-gen=*
 
 // This is a test package.
-package alltypesmatch
+package withtypevalidations
 
+// +validateTrue="type T1"
 type T1 struct {
 	// +validateTrue="field T1.S"
-	S  string `json:"s"`
-	T2 T2     `json:"t2"`
-	T3 T3     `json:"t3"`
-}
-
-type T2 struct {
-	// +validateTrue="field T2.S"
 	S string `json:"s"`
 }
 
-type T3 struct {
-	// Note: no validations on this one.
-	S string `json:"s"`
-}
+// Note: this has no validations.
+type T2 struct{}
 
-// Note: not linked into T1 at all.
-type T4 struct {
-	// Note: no validations.
-	S string `json:"s"`
-}
+// +validateTrue="type E1"
+type E1 string
 
-// +validateTrue="type ES"
-type ES string
-
-// Note: no validations.
-type ET1 T1
+// Note: this has no validations.
+type E2 string
