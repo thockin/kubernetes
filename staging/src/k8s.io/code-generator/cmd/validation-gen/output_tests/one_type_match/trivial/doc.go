@@ -17,23 +17,12 @@ limitations under the License.
 // +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package onetypematch
+package trivial
 
 type T1 struct {
 	TypeMeta int
-	// +validateTrue="field T1.S"
-	S string `json:"s"`
-	// +validateTrue="field T1.T2"
-	T2 T2 `json:"t2"`
 }
 
-// +validateTrue="type T2"
-type T2 struct {
-	// +validateTrue="field T2.S"
-	S string `json:"s"`
-}
+type T2 struct{}
 
-// Note: No validations and not linked into the root type-graph.
-type private struct {
-	S string
-}
+type E1 string
