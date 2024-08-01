@@ -597,7 +597,6 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			didSome = true
 		}
 	case types.Slice, types.Array:
-		//FIXME: figure out if we can make this a wrapper-function and do it in one call to validate.ValuesInSlice()
 		targs := targs.WithArgs(generator.Args{
 			"elemType": inType.Elem,
 		})
@@ -744,7 +743,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 				sw.Do("    func(obj $.keyType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 				sw.Append(keyBuf)
 				sw.Do("      return\n", targs)
-				sw.Do("    }(key, fldPath)...)\n", targs) // TODO: we need a way to denote "invalid key"
+				sw.Do("    }(key, fldPath)...)\n", targs)
 			}
 			if valBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
