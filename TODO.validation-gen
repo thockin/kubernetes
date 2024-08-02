@@ -34,15 +34,25 @@
 - Migrate core group to declarative validation
   - xref: Alex's WIP for jobs: https://github.com/alexzielenski/kubectl-validate/blob/jobset/jobset/patches/apis/jobset.x-k8s.io/v1alpha2.json
   - Enable declarative validation for strategies and test
-  - Migrate
+- Prove at least 1 case of each of:
+    - format
+    - schema (maxLen, maxItems, ...)
+    - required
     - enums
-    - required field validation
+    - non-discriminated unions (exactly one of)
+    - discriminated unions
+    - listMap key uniqueness and requiredness
+    - listMap key requiredness
     - SMD/SSA validation
     - OpenAPI value validation
-    - metadata.name/generateName validation
-    - unions
+    - metadata.name/generateName validation based on Object type
+    - label/annotation validations based on Object type
     - cross field validations
+    - IntOrString
+    - immutable (update)
     - update validations
+    - field found in listfield Y (e.g. volume mount name)
+    - dependencies - field X is allowed IFF field Y
 - Use Go-standard-style names for generated functions
 - Decide test regimen for validators lib
 - Fix bug where generating apps API group enables enum generation on core API group
@@ -54,12 +64,10 @@
 - Rename PtrOK - it's an awkward name
 
 Airplane:
-- Go thru all output_tests and clean up, simplify, focus
+- Handle cross-pkg refs to types that don't exist
 - Registration calls functions which were elided - uh oh!
 - Generator unit tests need updating
-- Catalog all varieties of validations (conditional, mutually-excluysive, numeric, string format, etc)
 - Look at core tests
-- Walk thru hand-written code and enumerate more varieties
 - Port Joe's variable stuff to my branch
 - Think about contingent fields (only validate obj.X if this validation passes)
 - Think about conditional validation (if obj.X is value Y, then validate obj.Z)
