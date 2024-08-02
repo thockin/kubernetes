@@ -292,8 +292,10 @@ type childNode struct {
 	underlyingType *types.Type
 	validations    []validators.FunctionGen
 
-	// iterated validation has to be tracked separately from field's validations.
+	// iterated validation has to be tracked separately from the field's validations.
 	eachKey, eachVal []validators.FunctionGen
+	// struct fields can have per-child-member validations.
+	inner map[string][]validators.FunctionGen
 }
 
 const (
@@ -449,6 +451,21 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 						}
 					}
 				}
+			case types.Struct:
+				/////////////////////////////////////////
+				//FIXME: look for "inner" validations
+				if validations, err := td.extractInnerValidations(field.Type, field.CommentLines); err != nil {
+					return fmt.Errorf("%v: %w", fldPath, err)
+				} else {
+					if len(validations) > 0 {
+						klog.V(5).InfoS("  found field-attached inner-validations", "n", len(validations))
+						if child.inner == nil {
+							child.inner = map[string][]validators.FunctionGen{}
+						}
+						child.validations = append(child.validations, validations...)
+					}
+				}
+				/////////////////////////////////////////
 			}
 
 			// Extract any field-attached validation rules.
@@ -500,6 +517,47 @@ func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, 
 		return types.Name{}, false
 	}
 	return types.Name{Package: pkg, Name: "Validate_" + t.Name.Name}, true
+}
+
+// FIXME:
+func (td *typeDiscoverer) extractInnerValidations(t *types.Type, comments []string) ([]validators.FunctionGen, error) {
+	var validations []validators.FunctionGen
+
+	//TODO: also support +k8s:inner
+	//FIXME: tag name and const for it
+	if tagVals, found := gengo.ExtractCommentTags("+", comments)["inner"]; found {
+		for _, tagVal := range tagVals {
+			parts := strings.SplitN(tagVal, "=", 2)
+			if len(parts) != 2 {
+				//FIXME: what?
+				return nil, fmt.Errorf("FIXME")
+			}
+			var childField *types.Member
+			for i := range t.Members {
+				m := &t.Members[i]
+				if m.Name == parts[0] {
+					childField = m
+				}
+			}
+			if childField == nil {
+				//FIXME: what?
+				return nil, fmt.Errorf("FIXME")
+			}
+
+			// Extract any embedded validation rules.
+			fakeComments := []string{parts[1]}
+			//FIXME: pass in "parent.child" for name or just "child"?
+			if innerValidations, err := td.validator.ExtractValidations(fmt.Sprintf("%s", childField.Name), childField.Type, fakeComments); err != nil {
+				return nil, err
+			} else {
+				if len(innerValidations) > 0 {
+					klog.V(5).InfoS("  found inner-validations", "n", len(validations))
+					validations = append(validations, innerValidations...)
+				}
+			}
+		}
+	}
+	return validations, nil
 }
 
 // emitValidationForType writes code for inType, calling type-attached
