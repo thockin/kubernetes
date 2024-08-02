@@ -17,7 +17,7 @@ limitations under the License.
 // +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package aliases
+package typedefs
 
 // +validateTrue="type E1"
 type E1 string

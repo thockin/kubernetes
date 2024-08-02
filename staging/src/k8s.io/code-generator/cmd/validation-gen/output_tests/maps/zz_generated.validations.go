@@ -53,11 +53,6 @@ func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 }
 
 func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// type T1
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type T1")...)
-	}
-
 	// field T1.TypeMeta has no validation
 
 	// field T1.MSS
@@ -228,34 +223,5 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.AnotherMSPS has no validation
 	// field T1.AnotherMPSS has no validation
 	// field T1.AnotherMPSPS has no validation
-	// field T1.AnotherMST2 has no validation
-	// field T1.AnotherMSPT2 has no validation
-
-	// field T1.AnotherMSE1
-	errs = append(errs,
-		func(obj map[string]E1, fldPath *field.Path) (errs field.ErrorList) {
-			for _, val := range obj {
-				errs = append(errs,
-					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_E1(&obj, fldPath)...)
-						return
-					}(val, fldPath.Key(key))...)
-			}
-			return
-		}(obj.AnotherMSE1, fldPath.Child("anothermse1"))...)
-
-	// field T1.AnotherME1S
-	errs = append(errs,
-		func(obj map[E1]string, fldPath *field.Path) (errs field.ErrorList) {
-			for key, _ := range obj {
-				errs = append(errs,
-					func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
-						errs = append(errs, Validate_E1(&obj, fldPath)...)
-						return
-					}(key, fldPath)...)
-			}
-			return
-		}(obj.AnotherME1S, fldPath.Child("anotherme1s"))...)
-
 	return errs
 }

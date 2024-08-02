@@ -19,37 +19,29 @@ limitations under the License.
 // This is a test package.
 package slices
 
-// +validateTrue="type T1"
 type T1 struct {
 	TypeMeta int
 
 	// +validateTrue="field T1.LS"
 	// +eachVal=+validateTrue="val T1.LS[*]"
-	// +eachVal=+required
 	LS []string `json:"ls"`
 	// +validateTrue="field T1.LPS"
 	// +eachVal=+validateTrue="val T1.LPS[*]"
-	// +eachVal=+required
 	LPS []*string `json:"lps"`
 
 	// +validateTrue="field T1.LT2"
 	// +eachVal=+validateTrue="val T1.LT2[*]"
-	// +eachVal=+required
 	LT2 []T2 `json:"lt2"`
 	// +validateTrue="field T1.LPT2"
 	// +eachVal=+validateTrue="val T1.LPT2[*]"
-	// +eachVal=+required
 	LPT2 []*T2 `json:"lpt2"`
 
 	// Duplicate types with no validation.
-	AnotherLS   []string  `json:"anotherls"`
-	AnotherLPS  []*string `json:"anotherlps"`
-	AnotherLT2  []T2      `json:"anotherlt2"`
-	AnotherLPT2 []*T2     `json:"anotherlpt2"`
+	AnotherLS  []string  `json:"anotherls"`
+	AnotherLPS []*string `json:"anotherlps"`
 }
 
-// +validateTrue="type T2"
 type T2 struct {
-	// +validateTrue="field T2.S"
-	S string `json:"s"`
+	// +validateTrue="field T2.LS"
+	LS []string `json:"ls"`
 }

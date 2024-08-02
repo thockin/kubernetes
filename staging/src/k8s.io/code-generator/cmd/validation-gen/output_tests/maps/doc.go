@@ -22,7 +22,6 @@ package maps
 // +validateTrue="type E1"
 type E1 string
 
-// +validateTrue="type T1"
 type T1 struct {
 	TypeMeta int
 
@@ -66,13 +65,8 @@ type T1 struct {
 	AnotherMSPS  map[string]*string  `json:"anothermsps"`
 	AnotherMPSS  map[*string]string  `json:"anothermpss"`
 	AnotherMPSPS map[*string]*string `json:"anothermpsps"`
-	AnotherMST2  map[string]string   `json:"anothermst2"`
-	AnotherMSPT2 map[string]*string  `json:"anothermspt2"`
-	AnotherMSE1  map[string]E1       `json:"anothermse1"`
-	AnotherME1S  map[E1]string       `json:"anotherme1s"`
 }
 
-// +validateTrue="type T2"
 type T2 struct {
 	// +validateTrue="field T2.S"
 	S string `json:"s"`

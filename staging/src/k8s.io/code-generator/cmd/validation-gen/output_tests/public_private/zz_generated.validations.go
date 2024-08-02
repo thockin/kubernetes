@@ -47,7 +47,7 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.Public
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.S")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "field T1.Public")...)
 			return
 		}(obj.Public, fldPath.Child("public"))...)
 

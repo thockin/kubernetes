@@ -98,16 +98,6 @@ func Validate_T1(obj *T1, fldPath *field.Path) (errs field.ErrorList) {
 	// field T1.AnotherPI has no validation
 	// field T1.AnotherPB has no validation
 	// field T1.AnotherPF has no validation
-
-	// field T1.AnotherPT2
-	errs = append(errs,
-		func(obj *T2, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, Validate_T2(obj, fldPath)...)
-			}
-			return
-		}(obj.AnotherPT2, fldPath.Child("aotherpt2"))...)
-
 	return errs
 }
 
