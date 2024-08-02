@@ -20,9 +20,17 @@ limitations under the License.
 package publicprivate
 
 type T1 struct {
-	// +validateTrue="field T1.S"
+	// +validateTrue="field T1.Public"
 	Public string `json:"public"`
 
-	// +validateTrue="field T1.S"
+	// +validateTrue="field T1.private"
+	private string `json:"private"`
+}
+
+type private struct {
+	// +validateTrue="field private.Public"
+	Public string `json:"public"`
+
+	// +validateTrue="field private.private"
 	private string `json:"private"`
 }

@@ -35,13 +35,13 @@ type T1 struct {
 	PT2 *T2 `json:"pt2"`
 
 	// Duplicate types with no validation.
-	AnotherPS  *string  `json:"aotherps"`
-	AnotherPI  *int     `json:"aotherpi"`
-	AnotherPB  *bool    `json:"aotherpb"`
-	AnotherPF  *float64 `json:"aotherpf"`
-	AnotherPT2 *T2      `json:"aotherpt2"`
+	AnotherPS *string  `json:"anotherps"`
+	AnotherPI *int     `json:"anotherpi"`
+	AnotherPB *bool    `json:"anotherpb"`
+	AnotherPF *float64 `json:"anotherpf"`
 }
 
+// Note: This has validations and is linked into the type-graph of T1.
 type T2 struct {
 	// +validateTrue="field T2.PS"
 	PS *string `json:"ps"`

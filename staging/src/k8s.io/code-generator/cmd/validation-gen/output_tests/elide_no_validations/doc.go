@@ -27,6 +27,7 @@ type T1 struct {
 	HasFieldVal HasFieldVal `json:"hasFieldVal"`
 
 	HasNoVal HasNoVal `json:"hasNoVal"`
+
 	// +validateTrue="field T1.HasNoValFieldVal"
 	HasNoValFieldVal HasNoVal `json:"hasNoValFieldVal"`
 }
