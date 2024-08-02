@@ -88,7 +88,10 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (FunctionFlags, 
 		Flags []string `json:"flags"`
 		Msg   string   `json:"msg"`
 	}
-	// We expect either a string or a JSON object.
+	// We expect either a string (maybe empty) or a JSON object.
+	if len(in) == 0 {
+		return 0, "", nil
+	}
 	var pl payload
 	if err := json.Unmarshal([]byte(in), &pl); err != nil {
 		s := ""
