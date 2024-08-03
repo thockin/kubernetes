@@ -28,6 +28,7 @@ import (
 func init() {
 	AddToRegistry(InitValidateTrueDeclarativeValidator)
 	AddToRegistry(InitValidateFalseDeclarativeValidator)
+	AddToRegistry(InitValidateErrorDeclarativeValidator)
 }
 
 func InitValidateTrueDeclarativeValidator(c *generator.Context) DeclarativeValidator {
@@ -42,6 +43,13 @@ type fixedResultDeclarativeValidator struct {
 	result bool
 }
 
+func InitValidateErrorDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+	return &errorDeclarativeValidator{}
+}
+
+type errorDeclarativeValidator struct {
+}
+
 const (
 	// These tags can take no value or a quoted string or a JSON object, which will be used in the
 	// error message.  The JSON object schema is:
@@ -51,6 +59,9 @@ const (
 	//   }
 	validateTrueTagName  = "validateTrue"  // TODO: also support k8s:...
 	validateFalseTagName = "validateFalse" // TODO: also support k8s:...
+
+	// This tag always returns an error from ExtractValidations.
+	validateErrorTagName = "validateError" // TODO: also support k8s:...
 )
 
 var (
@@ -61,22 +72,22 @@ func (v fixedResultDeclarativeValidator) ExtractValidations(field string, t *typ
 	var result []FunctionGen
 
 	if v.result {
-		tagVals, fixedTrue := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
-		if fixedTrue {
-			for _, val := range tagVals {
-				flags, msg, err := v.parseTagVal(val)
-				if err != nil {
-					return nil, err
-				}
-				result = append(result, Function(validateTrueTagName, flags, fixedResultValidator, true, msg))
+		vals := gengo.ExtractCommentTags("+", comments)[validateTrueTagName]
+		for _, val := range vals {
+			flags, msg, err := v.parseTagVal(val)
+			if err != nil {
+				return nil, fmt.Errorf("can't extract +%s tag: %w", validateTrueTagName, err)
 			}
+			result = append(result, Function(validateTrueTagName, flags, fixedResultValidator, true, msg))
 		}
 	} else {
-		vals, fixedFalse := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
-		if fixedFalse {
-			for _, v := range vals {
-				result = append(result, Function(validateFalseTagName, DefaultFlags, fixedResultValidator, false, v))
+		vals := gengo.ExtractCommentTags("+", comments)[validateFalseTagName]
+		for _, val := range vals {
+			flags, msg, err := v.parseTagVal(val)
+			if err != nil {
+				return nil, fmt.Errorf("can't extract +%s tag: %w", validateFalseTagName, err)
 			}
+			result = append(result, Function(validateFalseTagName, flags, fixedResultValidator, false, msg))
 		}
 	}
 
@@ -117,4 +128,12 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (FunctionFlags, 
 	}
 
 	return flags, pl.Msg, nil
+}
+
+func (v errorDeclarativeValidator) ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error) {
+	vals, found := gengo.ExtractCommentTags("+", comments)[validateErrorTagName]
+	if found {
+		return nil, fmt.Errorf("forced error: %q", vals)
+	}
+	return nil, nil
 }
