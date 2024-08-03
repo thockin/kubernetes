@@ -310,7 +310,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 		return nil
 	}
 
-	klog.V(5).InfoS("discovering", "type", t)
+	klog.V(5).InfoS("discovering", "type", t, "kind", t.Kind)
 
 	thisNode := &typeNode{
 		underlyingType: t,
@@ -333,7 +333,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 	case types.Builtin:
 		// Nothing more to do.
 	case types.Pointer:
-		klog.V(5).InfoS("  type is a pointer", "type", t.Elem)
 		if t.Elem.Kind == types.Pointer {
 			klog.Fatalf("type %v: pointers to pointers are not supported", t)
 		}
@@ -341,7 +340,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			return err
 		}
 	case types.Slice, types.Array:
-		klog.V(5).InfoS("  type is a list", "type", t.Elem)
 		if err := td.discover(t.Elem); err != nil {
 			return err
 		}
@@ -349,7 +347,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			underlyingType: t.Elem,
 		}
 	case types.Map:
-		klog.V(5).InfoS("  type is a map", "type", t.Elem)
 		if err := td.discover(t.Key); err != nil {
 			return err
 		}
@@ -364,7 +361,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			underlyingType: t.Elem,
 		}
 	case types.Struct:
-		klog.V(5).InfoS("  type is a struct")
 		fn, ok := td.getValidationFunctionName(t)
 		if !ok {
 			//FIXME: this seems like an error, but is it?  Or just "opaque from here"
@@ -466,7 +462,6 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			thisNode.children = append(thisNode.children, child)
 		}
 	case types.Alias:
-		klog.V(5).InfoS("  type is an alias", "type", t.Underlying)
 		// Note: By the language definition, what gengo calls "Aliases" (really
 		// just "type definitions") have underlying types of the type literal.
 		// In other words, if we define `type T1 string` and `type T2 T1`, the
