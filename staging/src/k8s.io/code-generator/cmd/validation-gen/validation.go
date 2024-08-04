@@ -353,105 +353,17 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 			underlyingType: t.Elem,
 		}
 	case types.Struct:
-		fn, ok := td.getValidationFunctionName(t)
-		if !ok {
+		if fn, ok := td.getValidationFunctionName(t); !ok {
 			//FIXME: this seems like an error, but is it?  Or just "opaque from here"
 			return nil
+		} else {
+			thisNode.funcName = fn
 		}
-		thisNode.funcName = fn
 
-		for _, memb := range t.Members {
-			name := memb.Name
-			if len(name) == 0 {
-				// embedded fields
-				if memb.Type.Kind == types.Pointer {
-					name = memb.Type.Elem.Name.Name
-				} else {
-					name = memb.Type.Name.Name
-				}
-			}
-			// If we try to emit code for this field and find no JSON name, we
-			// will abort.
-			jsonName := ""
-			if tags, ok := lookupJSONTags(memb); ok {
-				jsonName = tags.name
-			}
-			// Only do exported fields.
-			if unicode.IsLower([]rune(memb.Name)[0]) {
-				continue
-			}
-			klog.V(5).InfoS("  field", "name", name)
-
-			if err := td.discover(memb.Type, fldPath); err != nil {
-				return err
-			}
-
-			child := &childNode{
-				name:           name,
-				jsonName:       jsonName,
-				underlyingType: memb.Type,
-			}
-
-			switch memb.Type.Kind {
-			case types.Map:
-				//TODO: also support +k8s:eachKey
-				if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachKeyTag]; found {
-					for _, tagVal := range tagVals {
-						fakeComments := []string{tagVal}
-						// Extract any embedded key-validation rules.
-						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", memb.Name), memb.Type.Key, fakeComments); err != nil {
-							return fmt.Errorf("%v: %w", fldPath, err)
-						} else {
-							if len(validations) > 0 {
-								klog.V(5).InfoS("  found key-validations", "n", len(validations))
-								child.eachKey = append(child.eachKey, validations...)
-							}
-						}
-					}
-				}
-				//TODO: also support +k8s:eachVal
-				if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
-					for _, tagVal := range tagVals {
-						fakeComments := []string{tagVal}
-						// Extract any embedded list-validation rules.
-						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), memb.Type.Elem, fakeComments); err != nil {
-							return fmt.Errorf("%v: %w", fldPath, err)
-						} else {
-							if len(validations) > 0 {
-								klog.V(5).InfoS("  found list-validations", "n", len(validations))
-								child.eachVal = append(child.eachVal, validations...)
-							}
-						}
-					}
-				}
-			case types.Slice, types.Array:
-				//TODO: also support +k8s:eachVal
-				if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
-					for _, tagVal := range tagVals {
-						fakeComments := []string{tagVal}
-						// Extract any embedded list-validation rules.
-						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), memb.Type.Elem, fakeComments); err != nil {
-							return fmt.Errorf("%v: %w", fldPath, err)
-						} else {
-							if len(validations) > 0 {
-								klog.V(5).InfoS("  found list-validations", "n", len(validations))
-								child.eachVal = append(child.eachVal, validations...)
-							}
-						}
-					}
-				}
-			}
-
-			// Extract any field-attached validation rules.
-			if validations, err := td.validator.ExtractValidations(name, memb.Type, memb.CommentLines); err != nil {
-				return fmt.Errorf("%v: %w", fldPath, err)
-			} else {
-				if len(validations) > 0 {
-					klog.V(5).InfoS("  found field-attached value-validations", "n", len(validations))
-					child.validations = append(child.validations, validations...)
-				}
-			}
-			thisNode.children = append(thisNode.children, child)
+		if children, err := td.discoverStruct(t, fldPath); err != nil {
+			return err
+		} else {
+			thisNode.children = children
 		}
 	case types.Alias:
 		// Note: By the language definition, what gengo calls "Aliases" (really
@@ -472,17 +384,136 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 		if err := td.discover(t.Underlying, fldPath); err != nil {
 			return err
 		}
-		fn, ok := td.getValidationFunctionName(t)
-		if !ok {
+		if fn, ok := td.getValidationFunctionName(t); !ok {
 			//FIXME: this seems like an error, but is it?  Or just "opaque from here"
 			return nil
+		} else {
+			thisNode.funcName = fn
 		}
-		thisNode.funcName = fn
 	default:
 		return fmt.Errorf("field %s (%v): kind %v is not supported", fldPath.String(), t, t.Kind)
 	}
 
 	return nil
+}
+
+func stripPointerness(t *types.Type) *types.Type {
+	if t.Kind == types.Pointer {
+		return t.Elem
+	}
+	return t
+}
+
+func (td *typeDiscoverer) discoverStruct(t *types.Type, fldPath *field.Path) ([]*childNode, error) {
+	var children []*childNode
+
+	for _, memb := range t.Members {
+		name := memb.Name
+		if len(name) == 0 {
+			// embedded fields
+			if memb.Type.Kind == types.Pointer {
+				name = memb.Type.Elem.Name.Name
+			} else {
+				name = memb.Type.Name.Name
+			}
+		}
+		// Only do exported fields.
+		if unicode.IsLower([]rune(name)[0]) {
+			continue
+		}
+		membValType := stripPointerness(memb.Type)
+		// If we are descending into a named type, reboot the field path.
+		fldPath := fldPath
+		switch membValType.Kind {
+		case types.Alias, types.Struct:
+			fldPath = field.NewPath(memb.Type.Name.String())
+		default:
+			fldPath = fldPath.Child(name)
+		}
+
+		// If we try to emit code for this field and find no JSON name, we
+		// will abort.
+		jsonName := ""
+		if tags, ok := lookupJSONTags(memb); ok {
+			jsonName = tags.name
+		}
+
+		klog.V(5).InfoS("  field", "name", name, "jsonName", jsonName, "type", memb.Type)
+
+		// Discover the field type and populate typeNodes.
+		if err := td.discover(memb.Type, fldPath); err != nil {
+			return nil, err
+		}
+
+		child := &childNode{
+			name:           name,
+			jsonName:       jsonName,
+			underlyingType: memb.Type,
+		}
+
+		switch membValType.Kind {
+		case types.Map:
+			//TODO: also support +k8s:eachKey
+			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachKeyTag]; found {
+				for _, tagVal := range tagVals {
+					fakeComments := []string{tagVal}
+					// Extract any embedded key-validation rules.
+					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", memb.Name), membValType.Key, fakeComments); err != nil {
+						return nil, fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) > 0 {
+							klog.V(5).InfoS("  found key-validations", "n", len(validations))
+							child.eachKey = append(child.eachKey, validations...)
+						}
+					}
+				}
+			}
+			//TODO: also support +k8s:eachVal
+			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
+				for _, tagVal := range tagVals {
+					fakeComments := []string{tagVal}
+					// Extract any embedded list-validation rules.
+					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), membValType.Elem, fakeComments); err != nil {
+						return nil, fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) > 0 {
+							klog.V(5).InfoS("  found list-validations", "n", len(validations))
+							child.eachVal = append(child.eachVal, validations...)
+						}
+					}
+				}
+			}
+		case types.Slice, types.Array:
+			//TODO: also support +k8s:eachVal
+			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
+				for _, tagVal := range tagVals {
+					fakeComments := []string{tagVal}
+					// Extract any embedded list-validation rules.
+					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), membValType.Elem, fakeComments); err != nil {
+						return nil, fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) > 0 {
+							klog.V(5).InfoS("  found list-validations", "n", len(validations))
+							child.eachVal = append(child.eachVal, validations...)
+						}
+					}
+				}
+			}
+		}
+
+		// Extract any field-attached validation rules.
+		if validations, err := td.validator.ExtractValidations(name, membValType, memb.CommentLines); err != nil {
+			return nil, fmt.Errorf("field %s: %w", fldPath.String(), err)
+		} else {
+			if len(validations) > 0 {
+				klog.V(5).InfoS("  found field-attached value-validations", "n", len(validations))
+				child.validations = append(child.validations, validations...)
+			}
+		}
+
+		children = append(children, child)
+	}
+	return children, nil
 }
 
 func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, bool) {
@@ -557,10 +588,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 			}
 
 			// Get to the real type.
-			t := child.underlyingType
-			if t.Kind == types.Pointer {
-				t = t.Elem
-			}
+			t := stripPointerness(child.underlyingType)
 
 			if t.Kind == types.Struct || t.Kind == types.Alias {
 				// If this field is another type, call its validation function.
@@ -619,10 +647,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 		}
 
 		// Get to the real type.
-		t := inType.Elem
-		if t.Kind == types.Pointer {
-			t = t.Elem
-		}
+		t := stripPointerness(inType.Elem)
 
 		if t.Kind == types.Struct || t.Kind == types.Alias {
 			// If this field is another type, call its validation function.
@@ -673,10 +698,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 		}
 
 		// Get to the real type.
-		t := inType.Key
-		if t.Kind == types.Pointer {
-			t = t.Elem
-		}
+		t := stripPointerness(inType.Key)
 
 		if t.Kind == types.Struct || t.Kind == types.Alias {
 			// If this field is another type, call its validation function.
@@ -709,10 +731,7 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 		}
 
 		// Get to the real type.
-		t = inType.Elem
-		if t.Kind == types.Pointer {
-			t = t.Elem
-		}
+		t = stripPointerness(inType.Elem)
 
 		if t.Kind == types.Struct || t.Kind == types.Alias {
 			// If this field is another type, call its validation function.
