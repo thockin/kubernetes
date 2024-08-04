@@ -360,46 +360,46 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 		}
 		thisNode.funcName = fn
 
-		for _, field := range t.Members {
-			name := field.Name
+		for _, memb := range t.Members {
+			name := memb.Name
 			if len(name) == 0 {
 				// embedded fields
-				if field.Type.Kind == types.Pointer {
-					name = field.Type.Elem.Name.Name
+				if memb.Type.Kind == types.Pointer {
+					name = memb.Type.Elem.Name.Name
 				} else {
-					name = field.Type.Name.Name
+					name = memb.Type.Name.Name
 				}
 			}
 			// If we try to emit code for this field and find no JSON name, we
 			// will abort.
 			jsonName := ""
-			if tags, ok := lookupJSONTags(field); ok {
+			if tags, ok := lookupJSONTags(memb); ok {
 				jsonName = tags.name
 			}
 			// Only do exported fields.
-			if unicode.IsLower([]rune(field.Name)[0]) {
+			if unicode.IsLower([]rune(memb.Name)[0]) {
 				continue
 			}
 			klog.V(5).InfoS("  field", "name", name)
 
-			if err := td.discover(field.Type, fldPath); err != nil {
+			if err := td.discover(memb.Type, fldPath); err != nil {
 				return err
 			}
 
 			child := &childNode{
 				name:           name,
 				jsonName:       jsonName,
-				underlyingType: field.Type,
+				underlyingType: memb.Type,
 			}
 
-			switch field.Type.Kind {
+			switch memb.Type.Kind {
 			case types.Map:
 				//TODO: also support +k8s:eachKey
-				if tagVals, found := gengo.ExtractCommentTags("+", field.CommentLines)[eachKeyTag]; found {
+				if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachKeyTag]; found {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded key-validation rules.
-						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", field.Name), field.Type.Key, fakeComments); err != nil {
+						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", memb.Name), memb.Type.Key, fakeComments); err != nil {
 							return fmt.Errorf("%v: %w", fldPath, err)
 						} else {
 							if len(validations) > 0 {
@@ -410,11 +410,11 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 					}
 				}
 				//TODO: also support +k8s:eachVal
-				if tagVals, found := gengo.ExtractCommentTags("+", field.CommentLines)[eachValTag]; found {
+				if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
-						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", field.Name), field.Type.Elem, fakeComments); err != nil {
+						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), memb.Type.Elem, fakeComments); err != nil {
 							return fmt.Errorf("%v: %w", fldPath, err)
 						} else {
 							if len(validations) > 0 {
@@ -426,11 +426,11 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 				}
 			case types.Slice, types.Array:
 				//TODO: also support +k8s:eachVal
-				if tagVals, found := gengo.ExtractCommentTags("+", field.CommentLines)[eachValTag]; found {
+				if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
 					for _, tagVal := range tagVals {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
-						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", field.Name), field.Type.Elem, fakeComments); err != nil {
+						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), memb.Type.Elem, fakeComments); err != nil {
 							return fmt.Errorf("%v: %w", fldPath, err)
 						} else {
 							if len(validations) > 0 {
@@ -443,7 +443,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 			}
 
 			// Extract any field-attached validation rules.
-			if validations, err := td.validator.ExtractValidations(name, field.Type, field.CommentLines); err != nil {
+			if validations, err := td.validator.ExtractValidations(name, memb.Type, memb.CommentLines); err != nil {
 				return fmt.Errorf("%v: %w", fldPath, err)
 			} else {
 				if len(validations) > 0 {
