@@ -25,6 +25,7 @@ import (
 	"strings"
 	"unicode"
 
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/code-generator/cmd/validation-gen/validators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -262,7 +263,7 @@ func discoverTypes(validator validators.DeclarativeValidator, inputToPkg map[str
 		inputToPkg: inputToPkg,
 		knownTypes: results,
 	}
-	return td.discover(t)
+	return td.discover(t, field.NewPath(t.Name.String()))
 }
 
 // typeNode carries validation informatiuon for a single type.
@@ -306,7 +307,7 @@ const (
 // knownTypes.  The specified comments represent the parent context for this
 // type - the type comments for a type definition or the field comments for a
 // field.
-func (td *typeDiscoverer) discover(t *types.Type) error {
+func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 	// If we already know this type, we are done.
 	if _, ok := td.knownTypes[t]; ok {
 		return nil
@@ -323,7 +324,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 
 	// Extract any type-attached validation rules.
 	if validations, err := td.validator.ExtractValidations(t.Name.Name, t, t.CommentLines); err != nil {
-		return err
+		return fmt.Errorf("%v: %w", fldPath, err)
 	} else {
 		if len(validations) > 0 {
 			klog.V(5).InfoS("  found type-attached validations", "n", len(validations))
@@ -336,27 +337,27 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 		// Nothing more to do.
 	case types.Pointer:
 		if t.Elem.Kind == types.Pointer {
-			klog.Fatalf("type %v: pointers to pointers are not supported", t)
+			return fmt.Errorf("field %s (%v): pointers to pointers are not supported", fldPath.String(), t)
 		}
-		if err := td.discover(t.Elem); err != nil {
+		if err := td.discover(t.Elem, fldPath); err != nil {
 			return err
 		}
 	case types.Slice, types.Array:
-		if err := td.discover(t.Elem); err != nil {
+		if err := td.discover(t.Elem, fldPath); err != nil {
 			return err
 		}
 		thisNode.elem = &childNode{
 			underlyingType: t.Elem,
 		}
 	case types.Map:
-		if err := td.discover(t.Key); err != nil {
+		if err := td.discover(t.Key, fldPath); err != nil {
 			return err
 		}
 		thisNode.key = &childNode{
 			underlyingType: t.Elem,
 		}
 
-		if err := td.discover(t.Elem); err != nil {
+		if err := td.discover(t.Elem, fldPath); err != nil {
 			return err
 		}
 		thisNode.elem = &childNode{
@@ -392,7 +393,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 			}
 			klog.V(5).InfoS("  field", "name", name)
 
-			if err := td.discover(field.Type); err != nil {
+			if err := td.discover(field.Type, fldPath); err != nil {
 				return err
 			}
 
@@ -410,7 +411,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 						fakeComments := []string{tagVal}
 						// Extract any embedded key-validation rules.
 						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", field.Name), field.Type.Key, fakeComments); err != nil {
-							return err
+							return fmt.Errorf("%v: %w", fldPath, err)
 						} else {
 							if len(validations) > 0 {
 								klog.V(5).InfoS("  found key-validations", "n", len(validations))
@@ -425,7 +426,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
 						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", field.Name), field.Type.Elem, fakeComments); err != nil {
-							return err
+							return fmt.Errorf("%v: %w", fldPath, err)
 						} else {
 							if len(validations) > 0 {
 								klog.V(5).InfoS("  found list-validations", "n", len(validations))
@@ -441,7 +442,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 						fakeComments := []string{tagVal}
 						// Extract any embedded list-validation rules.
 						if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", field.Name), field.Type.Elem, fakeComments); err != nil {
-							return err
+							return fmt.Errorf("%v: %w", fldPath, err)
 						} else {
 							if len(validations) > 0 {
 								klog.V(5).InfoS("  found list-validations", "n", len(validations))
@@ -456,7 +457,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 				//FIXME: use a JSON tagval {field: "name", validation=...} ?
 				for _, subfield := range field.Type.Members {
 					if validations, err := td.extractInnerValidations(&subfield, field.CommentLines); err != nil {
-						return err
+						return fmt.Errorf("%v: %w", fldPath, err)
 					} else {
 						if len(validations) == 0 {
 							continue
@@ -499,7 +500,7 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 
 			// Extract any field-attached validation rules.
 			if validations, err := td.validator.ExtractValidations(name, field.Type, field.CommentLines); err != nil {
-				return err
+				return fmt.Errorf("%v: %w", fldPath, err)
 			} else {
 				if len(validations) > 0 {
 					klog.V(5).InfoS("  found field-attached value-validations", "n", len(validations))
@@ -522,9 +523,9 @@ func (td *typeDiscoverer) discover(t *types.Type) error {
 		//       has fields with validation tags, the validation for those fields
 		//       WILL be called from the generated for for the new type.
 		if t.Underlying.Kind == types.Pointer {
-			klog.Fatalf("type %v: aliases to pointers are not supported", t)
+			return fmt.Errorf("field %s (%v): typedefs of pointers are not supported", fldPath.String(), t)
 		}
-		if err := td.discover(t.Underlying); err != nil {
+		if err := td.discover(t.Underlying, fldPath); err != nil {
 			return err
 		}
 		fn, ok := td.getValidationFunctionName(t)

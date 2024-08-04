@@ -227,7 +227,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			klog.V(4).InfoS("pre-processing", "type", t)
 
 			if err := discoverTypes(declarativeValidator, inputToPkg, t, typeNodes); err != nil {
-				klog.Fatalf("failed to discover validations for type %v: %v", t.Name, err)
+				klog.Fatalf("failed to generate validations: %v", err)
 			}
 		}
 
