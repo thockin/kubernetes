@@ -132,16 +132,17 @@ func (a Args) With(key, value interface{}) Args {
 	return a2
 }
 
-// WithArgs makes a copy of a and adds the given arguments.
+// WithArgs makes a copy of a and adds the given arguments. In any keys
+// overlap, the values from rhs win.
 func (a Args) WithArgs(rhs Args) Args {
-	a2 := Args{}
-	for k, v := range rhs {
-		a2[k] = v
-	}
+	result := Args{}
 	for k, v := range a {
-		a2[k] = v
+		result[k] = v
 	}
-	return a2
+	for k, v := range rhs {
+		result[k] = v
+	}
+	return result
 }
 
 func (s *SnippetWriter) Out() io.Writer {
