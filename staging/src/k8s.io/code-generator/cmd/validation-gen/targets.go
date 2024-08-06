@@ -23,6 +23,7 @@ import (
 	"slices"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/code-generator/cmd/validation-gen/validators"
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/generator"
@@ -220,6 +221,26 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
+		//FIXME: new
+		//FIXME: make a ctor
+		td := &typeDiscoverer{
+			validator:   declarativeValidator,
+			inputToPkg:  inputToPkg,
+			typeNodes:   map[*types.Type]*typeNodeNew{},
+			typeTrees:   map[*types.Type]*nodeNew{},
+			nodesByPath: map[string]*nodeNew{},
+		}
+		for _, t := range rootTypes {
+			klog.V(4).InfoS("pre-processing", "type", t)
+			if node, err := td.discoverTypeNew(t, field.NewPath(t.Name.String())); err != nil {
+				klog.Fatalf("failed to generate validations: %v", err)
+			} else {
+				td.typeTrees[t] = node
+				fmt.Println(node.String()) //FIXME:
+			}
+		}
+
+		//FIXME: old
 		for _, t := range rootTypes {
 			if _, ok := typeNodes[t]; ok {
 				continue // already did this one
@@ -227,7 +248,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			klog.V(4).InfoS("pre-processing", "type", t)
 
 			if err := discoverTypes(declarativeValidator, inputToPkg, t, typeNodes); err != nil {
-				klog.Fatalf("failed to generate validations: %v", err)
+				klog.Fatalf("OLD: failed to generate validations: %v", err)
 			}
 		}
 

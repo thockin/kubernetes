@@ -252,8 +252,90 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 type typeDiscoverer struct {
 	validator  validators.DeclarativeValidator
 	inputToPkg map[string]string
-	inProgress map[*types.Type]bool
 	knownTypes map[*types.Type]*typeNode
+
+	typeTrees   map[*types.Type]*nodeNew     // This holds a record for each root type
+	typeNodes   map[*types.Type]*typeNodeNew // This holds a node for every known type //FIXME: rename
+	nodesByPath map[string]*nodeNew          // field-path -> node, including type
+}
+
+type typeNodeNew struct {
+	underlyingType *types.Type
+
+	// These are validations defined on the type.
+	validations []validators.FunctionGen
+}
+
+type nodeNew struct {
+	typeNode *typeNodeNew // always populated
+	parent   *nodeNew     // populated when this node is a struct field, list val, or map key or val
+	name     string       // the field name in the parent, populated when this node is a struct field
+	jsonName string       // always populated when name is populated
+	funcName types.Name   //FIXME: move to typeNodeNew?
+
+	children []*nodeNew // populated when this node is a struct
+	elem     *nodeNew   // populated when this node is a list or map (the value-type)
+	key      *nodeNew   // populated when this node is a map (the key-type)
+
+	// These are validations defined on a field.
+	validations []validators.FunctionGen
+}
+
+func (n *nodeNew) String() string {
+	buf := bytes.Buffer{}
+	visited := map[*nodeNew]bool{n: true}
+	if n.parent == nil {
+		buf.WriteString(fmt.Sprintf("type: %s {\n", n.typeNode.underlyingType))
+	} else {
+		buf.WriteString(fmt.Sprintf("field: %s.%s (%s) {\n", n.parent.typeNode.underlyingType, n.name, n.typeNode.underlyingType))
+	}
+	n.stringValidations(&buf, 1)
+	n.stringChildren(&buf, 1, visited)
+	buf.WriteString("}")
+	return buf.String()
+}
+
+func (n *nodeNew) stringIndent(buf *bytes.Buffer, indent int) {
+	for i := 0; i < indent; i++ {
+		buf.WriteString("    ")
+	}
+}
+
+func (n *nodeNew) stringValidations(buf *bytes.Buffer, indent int) {
+	for _, val := range n.typeNode.validations {
+		n.stringIndent(buf, indent)
+		fn, args := val.SignatureAndArgs()
+		buf.WriteString(fmt.Sprintf("type-validation: %v(%+v)\n", fn, args))
+	}
+	for _, val := range n.validations {
+		n.stringIndent(buf, indent)
+		fn, args := val.SignatureAndArgs()
+		buf.WriteString(fmt.Sprintf("field-validation: %v(%+v)\n", fn, args))
+	}
+	if n.elem != nil {
+		for _, val := range n.elem.validations {
+			n.stringIndent(buf, indent)
+			fn, args := val.SignatureAndArgs()
+			buf.WriteString(fmt.Sprintf("value-validation: %v(%+v)\n", fn, args))
+		}
+	}
+}
+
+func (n *nodeNew) stringChildren(buf *bytes.Buffer, indent int, visited map[*nodeNew]bool) {
+	for _, child := range n.children {
+		n.stringIndent(buf, indent)
+		buf.WriteString(fmt.Sprintf("child: %s (%s) ", child.name, child.typeNode.underlyingType))
+		if visited[child] {
+			buf.WriteString("(recursive)\n")
+			return
+		}
+		visited[child] = true
+		buf.WriteString("{\n")
+		child.stringValidations(buf, indent+1)
+		child.stringChildren(buf, indent+1, visited)
+		n.stringIndent(buf, indent)
+		buf.WriteString("}\n")
+	}
 }
 
 // discoverTypes walks the type graph and populates the result map.
@@ -405,6 +487,130 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 		return fmt.Errorf("field %s (%v): kind %v is not supported", fldPath.String(), t, t.Kind)
 	}
 
+	return nil
+}
+func (td *typeDiscoverer) getTypeNode(t *types.Type, fldPath *field.Path) (*typeNodeNew, error) {
+	if tn := td.typeNodes[t]; tn != nil {
+		return tn, nil
+	}
+	// Populate a new typeNodeNew for t.
+	klog.V(5).InfoS("new type-node", "type", t, "kind", t.Kind)
+
+	tn := &typeNodeNew{
+		underlyingType: t,
+	}
+
+	// Extract any type-attached validation rules.
+	// TODO: do eachVal and eachKey for aliases to slices/maps
+	if validations, err := td.validator.ExtractValidations(t.Name.Name, t, t.CommentLines); err != nil {
+		return nil, fmt.Errorf("%v: %w", fldPath, err)
+	} else {
+		if len(validations) > 0 {
+			klog.V(5).InfoS("  found type-attached validations", "n", len(validations))
+			tn.validations = validations
+		}
+	}
+	td.typeNodes[t] = tn
+
+	return tn, nil
+}
+func (td *typeDiscoverer) discoverTypeNew(t *types.Type, fldPath *field.Path) (*nodeNew, error) {
+	node := &nodeNew{}
+	if err := td.discoverNodeNew(node, t, fldPath); err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+func (td *typeDiscoverer) discoverNodeNew(thisNode *nodeNew, t *types.Type, fldPath *field.Path) error {
+	klog.V(5).InfoS("discovering", "type", t, "kind", t.Kind, "name", thisNode.name, "parent", thisNode.parent)
+
+	// Every type we discover needs a typeNodeNew, but the node passed in here
+	// may already have the typeNode field set, e.g. an "Alias" (type X string)
+	// is set to "X" not "string", even though we are now discovering "string".
+	if tn, err := td.getTypeNode(t, fldPath); err != nil {
+		return err
+	} else if thisNode.typeNode == nil {
+		thisNode.typeNode = tn
+	}
+
+	switch t.Kind {
+	case types.Builtin:
+		// Nothing more to do.
+	case types.Alias:
+		// When we emit code, we can call the type-specific validation function.
+		if fn, ok := td.getValidationFunctionName(t); !ok {
+			//FIXME: this seems like an error, but is it?  Or just "opaque from here"
+			return nil
+		} else {
+			thisNode.funcName = fn
+		}
+
+		// Note: By the language definition, what gengo calls "Aliases" (really
+		// just "type definitions") have underlying types of the type literal.
+		// In other words, if we define `type T1 string` and `type T2 T1`, the
+		// underlying type of T2 is string, not T1.  This means that:
+		//    1) We will emit code for both underlying types. If the underlying
+		//       type is a struct with many fields, we will emit two identical
+		//       functions.
+		//    2) Validating a field of type T2 will NOT call any validation
+		//       defined on the type T1.
+		//    3) In the case of a type definition whose RHS is a struct which
+		//       has fields with validation tags, the validation for those fields
+		//       WILL be called from the generated for for the new type.
+		if t.Underlying.Kind == types.Pointer {
+			return fmt.Errorf("field %s (%v): typedefs of pointers are not supported", fldPath.String(), t)
+		}
+		if err := td.discoverNodeNew(thisNode, t.Underlying, fldPath); err != nil {
+			return err
+		}
+	case types.Struct:
+		// When we emit code, we can call the type-specific validation function.
+		if fn, ok := td.getValidationFunctionName(t); !ok {
+			//FIXME: this seems like an error, but is it?  Or just "opaque from here"
+			return nil
+		} else {
+			thisNode.funcName = fn
+		}
+
+		if children, err := td.discoverStructNew(thisNode, fldPath); err != nil {
+			return err
+		} else {
+			thisNode.children = children
+		}
+	case types.Slice, types.Array:
+		elemNode := &nodeNew{
+			parent: thisNode,
+		}
+		if err := td.discoverNodeNew(thisNode, t.Elem, fldPath.Child("(values)")); err != nil {
+			return err
+		}
+		thisNode.elem = elemNode
+	case types.Map:
+		keyNode := &nodeNew{
+			parent: thisNode,
+		}
+		if err := td.discoverNodeNew(thisNode, t.Key, fldPath.Child("(keys)")); err != nil {
+			return err
+		}
+		thisNode.key = keyNode
+
+		elemNode := &nodeNew{
+			parent: thisNode,
+		}
+		if err := td.discoverNodeNew(thisNode, t.Elem, fldPath.Child("(values)")); err != nil {
+			return err
+		}
+		thisNode.elem = elemNode
+	case types.Pointer:
+		if t.Elem.Kind == types.Pointer {
+			return fmt.Errorf("field %s (%v): pointers to pointers are not supported", fldPath.String(), t)
+		}
+		if err := td.discoverNodeNew(thisNode, t.Elem, fldPath); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("field %s (%v): kind %v is not supported", fldPath.String(), t, t.Kind)
+	}
 	return nil
 }
 
@@ -569,6 +775,180 @@ func (td *typeDiscoverer) discoverStruct(t *types.Type, fldPath *field.Path) ([]
 		}
 
 		children = append(children, child)
+	}
+	return children, nil
+}
+func (td *typeDiscoverer) discoverStructNew(thisNode *nodeNew, fldPath *field.Path) ([]*nodeNew, error) {
+	t := stripPointerness(thisNode.typeNode.underlyingType)
+
+	var children []*nodeNew
+
+	//FIXME: rename back to "field" ?
+	for _, memb := range t.Members {
+		name := memb.Name
+		if len(name) == 0 { // embedded fields
+			if memb.Type.Kind == types.Pointer {
+				name = memb.Type.Elem.Name.Name
+			} else {
+				name = memb.Type.Name.Name
+			}
+		}
+		// Only do exported fields.
+		if unicode.IsLower([]rune(name)[0]) {
+			continue
+		}
+		// If we try to emit code for this field and find no JSON name, we
+		// will abort.
+		jsonName := ""
+		if tags, ok := lookupJSONTags(memb); ok {
+			jsonName = tags.name
+		}
+
+		klog.V(5).InfoS("  field", "name", name, "jsonName", jsonName, "type", memb.Type)
+
+		// If we have seen this field before (specifically the type +
+		// fieldname), then we have some recursion going and can stop.
+		fldPath := fldPath.Child(name)
+		if existing := td.nodesByPath[fldPath.String()]; existing != nil {
+			klog.V(5).InfoS("  field was seen before", "path", fldPath.String())
+			children = append(children, existing)
+			continue
+		}
+
+		// Make a new node and register it ASAP to break any recursion.
+		fieldNode := &nodeNew{
+			parent:   thisNode,
+			name:     name,
+			jsonName: jsonName,
+		}
+		td.nodesByPath[fldPath.String()] = fieldNode
+
+		// Get this member's underlying value type.
+		membValType := stripPointerness(memb.Type)
+
+		// If we are descending into a named type, reboot the field path.
+		/*
+			fldPathFromParent := fldPath.Child(name)
+		*/
+		switch membValType.Kind {
+		case types.Alias, types.Struct:
+			fldPath = field.NewPath(membValType.Name.String())
+		}
+
+		// Extract any field-attached validation rules.
+		if validations, err := td.validator.ExtractValidations(name, membValType, memb.CommentLines); err != nil {
+			return nil, fmt.Errorf("field %s: %w", fldPath.String(), err)
+		} else {
+			if len(validations) > 0 {
+				klog.V(5).InfoS("  found field-attached value-validations", "n", len(validations))
+				fieldNode.validations = append(fieldNode.validations, validations...)
+			}
+		}
+
+		// Discover the field type.
+		err := td.discoverNodeNew(fieldNode, memb.Type, fldPath)
+		if err != nil {
+			return nil, err
+		}
+
+		switch membValType.Kind {
+		case types.Slice, types.Array:
+			//TODO: also support +k8s:eachVal
+			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
+				for _, tagVal := range tagVals {
+					fakeComments := []string{tagVal}
+					// Extract any embedded list-validation rules.
+					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s.(values)", memb.Name), membValType.Elem, fakeComments); err != nil {
+						return nil, fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) > 0 {
+							klog.V(5).InfoS("  found list-validations", "n", len(validations))
+							fieldNode.elem.validations = validations
+						}
+					}
+				}
+			}
+		case types.Map:
+			//TODO: also support +k8s:eachKey
+			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachKeyTag]; found {
+				for _, tagVal := range tagVals {
+					fakeComments := []string{tagVal}
+					// Extract any embedded key-validation rules.
+					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s.(keys)", memb.Name), membValType.Key, fakeComments); err != nil {
+						return nil, fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) > 0 {
+							klog.V(5).InfoS("  found key-validations", "n", len(validations))
+							fieldNode.key.validations = validations
+						}
+					}
+				}
+			}
+			//TODO: also support +k8s:eachVal
+			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
+				for _, tagVal := range tagVals {
+					fakeComments := []string{tagVal}
+					// Extract any embedded list-validation rules.
+					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s.(values)", memb.Name), membValType.Elem, fakeComments); err != nil {
+						return nil, fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) > 0 {
+							klog.V(5).InfoS("  found list-validations", "n", len(validations))
+							fieldNode.elem.validations = validations
+						}
+					}
+				}
+			}
+			/*
+				case types.Struct:
+					/////////////////////////////////////////
+					//FIXME: look for "inner" validations
+					//FIXME: use a JSON tagval {field: "name", validation=...} ?
+					for _, subfield := range membValType.Members {
+						//FIXME: almost exact dup of above first-level struct logic, except doesn't call discover
+						name := subfield.Name
+						if len(name) == 0 {
+							// embedded fields
+							if memb.Type.Kind == types.Pointer {
+								name = subfield.Type.Elem.Name.Name
+							} else {
+								name = subfield.Type.Name.Name
+							}
+						}
+						// If we try to emit code for this field and find no JSON name, we
+						// will abort.
+						jsonName := ""
+						if tags, ok := lookupJSONTags(subfield); ok {
+							jsonName = tags.name
+						}
+						// Only do exported fields.
+						if unicode.IsLower([]rune(memb.Name)[0]) {
+							continue
+						}
+						klog.V(5).InfoS("  subfield", "name", memb.Name, name) //FIXME: we shadowed "name"
+
+						if validations, err := td.extractInnerValidations(&subfield, memb.CommentLines); err != nil {
+							return nil, fmt.Errorf("%v: %w", fldPathFromParent.Child(name), err)
+						} else {
+							if len(validations) == 0 {
+								continue
+							}
+							klog.V(5).InfoS("  found field-attached inner-validations", "n", len(validations))
+
+							subchild := &childNode{
+								name:           name,
+								jsonName:       jsonName,
+								underlyingType: subfield.Type,
+								validations:    validations,
+							}
+							child.inner = append(child.inner, subchild)
+						}
+						////////////////////////////////////////
+					}
+			*/
+		}
+
+		children = append(children, fieldNode)
 	}
 	return children, nil
 }
