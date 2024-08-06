@@ -295,7 +295,7 @@ type childNode struct {
 	// iterated validation has to be tracked separately from the field's validations.
 	eachKey, eachVal []validators.FunctionGen
 	// struct fields can have per-child-member validations.
-	inner map[string][]validators.FunctionGen
+	inner []*childNode
 }
 
 const (
@@ -454,18 +454,48 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) error {
 			case types.Struct:
 				/////////////////////////////////////////
 				//FIXME: look for "inner" validations
-				if validations, err := td.extractInnerValidations(field.Type, field.CommentLines); err != nil {
-					return fmt.Errorf("%v: %w", fldPath, err)
-				} else {
-					if len(validations) > 0 {
-						klog.V(5).InfoS("  found field-attached inner-validations", "n", len(validations))
-						if child.inner == nil {
-							child.inner = map[string][]validators.FunctionGen{}
+				//FIXME: use a JSON tagval {field: "name", validation=...} ?
+				for _, subfield := range field.Type.Members {
+					if validations, err := td.extractInnerValidations(&subfield, field.CommentLines); err != nil {
+						return fmt.Errorf("%v: %w", fldPath, err)
+					} else {
+						if len(validations) == 0 {
+							continue
 						}
-						child.validations = append(child.validations, validations...)
+						klog.V(5).InfoS("  found field-attached inner-validations", "n", len(validations))
+
+						//FIXME: almost exact dup of above first-level struct logic, except doesn't call discover
+						name := subfield.Name
+						if len(name) == 0 {
+							// embedded fields
+							if field.Type.Kind == types.Pointer {
+								name = subfield.Type.Elem.Name.Name
+							} else {
+								name = subfield.Type.Name.Name
+							}
+						}
+						// If we try to emit code for this field and find no JSON name, we
+						// will abort.
+						jsonName := ""
+						if tags, ok := lookupJSONTags(subfield); ok {
+							jsonName = tags.name
+						}
+						// Only do exported fields.
+						if unicode.IsLower([]rune(field.Name)[0]) {
+							continue
+						}
+						klog.V(5).InfoS("  subfield", "name", field.Name, name) //FIXME: we shadowed "name"
+
+						subchild := &childNode{
+							name:           name,
+							jsonName:       jsonName,
+							underlyingType: subfield.Type,
+							validations:    validations,
+						}
+						child.inner = append(child.inner, subchild)
 					}
+					////////////////////////////////////////
 				}
-				/////////////////////////////////////////
 			}
 
 			// Extract any field-attached validation rules.
@@ -520,38 +550,22 @@ func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, 
 }
 
 // FIXME:
-func (td *typeDiscoverer) extractInnerValidations(t *types.Type, comments []string) ([]validators.FunctionGen, error) {
+func (td *typeDiscoverer) extractInnerValidations(subfield *types.Member, comments []string) ([]validators.FunctionGen, error) {
 	var validations []validators.FunctionGen
 
 	//TODO: also support +k8s:inner
 	//FIXME: tag name and const for it
-	if tagVals, found := gengo.ExtractCommentTags("+", comments)["inner"]; found {
+	fieldTag := fmt.Sprintf("%s(%s)", "inner", subfield.Name)
+	if tagVals, found := gengo.ExtractCommentTags("+", comments)[fieldTag]; found {
 		for _, tagVal := range tagVals {
-			parts := strings.SplitN(tagVal, "=", 2)
-			if len(parts) != 2 {
-				//FIXME: what?
-				return nil, fmt.Errorf("FIXME")
-			}
-			var childField *types.Member
-			for i := range t.Members {
-				m := &t.Members[i]
-				if m.Name == parts[0] {
-					childField = m
-				}
-			}
-			if childField == nil {
-				//FIXME: what?
-				return nil, fmt.Errorf("FIXME")
-			}
-
 			// Extract any embedded validation rules.
-			fakeComments := []string{parts[1]}
+			fakeComments := []string{tagVal}
 			//FIXME: pass in "parent.child" for name or just "child"?
-			if innerValidations, err := td.validator.ExtractValidations(fmt.Sprintf("%s", childField.Name), childField.Type, fakeComments); err != nil {
+			if innerValidations, err := td.validator.ExtractValidations(fmt.Sprintf("%s", subfield.Name), subfield.Type, fakeComments); err != nil {
 				return nil, err
 			} else {
 				if len(innerValidations) > 0 {
-					klog.V(5).InfoS("  found inner-validations", "n", len(validations))
+					klog.V(5).InfoS("  found inner-validations", "field", subfield.Name, "n", len(validations))
 					validations = append(validations, innerValidations...)
 				}
 			}
@@ -633,6 +647,44 @@ func (g *genValidations) emitValidationForType(c *generator.Context, inType *typ
 				// If this field is another type, call its validation function.
 				// Checking for nil is handled inside this call.
 				g.emitCallToOtherTypeFunc(c, t, childIsPtr, bufsw)
+				//FIXME: almost exact dup of above
+				for _, subchild := range child.inner {
+					if len(subchild.name) == 0 {
+						klog.Fatalf("missing child name for field in %v", t)
+					}
+					if len(subchild.jsonName) == 0 {
+						klog.Fatalf("missing child JSON name for field %v.%s", t, subchild.name)
+					}
+
+					//FIXME: do we need the extra stuff from parent?
+					targs := targs.WithArgs(generator.Args{
+						"inType":    t,
+						"fieldName": subchild.name,
+						"fieldJSON": subchild.jsonName,
+						"fieldType": subchild.underlyingType,
+					})
+
+					bufsw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+					//TODO: pass val first or fldpath first?  validators do fldpath, why?
+					bufsw.Do("errs = append(errs,\n", targs)
+					bufsw.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+
+					if len(subchild.validations) > 0 {
+						// When calling registered validators, we always pass the
+						// underlying value-type.  E.g. if the field's type is string,
+						// we pass string, and if the field's type is *string, we also
+						// pass string (checking for nil, first).  This means those
+						// validators don't have to know the difference, but it also
+						// means that large structs will be passed by value.  If this
+						// turns out to be a real problem, we could change this to pass
+						// everything by pointer.
+						subchildIsPtr := subchild.underlyingType.Kind == types.Pointer
+						g.emitCallsToValidators(c, subchild.validations, subchildIsPtr, bufsw)
+					}
+					bufsw.Do("    return\n", targs)
+					bufsw.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+					bufsw.Do("\n", nil)
+				}
 			} else {
 				// Descend into this field.
 				g.emitValidationForType(c, t, childIsPtr, bufsw, child.eachKey, child.eachVal)
