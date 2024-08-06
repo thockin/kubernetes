@@ -158,7 +158,6 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	}
 
 	// Build a cache of type->callNode for every type we need.
-	typeNodes := map[*types.Type]*typeNode{}
 	for _, input := range context.Inputs {
 		klog.V(2).InfoS("processing", "pkg", input)
 
@@ -220,13 +219,10 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
+		td := NewTypeDiscoverer(declarativeValidator, inputToPkg)
 		for _, t := range rootTypes {
-			if _, ok := typeNodes[t]; ok {
-				continue // already did this one
-			}
 			klog.V(4).InfoS("pre-processing", "type", t)
-
-			if err := discoverTypes(declarativeValidator, inputToPkg, t, typeNodes); err != nil {
+			if err := td.DiscoverType(t); err != nil {
 				klog.Fatalf("failed to generate validations: %v", err)
 			}
 		}
@@ -244,7 +240,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 				GeneratorsFunc: func(c *generator.Context) (generators []generator.Generator) {
 					return []generator.Generator{
-						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, typeNodes, inputToPkg, declarativeValidator),
+						NewGenValidations(args.OutputFile, pkg.Path, rootTypes, td, inputToPkg, declarativeValidator),
 					}
 				},
 			})

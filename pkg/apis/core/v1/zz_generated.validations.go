@@ -882,7 +882,14 @@ func Validate_RangeAllocation(obj *v1.RangeAllocation, fldPath *field.Path) (err
 func Validate_ReplicationController(obj *v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.ReplicationController.TypeMeta has no validation
 	// field v1.ReplicationController.ObjectMeta has no validation
-	// field v1.ReplicationController.Spec has no validation
+
+	// field v1.ReplicationController.Spec
+	errs = append(errs,
+		func(obj v1.ReplicationControllerSpec, fldPath *field.Path) (errs field.ErrorList) {
+			errs = append(errs, Validate_ReplicationControllerSpec(&obj, fldPath)...)
+			return
+		}(obj.Spec, fldPath.Child("spec"))...)
+
 	// field v1.ReplicationController.Status has no validation
 	return errs
 }
@@ -890,7 +897,37 @@ func Validate_ReplicationController(obj *v1.ReplicationController, fldPath *fiel
 func Validate_ReplicationControllerList(obj *v1.ReplicationControllerList, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.ReplicationControllerList.TypeMeta has no validation
 	// field v1.ReplicationControllerList.ListMeta has no validation
-	// field v1.ReplicationControllerList.Items has no validation
+
+	// field v1.ReplicationControllerList.Items
+	errs = append(errs,
+		func(obj []v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
+			for i, val := range obj {
+				errs = append(errs,
+					func(obj v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
+						errs = append(errs, Validate_ReplicationController(&obj, fldPath)...)
+						return
+					}(val, fldPath.Index(i))...)
+			}
+			return
+		}(obj.Items, fldPath.Child("items"))...)
+
+	return errs
+}
+
+func Validate_ReplicationControllerSpec(obj *v1.ReplicationControllerSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field v1.ReplicationControllerSpec.Replicas has no validation
+	// field v1.ReplicationControllerSpec.MinReadySeconds has no validation
+	// field v1.ReplicationControllerSpec.Selector has no validation
+
+	// field v1.ReplicationControllerSpec.Template
+	errs = append(errs,
+		func(obj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+			if obj != nil {
+				errs = append(errs, Validate_PodTemplateSpec(obj, fldPath)...)
+			}
+			return
+		}(obj.Template, fldPath.Child("template"))...)
+
 	return errs
 }
 
