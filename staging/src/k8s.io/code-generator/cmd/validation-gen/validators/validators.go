@@ -23,7 +23,7 @@ import "k8s.io/gengo/v2/types"
 type DeclarativeValidator interface {
 	// ExtractValidations returns a FunctionGen for each validation this DeclarativeValidator
 	// supports for the given go type, and it's corresponding comment strings.
-	ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error)
+	ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error)
 }
 
 // FunctionFlags define optional properties of a validator.  Most validators

@@ -203,12 +203,14 @@ type typeNode struct {
 	valueType *types.Type // never a pointer, but may be a map, slice, struct, etc.
 	funcName  types.Name  // populated when this type is "opaque"
 
-	fields []*childNode // populated when this type is a struct
-	key    *childNode   // populated when this type is a map
-	elem   *childNode   // populated when this type is a map or slice
+	fields     []*childNode // populated when this type is a struct
+	key        *childNode   // populated when this type is a map
+	elem       *childNode   // populated when this type is a map or slice
+	underlying *childNode   // populated when this type is an alias
 
-	// These are validations defined on the type.
-	typeValidations []validators.FunctionGen
+	typeValidations []validators.FunctionGen // validations on the type
+	keyValidations  []validators.FunctionGen // validations on each key of a map type
+	elemValidations []validators.FunctionGen // validations on each value of a list or map
 }
 
 // lookupField returns the childNode with the specified JSON name.
@@ -331,8 +333,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	td.typeNodes[t] = thisNode
 
 	// Extract any type-attached validation rules.
-	// TODO: do eachVal and eachKey for aliases to slices/maps
-	if validations, err := td.validator.ExtractValidations(t.Name.Name, t, t.CommentLines); err != nil {
+	if validations, err := td.validator.ExtractValidations(t, t.CommentLines); err != nil {
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
 		if len(validations) > 0 {
@@ -355,22 +356,8 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 	case types.Builtin:
 		// Nothing more to do.
 	case types.Alias:
-		// Note: By the language definition, what gengo calls "Aliases" (really
-		// just "type definitions") have underlying types of the type literal.
-		// In other words, if we define `type T1 string` and `type T2 T1`, the
-		// underlying type of T2 is string, not T1.  This means that:
-		//    1) We will emit code for both underlying types. If the underlying
-		//       type is a struct with many fields, we will emit two identical
-		//       functions.
-		//    2) Validating a field of type T2 will NOT call any validation
-		//       defined on the type T1.
-		//    3) In the case of a type definition whose RHS is a struct which
-		//       has fields with validation tags, the validation for those fields
-		//       WILL be called from the generated for for the new type.
-		if t.Underlying.Kind == types.Pointer {
-			return nil, fmt.Errorf("field %s (%v): typedefs of pointers are not supported", fldPath.String(), t)
-		}
-		if _, err := td.discover(t.Underlying, fldPath); err != nil {
+		// Discover into this alias, recursively.
+		if err := td.discoverAlias(thisNode, fldPath); err != nil {
 			return nil, err
 		}
 	case types.Struct:
@@ -458,11 +445,11 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		}
 
 		// Extract any field-attached validation rules.
-		if validations, err := td.validator.ExtractValidations(name, memb.Type, memb.CommentLines); err != nil {
+		if validations, err := td.validator.ExtractValidations(memb.Type, memb.CommentLines); err != nil {
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
 			if len(validations) > 0 {
-				klog.V(5).InfoS("  found field-attached value-validations", "n", len(validations))
+				klog.V(5).InfoS("  found field-attached validations", "n", len(validations))
 				child.fieldValidations = append(child.fieldValidations, validations...)
 			}
 		}
@@ -470,50 +457,35 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		// Add any other field-attached "special" validators.
 		switch childType.Kind {
 		case types.Slice, types.Array:
+			// Extract any embedded list-validation rules.
 			//TODO: also support +k8s:eachVal
-			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
-				for _, tagVal := range tagVals {
-					fakeComments := []string{tagVal}
-					// Extract any embedded list-validation rules.
-					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), childType.Elem, fakeComments); err != nil {
-						return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
-					} else {
-						if len(validations) > 0 {
-							klog.V(5).InfoS("  found list-validations", "n", len(validations))
-							child.elemValidations = validations
-						}
-					}
+			if validations, err := td.extractEmbeddedValidations(eachValTag, memb.CommentLines, childType.Elem); err != nil {
+				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
+			} else {
+				if len(validations) > 0 {
+					klog.V(5).InfoS("found list-validations", "n", len(validations))
+					child.elemValidations = validations
 				}
 			}
 		case types.Map:
+			// Extract any embedded key-validation rules.
 			//TODO: also support +k8s:eachKey
-			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachKeyTag]; found {
-				for _, tagVal := range tagVals {
-					fakeComments := []string{tagVal}
-					// Extract any embedded key-validation rules.
-					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[keys]", memb.Name), childType.Key, fakeComments); err != nil {
-						return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
-					} else {
-						if len(validations) > 0 {
-							klog.V(5).InfoS("  found key-validations", "n", len(validations))
-							child.keyValidations = validations
-						}
-					}
+			if validations, err := td.extractEmbeddedValidations(eachKeyTag, memb.CommentLines, childType.Key); err != nil {
+				return fmt.Errorf("%v: %w", childPath.Key("keys"), err)
+			} else {
+				if len(validations) > 0 {
+					klog.V(5).InfoS("found key-validations", "n", len(validations))
+					child.keyValidations = validations
 				}
 			}
+			// Extract any embedded val-validation rules.
 			//TODO: also support +k8s:eachVal
-			if tagVals, found := gengo.ExtractCommentTags("+", memb.CommentLines)[eachValTag]; found {
-				for _, tagVal := range tagVals {
-					fakeComments := []string{tagVal}
-					// Extract any embedded list-validation rules.
-					if validations, err := td.validator.ExtractValidations(fmt.Sprintf("%s[vals]", memb.Name), childType.Elem, fakeComments); err != nil {
-						return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
-					} else {
-						if len(validations) > 0 {
-							klog.V(5).InfoS("  found list-validations", "n", len(validations))
-							child.elemValidations = validations
-						}
-					}
+			if validations, err := td.extractEmbeddedValidations(eachValTag, memb.CommentLines, childType.Elem); err != nil {
+				return fmt.Errorf("%v: %w", childPath.Key("vals"), err)
+			} else {
+				if len(validations) > 0 {
+					klog.V(5).InfoS("found list-validations", "n", len(validations))
+					child.elemValidations = validations
 				}
 			}
 		}
@@ -533,6 +505,90 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 // are being processed by this generator. For cross-package calls we will need
 // to verify the target, either by naming convention + fingerprint or by
 // explicit comment-tags or something.
+// discoverAlias walks an alias type recursively.
+func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path) error {
+	t := thisNode.valueType
+	underlying := t.Underlying
+
+	// Note: By the language definition, what gengo calls "Aliases" (really
+	// just "type definitions") have underlying types of the type literal.
+	// In other words, if we define `type T1 string` and `type T2 T1`, the
+	// underlying type of T2 is string, not T1.  This means that:
+	//    1) We will emit code for both underlying types. If the underlying
+	//       type is a struct with many fields, we will emit two identical
+	//       functions.
+	//    2) Validating a field of type T2 will NOT call any validation
+	//       defined on the type T1.
+	//    3) In the case of a type definition whose RHS is a struct which
+	//       has fields with validation tags, the validation for those fields
+	//       WILL be called from the generated for for the new type.
+
+	// Discover the underlying type.
+	var child *childNode
+	if node, err := td.discover(underlying, fldPath); err != nil {
+		return err
+	} else {
+		child = &childNode{
+			childType: underlying,
+			node:      node,
+		}
+	}
+	thisNode.underlying = child
+
+	// Add any other type-attached "special" validators.
+	switch underlying.Kind {
+	case types.Slice, types.Array:
+		// Extract any embedded list-validation rules.
+		//TODO: also support +k8s:eachVal
+		if validations, err := td.extractEmbeddedValidations(eachValTag, thisNode.valueType.CommentLines, underlying); err != nil {
+			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
+		} else {
+			if len(validations) > 0 {
+				klog.V(5).InfoS("found list-validations", "n", len(validations))
+				child.elemValidations = validations
+			}
+		}
+	case types.Map:
+		// Extract any embedded key-validation rules.
+		//TODO: also support +k8s:eachKey
+		if validations, err := td.extractEmbeddedValidations(eachKeyTag, thisNode.valueType.CommentLines, underlying); err != nil {
+			return fmt.Errorf("%v: %w", fldPath.Key("keys"), err)
+		} else {
+			if len(validations) > 0 {
+				klog.V(5).InfoS("found key-validations", "n", len(validations))
+				child.keyValidations = validations
+			}
+		}
+		// Extract any embedded val-validation rules.
+		//TODO: also support +k8s:eachVal
+		if validations, err := td.extractEmbeddedValidations(eachValTag, thisNode.valueType.CommentLines, underlying); err != nil {
+			return fmt.Errorf("%v: %w", fldPath.Key("vals"), err)
+		} else {
+			if len(validations) > 0 {
+				klog.V(5).InfoS("found val-validations", "n", len(validations))
+				child.elemValidations = validations
+			}
+		}
+	}
+
+	return nil
+}
+
+func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []string, t *types.Type) ([]validators.FunctionGen, error) {
+	var result []validators.FunctionGen
+	if tagVals, found := gengo.ExtractCommentTags("+", comments)[tag]; found {
+		for _, tagVal := range tagVals {
+			fakeComments := []string{tagVal}
+			if validations, err := td.validator.ExtractValidations(t, fakeComments); err != nil {
+				return nil, err
+			} else {
+				result = append(result, validations...)
+			}
+		}
+	}
+	return result, nil
+}
+
 func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, bool) {
 	pkg, ok := td.inputToPkg[t.Name.Package]
 	if !ok {
@@ -659,7 +715,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 	case types.Builtin:
 		// Nothing further.
 	case types.Alias:
-		// Nothing further.
+		g.emitValidationForChild(c, thisNode.underlying, objIsPtr, sw)
 	case types.Struct:
 		for _, fld := range thisNode.fields {
 			if len(fld.name) == 0 {
@@ -694,9 +750,13 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 
 			// Get to the real type.
 			switch fld.node.valueType.Kind {
-			case types.Struct, types.Alias:
-				// If this field is another type, call its validation function.
-				// Checking for nil is handled inside this call.
+			case types.Alias:
+				// Emit for the underlying type.
+				g.emitValidationForChild(c, fld.node.underlying, childIsPtr, bufsw)
+				// Call the type's validation function.
+				g.emitCallToOtherTypeFunc(c, fld.node, childIsPtr, bufsw)
+			case types.Struct:
+				// Call the type's validation function.
 				g.emitCallToOtherTypeFunc(c, fld.node, childIsPtr, bufsw)
 			default:
 				// Descend into this field.
@@ -726,7 +786,11 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 	case types.Slice, types.Array:
 		targs := targs.WithArgs(generator.Args{
 			"elemType": inType.Elem,
+			"deref":    "", // updated below if needed
 		})
+		if objIsPtr {
+			targs["deref"] = "*"
+		}
 
 		elemIsPtr := inType.Elem.Kind == types.Pointer
 
@@ -735,7 +799,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		elemSW := sw.Dup(elemBuf)
 
 		// Validate each value.
-		validations := thisChild.elemValidations
+		validations := thisNode.elemValidations
+		validations = append(validations, thisChild.elemValidations...)
 		if len(validations) > 0 {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
@@ -761,19 +826,29 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		}
 
 		if elemBuf.Len() > 0 {
-			sw.Do("for i, val := range obj {\n", targs)
+			if objIsPtr {
+				sw.Do("if obj != nil {\n", targs)
+			}
+			sw.Do("for i, val := range $.deref$obj {\n", targs)
 			sw.Do("  errs = append(errs,\n", targs)
 			sw.Do("    func(obj $.elemType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 			sw.Append(elemBuf)
 			sw.Do("      return\n", targs)
 			sw.Do("    }(val, fldPath.Index(i))...)\n", targs)
 			sw.Do("}\n", nil)
+			if objIsPtr {
+				sw.Do("}\n", targs)
+			}
 		}
 	case types.Map:
 		targs := targs.WithArgs(generator.Args{
 			"keyType": inType.Key,
 			"valType": inType.Elem,
+			"deref":   "", // updated below if needed
 		})
+		if objIsPtr {
+			targs["deref"] = "*"
+		}
 
 		keyIsPtr := inType.Key.Kind == types.Pointer
 		valIsPtr := inType.Elem.Kind == types.Pointer
@@ -783,7 +858,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		keySW := sw.Dup(keyBuf)
 
 		// Validate each key.
-		keyValidations := thisChild.keyValidations
+		keyValidations := thisNode.keyValidations
+		keyValidations = append(keyValidations, thisChild.keyValidations...)
 		if len(keyValidations) > 0 {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
@@ -813,7 +889,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		valSW := sw.Dup(valBuf)
 
 		// Validate each value.
-		valValidations := thisChild.elemValidations
+		valValidations := thisNode.elemValidations
+		valValidations = append(valValidations, thisChild.elemValidations...)
 		if len(valValidations) > 0 {
 			// When calling registered validators, we always pass the
 			// underlying value-type.  E.g. if the field's type is string,
@@ -838,15 +915,15 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			// validations.
 		}
 
-		kName, vName := "_", "_"
-		if keyBuf.Len() > 0 {
-			kName = "key"
-		}
+		vName := "_"
 		if valBuf.Len() > 0 {
 			vName = "val"
 		}
 		if keyBuf.Len()+valBuf.Len() > 0 {
-			sw.Do("for $.key$, $.val$ := range obj {\n", targs.WithArgs(generator.Args{"key": kName, "val": vName}))
+			if objIsPtr {
+				sw.Do("if obj != nil {\n", targs)
+			}
+			sw.Do("for key, $.val$ := range $.deref$obj {\n", targs.With("val", vName))
 			if keyBuf.Len() > 0 {
 				sw.Do("  errs = append(errs,\n", targs)
 				sw.Do("    func(obj $.keyType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
@@ -861,6 +938,10 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				sw.Do("      return\n", targs)
 				sw.Do("    }(val, fldPath.Key(key))...)\n", nil) // TODO: what if the key is not a string?
 			}
+			if objIsPtr {
+				sw.Do("}\n", targs)
+			}
+
 			sw.Do("}\n", nil)
 		}
 	default:

@@ -17,31 +17,16 @@ limitations under the License.
 // +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package slices
+package primitive
 
+// +validateTrue="type T1"
 type T1 struct {
 	TypeMeta int
 
 	// +validateTrue="field T1.LS"
-	// +eachVal=+validateTrue="val T1.LS[*]"
+	// +eachVal=+validateTrue="T1.LS[vals]"
 	LS []string `json:"ls"`
-	// +validateTrue="field T1.LPS"
-	// +eachVal=+validateTrue="val T1.LPS[*]"
-	LPS []*string `json:"lps"`
 
-	// +validateTrue="field T1.LT2"
-	// +eachVal=+validateTrue="val T1.LT2[*]"
-	LT2 []T2 `json:"lt2"`
-	// +validateTrue="field T1.LPT2"
-	// +eachVal=+validateTrue="val T1.LPT2[*]"
-	LPT2 []*T2 `json:"lpt2"`
-
-	// Duplicate types with no validation.
-	AnotherLS  []string  `json:"anotherls"`
-	AnotherLPS []*string `json:"anotherlps"`
-}
-
-type T2 struct {
-	// +validateTrue="field T2.LS"
-	LS []string `json:"ls"`
+	// Duplicate with no validation.
+	AnotherLS []string `json:"anotherls"`
 }

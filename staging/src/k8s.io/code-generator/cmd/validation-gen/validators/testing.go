@@ -68,7 +68,7 @@ var (
 	fixedResultValidator = types.Name{Package: libValidationPkg, Name: "FixedResult"}
 )
 
-func (v fixedResultDeclarativeValidator) ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error) {
+func (v fixedResultDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
 	var result []FunctionGen
 
 	if v.result {
@@ -130,7 +130,7 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (FunctionFlags, 
 	return flags, pl.Msg, nil
 }
 
-func (v errorDeclarativeValidator) ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error) {
+func (v errorDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
 	vals, found := gengo.ExtractCommentTags("+", comments)[validateErrorTagName]
 	if found {
 		return nil, fmt.Errorf("forced error: %q", vals)

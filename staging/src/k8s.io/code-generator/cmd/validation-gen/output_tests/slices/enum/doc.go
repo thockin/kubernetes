@@ -14,35 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=*
+// +k8s:validation-gen=TypeMeta
 
 // This is a test package.
-package recursvie
-
-// +validateTrue="type T1"
-type T1 struct {
-	// +validateTrue="field T1.PT1"
-	PT1 *T1 `json:"pt1"`
-
-	// +validateTrue="field T1.T2"
-	T2 T2 `json:"t2"`
-	// +validateTrue="field T1.PT2"
-	PT2 *T2 `json:"pt2"`
-}
-
-// +validateTrue="type T2"
-type T2 struct {
-	// +validateTrue="field T2.PT1"
-	PT1 *T1 `json:"pt1"`
-
-	// +validateTrue="field T2.PT2"
-	PT2 *T2 `json:"pt2"`
-}
+package enum
 
 // +validateTrue="type E1"
-// +eachVal=+validateTrue="type E1 values"
-type E1 []E1
+type E1 string
 
-// +validateTrue="type E2"
-// +eachVal=+validateTrue="type E2 values"
-type E2 []*E2
+type T1 struct {
+	TypeMeta int
+
+	// +validateTrue="field T1.LE1"
+	// +eachVal=+validateTrue="T1.LE1[vals]"
+	LE1 []E1 `json:"le1"`
+
+	// +validateTrue="field T1.LPE1"
+	// +eachVal=+validateTrue="T1.LPE1[vals]"
+	LPE1 []*E1 `json:"lpe1"`
+}

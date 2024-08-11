@@ -44,7 +44,7 @@ var (
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 )
 
-func (openAPIDeclarativeValidator) ExtractValidations(field string, t *types.Type, comments []string) ([]FunctionGen, error) {
+func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) ([]FunctionGen, error) {
 	var v []FunctionGen
 	// Leverage the kube-openapi parser for 'k8s:validation:' validations.
 	schema, err := generators.ParseCommentTags(t, comments, markerPrefix)

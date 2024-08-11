@@ -67,6 +67,16 @@ func Validate_E1(obj *E1, fldPath *field.Path) (errs field.ErrorList) {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E1")...)
 	}
 
+	if obj != nil {
+		for i, val := range *obj {
+			errs = append(errs,
+				func(obj E1, fldPath *field.Path) (errs field.ErrorList) {
+					errs = append(errs, validate.FixedResult(fldPath, obj, true, "type E1 values")...)
+					errs = append(errs, Validate_E1(&obj, fldPath)...)
+					return
+				}(val, fldPath.Index(i))...)
+		}
+	}
 	return errs
 }
 
@@ -76,6 +86,20 @@ func Validate_E2(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
 		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E2")...)
 	}
 
+	if obj != nil {
+		for i, val := range *obj {
+			errs = append(errs,
+				func(obj *E2, fldPath *field.Path) (errs field.ErrorList) {
+					if obj != nil {
+						errs = append(errs, validate.FixedResult(fldPath, *obj, true, "type E2 values")...)
+					}
+					if obj != nil {
+						errs = append(errs, Validate_E2(obj, fldPath)...)
+					}
+					return
+				}(val, fldPath.Index(i))...)
+		}
+	}
 	return errs
 }
 
