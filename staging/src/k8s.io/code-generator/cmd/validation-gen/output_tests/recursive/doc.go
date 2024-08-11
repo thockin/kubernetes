@@ -14,15 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=TypeMeta
+// +k8s:validation-gen=*
 
 // This is a test package.
 package recursvie
 
 // +validateTrue="type T1"
 type T1 struct {
-	TypeMeta int
-
 	// +validateTrue="field T1.PT1"
 	PT1 *T1 `json:"pt1"`
 
@@ -40,3 +38,11 @@ type T2 struct {
 	// +validateTrue="field T2.PT2"
 	PT2 *T2 `json:"pt2"`
 }
+
+// +validateTrue="type E1"
+// +eachValue=+validateTrue="type E1 values"
+type E1 []E1
+
+// +validateTrue="type E2"
+// +eachValue=+validateTrue="type E2 values"
+type E2 []*E2
