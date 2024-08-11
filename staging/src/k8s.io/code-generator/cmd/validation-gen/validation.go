@@ -18,7 +18,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -112,78 +111,24 @@ func (g *genValidations) isOtherPackage(pkg string) bool {
 }
 
 func (g *genValidations) Init(c *generator.Context, w io.Writer) error {
+	klog.V(5).Infof("emitting registration code")
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
-
-	scheme := c.Universe.Type(schemeType)
-	schemePtr := &types.Type{
-		Kind: types.Pointer,
-		Elem: scheme,
+	g.emitRegisterFunction(c, sw)
+	if err := sw.Error(); err != nil {
+		return err
 	}
-	sw.Do("func init() { localSchemeBuilder.Register(RegisterValidations)}\n\n", nil)
-
-	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
-	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
-	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
-	for _, t := range g.rootTypes {
-		node := g.discovered.typeNodes[t]
-		if node == nil {
-			// Should never happen.
-			klog.Fatalf("found nil node for root-type %v", t)
-		}
-
-		// TODO: It would be nice if these were not hard-coded.
-		var statusType *types.Type
-		var statusField string
-		if status := node.lookupField("status"); status != nil {
-			statusType = status.node.valueType
-			statusField = status.name
-		}
-
-		targs := generator.Args{
-			"rootType":    t,
-			"statusType":  statusType,
-			"statusField": statusField,
-			"errorList":   c.Universe.Type(errorListType),
-			"fieldPath":   c.Universe.Type(fieldPathType),
-			"fmtErrorf":   c.Universe.Type(errorfType),
-		}
-		//TODO: can this be (*$.rootType|raw$)(nil) ?
-		sw.Do("scheme.AddValidationFunc(new($.rootType|raw$), func(obj, oldObj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
-		sw.Do("  if len(subresources) == 0 {\n", targs)
-		sw.Do("    return $.rootType|objectvalidationfn$(obj.(*$.rootType|raw$), nil)\n", targs)
-		sw.Do("  }\n", targs)
-
-		if statusType != nil {
-			sw.Do("  if len(subresources) == 1 && subresources[0] == \"status\" {\n", targs)
-			if g.hasValidations(g.discovered.typeNodes[statusType]) {
-				sw.Do("    root := obj.(*$.rootType|raw$)\n", targs)
-				sw.Do("    return $.statusType|objectvalidationfn$(&root.$.statusField$, nil)\n", targs)
-			} else {
-				sw.Do("    return nil // $.statusType|raw$ has no validation\n", targs)
-			}
-			sw.Do("  }\n", targs)
-		}
-		sw.Do("  return $.errorList|raw${field.InternalError(nil, $.fmtErrorf|raw$(\"no validation found for %T, subresources: %v\", obj, subresources))}\n", targs)
-		sw.Do("})\n", targs)
-
-		// TODO: Support update validations
-		//       This will require correlating old object.
-	}
-	sw.Do("return nil\n", nil)
-	sw.Do("}\n\n", nil)
-	return sw.Error()
+	return nil
 }
 
 func (g *genValidations) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
 	klog.V(5).Infof("emitting validation code for type %v", t)
 
-	var errs []error
 	sw := generator.NewSnippetWriter(w, c, "$", "$")
 	g.emitValidationFunction(c, t, sw)
 	if err := sw.Error(); err != nil {
-		errs = append(errs, err)
+		return err
 	}
-	return errors.Join(errs...)
+	return nil
 }
 
 func (g *genValidations) hasValidations(n *typeNode) bool {
@@ -218,28 +163,6 @@ func (g *genValidations) hasValidationsMiss(n *typeNode) bool {
 	return false
 }
 
-func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
-	targs := generator.Args{
-		"inType":    t,
-		"errorList": c.Universe.Type(errorListType),
-		"fieldPath": c.Universe.Type(fieldPathType),
-	}
-
-	sw.Do("func $.inType|objectvalidationfn$(obj *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
-	node := g.discovered.typeNodes[t]
-	if node == nil {
-		// Should never happen.
-		klog.Fatalf("found nil node for type %v", t)
-	}
-	fakeChild := &childNode{
-		node:      node,
-		childType: t,
-	}
-	g.emitValidationForChild(c, fakeChild, true, sw)
-	sw.Do("return errs\n", nil)
-	sw.Do("}\n\n", nil)
-}
-
 // typeDiscoverer contains fields necessary to build graphs of types.
 type typeDiscoverer struct {
 	validator  validators.DeclarativeValidator
@@ -259,6 +182,19 @@ func NewTypeDiscoverer(validator validators.DeclarativeValidator, inputToPkg map
 	}
 }
 
+// childNode represents a type which is used in another type (e.g. a struct
+// field).
+type childNode struct {
+	name      string      // the field name in the parent, populated when this node is a struct field
+	jsonName  string      // always populated when name is populated
+	childType *types.Type // the real type of the child (may be a pointer)
+	node      *typeNode   // the node of the child's value type
+
+	fieldValidations []validators.FunctionGen // validations on the field
+	keyValidations   []validators.FunctionGen // validations on each key of a map field
+	elemValidations  []validators.FunctionGen // validations on each value of a list or map
+}
+
 // typeNode represents a node in the type-graph, annotated with information
 // about validations.  Everything in this type, transitively, is assoctiated
 // with the type, and not any specific instance of that type (e.g. when used as
@@ -275,9 +211,19 @@ type typeNode struct {
 	typeValidations []validators.FunctionGen
 }
 
-// Dump returns a multi-line string which represents a typeNode and its
+// lookupField returns the childNode with the specified JSON name.
+func (n typeNode) lookupField(jsonName string) *childNode {
+	for _, fld := range n.fields {
+		if fld.jsonName == jsonName {
+			return fld
+		}
+	}
+	return nil
+}
+
+// dump returns a multi-line string which represents a typeNode and its
 // children.  This can be used to debug the type graph.
-func (n *typeNode) Dump() string {
+func (n *typeNode) dump() string {
 	buf := bytes.Buffer{}
 	visited := map[*typeNode]bool{}
 	buf.WriteString(fmt.Sprintf("type %s {\n", n.valueType))
@@ -333,29 +279,6 @@ func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*type
 	}
 }
 
-// childNode represents a type which is used in another type (e.g. a struct
-// field).
-type childNode struct {
-	name      string      // the field name in the parent, populated when this node is a struct field
-	jsonName  string      // always populated when name is populated
-	childType *types.Type // the real type of the child (may be a pointer)
-	node      *typeNode   // the node of the child's value type
-
-	fieldValidations []validators.FunctionGen // validations on the field
-	keyValidations   []validators.FunctionGen // validations on each key of a map field
-	elemValidations  []validators.FunctionGen // validations on each value of a list or map
-}
-
-// lookupField returns the childNode with the specified JSON name.
-func (n typeNode) lookupField(jsonName string) *childNode {
-	for _, fld := range n.fields {
-		if fld.jsonName == jsonName {
-			return fld
-		}
-	}
-	return nil
-}
-
 const (
 	// This tag defines a validation which is to be run on each key in a map.
 	eachKeyTag = "eachKey"
@@ -373,7 +296,7 @@ func (td *typeDiscoverer) DiscoverType(t *types.Type) error {
 	if node, err := td.discover(t, fldPath); err != nil {
 		return err
 	} else {
-		fmt.Println(node.Dump()) //FIXME: remove
+		fmt.Println(node.dump()) //FIXME: remove
 	}
 	return nil
 }
@@ -616,6 +539,92 @@ func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, 
 		return types.Name{}, false
 	}
 	return types.Name{Package: pkg, Name: "Validate_" + t.Name.Name}, true
+}
+
+// emitRegisterFunction emits the type-registration logic for validation
+// functions.
+func (g *genValidations) emitRegisterFunction(c *generator.Context, sw *generator.SnippetWriter) {
+	scheme := c.Universe.Type(schemeType)
+	schemePtr := &types.Type{
+		Kind: types.Pointer,
+		Elem: scheme,
+	}
+
+	sw.Do("func init() { localSchemeBuilder.Register(RegisterValidations)}\n\n", nil)
+
+	sw.Do("// RegisterValidations adds validation functions to the given scheme.\n", nil)
+	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
+	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
+	for _, t := range g.rootTypes {
+		node := g.discovered.typeNodes[t]
+		if node == nil {
+			// Should never happen.
+			klog.Fatalf("found nil node for root-type %v", t)
+		}
+
+		// TODO: It would be nice if these were not hard-coded.
+		var statusType *types.Type
+		var statusField string
+		if status := node.lookupField("status"); status != nil {
+			statusType = status.node.valueType
+			statusField = status.name
+		}
+
+		targs := generator.Args{
+			"rootType":    t,
+			"statusType":  statusType,
+			"statusField": statusField,
+			"errorList":   c.Universe.Type(errorListType),
+			"fieldPath":   c.Universe.Type(fieldPathType),
+			"fmtErrorf":   c.Universe.Type(errorfType),
+		}
+		//TODO: can this be (*$.rootType|raw$)(nil) ?
+		sw.Do("scheme.AddValidationFunc(new($.rootType|raw$), func(obj, oldObj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
+		sw.Do("  if len(subresources) == 0 {\n", targs)
+		sw.Do("    return $.rootType|objectvalidationfn$(obj.(*$.rootType|raw$), nil)\n", targs)
+		sw.Do("  }\n", targs)
+
+		if statusType != nil {
+			sw.Do("  if len(subresources) == 1 && subresources[0] == \"status\" {\n", targs)
+			if g.hasValidations(g.discovered.typeNodes[statusType]) {
+				sw.Do("    root := obj.(*$.rootType|raw$)\n", targs)
+				sw.Do("    return $.statusType|objectvalidationfn$(&root.$.statusField$, nil)\n", targs)
+			} else {
+				sw.Do("    return nil // $.statusType|raw$ has no validation\n", targs)
+			}
+			sw.Do("  }\n", targs)
+		}
+		sw.Do("  return $.errorList|raw${field.InternalError(nil, $.fmtErrorf|raw$(\"no validation found for %T, subresources: %v\", obj, subresources))}\n", targs)
+		sw.Do("})\n", targs)
+
+		// TODO: Support update validations
+		//       This will require correlating old object.
+	}
+	sw.Do("return nil\n", nil)
+	sw.Do("}\n\n", nil)
+}
+
+// emitValidationFunction emits a validation function for the specified type.
+func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
+	targs := generator.Args{
+		"inType":    t,
+		"errorList": c.Universe.Type(errorListType),
+		"fieldPath": c.Universe.Type(fieldPathType),
+	}
+
+	sw.Do("func $.inType|objectvalidationfn$(obj *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+	node := g.discovered.typeNodes[t]
+	if node == nil {
+		// Should never happen.
+		klog.Fatalf("found nil node for type %v", t)
+	}
+	fakeChild := &childNode{
+		node:      node,
+		childType: t,
+	}
+	g.emitValidationForChild(c, fakeChild, true, sw)
+	sw.Do("return errs\n", nil)
+	sw.Do("}\n\n", nil)
 }
 
 // emitValidationForChild emits code for the specified childNode, calling
