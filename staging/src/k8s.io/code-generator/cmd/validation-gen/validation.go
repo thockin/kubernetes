@@ -396,7 +396,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 			}
 		}
 	default:
-		return nil, fmt.Errorf("field %s (%v): kind %v is not supported", fldPath.String(), t, t.Kind)
+		return nil, fmt.Errorf("field %s (%v, kind %v) is not supported", fldPath.String(), t, t.Kind)
 	}
 
 	return thisNode, nil
