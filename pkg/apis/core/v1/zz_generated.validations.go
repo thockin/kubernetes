@@ -1021,6 +1021,11 @@ func Validate_ContainerStatus(in *v1.ContainerStatus, fldPath *field.Path) (errs
 		errs = append(errs, Validate_ContainerUser(in.User, fldPath.Child("user"))...)
 	}
 
+	// AllocatedResourcesStatus
+	for i, val := range in.AllocatedResourcesStatus {
+		errs = append(errs, Validate_ResourceStatus(&val, fldPath.Index(i))...)
+	}
+
 	return errs
 }
 
@@ -1585,6 +1590,7 @@ func Validate_HostAlias(in *v1.HostAlias, fldPath *field.Path) (errs field.Error
 
 func Validate_HostIP(in *v1.HostIP, fldPath *field.Path) (errs field.ErrorList) {
 	// IP
+	errs = append(errs, validate.Required(fldPath.Child("ip"), in.IP)...)
 
 	return errs
 }
@@ -1670,6 +1676,15 @@ func Validate_ISCSIVolumeSource(in *v1.ISCSIVolumeSource, fldPath *field.Path) (
 	}
 
 	// InitiatorName
+
+	return errs
+}
+
+func Validate_ImageVolumeSource(in *v1.ImageVolumeSource, fldPath *field.Path) (errs field.ErrorList) {
+	// Reference
+
+	// PullPolicy
+	errs = append(errs, Validate_PullPolicy(&in.PullPolicy, fldPath.Child("pullPolicy"))...)
 
 	return errs
 }
@@ -2061,6 +2076,12 @@ func Validate_NodeDaemonEndpoints(in *v1.NodeDaemonEndpoints, fldPath *field.Pat
 	return errs
 }
 
+func Validate_NodeFeatures(in *v1.NodeFeatures, fldPath *field.Path) (errs field.ErrorList) {
+	// SupplementalGroupsPolicy
+
+	return errs
+}
+
 func Validate_NodeInclusionPolicy(in *v1.NodeInclusionPolicy, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
@@ -2106,6 +2127,8 @@ func Validate_NodeRuntimeHandler(in *v1.NodeRuntimeHandler, fldPath *field.Path)
 
 func Validate_NodeRuntimeHandlerFeatures(in *v1.NodeRuntimeHandlerFeatures, fldPath *field.Path) (errs field.ErrorList) {
 	// RecursiveReadOnlyMounts
+
+	// UserNamespaces
 
 	return errs
 }
@@ -2225,6 +2248,11 @@ func Validate_NodeStatus(in *v1.NodeStatus, fldPath *field.Path) (errs field.Err
 	// RuntimeHandlers
 	for i, val := range in.RuntimeHandlers {
 		errs = append(errs, Validate_NodeRuntimeHandler(&val, fldPath.Index(i))...)
+	}
+
+	// Features
+	if in.Features != nil {
+		errs = append(errs, Validate_NodeFeatures(in.Features, fldPath.Child("features"))...)
 	}
 
 	return errs
@@ -2831,6 +2859,7 @@ func Validate_PodFSGroupChangePolicy(in *v1.PodFSGroupChangePolicy, fldPath *fie
 
 func Validate_PodIP(in *v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
 	// IP
+	errs = append(errs, validate.Required(fldPath.Child("ip"), in.IP)...)
 
 	return errs
 }
@@ -3525,6 +3554,8 @@ func Validate_ReplicationControllerStatus(in *v1.ReplicationControllerStatus, fl
 func Validate_ResourceClaim(in *v1.ResourceClaim, fldPath *field.Path) (errs field.ErrorList) {
 	// Name
 
+	// Request
+
 	return errs
 }
 
@@ -3536,6 +3567,24 @@ func Validate_ResourceFieldSelector(in *v1.ResourceFieldSelector, fldPath *field
 	// Divisor
 	errs = append(errs, unnameable_(&in.Divisor, fldPath.Child("divisor"))...)
 
+	return errs
+}
+
+func Validate_ResourceHealth(in *v1.ResourceHealth, fldPath *field.Path) (errs field.ErrorList) {
+	// ResourceID
+	errs = append(errs, Validate_ResourceID(&in.ResourceID, fldPath.Child("resourceID"))...)
+
+	// Health
+	errs = append(errs, Validate_ResourceHealthStatus(&in.Health, fldPath.Child("health"))...)
+
+	return errs
+}
+
+func Validate_ResourceHealthStatus(in *v1.ResourceHealthStatus, fldPath *field.Path) (errs field.ErrorList) {
+	return errs
+}
+
+func Validate_ResourceID(in *v1.ResourceID, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
@@ -3625,6 +3674,19 @@ func Validate_ResourceRequirements(in *v1.ResourceRequirements, fldPath *field.P
 }
 
 func Validate_ResourceResizeRestartPolicy(in *v1.ResourceResizeRestartPolicy, fldPath *field.Path) (errs field.ErrorList) {
+	return errs
+}
+
+func Validate_ResourceStatus(in *v1.ResourceStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// Name
+	errs = append(errs, validate.Required(fldPath.Child("name"), in.Name)...)
+	errs = append(errs, Validate_ResourceName(&in.Name, fldPath.Child("name"))...)
+
+	// Resources
+	for i, val := range in.Resources {
+		errs = append(errs, Validate_ResourceHealth(&val, fldPath.Index(i))...)
+	}
+
 	return errs
 }
 
@@ -4533,6 +4595,11 @@ func Validate_VolumeSource(in *v1.VolumeSource, fldPath *field.Path) (errs field
 	// Ephemeral
 	if in.Ephemeral != nil {
 		errs = append(errs, Validate_EphemeralVolumeSource(in.Ephemeral, fldPath.Child("ephemeral"))...)
+	}
+
+	// Image
+	if in.Image != nil {
+		errs = append(errs, Validate_ImageVolumeSource(in.Image, fldPath.Child("image"))...)
 	}
 
 	return errs
