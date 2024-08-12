@@ -80,7 +80,7 @@ func (persistentvolumeStrategy) Validate(ctx context.Context, obj runtime.Object
 	opts := validation.ValidationOptionsForPersistentVolume(persistentvolume, nil)
 	errorList := validation.ValidatePersistentVolume(persistentvolume, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(persistentvolume)...)
-	errorList = append(errorList, rest.ValidateDeclaratively(ctx, obj)...)
+	errorList = append(errorList, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return errorList
 }
 
@@ -112,7 +112,7 @@ func (persistentvolumeStrategy) ValidateUpdate(ctx context.Context, obj, old run
 	errorList := validation.ValidatePersistentVolume(newPv, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(newPv)...)
 	errorList = append(errorList, validation.ValidatePersistentVolumeUpdate(newPv, oldPv, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return errorList
 }
 
@@ -166,7 +166,7 @@ func (persistentvolumeStatusStrategy) PrepareForUpdate(ctx context.Context, obj,
 
 func (persistentvolumeStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidatePersistentVolumeStatusUpdate(obj.(*api.PersistentVolume), old.(*api.PersistentVolume))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

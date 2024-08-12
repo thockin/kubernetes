@@ -84,7 +84,7 @@ func (persistentvolumeclaimStrategy) Validate(ctx context.Context, obj runtime.O
 	pvc := obj.(*api.PersistentVolumeClaim)
 	opts := validation.ValidationOptionsForPersistentVolumeClaim(pvc, nil)
 	allErrs := validation.ValidatePersistentVolumeClaim(pvc, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -128,7 +128,7 @@ func (persistentvolumeclaimStrategy) ValidateUpdate(ctx context.Context, obj, ol
 	opts := validation.ValidationOptionsForPersistentVolumeClaim(newPvc, oldPvc)
 	errorList := validation.ValidatePersistentVolumeClaim(newPvc, opts)
 	errorList = append(errorList, validation.ValidatePersistentVolumeClaimUpdate(newPvc, oldPvc, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return errorList
 }
 

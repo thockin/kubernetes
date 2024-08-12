@@ -48,7 +48,7 @@ func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 
 func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceAccount(obj.(*api.ServiceAccount))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -75,7 +75,7 @@ func cleanSecretReferences(serviceAccount *api.ServiceAccount) {
 
 func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceAccountUpdate(obj.(*api.ServiceAccount), old.(*api.ServiceAccount))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

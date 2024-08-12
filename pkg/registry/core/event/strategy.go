@@ -62,7 +62,7 @@ func (eventStrategy) Validate(ctx context.Context, obj runtime.Object) field.Err
 	groupVersion := requestGroupVersion(ctx)
 	event := obj.(*api.Event)
 	allErrs := validation.ValidateEventCreate(event, groupVersion)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -82,7 +82,7 @@ func (eventStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object
 	event := obj.(*api.Event)
 	oldEvent := old.(*api.Event)
 	allErrs := validation.ValidateEventUpdate(event, oldEvent, groupVersion)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

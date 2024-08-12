@@ -57,7 +57,7 @@ func (podTemplateStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	template := obj.(*api.PodTemplate)
 	opts := pod.GetValidationOptionsFromPodTemplate(&template.Template, nil)
 	allErrs := corevalidation.ValidatePodTemplate(template, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -99,7 +99,7 @@ func (podTemplateStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 	// Allow downward api usage of hugepages on pod update if feature is enabled or if the old pod already had used them.
 	opts := pod.GetValidationOptionsFromPodTemplate(&template.Template, &oldTemplate.Template)
 	allErrs := corevalidation.ValidatePodTemplateUpdate(template, oldTemplate, opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

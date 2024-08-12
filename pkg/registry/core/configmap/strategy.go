@@ -62,7 +62,7 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	cfg := obj.(*api.ConfigMap)
 
 	allErrs := validation.ValidateConfigMap(cfg)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -87,7 +87,7 @@ func (strategy) ValidateUpdate(ctx context.Context, newObj, oldObj runtime.Objec
 	oldCfg, newCfg := oldObj.(*api.ConfigMap), newObj.(*api.ConfigMap)
 
 	allErrs := validation.ValidateConfigMapUpdate(newCfg, oldCfg)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, newCfg, oldCfg)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, newCfg, oldCfg)...)
 	return allErrs
 }
 

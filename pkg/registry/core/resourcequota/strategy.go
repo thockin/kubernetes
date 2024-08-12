@@ -74,7 +74,7 @@ func (resourcequotaStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 func (resourcequotaStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	resourcequota := obj.(*api.ResourceQuota)
 	allErrs := validation.ValidateResourceQuota(resourcequota)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -96,7 +96,7 @@ func (resourcequotaStrategy) AllowCreateOnUpdate() bool {
 func (resourcequotaStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	newObj, oldObj := obj.(*api.ResourceQuota), old.(*api.ResourceQuota)
 	allErrs := validation.ValidateResourceQuotaUpdate(newObj, oldObj)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 
@@ -136,7 +136,7 @@ func (resourcequotaStatusStrategy) PrepareForUpdate(ctx context.Context, obj, ol
 
 func (resourcequotaStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateResourceQuotaStatusUpdate(obj.(*api.ResourceQuota), old.(*api.ResourceQuota))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

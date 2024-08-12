@@ -63,7 +63,7 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	revision := obj.(*apps.ControllerRevision)
 
 	allErrs := validation.ValidateControllerRevisionCreate(revision)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -82,7 +82,7 @@ func (strategy) AllowUnconditionalUpdate() bool {
 func (strategy) ValidateUpdate(ctx context.Context, newObj, oldObj runtime.Object) field.ErrorList {
 	oldRevision, newRevision := oldObj.(*apps.ControllerRevision), newObj.(*apps.ControllerRevision)
 	allErrs := validation.ValidateControllerRevisionUpdate(newRevision, oldRevision)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, newObj, oldObj)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, newObj, oldObj)...)
 	return allErrs
 }
 

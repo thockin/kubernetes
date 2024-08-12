@@ -59,7 +59,7 @@ func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 
 func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateSecret(obj.(*api.Secret))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -89,7 +89,7 @@ func (strategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
 
 func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateSecretUpdate(obj.(*api.Secret), old.(*api.Secret))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

@@ -121,7 +121,7 @@ func (podStrategy) Validate(ctx context.Context, obj runtime.Object) field.Error
 	opts := podutil.GetValidationOptionsFromPodSpecAndMeta(&pod.Spec, nil, &pod.ObjectMeta, nil)
 	opts.ResourceIsPod = true
 	allErrs := corevalidation.ValidatePodCreate(pod, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -153,7 +153,7 @@ func (podStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) 
 	opts := podutil.GetValidationOptionsFromPodSpecAndMeta(&pod.Spec, &oldPod.Spec, &pod.ObjectMeta, &oldPod.ObjectMeta)
 	opts.ResourceIsPod = true
 	allErrs := corevalidation.ValidatePodUpdate(obj.(*api.Pod), old.(*api.Pod), opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

@@ -123,7 +123,7 @@ func (daemonSetStrategy) Validate(ctx context.Context, obj runtime.Object) field
 	daemonSet := obj.(*apps.DaemonSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&daemonSet.Spec.Template, nil)
 	allErrs := validation.ValidateDaemonSet(daemonSet, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -169,7 +169,7 @@ func (daemonSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Ob
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 
 	return allErrs
 }
@@ -215,7 +215,7 @@ func (daemonSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old ru
 
 func (daemonSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateDaemonSetStatusUpdate(obj.(*apps.DaemonSet), old.(*apps.DaemonSet))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

@@ -54,7 +54,7 @@ func (endpointsStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 // Validate validates a new endpoints.
 func (endpointsStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsCreate(obj.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 

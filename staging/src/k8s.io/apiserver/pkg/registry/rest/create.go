@@ -32,7 +32,6 @@ import (
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/apiserver/pkg/warning"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 )
 
 // RESTCreateStrategy defines the minimum validation, accepted input, and
@@ -223,31 +222,31 @@ func AdmissionToValidateObjectFunc(admit admission.Interface, staticAttributes a
 	}
 }
 
-func ValidateDeclaratively(ctx context.Context, obj runtime.Object, subresources ...string) field.ErrorList {
+func ValidateDeclaratively(ctx context.Context, scheme *runtime.Scheme, obj runtime.Object, subresources ...string) field.ErrorList {
 	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
 		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
-		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		versionedObj, err := scheme.ConvertToVersion(obj, groupVersion)
 		if err != nil {
 			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
 		}
-		return legacyscheme.Scheme.Validate(versionedObj, subresources...)
+		return scheme.Validate(versionedObj, subresources...)
 	} else {
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}
 }
 
-func ValidateUpdateDeclaratively(ctx context.Context, obj, oldObj runtime.Object, subresources ...string) field.ErrorList {
+func ValidateUpdateDeclaratively(ctx context.Context, scheme *runtime.Scheme, obj, oldObj runtime.Object, subresources ...string) field.ErrorList {
 	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
 		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
-		versionedObj, err := legacyscheme.Scheme.ConvertToVersion(obj, groupVersion)
+		versionedObj, err := scheme.ConvertToVersion(obj, groupVersion)
 		if err != nil {
 			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
 		}
-		versionedOldObj, err := legacyscheme.Scheme.ConvertToVersion(oldObj, groupVersion)
+		versionedOldObj, err := scheme.ConvertToVersion(oldObj, groupVersion)
 		if err != nil {
 			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
 		}
-		return legacyscheme.Scheme.ValidateUpdate(versionedObj, versionedOldObj, subresources...)
+		return scheme.ValidateUpdate(versionedObj, versionedOldObj, subresources...)
 	} else {
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}

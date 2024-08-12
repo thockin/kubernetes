@@ -55,7 +55,7 @@ func (limitrangeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime
 func (limitrangeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	limitRange := obj.(*api.LimitRange)
 	allErrs := validation.ValidateLimitRange(limitRange)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -75,7 +75,7 @@ func (limitrangeStrategy) AllowCreateOnUpdate() bool {
 func (limitrangeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	limitRange := obj.(*api.LimitRange)
 	allErrs := validation.ValidateLimitRange(limitRange)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

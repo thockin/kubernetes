@@ -98,7 +98,7 @@ func (namespaceStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 func (namespaceStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	namespace := obj.(*api.Namespace)
 	allErrs := validation.ValidateNamespace(namespace)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -142,7 +142,7 @@ func (namespaceStrategy) AllowCreateOnUpdate() bool {
 func (namespaceStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	errorList := validation.ValidateNamespace(obj.(*api.Namespace))
 	allErrs := append(errorList, validation.ValidateNamespaceUpdate(obj.(*api.Namespace), old.(*api.Namespace))...)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 
@@ -179,7 +179,7 @@ func (namespaceStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old ru
 
 func (namespaceStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateNamespaceStatusUpdate(obj.(*api.Namespace), old.(*api.Namespace))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 
