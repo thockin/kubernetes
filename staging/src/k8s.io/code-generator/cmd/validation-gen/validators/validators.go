@@ -32,7 +32,7 @@ type FunctionFlags uint32
 
 // IsSet returns true if all of the wanted flags are set.
 func (ff FunctionFlags) IsSet(wanted FunctionFlags) bool {
-	return (ff & wanted) == ff
+	return (ff & wanted) == wanted
 }
 
 const (

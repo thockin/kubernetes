@@ -165,9 +165,8 @@ func Validate_T00(obj *T00, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T01(obj *T01, fldPath *field.Path) (errs field.ErrorList) {
 	// type T01
-	if e := validate.FixedResult(fldPath, obj, true, "T01, no flags"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // fatal
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T01, no flags")...)
 	}
 
 	// field T01.TypeMeta has no validation
@@ -175,19 +174,15 @@ func Validate_T01(obj *T01, fldPath *field.Path) (errs field.ErrorList) {
 	// field T01.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T01.S, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T01.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T01.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T01.PS, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T01.PS, no flags")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -195,10 +190,7 @@ func Validate_T01(obj *T01, fldPath *field.Path) (errs field.ErrorList) {
 	// field T01.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T01.T, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T01.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -206,9 +198,8 @@ func Validate_T01(obj *T01, fldPath *field.Path) (errs field.ErrorList) {
 	// field T01.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T01.PT, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T01.PT, no flags")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -262,44 +253,36 @@ func Validate_T02(obj *T02, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T03(obj *T03, fldPath *field.Path) (errs field.ErrorList) {
 	// type T03
-	if e := validate.FixedResult(fldPath, obj, true, "T03, no flags"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // fatal
-	}
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03, PtrOK")...)
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T03, no flags")...)
+	}
 
 	// field T03.TypeMeta has no validation
 
 	// field T03.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T03.S, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03.S, PtrOK")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T03.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T03.PS, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03.PS, PtrOK")...)
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T03.PS, no flags")...)
+			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
 
 	// field T03.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T03.T, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03.T, PtrOK")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -307,11 +290,10 @@ func Validate_T03(obj *T03, fldPath *field.Path) (errs field.ErrorList) {
 	// field T03.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T03.PT, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T03.PT, PtrOK")...)
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T03.PT, no flags")...)
+			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
 			}
@@ -385,15 +367,12 @@ func Validate_T04(obj *T04, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 	// type T05
-	if e := validate.FixedResult(fldPath, obj, true, "T05, no flags"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // fatal
-	}
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "T05, IsFatal"); len(e) != 0 {
 			errs = append(errs, e...)
 			return // fatal
 		}
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T05, no flags")...)
 	}
 
 	// field T05.TypeMeta has no validation
@@ -401,29 +380,23 @@ func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 	// field T05.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T05.S, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if e := validate.FixedResult(fldPath, obj, true, "T05.S, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T05.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T05.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T05.PS, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T05.PS, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
 					return // fatal
 				}
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T05.PS, no flags")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -431,14 +404,11 @@ func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 	// field T05.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T05.T, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if e := validate.FixedResult(fldPath, obj, true, "T05.T, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T05.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -446,15 +416,12 @@ func Validate_T05(obj *T05, fldPath *field.Path) (errs field.ErrorList) {
 	// field T05.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T05.PT, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T05.PT, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
 					return // fatal
 				}
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T05.PT, no flags")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -534,10 +501,6 @@ func Validate_T06(obj *T06, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T07(obj *T07, fldPath *field.Path) (errs field.ErrorList) {
 	// type T07
-	if e := validate.FixedResult(fldPath, obj, true, "T07, no flags"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // fatal
-	}
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "T07, IsFatal"); len(e) != 0 {
 			errs = append(errs, e...)
@@ -545,31 +508,27 @@ func Validate_T07(obj *T07, fldPath *field.Path) (errs field.ErrorList) {
 		}
 	}
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07, PtrOK")...)
+	if obj != nil {
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T07, no flags")...)
+	}
 
 	// field T07.TypeMeta has no validation
 
 	// field T07.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T07.S, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if e := validate.FixedResult(fldPath, obj, true, "T07.S, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07.S, PtrOK")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T07.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T07.PS, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T07.PS, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
@@ -577,21 +536,21 @@ func Validate_T07(obj *T07, fldPath *field.Path) (errs field.ErrorList) {
 				}
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07.PS, PtrOK")...)
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T07.PS, no flags")...)
+			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
 
 	// field T07.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T07.T, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if e := validate.FixedResult(fldPath, obj, true, "T07.T, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07.T, PtrOK")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -599,10 +558,6 @@ func Validate_T07(obj *T07, fldPath *field.Path) (errs field.ErrorList) {
 	// field T07.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T07.PT, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T07.PT, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
@@ -610,6 +565,9 @@ func Validate_T07(obj *T07, fldPath *field.Path) (errs field.ErrorList) {
 				}
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T07.PT, PtrOK")...)
+			if obj != nil {
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T07.PT, no flags")...)
+			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
 			}
@@ -621,8 +579,9 @@ func Validate_T07(obj *T07, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T08(obj *T08, fldPath *field.Path) (errs field.ErrorList) {
 	// type T08
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T08, PtrOK|IsFatal")...)
+	if e := validate.FixedResult(fldPath, obj, true, "T08, PtrOK|IsFatal"); len(e) != 0 {
+		errs = append(errs, e...)
+		return // fatal
 	}
 
 	// field T08.TypeMeta has no validation
@@ -630,15 +589,19 @@ func Validate_T08(obj *T08, fldPath *field.Path) (errs field.ErrorList) {
 	// field T08.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T08.S, PtrOK|IsFatal")...)
+			if e := validate.FixedResult(fldPath, obj, true, "T08.S, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T08.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T08.PS, PtrOK|IsFatal")...)
+			if e := validate.FixedResult(fldPath, obj, true, "T08.PS, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -646,7 +609,10 @@ func Validate_T08(obj *T08, fldPath *field.Path) (errs field.ErrorList) {
 	// field T08.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T08.T, PtrOK|IsFatal")...)
+			if e := validate.FixedResult(fldPath, obj, true, "T08.T, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -654,8 +620,9 @@ func Validate_T08(obj *T08, fldPath *field.Path) (errs field.ErrorList) {
 	// field T08.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T08.PT, PtrOK|IsFatal")...)
+			if e := validate.FixedResult(fldPath, obj, true, "T08.PT, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -668,12 +635,12 @@ func Validate_T08(obj *T08, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T09(obj *T09, fldPath *field.Path) (errs field.ErrorList) {
 	// type T09
-	if e := validate.FixedResult(fldPath, obj, true, "T09, no flags"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "T09, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T09, PtrOK|IsFatal")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T09, no flags")...)
 	}
 
 	// field T09.TypeMeta has no validation
@@ -681,23 +648,23 @@ func Validate_T09(obj *T09, fldPath *field.Path) (errs field.ErrorList) {
 	// field T09.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T09.S, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T09.S, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T09.S, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T09.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T09.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T09.PS, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T09.PS, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T09.PS, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T09.PS, no flags")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -705,11 +672,11 @@ func Validate_T09(obj *T09, fldPath *field.Path) (errs field.ErrorList) {
 	// field T09.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T09.T, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T09.T, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T09.T, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T09.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -717,12 +684,12 @@ func Validate_T09(obj *T09, fldPath *field.Path) (errs field.ErrorList) {
 	// field T09.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T09.PT, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T09.PT, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T09.PT, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T09.PT, no flags")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -735,36 +702,44 @@ func Validate_T09(obj *T09, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T10(obj *T10, fldPath *field.Path) (errs field.ErrorList) {
 	// type T10
-	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10, PtrOK")...)
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T10, PtrOK|IsFatal")...)
+	if e := validate.FixedResult(fldPath, obj, true, "T10, PtrOK|IsFatal"); len(e) != 0 {
+		errs = append(errs, e...)
+		return // fatal
 	}
+	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10, PtrOK")...)
 
 	// field T10.TypeMeta has no validation
 
 	// field T10.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T10.S, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.S, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.S, PtrOK|IsFatal")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T10.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.PS, PtrOK")...)
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T10.PS, PtrOK|IsFatal")...)
+			if e := validate.FixedResult(fldPath, obj, true, "T10.PS, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
 			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.PS, PtrOK")...)
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
 
 	// field T10.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T10.T, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.T, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.T, PtrOK|IsFatal")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -772,10 +747,11 @@ func Validate_T10(obj *T10, fldPath *field.Path) (errs field.ErrorList) {
 	// field T10.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.PT, PtrOK")...)
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T10.PT, PtrOK|IsFatal")...)
+			if e := validate.FixedResult(fldPath, obj, true, "T10.PT, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
 			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T10.PT, PtrOK")...)
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
 			}
@@ -787,13 +763,13 @@ func Validate_T10(obj *T10, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T11(obj *T11, fldPath *field.Path) (errs field.ErrorList) {
 	// type T11
-	if e := validate.FixedResult(fldPath, obj, true, "T11, no flags"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "T11, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11, PtrOK")...)
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T11, PtrOK|IsFatal")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T11, no flags")...)
 	}
 
 	// field T11.TypeMeta has no validation
@@ -801,25 +777,25 @@ func Validate_T11(obj *T11, fldPath *field.Path) (errs field.ErrorList) {
 	// field T11.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T11.S, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T11.S, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.S, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.S, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T11.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T11.PS, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T11.PS, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.PS, PtrOK")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T11.PS, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T11.PS, no flags")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -827,12 +803,12 @@ func Validate_T11(obj *T11, fldPath *field.Path) (errs field.ErrorList) {
 	// field T11.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T11.T, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T11.T, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.T, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.T, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -840,13 +816,13 @@ func Validate_T11(obj *T11, fldPath *field.Path) (errs field.ErrorList) {
 	// field T11.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T11.PT, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T11.PT, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T11.PT, PtrOK")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T11.PT, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T11.PT, no flags")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -859,12 +835,15 @@ func Validate_T11(obj *T11, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T12(obj *T12, fldPath *field.Path) (errs field.ErrorList) {
 	// type T12
+	if e := validate.FixedResult(fldPath, obj, true, "T12, PtrOK|IsFatal"); len(e) != 0 {
+		errs = append(errs, e...)
+		return // fatal
+	}
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "T12, IsFatal"); len(e) != 0 {
 			errs = append(errs, e...)
 			return // fatal
 		}
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T12, PtrOK|IsFatal")...)
 	}
 
 	// field T12.TypeMeta has no validation
@@ -872,23 +851,29 @@ func Validate_T12(obj *T12, fldPath *field.Path) (errs field.ErrorList) {
 	// field T12.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T12.S, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if e := validate.FixedResult(fldPath, obj, true, "T12.S, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T12.S, PtrOK|IsFatal")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T12.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T12.PS, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T12.PS, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
 					return // fatal
 				}
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T12.PS, PtrOK|IsFatal")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -896,11 +881,14 @@ func Validate_T12(obj *T12, fldPath *field.Path) (errs field.ErrorList) {
 	// field T12.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T12.T, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if e := validate.FixedResult(fldPath, obj, true, "T12.T, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T12.T, PtrOK|IsFatal")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -908,12 +896,15 @@ func Validate_T12(obj *T12, fldPath *field.Path) (errs field.ErrorList) {
 	// field T12.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T12.PT, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T12.PT, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
 					return // fatal
 				}
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T12.PT, PtrOK|IsFatal")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -926,7 +917,7 @@ func Validate_T12(obj *T12, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 	// type T13
-	if e := validate.FixedResult(fldPath, obj, true, "T13, no flags"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "T13, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
@@ -935,7 +926,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, e...)
 			return // fatal
 		}
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13, PtrOK|IsFatal")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13, no flags")...)
 	}
 
 	// field T13.TypeMeta has no validation
@@ -943,7 +934,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 	// field T13.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T13.S, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T13.S, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -951,14 +942,14 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T13.S, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T13.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T13.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T13.PS, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T13.PS, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -967,7 +958,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, e...)
 					return // fatal
 				}
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13.PS, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13.PS, no flags")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -975,7 +966,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 	// field T13.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T13.T, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T13.T, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -983,7 +974,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T13.T, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T13.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -991,7 +982,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 	// field T13.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T13.PT, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T13.PT, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1000,7 +991,7 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 					errs = append(errs, e...)
 					return // fatal
 				}
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13.PT, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T13.PT, no flags")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -1013,6 +1004,10 @@ func Validate_T13(obj *T13, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T14(obj *T14, fldPath *field.Path) (errs field.ErrorList) {
 	// type T14
+	if e := validate.FixedResult(fldPath, obj, true, "T14, PtrOK|IsFatal"); len(e) != 0 {
+		errs = append(errs, e...)
+		return // fatal
+	}
 	if obj != nil {
 		if e := validate.FixedResult(fldPath, *obj, true, "T14, IsFatal"); len(e) != 0 {
 			errs = append(errs, e...)
@@ -1020,27 +1015,31 @@ func Validate_T14(obj *T14, fldPath *field.Path) (errs field.ErrorList) {
 		}
 	}
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14, PtrOK")...)
-	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T14, PtrOK|IsFatal")...)
-	}
 
 	// field T14.TypeMeta has no validation
 
 	// field T14.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T14.S, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if e := validate.FixedResult(fldPath, obj, true, "T14.S, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14.S, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14.S, PtrOK|IsFatal")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T14.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T14.PS, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T14.PS, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
@@ -1048,21 +1047,21 @@ func Validate_T14(obj *T14, fldPath *field.Path) (errs field.ErrorList) {
 				}
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14.PS, PtrOK")...)
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T14.PS, PtrOK|IsFatal")...)
-			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
 
 	// field T14.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T14.T, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if e := validate.FixedResult(fldPath, obj, true, "T14.T, IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14.T, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14.T, PtrOK|IsFatal")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -1070,6 +1069,10 @@ func Validate_T14(obj *T14, fldPath *field.Path) (errs field.ErrorList) {
 	// field T14.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.FixedResult(fldPath, obj, true, "T14.PT, PtrOK|IsFatal"); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			if obj != nil {
 				if e := validate.FixedResult(fldPath, *obj, true, "T14.PT, IsFatal"); len(e) != 0 {
 					errs = append(errs, e...)
@@ -1077,9 +1080,6 @@ func Validate_T14(obj *T14, fldPath *field.Path) (errs field.ErrorList) {
 				}
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T14.PT, PtrOK")...)
-			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T14.PT, PtrOK|IsFatal")...)
-			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
 			}
@@ -1091,7 +1091,7 @@ func Validate_T14(obj *T14, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 	// type T15
-	if e := validate.FixedResult(fldPath, obj, true, "T15, no flags"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "T15, PtrOK|IsFatal"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
@@ -1103,7 +1103,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 	}
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15, PtrOK")...)
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T15, PtrOK|IsFatal")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T15, no flags")...)
 	}
 
 	// field T15.TypeMeta has no validation
@@ -1111,7 +1111,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 	// field T15.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T15.S, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T15.S, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1120,14 +1120,14 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.S, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.S, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.S, no flags")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field T15.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T15.PS, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T15.PS, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1139,7 +1139,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.PS, PtrOK")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T15.PS, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T15.PS, no flags")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -1147,7 +1147,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 	// field T15.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T15.T, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T15.T, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1156,7 +1156,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 				return // fatal
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.T, PtrOK")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.T, PtrOK|IsFatal")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.T, no flags")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -1164,7 +1164,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 	// field T15.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "T15.PT, no flags"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "T15.PT, PtrOK|IsFatal"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1176,7 +1176,7 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T15.PT, PtrOK")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T15.PT, PtrOK|IsFatal")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T15.PT, no flags")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -1189,15 +1189,11 @@ func Validate_T15(obj *T15, fldPath *field.Path) (errs field.ErrorList) {
 
 func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorList) {
 	// type TMultiple
-	if e := validate.FixedResult(fldPath, obj, true, "TMultiple, no flags 1"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK|IsFatal 1"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
-	if e := validate.FixedResult(fldPath, obj, true, "T0, string payload"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // fatal
-	}
-	if e := validate.FixedResult(fldPath, obj, true, "TMultiple, no flags 2"); len(e) != 0 {
+	if e := validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK|IsFatal 2"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // fatal
 	}
@@ -1214,8 +1210,9 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK 1")...)
 	errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple, PtrOK 2")...)
 	if obj != nil {
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, PtrOK|IsFatal 1")...)
-		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, PtrOK|IsFatal 2")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 1")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
+		errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple, no flags 2")...)
 	}
 
 	// field TMultiple.TypeMeta has no validation
@@ -1223,15 +1220,11 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 	// field TMultiple.S
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 1"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK|IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			if e := validate.FixedResult(fldPath, obj, true, "T0, string payload"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 2"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK|IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1245,23 +1238,20 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK 2")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK|IsFatal 1")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, PtrOK|IsFatal 2")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 1")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.S, no flags 2")...)
 			return
 		}(obj.S, fldPath.Child("s"))...)
 
 	// field TMultiple.PS
 	errs = append(errs,
 		func(obj *string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PS, no flags 1"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK|IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			if e := validate.FixedResult(fldPath, obj, true, "T0, string payload"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PS, no flags 2"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK|IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1278,8 +1268,9 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PS, PtrOK 2")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, PtrOK|IsFatal 1")...)
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, PtrOK|IsFatal 2")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 1")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PS, no flags 2")...)
 			}
 			return
 		}(obj.PS, fldPath.Child("ps"))...)
@@ -1287,15 +1278,11 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 	// field TMultiple.T
 	errs = append(errs,
 		func(obj Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 1"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK|IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			if e := validate.FixedResult(fldPath, obj, true, "T0, string payload"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 2"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK|IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1309,8 +1296,9 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			}
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK 2")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK|IsFatal 1")...)
-			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, PtrOK|IsFatal 2")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 1")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.T, no flags 2")...)
 			errs = append(errs, Validate_Tother(&obj, fldPath)...)
 			return
 		}(obj.T, fldPath.Child("t"))...)
@@ -1318,15 +1306,11 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 	// field TMultiple.PT
 	errs = append(errs,
 		func(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PT, no flags 1"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK|IsFatal 1"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			if e := validate.FixedResult(fldPath, obj, true, "T0, string payload"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
-			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PT, no flags 2"); len(e) != 0 {
+			if e := validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK|IsFatal 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
@@ -1343,8 +1327,9 @@ func Validate_TMultiple(obj *TMultiple, fldPath *field.Path) (errs field.ErrorLi
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK 1")...)
 			errs = append(errs, validate.FixedResult(fldPath, obj, true, "TMultiple.PT, PtrOK 2")...)
 			if obj != nil {
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, PtrOK|IsFatal 1")...)
-				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, PtrOK|IsFatal 2")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 1")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "T0, string payload")...)
+				errs = append(errs, validate.FixedResult(fldPath, *obj, true, "TMultiple.PT, no flags 2")...)
 			}
 			if obj != nil {
 				errs = append(errs, Validate_Tother(obj, fldPath)...)
@@ -1359,10 +1344,7 @@ func Validate_Tother(obj *Tother, fldPath *field.Path) (errs field.ErrorList) {
 	// field Tother.OS
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.FixedResult(fldPath, obj, true, "Tother, no flags"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // fatal
-			}
+			errs = append(errs, validate.FixedResult(fldPath, obj, true, "Tother, no flags")...)
 			return
 		}(obj.OS, fldPath.Child("os"))...)
 

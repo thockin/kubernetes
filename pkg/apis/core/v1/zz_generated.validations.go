@@ -444,7 +444,10 @@ func Validate_HostAlias(obj *v1.HostAlias, fldPath *field.Path) (errs field.Erro
 	// field v1.HostAlias.IP
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.Required(fldPath, obj)...)
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			return
 		}(obj.IP, fldPath.Child("ip"))...)
 
@@ -456,7 +459,10 @@ func Validate_HostIP(obj *v1.HostIP, fldPath *field.Path) (errs field.ErrorList)
 	// field v1.HostIP.IP
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.Required(fldPath, obj)...)
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			return
 		}(obj.IP, fldPath.Child("ip"))...)
 
@@ -596,7 +602,10 @@ func Validate_PodIP(obj *v1.PodIP, fldPath *field.Path) (errs field.ErrorList) {
 	// field v1.PodIP.IP
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.Required(fldPath, obj)...)
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			return
 		}(obj.IP, fldPath.Child("ip"))...)
 
@@ -904,7 +913,10 @@ func Validate_ResourceStatus(obj *v1.ResourceStatus, fldPath *field.Path) (errs 
 	// field v1.ResourceStatus.Name
 	errs = append(errs,
 		func(obj v1.ResourceName, fldPath *field.Path) (errs field.ErrorList) {
-			errs = append(errs, validate.Required(fldPath, obj)...)
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // fatal
+			}
 			return
 		}(obj.Name, fldPath.Child("name"))...)
 
@@ -976,11 +988,11 @@ func Validate_Volume(obj *v1.Volume, fldPath *field.Path) (errs field.ErrorList)
 	// field v1.Volume.Name
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
-			if e := validate.DNSLabel(fldPath, obj); len(e) != 0 {
+			if e := validate.Required(fldPath, obj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // fatal
 			}
-			errs = append(errs, validate.Required(fldPath, obj)...)
+			errs = append(errs, validate.DNSLabel(fldPath, obj)...)
 			return
 		}(obj.Name, fldPath.Child("name"))...)
 
