@@ -614,8 +614,7 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, sw *generato
 	for _, t := range g.rootTypes {
 		node := g.discovered.typeNodes[t]
 		if node == nil {
-			// Should never happen.
-			klog.Fatalf("found nil node for root-type %v", t)
+			panic(fmt.Sprintf("found nil node for root-type %v", t))
 		}
 
 		// TODO: It would be nice if these were not hard-coded.
@@ -671,8 +670,7 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 	sw.Do("func $.inType|objectvalidationfn$(obj *$.inType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
 	node := g.discovered.typeNodes[t]
 	if node == nil {
-		// Should never happen.
-		klog.Fatalf("found nil node for type %v", t)
+		panic(fmt.Sprintf("found nil node for root-type %v", t))
 	}
 	fakeChild := &childNode{
 		node:      node,
@@ -945,7 +943,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			sw.Do("}\n", nil)
 		}
 	default:
-		klog.Fatalf("unhandled type: %v (%s)", inType, inType.Kind)
+		panic(fmt.Sprintf("unhandled type: %v (kind %s)", inType, inType.Kind))
 	}
 }
 
