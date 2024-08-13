@@ -67,7 +67,6 @@
 - Error when calling eachVal on non-list types or ignore?
 - Add conditional validation (cross-field)
 - Rename PtrOK - it's an awkward name
-- nit: get rid of leading spaces on logs
 - failure tests for error messages
 - Test for registration / init func
 - "inner" validation

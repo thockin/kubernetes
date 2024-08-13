@@ -337,7 +337,7 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		return nil, fmt.Errorf("%v: %w", fldPath, err)
 	} else {
 		if len(validations) > 0 {
-			klog.V(5).InfoS("  found type-attached validations", "n", len(validations))
+			klog.V(5).InfoS("found type-attached validations", "n", len(validations))
 			thisNode.typeValidations = validations
 		}
 	}
@@ -427,7 +427,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			jsonName = tags.name
 		}
 
-		klog.V(5).InfoS("  field", "name", name, "jsonName", jsonName, "type", memb.Type)
+		klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
 
 		// Discover the field type.
 		childPath := fldPath.Child(name)
@@ -449,7 +449,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			return fmt.Errorf("field %s: %w", childPath.String(), err)
 		} else {
 			if len(validations) > 0 {
-				klog.V(5).InfoS("  found field-attached validations", "n", len(validations))
+				klog.V(5).InfoS("found field-attached validations", "n", len(validations))
 				child.fieldValidations = append(child.fieldValidations, validations...)
 			}
 		}
