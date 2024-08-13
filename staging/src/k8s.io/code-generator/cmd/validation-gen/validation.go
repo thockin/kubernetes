@@ -804,8 +804,8 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 		nonfatalPtr := make([]validators.FunctionGen, 0, len(in))
 
 		for _, fg := range in {
-			isFatal := (fg.Flags()&validators.IsFatal != 0)
-			isPtrOK := (fg.Flags()&validators.PtrOK != 0)
+			isFatal := (fg.Flags().IsSet(validators.IsFatal))
+			isPtrOK := (fg.Flags().IsSet(validators.PtrOK))
 
 			if isFatal {
 				if isPtrOK {
@@ -832,8 +832,8 @@ func (g *genValidations) emitCallsToValidators(c *generator.Context, validations
 
 	insideNilCheck := false
 	for _, v := range validations {
-		ptrOK := (v.Flags()&validators.PtrOK != 0)
-		isFatal := (v.Flags()&validators.IsFatal != 0)
+		ptrOK := (v.Flags().IsSet(validators.PtrOK))
+		isFatal := (v.Flags().IsSet(validators.IsFatal))
 
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
