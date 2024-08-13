@@ -633,8 +633,7 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, sw *generato
 			"fieldPath":   c.Universe.Type(fieldPathType),
 			"fmtErrorf":   c.Universe.Type(errorfType),
 		}
-		//TODO: can this be (*$.rootType|raw$)(nil) ?
-		sw.Do("scheme.AddValidationFunc(new($.rootType|raw$), func(obj, oldObj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
+		sw.Do("scheme.AddValidationFunc((*$.rootType|raw$)(nil), func(obj, oldObj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
 		sw.Do("  if len(subresources) == 0 {\n", targs)
 		sw.Do("    return $.rootType|objectvalidationfn$(obj.(*$.rootType|raw$), nil)\n", targs)
 		sw.Do("  }\n", targs)

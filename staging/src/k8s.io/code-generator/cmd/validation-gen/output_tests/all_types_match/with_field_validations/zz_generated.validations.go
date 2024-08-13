@@ -34,31 +34,31 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(new(T1), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T1)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T1(obj.(*T1), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(T2), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T2)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T2(obj.(*T2), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(T3), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T3)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T3(obj.(*T3), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(T4), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T4)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T4(obj.(*T4), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(T5), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*T5)(nil), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T5(obj.(*T5), nil)
 		}
