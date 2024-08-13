@@ -16,14 +16,14 @@
 - Ratcheting support?
   - Do we need to do anything with feature gate awareness?
   - Some handwritten validations take options params that guide validation behavior. How to support?
-- Stop using "+k8s:validation-gen=TypeMeta" to find root types
-  - Stop generating validation for list types
+- Stop using "+k8s:validation-gen=TypeMeta" to find root types?
+  - Do we need something more flexible?
+- Stop generating validation for list types
 - Add OpenAPI value validation
   - Size limits (+min{Length,Properties,Items}, +max{Length,Properties,Items})
   - Numeric limits (+minimum, +maximum, +exclusiveMinimum, +exclusiveMaximum)
   - String formats (+format)
 - Add metadata.name/generateName validation (+nameFormat?)
-- Add required field validation (+optional)
 - Add SMD/SSA validation (+listType, +listMapKey, +patchMergeKey, +patchStrategy)
 - Add CEL validation rules
 - Fix enum generator to generate refs to enum constants instead of string literals.  Also generate a sets.Set for each enum?
@@ -37,40 +37,71 @@
 - Migrate core group to declarative validation
   - xref: Alex's WIP for jobs: https://github.com/alexzielenski/kubectl-validate/blob/jobset/jobset/patches/apis/jobset.x-k8s.io/v1alpha2.json
   - Enable declarative validation for strategies and test
-  - Migrate
+- Prove at least 1 case of each of:
+    - format
+    - schema (maxLen, maxItems, ...)
+    - required
     - enums
-    - required field validation
+    - non-discriminated unions (exactly one of)
+    - discriminated unions
+    - listMap key uniqueness and requiredness
+    - listMap key requiredness
     - SMD/SSA validation
     - OpenAPI value validation
-    - metadata.name/generateName validation
-    - unions
+    - metadata.name/generateName validation based on Object type
+    - label/annotation validations based on Object type
     - cross field validations
+      - only validate obj.X if this validation passes
+      - if obj.X is value Y, then validate obj.Z
+    - IntOrString
+    - immutable (update)
     - update validations
+    - field found in listfield Y (e.g. volume mount name)
+    - dependencies - field X is allowed IFF field Y
 - Use Go-standard-style names for generated functions
 - Decide test regimen for validators lib
 - Fix bug where generating apps API group enables enum generation on core API group
 - Clear out 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
   for scalar testing that should be put in declarative validator test code
 - rename "disabled-tags" to "disabled-tag" and document as repeated
-- Error when calling eachVal on non-list types.
+- Error when calling eachVal on non-list types or ignore?
 - Add conditional validation (cross-field)
 - Rename PtrOK - it's an awkward name
-- Test cross-pkg fields
+- nit: get rid of leading spaces on logs
+- failure tests for error messages
+- Test for registration / init func
+- "inner" validation
 - Generator unit tests need updating
-- Catalog all varieties of validations (conditional, mutually-excluysive, numeric, string format, etc)
+- How to handle feature gates and options structs
 - Try to link typedef-of-typedef to chain validations?
-    Get pos in walkType()
-    for each file in pkg.Syntax[] (ast.File)
-        for each decl in file.Decls[] (ast.Decl -> ast.GenDecl)
-            for each spec in decl.Specs[] (ast.Spec -> ast.TypeSpec)
-                if Name.NamePos matches {
-                    Look at spec.Type
-                    if is ast.Ident
-                        look at ident.Obj
-                        if nil
-                            builtin?
-                        if obj.Kind = Typ
-                            look at obj.Name and obj.Decl.(TypeSpec).Name.NamePos
-                            match that to another type?
-
-
+  ```
+  Get pos in walkType
+  for each file in pkg.Syntax[] (ast.File)
+        for each decl in file.Decls[] (ast.Decl -> ast.GenDecl)
+                for each spec in decl.Specs[] (ast.Spec -> ast.TypeSpec)
+                        if Name.NamePos matches {
+                                Look at spec.Type
+                                if is ast.Ident
+                                        look at ident.Obj
+                                        if nil
+                                                builtin?
+                                        if obj.Kind = Typ
+                                                look at obj.Name and obj.Decl.(TypeSpec).Name.NamePos
+                                                match that to another type?
+  ```
+- Can we fix the gengo alias-to-ptr issue?  Causes problems in other generators.
+  ```
+  diff --git a/vendor/k8s.io/gengo/v2/parser/parse.go b/vendor/k8s.io/gengo/v2/parser/parse.go
+  index a5993d16393..9214db19873 100644
+  --- a/vendor/k8s.io/gengo/v2/parser/parse.go
+  +++ b/vendor/k8s.io/gengo/v2/parser/parse.go
+  @@ -726,7 +726,7 @@ func (p *Parser) walkType(u types.Universe, useName *types.Name, in gotypes.Type
+          case *gotypes.Named:
+                  var out *types.Type
+                  switch t.Underlying().(type) {
+  -               case *gotypes.Named, *gotypes.Basic, *gotypes.Map, *gotypes.Slice:
+  +               case *gotypes.Named, *gotypes.Basic, *gotypes.Map, *gotypes.Slice, *gotypes.Pointer:
+                          name := goNameToName(t.String())
+                          out = u.Type(name)
+                          if out.Kind != types.Unknown {
+  ```
