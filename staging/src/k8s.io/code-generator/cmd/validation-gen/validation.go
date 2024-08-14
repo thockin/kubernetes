@@ -497,14 +497,6 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 	return nil
 }
 
-// getValidationFunctionName looks up the name of the specified type's
-// validation function.
-//
-// TODO: Currently this is a "blind" call - we hope that the expected function
-// exists, but we don't verify that, and we only emit calls into packages which
-// are being processed by this generator. For cross-package calls we will need
-// to verify the target, either by naming convention + fingerprint or by
-// explicit comment-tags or something.
 // discoverAlias walks an alias type recursively.
 func (td *typeDiscoverer) discoverAlias(thisNode *typeNode, fldPath *field.Path) error {
 	t := thisNode.valueType
@@ -589,6 +581,14 @@ func (td *typeDiscoverer) extractEmbeddedValidations(tag string, comments []stri
 	return result, nil
 }
 
+// getValidationFunctionName looks up the name of the specified type's
+// validation function.
+//
+// TODO: Currently this is a "blind" call - we hope that the expected function
+// exists, but we don't verify that, and we only emit calls into packages which
+// are being processed by this generator. For cross-package calls we will need
+// to verify the target, either by naming convention + fingerprint or by
+// explicit comment-tags or something.
 func (td *typeDiscoverer) getValidationFunctionName(t *types.Type) (types.Name, bool) {
 	pkg, ok := td.inputToPkg[t.Name.Package]
 	if !ok {
@@ -633,6 +633,8 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, sw *generato
 			"fieldPath":   c.Universe.Type(fieldPathType),
 			"fmtErrorf":   c.Universe.Type(errorfType),
 		}
+		// This uses a typed nil pointer, rather than a real instance because
+		// we need the type information, but not an instance of the type.
 		sw.Do("scheme.AddValidationFunc((*$.rootType|raw$)(nil), func(obj, oldObj interface{}, subresources ...string) $.errorList|raw$ {\n", targs)
 		sw.Do("  if len(subresources) == 0 {\n", targs)
 		sw.Do("    return $.rootType|objectvalidationfn$(obj.(*$.rootType|raw$), nil)\n", targs)
