@@ -82,7 +82,7 @@ func Validate_E01(opCtx operation.Context, obj, oldObj *E01, fldPath *field.Path
 
 func Validate_E02(opCtx operation.Context, obj, oldObj *E02, fldPath *field.Path) (errs field.ErrorList) {
 	// type E02
-	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E02, Fatal"); len(e) != 0 {
+	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E02, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
@@ -92,7 +92,7 @@ func Validate_E02(opCtx operation.Context, obj, oldObj *E02, fldPath *field.Path
 
 func Validate_E03(opCtx operation.Context, obj, oldObj *E03, fldPath *field.Path) (errs field.ErrorList) {
 	// type E03
-	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E03, Fatal"); len(e) != 0 {
+	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "E03, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
@@ -103,11 +103,11 @@ func Validate_E03(opCtx operation.Context, obj, oldObj *E03, fldPath *field.Path
 
 func Validate_EMultiple(opCtx operation.Context, obj, oldObj *EMultiple, fldPath *field.Path) (errs field.ErrorList) {
 	// type EMultiple
-	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, Fatal 1"); len(e) != 0 {
+	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, ShortCircuit 1"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
-	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, Fatal 2"); len(e) != 0 {
+	if e := validate.FixedResult(opCtx, fldPath, obj, oldObj, true, "EMultiple, ShortCircuit 2"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}

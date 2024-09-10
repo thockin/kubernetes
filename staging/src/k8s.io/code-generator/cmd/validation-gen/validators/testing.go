@@ -107,7 +107,7 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 				Schema: []TagPayloadSchema{{
 					Key:   "flags",
 					Value: "<list-of-flag-string>",
-					Docs:  `values: Fatal, NonError`,
+					Docs:  `values: ShortCircuit, NonError`,
 				}, {
 					Key:   "msg",
 					Value: "<string>",
@@ -136,7 +136,7 @@ func (v fixedResultDeclarativeValidator) Docs() []TagDoc {
 				Schema: []TagPayloadSchema{{
 					Key:   "flags",
 					Value: "<list-of-flag-string>",
-					Docs:  `values: Fatal, NonError`,
+					Docs:  `values: ShortCircuit, NonError`,
 				}, {
 					Key:   "msg",
 					Value: "<string>",
@@ -178,8 +178,8 @@ func (_ fixedResultDeclarativeValidator) parseTagVal(in string) (tagVal, error) 
 	var flags FunctionFlags
 	for _, fl := range pl.Flags {
 		switch fl {
-		case "Fatal":
-			flags |= Fatal
+		case "ShortCircuit":
+			flags |= ShortCircuit
 		case "NonError":
 			flags |= NonError
 		default:

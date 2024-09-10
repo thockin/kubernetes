@@ -26,7 +26,7 @@ var localSchemeBuilder = testscheme.New()
 
 // Treat these as 4 bits, and ensure all combinations
 //   bit 0: no flags
-//   bit 1: Fatal
+//   bit 1: ShortCircuit
 
 // Note: No validations.
 type E00 string
@@ -34,17 +34,17 @@ type E00 string
 // +validateTrue={"flags":[], "msg":"E01, no flags"}
 type E01 string
 
-// +validateTrue={"flags":["Fatal"], "msg":"E02, Fatal"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"E02, ShortCircuit"}
 type E02 string
 
 // +validateTrue={"flags":[], "msg":"E03, no flags"}
-// +validateTrue={"flags":["Fatal"], "msg":"E03, Fatal"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"E03, ShortCircuit"}
 type E03 string
 
 // Note: these are intentionally in the wrong final order.
 // +validateTrue={"flags":[], "msg":"EMultiple, no flags 1"}
-// +validateTrue={"flags":["Fatal"], "msg":"EMultiple, Fatal 1"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"EMultiple, ShortCircuit 1"}
 // +validateTrue="E0, string payload"
 // +validateTrue={"flags":[], "msg":"EMultiple, no flags 2"}
-// +validateTrue={"flags":["Fatal"], "msg":"EMultiple, Fatal 2"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"EMultiple, ShortCircuit 2"}
 type EMultiple string

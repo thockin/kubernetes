@@ -31,7 +31,7 @@ type Tother struct {
 
 // Treat these as 4 bits, and ensure all combinations
 //   bit 0: no flags
-//   bit 1: Fatal
+//   bit 1: ShortCircuit
 
 // Note: No validations.
 type T00 struct {
@@ -55,67 +55,67 @@ type T01 struct {
 	PT *Tother `json:"pt"`
 }
 
-// +validateTrue={"flags":["Fatal"], "msg":"T02, Fatal"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"T02, ShortCircuit"}
 type T02 struct {
 	TypeMeta int
-	// +validateTrue={"flags":["Fatal"], "msg":"T02.S, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T02.S, ShortCircuit"}
 	S string `json:"s"`
-	// +validateTrue={"flags":["Fatal"], "msg":"T02.PS, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T02.PS, ShortCircuit"}
 	PS *string `json:"ps"`
-	// +validateTrue={"flags":["Fatal"], "msg":"T02.T, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T02.T, ShortCircuit"}
 	T Tother `json:"t"`
-	// +validateTrue={"flags":["Fatal"], "msg":"T02.PT, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T02.PT, ShortCircuit"}
 	PT *Tother `json:"pt"`
 }
 
 // +validateTrue={"flags":[], "msg":"T03, no flags"}
-// +validateTrue={"flags":["Fatal"], "msg":"T03, Fatal"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"T03, ShortCircuit"}
 type T03 struct {
 	TypeMeta int
 	// +validateTrue={"flags":[], "msg":"T03.S, no flags"}
-	// +validateTrue={"flags":["Fatal"], "msg":"T03.S, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T03.S, ShortCircuit"}
 	S string `json:"s"`
 	// +validateTrue={"flags":[], "msg":"T03.PS, no flags"}
-	// +validateTrue={"flags":["Fatal"], "msg":"T03.PS, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T03.PS, ShortCircuit"}
 	PS *string `json:"ps"`
 	// +validateTrue={"flags":[], "msg":"T03.T, no flags"}
-	// +validateTrue={"flags":["Fatal"], "msg":"T03.T, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T03.T, ShortCircuit"}
 	T Tother `json:"t"`
 	// +validateTrue={"flags":[], "msg":"T03.PT, no flags"}
-	// +validateTrue={"flags":["Fatal"], "msg":"T03.PT, Fatal"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"T03.PT, ShortCircuit"}
 	PT *Tother `json:"pt"`
 }
 
 // Note: these are intentionally in the wrong final order.
 // +validateTrue={"flags":[], "msg":"TMultiple, no flags 1"}
-// +validateTrue={"flags":["Fatal"], "msg":"TMultiple, Fatal 1"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple, ShortCircuit 1"}
 // +validateTrue="T0, string payload"
 // +validateTrue={"flags":[], "msg":"TMultiple, no flags 2"}
-// +validateTrue={"flags":["Fatal"], "msg":"TMultiple, Fatal 2"}
+// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple, ShortCircuit 2"}
 type TMultiple struct {
 	TypeMeta int
 	// +validateTrue={"flags":[], "msg":"TMultiple.S, no flags 1"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.S, Fatal 1"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.S, ShortCircuit 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.S, no flags 2"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.S, Fatal 2"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.S, ShortCircuit 2"}
 	S string `json:"s"`
 	// +validateTrue={"flags":[], "msg":"TMultiple.PS, no flags 1"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PS, Fatal 1"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.PS, ShortCircuit 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.PS, no flags 2"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PS, Fatal 2"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.PS, ShortCircuit 2"}
 	PS *string `json:"ps"`
 	// +validateTrue={"flags":[], "msg":"TMultiple.T, no flags 1"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.T, Fatal 1"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.T, ShortCircuit 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.T, no flags 2"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.T, Fatal 2"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.T, ShortCircuit 2"}
 	T Tother `json:"t"`
 	// +validateTrue={"flags":[], "msg":"TMultiple.PT, no flags 1"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PT, Fatal 1"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.PT, ShortCircuit 1"}
 	// +validateTrue="T0, string payload"
 	// +validateTrue={"flags":[], "msg":"TMultiple.PT, no flags 2"}
-	// +validateTrue={"flags":["Fatal"], "msg":"TMultiple.PT, Fatal 2"}
+	// +validateTrue={"flags":["ShortCircuit"], "msg":"TMultiple.PT, ShortCircuit 2"}
 	PT *Tother `json:"pt"`
 }

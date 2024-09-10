@@ -1185,27 +1185,27 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typ
 func emitCallsToValidators(c *generator.Context, validations []validators.FunctionGen, sw *generator.SnippetWriter) {
 	// Helper func
 	sort := func(in []validators.FunctionGen) []validators.FunctionGen {
-		fatal := make([]validators.FunctionGen, 0, len(in))
-		nonfatal := make([]validators.FunctionGen, 0, len(in))
+		sooner := make([]validators.FunctionGen, 0, len(in))
+		later := make([]validators.FunctionGen, 0, len(in))
 
 		for _, fg := range in {
-			isFatal := (fg.Flags().IsSet(validators.Fatal))
+			isShortCircuit := (fg.Flags().IsSet(validators.ShortCircuit))
 
-			if isFatal {
-				fatal = append(fatal, fg)
+			if isShortCircuit {
+				sooner = append(sooner, fg)
 			} else {
-				nonfatal = append(nonfatal, fg)
+				later = append(later, fg)
 			}
 		}
-		result := fatal
-		result = append(result, nonfatal...)
+		result := sooner
+		result = append(result, later...)
 		return result
 	}
 
 	validations = sort(validations)
 
 	for _, v := range validations {
-		isFatal := v.Flags().IsSet(validators.Fatal)
+		isShortCircuit := v.Flags().IsSet(validators.ShortCircuit)
 		isNonError := v.Flags().IsSet(validators.NonError)
 
 		fn, extraArgs := v.SignatureAndArgs()
@@ -1234,7 +1234,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 			sw.Do(")", targs)
 		}
 
-		if isFatal {
+		if isShortCircuit {
 			sw.Do("if e := ", nil)
 			emitCall()
 			sw.Do("; len(e) != 0 {\n", nil)
