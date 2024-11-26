@@ -1,0 +1,39 @@
+ACK.  Thinking about incrementality.  Something like:
+
+In docs.go, `// +k8s:validation-gen=<value>` means to enable validation
+generation for this package.  The value dictates which types are considered
+"root" types and what the default disposition is.  The value is a list of
+comma-separated key=value pairs.  Supported keys and their values:
+  * key: "roots"
+    values:
+      - "*": all public types are roots
+      - "field:<name>": any public type with a field named "name" is a root
+    default: "" (none)
+  * key: "default"
+    values:
+      - "true": validation generation is enabled for all roots, but may be
+        disabled at a finer scope (type or field)
+      - "false": validation generation is disabled for all roots, but may be
+        enabled at a finer scope (type or field)
+    default: "true"
+
+If multiple tags are found, they will be joined as if specified together.
+
+Examples:
+  * // +k8s:validation-gen=roots=*
+  * // +k8s:validation-gen=roots=field:TypeMeta
+  * // +k8s:validation-gen=roots=*,default=false
+  * // +k8s:validation-gen=roots=field:TypeMeta,default=false
+
+For any type definition, `// +k8s:validation-gen=<value>` controls the
+validation generation for this type and all direct children (fields, map keys
+and values, and slice values).  Supported values:
+  * "true" validation generation is enabled, but may be disabled per field
+  * "false" validation generation is disabled, but may be enabled per field
+
+For any field, `// +k8s:validation-gen=<value>` controls the validation
+generation for this field.  Supported values:
+  * "true" validation generation is enabled
+  * "false" validation generation is disabled
+
+
