@@ -37,8 +37,8 @@ type optionDeclarativeValidator struct {
 }
 
 const (
-	ifOptionEnabledTag  = "ifOptionEnabled"
-	ifOptionDisabledTag = "ifOptionDisabled"
+	ifOptionEnabledTag  = "k8s:ifOptionEnabled"
+	ifOptionDisabledTag = "k8s:ifOptionDisabled"
 )
 
 func (o optionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {

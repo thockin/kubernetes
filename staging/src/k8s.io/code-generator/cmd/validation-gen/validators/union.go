@@ -49,8 +49,8 @@ type unionDeclarativeValidator struct {
 const (
 	// +union and +unionDiscriminator tag are used by openapi-gen to publish x-kubernetes-union and x-kubernetes-discriminator
 	// extensions into Kubernetes published OpenAPI.
-	discriminatorTagName = "unionDiscriminator"
-	memberTagName        = "unionMember"
+	discriminatorTagName = "k8s:unionDiscriminator"
+	memberTagName        = "k8s:unionMember"
 )
 
 // discriminatorParams defines JSON the parameter value for the +unionDiscriminator tag.

@@ -327,13 +327,13 @@ func (n *typeNode) dumpChildren(buf *bytes.Buffer, indent int, visited map[*type
 
 const (
 	// This tag defines a validation which is to be run on each key in a map.
-	eachKeyTag = "eachKey"
+	eachKeyTag = "k8s:eachKey"
 	// This tag defines a validation which is to be run on each value in a map
 	// or slice.
-	eachValTag = "eachVal"
+	eachValTag = "k8s:eachVal"
 	// This tag designates a child field as part of the list-map key for a list
 	// of structs.
-	listMapKeyTag = "listMapKey"
+	listMapKeyTag = "k8s:listMapKey"
 )
 
 // builtinTagDocs returns information about the hard-coded tags.
