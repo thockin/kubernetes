@@ -36,7 +36,7 @@ func InitRequiredDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 type requiredDeclarativeValidator struct{}
 
 const (
-	requiredTagName = "required" // TODO: also support k8s:required
+	requiredTagName = "k8s:required"
 )
 
 var (
@@ -89,7 +89,7 @@ func InitForbiddenDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator 
 type forbiddenDeclarativeValidator struct{}
 
 const (
-	forbiddenTagName = "forbidden" // TODO: also support k8s:forbidden
+	forbiddenTagName = "k8s:forbidden"
 )
 
 var (
@@ -171,7 +171,7 @@ func InitOptionalDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 type optionalDeclarativeValidator struct{}
 
 const (
-	optionalTagName = "optional" // TODO: also support k8s:optional
+	optionalTagName = "k8s:optional"
 )
 
 var (

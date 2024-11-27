@@ -32,7 +32,10 @@ func InitOpenAPIDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 type openAPIDeclarativeValidator struct{}
 
 const (
-	markerPrefix     = "k8s:validation:"
+	//FIXME: If we change this to "k8s:" then kube-openapi's parsing tries to
+	//       parse all tags, not just ones it knows. The previous tag is used
+	//       in some types.go fields, so just give it a bogus name for now.
+	markerPrefix     = "k8s:validation:new:"
 	formatTagName    = markerPrefix + ":format"
 	maxLengthTagName = markerPrefix + ":maxLength"
 	maxItemsTagName  = markerPrefix + ":maxItems"

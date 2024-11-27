@@ -51,11 +51,11 @@ type errorDeclarativeValidator struct {
 }
 
 const (
-	validateTrueTagName  = "validateTrue"  // TODO: also support k8s:...
-	validateFalseTagName = "validateFalse" // TODO: also support k8s:...
+	validateTrueTagName  = "k8s:validateTrue"
+	validateFalseTagName = "k8s:validateFalse"
 
 	// This tag always returns an error from ExtractValidations.
-	validateErrorTagName = "validateError" // TODO: also support k8s:...
+	validateErrorTagName = "k8s:validateError"
 )
 
 var (

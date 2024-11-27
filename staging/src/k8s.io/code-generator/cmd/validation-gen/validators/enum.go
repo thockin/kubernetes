@@ -94,7 +94,7 @@ func (et *enumType) SymbolConstants() []Identifier {
 
 // TODO: Everything below this comment is an exact copy of kube-openapi's enum.go.
 
-const tagEnumType = "enum"
+const tagEnumType = "k8s:enum"
 const enumTypeDescriptionHeader = "Possible enum values:"
 
 type enumValue struct {
