@@ -28,20 +28,20 @@ var localSchemeBuilder = testscheme.New()
 type U struct {
 	TypeMeta int
 
-	// +unionMember={"union": "union1"}
-	// +optional
+	// +k8s:unionMember={"union": "union1"}
+	// +k8s:optional
 	U1M1 *M1 `json:"u1m1"`
 
-	// +unionMember={"union": "union1"}
-	// +optional
+	// +k8s:unionMember={"union": "union1"}
+	// +k8s:optional
 	U1M2 *M2 `json:"u1m2"`
 
-	// +unionMember={"union": "union2"}
-	// +optional
+	// +k8s:unionMember={"union": "union2"}
+	// +k8s:optional
 	U2M1 *M1 `json:"u2m1"`
 
-	// +unionMember={"union": "union2"}
-	// +optional
+	// +k8s:unionMember={"union": "union2"}
+	// +k8s:optional
 	U2M2 *M2 `json:"u2m2"`
 }
 

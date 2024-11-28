@@ -28,16 +28,16 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.S"
+	// +k8s:validateFalse="field T1.S"
 	S string `json:"s"`
-	// +validateFalse="field T1.I"
+	// +k8s:validateFalse="field T1.I"
 	I int `json:"i"`
-	// +validateFalse="field T1.B"
+	// +k8s:validateFalse="field T1.B"
 	B bool `json:"b"`
-	// +validateFalse="field T1.F"
+	// +k8s:validateFalse="field T1.F"
 	F float64 `json:"f"`
 
-	// +validateFalse="field T1.T2"
+	// +k8s:validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
 
 	// No internal validations.
@@ -53,13 +53,13 @@ type T1 struct {
 
 // Note: This has validations and is linked into the type-graph of T1.
 type T2 struct {
-	// +validateFalse="field T2.S"
+	// +k8s:validateFalse="field T2.S"
 	S string `json:"s"`
-	// +validateFalse="field T2.I"
+	// +k8s:validateFalse="field T2.I"
 	I int `json:"i"`
-	// +validateFalse="field T2.B"
+	// +k8s:validateFalse="field T2.B"
 	B bool `json:"b"`
-	// +validateFalse="field T2.F"
+	// +k8s:validateFalse="field T2.F"
 	F float64 `json:"f"`
 }
 
@@ -73,13 +73,13 @@ type T3 struct {
 
 // Note: This has validations and is not linked into the type-graph of T1.
 type T4 struct {
-	// +validateFalse="field T4.S"
+	// +k8s:validateFalse="field T4.S"
 	S string `json:"s"`
-	// +validateFalse="field T4.I"
+	// +k8s:validateFalse="field T4.I"
 	I int `json:"i"`
-	// +validateFalse="field T4.B"
+	// +k8s:validateFalse="field T4.B"
 	B bool `json:"b"`
-	// +validateFalse="field T4.F"
+	// +k8s:validateFalse="field T4.F"
 	F float64 `json:"f"`
 }
 

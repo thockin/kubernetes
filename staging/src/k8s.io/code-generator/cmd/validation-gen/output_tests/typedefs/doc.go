@@ -25,50 +25,50 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type E1"
+// +k8s:validateFalse="type E1"
 type E1 string
 
-// +validateFalse="type E2"
+// +k8s:validateFalse="type E2"
 type E2 int
 
-// +validateFalse="type E3"
+// +k8s:validateFalse="type E3"
 type E3 E1
 
-// +validateFalse="type E4"
+// +k8s:validateFalse="type E4"
 type E4 T2
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.E1"
+	// +k8s:validateFalse="field T1.E1"
 	E1 E1 `json:"e1"`
-	// +validateFalse="field T1.PE1"
+	// +k8s:validateFalse="field T1.PE1"
 	PE1 *E1 `json:"pe1"`
 
-	// +validateFalse="field T1.E2"
+	// +k8s:validateFalse="field T1.E2"
 	E2 E2 `json:"e2"`
-	// +validateFalse="field T1.PE2"
+	// +k8s:validateFalse="field T1.PE2"
 	PE2 *E2 `json:"pe2"`
 
-	// +validateFalse="field T1.E3"
+	// +k8s:validateFalse="field T1.E3"
 	E3 E3 `json:"e3"`
-	// +validateFalse="field T1.PE3"
+	// +k8s:validateFalse="field T1.PE3"
 	PE3 *E3 `json:"pe3"`
 
-	// +validateFalse="field T1.E4"
+	// +k8s:validateFalse="field T1.E4"
 	E4 E4 `json:"e4"`
-	// +validateFalse="field T1.PE4"
+	// +k8s:validateFalse="field T1.PE4"
 	PE4 *E4 `json:"pe4"`
 
-	// +validateFalse="field T1.T2"
+	// +k8s:validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateFalse="field T1.PT2"
+	// +k8s:validateFalse="field T1.PT2"
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateFalse="type T2"
+// +k8s:validateFalse="type T2"
 type T2 struct {
-	// +validateFalse="field T2.S"
+	// +k8s:validateFalse="field T2.S"
 	S string `json:"s"`
 }

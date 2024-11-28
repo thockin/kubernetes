@@ -243,7 +243,7 @@ type typeNode struct {
 	key         *childNode     // populated when this type is a map
 	elem        *childNode     // populated when this type is a map or slice
 	underlying  *childNode     // populated when this type is an alias
-	listMapKeys []types.Member // populated with +listMapKey values when this type is a +listType=map slice
+	listMapKeys []types.Member // populated with listMapKey values when this type is listType=map slice
 
 	typeValidations validators.Validations // validations on the type
 	keyValidations  validators.Validations // validations on each key of a map type
@@ -535,7 +535,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 				childType: childType,
 				node:      node,
 			}
-			// Extract +listMapKeys for correlating object and oldObject during
+			// Extract +k8s:listMapKeys for correlating object and oldObject during
 			// update validation.
 			if listMapKeyNames, ok := gengo.ExtractCommentTags("+", memb.CommentLines)[listMapKeyTag]; ok {
 				// List-maps can only be list types.
@@ -1024,8 +1024,8 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			oldVal := "nil" // updated below if needed
 
 			// Lookup corresponding old slice elem values for update validation using a traverse.ListMap.
-			// Only +listType=map slices have corresponding old values. Corresponding old values have matching
-			// +listMapKey values.
+			// Only +k8s:listType=map slices have corresponding old values. Corresponding old values have matching
+			// +k8s:listMapKey values.
 			if isCorrelatable {
 				// Note: this func returns 'any' but it's always an array (not
 				// slice) of 'any', and those should always be comparable, so

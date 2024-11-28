@@ -29,31 +29,31 @@ type M struct {
 	// Validation on type only.
 	M0 IntSliceLimited `json:"m0"`
 	// Validation on field only.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M1 IntSlice `json:"m1"`
 	// Validation on both type and field.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M2 IntSliceLimited `json:"m2"`
 
 	// typedef-of-slice-of-pointer-to-primitive
 	// Validation on type only.
 	M3 IntPtrSliceLimited `json:"m3"`
 	// Validation on field only.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M4 IntPtrSlice `json:"m4"`
 	// Validation on both type and field.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M5 IntPtrSliceLimited `json:"m5"`
 }
 
 // Note: no limit here
 type IntSlice []int
 
-// +k8s:validation:maxItems=2
+// +k8s:validation:new:maxItems=2
 type IntSliceLimited []int
 
 // Note: no limit here
 type IntPtrSlice []*int
 
-// +k8s:validation:maxItems=2
+// +k8s:validation:new:maxItems=2
 type IntPtrSliceLimited []*int

@@ -37,17 +37,17 @@ type T1 struct {
 	PE2 *E2 `json:"pe2"`
 }
 
-// +enum
+// +k8s:enum
 type E0 string // Note: this enum has no values
 
-// +enum
+// +k8s:enum
 type E1 string // Note: this enum has 1 value
 
 const (
 	E1V1 E1 = "e1v1"
 )
 
-// +enum
+// +k8s:enum
 type E2 string // Note: this enum has 2 values
 
 const (

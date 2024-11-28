@@ -26,36 +26,36 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +listType=map
-	// +listMapKey=k1
-	// +listMapKey=k2
+	// +k8s:listType=map
+	// +k8s:listMapKey=k1
+	// +k8s:listMapKey=k2
 	LM1 []M1 `json:"lm1"`
 
-	// +listType=map
-	// +listMapKey=k1
-	// +listMapKey=k2
+	// +k8s:listType=map
+	// +k8s:listMapKey=k1
+	// +k8s:listMapKey=k2
 	LM2 []M2 `json:"lm2"`
 
-	// +listType=map
-	// +listMapKey=k1
-	// +listMapKey=k2
+	// +k8s:listType=map
+	// +k8s:listMapKey=k1
+	// +k8s:listMapKey=k2
 	LM3 []M3 `json:"lm3"`
 
-	// +listType=map
-	// +listType=map
-	// +listMapKey=k1
-	// +listMapKey=k2
+	// +k8s:listType=map
+	// +k8s:listType=map
+	// +k8s:listMapKey=k1
+	// +k8s:listMapKey=k2
 	LM4 []M4 `json:"lm4"`
 }
 
 type M1 struct {
-	// +validateFalse="M1.K1"
+	// +k8s:validateFalse="M1.K1"
 	K1 string `json:"k1"`
 
-	// +validateFalse="M1.K2"
+	// +k8s:validateFalse="M1.K2"
 	K2 string `json:"k2"`
 
-	// +validateFalse="M1.S"
+	// +k8s:validateFalse="M1.S"
 	S string `json:"s"`
 }
 

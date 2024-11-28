@@ -26,12 +26,12 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateFalse={"flags":[], "msg":"T1.S"}
+	// +k8s:validateFalse={"flags":[], "msg":"T1.S"}
 	S string `json:"s"`
-	// +validateFalse={"flags":[], "msg":"T1.I"}
+	// +k8s:validateFalse={"flags":[], "msg":"T1.I"}
 	I int `json:"i"`
-	// +validateFalse={"flags":[], "msg":"T1.B"}
+	// +k8s:validateFalse={"flags":[], "msg":"T1.B"}
 	B bool `json:"b"`
-	// +validateFalse={"flags":[], "msg":"T1.F"}
+	// +k8s:validateFalse={"flags":[], "msg":"T1.F"}
 	F float64 `json:"f"`
 }

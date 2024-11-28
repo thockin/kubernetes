@@ -62,15 +62,15 @@ limitations under the License.
 // all `validateFalse` validation errors. For example:
 //
 //	type T1 struct {
-//		// +validateFalse="field T1.S"
+//		// +k8s:validateFalse="field T1.S"
 //		S string `json:"s"`
-//		// +validateFalse="field T1.T"
+//		// +k8s:validateFalse="field T1.T"
 //		T T2 `json:"t"`
 //	}
 //
 // The above `example.T1` test type has two validated fields: `s` and 't'. The fields are named
 // according to the Go "json" field tag, and each has a validation error identifier
-// provided by `+validateFalse=<identifier>`.
+// provided by `+k8s:validateFalse=<identifier>`.
 //
 // The `validateFalse` test fixture will validate an instance of `example.T1`, generated using fuzzed
 // data, and then group the validation errors by field name. Represented in JSON like:
@@ -87,7 +87,7 @@ limitations under the License.
 //	}
 //
 // This validation error data contains an object for each registered type, keyed by type name.
-// For each registered type, the validation errors from `+validateFalse` tags are grouped
+// For each registered type, the validation errors from `+k8s:validateFalse` tags are grouped
 // by field path with all validation error identifiers collected into a list.
 //
 // This data is compared with the expected validation results that are defined in

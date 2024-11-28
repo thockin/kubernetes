@@ -25,17 +25,17 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.AMSS"
-	// +eachKey=+validateFalse="T1.AMSS[keys]"
-	// +eachVal=+validateFalse="T1.AMSS[vals]"
+	// +k8s:validateFalse="field T1.AMSS"
+	// +k8s:eachKey=+k8s:validateFalse="T1.AMSS[keys]"
+	// +k8s:eachVal=+k8s:validateFalse="T1.AMSS[vals]"
 	AMSS AMSS `json:"amss"`
 }
 
-// +validateFalse="type AMSS"
-// +eachKey=+validateFalse="AMSS[keys]"
-// +eachVal=+validateFalse="AMSS[vals]"
+// +k8s:validateFalse="type AMSS"
+// +k8s:eachKey=+k8s:validateFalse="AMSS[keys]"
+// +k8s:eachVal=+k8s:validateFalse="AMSS[vals]"
 type AMSS map[string]string

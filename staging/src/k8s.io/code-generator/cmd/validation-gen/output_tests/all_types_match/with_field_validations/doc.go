@@ -27,17 +27,17 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateFalse="field T1.S"
+	// +k8s:validateFalse="field T1.S"
 	S string `json:"s"`
-	// +validateFalse="field T1.T2"
+	// +k8s:validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateFalse="field T1.T3"
+	// +k8s:validateFalse="field T1.T3"
 	T3 T3 `json:"t3"`
 }
 
 // Note: this has validations and is linked into T1.
 type T2 struct {
-	// +validateFalse="field T2.S"
+	// +k8s:validateFalse="field T2.S"
 	S string `json:"s"`
 }
 
@@ -48,7 +48,7 @@ type T3 struct {
 
 // Note: this has validations and is not linked into T1.
 type T4 struct {
-	// +validateFalse="field T4.S"
+	// +k8s:validateFalse="field T4.S"
 	S string `json:"s"`
 }
 

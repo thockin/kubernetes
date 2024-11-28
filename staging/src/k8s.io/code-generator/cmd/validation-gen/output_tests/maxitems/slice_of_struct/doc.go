@@ -26,31 +26,31 @@ type M struct {
 	TypeMeta int
 
 	// slice-of-struct
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M0 []S `json:"m0"`
 
 	// typedef-of-slice-of-struct
 	// Validation on type only.
 	M1 SSliceLimited `json:"m1"`
 	// Validation on field only.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M2 SSlice `json:"m2"`
 	// Validation on both type and field.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M3 SSliceLimited `json:"m3"`
 
 	// slice-of-pointer-to-struct
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M4 []*S `json:"m4"`
 
 	// typedef-of-slice-of-pointer-to-struct
 	// Validation on type only.
 	M5 SPtrSliceLimited `json:"m5"`
 	// Validation on field only.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M6 SPtrSlice `json:"m6"`
 	// Validation on both type and field.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M7 SPtrSliceLimited `json:"m7"`
 }
 
@@ -59,10 +59,10 @@ type S struct{}
 // Note: no limit here
 type SSlice []S
 
-// +k8s:validation:maxItems=2
+// +k8s:validation:new:maxItems=2
 type SSliceLimited []S
 
-// +k8s:validation:maxItems=2
+// +k8s:validation:new:maxItems=2
 type SPtrSliceLimited []*S
 
 // Note: no limit here

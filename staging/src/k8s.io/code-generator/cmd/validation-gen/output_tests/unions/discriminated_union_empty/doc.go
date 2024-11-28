@@ -28,7 +28,7 @@ var localSchemeBuilder = testscheme.New()
 type DU1 struct {
 	TypeMeta int
 
-	// +unionDiscriminator
+	// +k8s:unionDiscriminator
 	D D `json:"d"`
 }
 

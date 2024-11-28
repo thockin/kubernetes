@@ -74,8 +74,6 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 			return
 		}(obj.PS, safe.Field(oldObj, func(oldObj *T1) *string { return oldObj.PS }), fldPath.Child("ps"))...)
 
-	// field T1.T2 has no validation
-
 	// field T1.PT2
 	errs = append(errs,
 		func(obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {

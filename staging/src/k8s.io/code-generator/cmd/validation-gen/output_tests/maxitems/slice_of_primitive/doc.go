@@ -26,11 +26,11 @@ type M struct {
 	TypeMeta int
 
 	// slice-of-primitive
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M0 []int `json:"m0"`
 
 	// slice-of-pointer-to-primitive
 	// Validation on field only.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M1 []*int `json:"m1"`
 }

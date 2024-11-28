@@ -25,25 +25,25 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1 #1"
-// +validateFalse="type T1 #2"
-// +validateFalse="type T1 #3"
+// +k8s:validateFalse="type T1 #1"
+// +k8s:validateFalse="type T1 #2"
+// +k8s:validateFalse="type T1 #3"
 type T1 struct {
 	TypeMeta int
-	// +validateFalse="field T1.S #1"
-	// +validateFalse="field T1.S #2"
-	// +validateFalse="field T1.S #3"
+	// +k8s:validateFalse="field T1.S #1"
+	// +k8s:validateFalse="field T1.S #2"
+	// +k8s:validateFalse="field T1.S #3"
 	S string `json:"s"`
-	// +validateFalse="field T1.T2 #1"
-	// +validateFalse="field T1.T2 #2"
-	// +validateFalse="field T1.T2 #3"
+	// +k8s:validateFalse="field T1.T2 #1"
+	// +k8s:validateFalse="field T1.T2 #2"
+	// +k8s:validateFalse="field T1.T2 #3"
 	T2 T2 `json:"t2"`
 }
 
-// +validateFalse="type T2 #1"
-// +validateFalse="type T2 #2"
+// +k8s:validateFalse="type T2 #1"
+// +k8s:validateFalse="type T2 #2"
 type T2 struct {
-	// +validateFalse="field T2.S #1"
-	// +validateFalse="field T2.S #2"
+	// +k8s:validateFalse="field T2.S #1"
+	// +k8s:validateFalse="field T2.S #2"
 	S string `json:"s"`
 }

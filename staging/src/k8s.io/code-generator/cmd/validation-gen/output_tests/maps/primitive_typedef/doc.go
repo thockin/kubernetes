@@ -25,22 +25,22 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.MSAMSS"
-	// +eachKey=+validateFalse="T1.MSAMSS[keys]"
-	// +eachVal=+validateFalse="T1.MSAMSS[vals]"
+	// +k8s:validateFalse="field T1.MSAMSS"
+	// +k8s:eachKey=+k8s:validateFalse="T1.MSAMSS[keys]"
+	// +k8s:eachVal=+k8s:validateFalse="T1.MSAMSS[vals]"
 	MSAMSS map[string]AMSS `json:"msamss"`
 
-	// +validateTrue="field T1.MSPAMSS"
-	// +eachKey=+validateTrue="T1.MSPAMSS[keys]"
-	// +eachVal=+validateTrue="T1.MSPAMSS[vals]"
+	// +k8s:validateTrue="field T1.MSPAMSS"
+	// +k8s:eachKey=+k8s:validateTrue="T1.MSPAMSS[keys]"
+	// +k8s:eachVal=+k8s:validateTrue="T1.MSPAMSS[vals]"
 	MSPAMSS map[string]*AMSS `json:"mspamss"`
 }
 
-// +validateFalse="type AMSS"
-// +eachKey=+validateFalse="AMSS[keys]"
-// +eachVal=+validateFalse="AMSS[vals]"
+// +k8s:validateFalse="type AMSS"
+// +k8s:eachKey=+k8s:validateFalse="AMSS[keys]"
+// +k8s:eachVal=+k8s:validateFalse="AMSS[vals]"
 type AMSS map[string]string
