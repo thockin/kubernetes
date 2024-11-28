@@ -28,15 +28,15 @@ var localSchemeBuilder = testscheme.New()
 type DU struct {
 	TypeMeta int
 
-	// +unionDiscriminator
+	// +k8s:unionDiscriminator
 	D D `json:"d"`
 
-	// +unionMember={"memberName": "CustomM1"}
-	// +optional
+	// +k8s:unionMember={"memberName": "CustomM1"}
+	// +k8s:optional
 	M1 *M1 `json:"m1"`
 
-	// +unionMember={"memberName": "CustomM2"}
-	// +optional
+	// +k8s:unionMember={"memberName": "CustomM2"}
+	// +k8s:optional
 	M2 *M2 `json:"m2"`
 }
 

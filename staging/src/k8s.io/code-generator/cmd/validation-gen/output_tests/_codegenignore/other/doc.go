@@ -22,14 +22,14 @@ limitations under the License.
 // and so the generated could should NOT descend into these.
 package other
 
-// +validateFalse="you should not see this outside of this pkg"
+// +k8s:validateFalse="you should not see this outside of this pkg"
 type StringType string
 
-// +validateFalse="you should not see this outside of this pkg"
+// +k8s:validateFalse="you should not see this outside of this pkg"
 type IntType int
 
-// +validateFalse="you should not see this outside of this pkg"
+// +k8s:validateFalse="you should not see this outside of this pkg"
 type StructType struct {
-	// +validateFalse="you should not see this outside of this pkg"
+	// +k8s:validateFalse="you should not see this outside of this pkg"
 	StringField string `json:"stringField"`
 }

@@ -27,13 +27,13 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +ifOptionEnabled=FeatureX=+validateFalse="field T1.S1"
+	// +k8s:ifOptionEnabled=FeatureX=+k8s:validateFalse="field T1.S1"
 	S1 string `json:"s1"`
 
-	// +ifOptionDisabled=FeatureX=+validateFalse="field T1.S2"
+	// +k8s:ifOptionDisabled=FeatureX=+k8s:validateFalse="field T1.S2"
 	S2 string `json:"s2"`
 
-	// +ifOptionEnabled=FeatureX=+validateFalse="field T1.S3.FeatureX"
-	// +ifOptionDisabled=FeatureY=+validateFalse="field T1.S3.FeatureY"
+	// +k8s:ifOptionEnabled=FeatureX=+k8s:validateFalse="field T1.S3.FeatureX"
+	// +k8s:ifOptionDisabled=FeatureY=+k8s:validateFalse="field T1.S3.FeatureY"
 	S3 string `json:"s3"`
 }

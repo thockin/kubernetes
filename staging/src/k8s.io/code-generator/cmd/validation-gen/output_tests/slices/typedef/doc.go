@@ -25,19 +25,19 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.ALS"
-	// +eachVal=+validateFalse="T1.ALS[vals]"
+	// +k8s:validateFalse="field T1.ALS"
+	// +k8s:eachVal=+k8s:validateFalse="T1.ALS[vals]"
 	ALS ALS `json:"als"`
 
-	// +validateFalse="field T1.LALS"
-	// +eachVal=+validateFalse="T1.LALS[vals]"
+	// +k8s:validateFalse="field T1.LALS"
+	// +k8s:eachVal=+k8s:validateFalse="T1.LALS[vals]"
 	LALS []ALS `json:"lals"`
 }
 
-// +validateFalse="type ALS"
-// +eachVal=+validateFalse="ALS[vals]"
+// +k8s:validateFalse="type ALS"
+// +k8s:eachVal=+k8s:validateFalse="ALS[vals]"
 type ALS []string

@@ -25,13 +25,13 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.MSS"
-	// +eachKey=+validateFalse="T1.MSS[keys]"
-	// +eachVal=+validateFalse="T1.MSS[vals]"
+	// +k8s:validateFalse="field T1.MSS"
+	// +k8s:eachKey=+k8s:validateFalse="T1.MSS[keys]"
+	// +k8s:eachVal=+k8s:validateFalse="T1.MSS[vals]"
 	MSS map[string]string `json:"mss"`
 
 	// Duplicate with no validation.

@@ -30,6 +30,6 @@ type T1 struct {
 }
 
 type M1 struct {
-	// +validateFalse="M1.S"
+	// +k8s:validateFalse="M1.S"
 	S string `json:"s"`
 }

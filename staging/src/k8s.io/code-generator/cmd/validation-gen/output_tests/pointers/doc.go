@@ -28,16 +28,16 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.PS"
+	// +k8s:validateFalse="field T1.PS"
 	PS *string `json:"ps"`
-	// +validateFalse="field T1.PI"
+	// +k8s:validateFalse="field T1.PI"
 	PI *int `json:"pi"`
-	// +validateFalse="field T1.PB"
+	// +k8s:validateFalse="field T1.PB"
 	PB *bool `json:"pb"`
-	// +validateFalse="field T1.PF"
+	// +k8s:validateFalse="field T1.PF"
 	PF *float64 `json:"pf"`
 
-	// +validateFalse="field T1.PT2"
+	// +k8s:validateFalse="field T1.PT2"
 	PT2 *T2 `json:"pt2"`
 
 	// Duplicate types with no validation.
@@ -49,12 +49,12 @@ type T1 struct {
 
 // Note: This has validations and is linked into the type-graph of T1.
 type T2 struct {
-	// +validateFalse="field T2.PS"
+	// +k8s:validateFalse="field T2.PS"
 	PS *string `json:"ps"`
-	// +validateFalse="field T2.PI"
+	// +k8s:validateFalse="field T2.PI"
 	PI *int `json:"pi"`
-	// +validateFalse="field T2.PB"
+	// +k8s:validateFalse="field T2.PB"
 	PB *bool `json:"pb"`
-	// +validateFalse="field T2.PF"
+	// +k8s:validateFalse="field T2.PF"
 	PF *float64 `json:"pf"`
 }

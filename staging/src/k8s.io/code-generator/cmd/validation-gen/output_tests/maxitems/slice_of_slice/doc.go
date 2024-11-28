@@ -26,20 +26,20 @@ type M struct {
 	TypeMeta int
 
 	// slice-of-slice-of-value
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M0 [][]int `json:"m0"`
 
 	// slice-of-typedef-of-slice-of-value
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M1 []IntSlice `json:"m1"`
 
 	// slice-of-slice-of-pointer
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M2 [][]*int `json:"m2"`
 
 	// slice-of-typedef-of-slice-of-pointer
 	// Validation on field only.
-	// +k8s:validation:maxItems=1
+	// +k8s:validation:new:maxItems=1
 	M3 []IntPtrSlice `json:"m3"`
 }
 

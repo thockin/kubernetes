@@ -28,20 +28,20 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.S"
-	// +required
+	// +k8s:validateFalse="field T1.S"
+	// +k8s:required
 	S string `json:"s"`
-	// +validateFalse="field T1.PS"
-	// +required
+	// +k8s:validateFalse="field T1.PS"
+	// +k8s:required
 	PS *string `json:"ps"`
 
-	// +validateFalse="field T1.T2"
-	// +required
+	// +k8s:validateFalse="field T1.T2"
+	// +k8s:required
 	T2 T2 `json:"t2"`
-	// +validateFalse="field T1.PT2"
-	// +required
+	// +k8s:validateFalse="field T1.PT2"
+	// +k8s:required
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateFalse="type T2"
+// +k8s:validateFalse="type T2"
 type T2 struct{}

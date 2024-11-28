@@ -25,24 +25,24 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type E1"
+// +k8s:validateFalse="type E1"
 type E1 string
 
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.MSE1"
-	// +eachKey=+validateFalse="T1.MSE1[keys]"
-	// +eachVal=+validateFalse="T1.MSE1[vals]"
+	// +k8s:validateFalse="field T1.MSE1"
+	// +k8s:eachKey=+k8s:validateFalse="T1.MSE1[keys]"
+	// +k8s:eachVal=+k8s:validateFalse="T1.MSE1[vals]"
 	MSE1 map[string]E1 `json:"mse1"`
 
-	// +validateFalse="field T1.MSPE1"
-	// +eachKey=+validateFalse="T1.MSPE1[keys]"
-	// +eachVal=+validateFalse="T1.MSPE1[vals]"
+	// +k8s:validateFalse="field T1.MSPE1"
+	// +k8s:eachKey=+k8s:validateFalse="T1.MSPE1[keys]"
+	// +k8s:eachVal=+k8s:validateFalse="T1.MSPE1[vals]"
 	MSPE1 map[string]*E1 `json:"mspe1"`
 
-	// +validateFalse="field T1.ME1S"
-	// +eachKey=+validateFalse="T1.ME1S[keys]"
-	// +eachVal=+validateFalse="T1.ME1S[vals]"
+	// +k8s:validateFalse="field T1.ME1S"
+	// +k8s:eachKey=+k8s:validateFalse="T1.ME1S[keys]"
+	// +k8s:eachVal=+k8s:validateFalse="T1.ME1S[vals]"
 	ME1S map[E1]string `json:"me1s"`
 }

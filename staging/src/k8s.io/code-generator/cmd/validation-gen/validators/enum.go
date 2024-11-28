@@ -54,7 +54,7 @@ func (c *enumDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 			//       The correct package would be the output package but is not known here. This does not show up in generated code.
 			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
 			supportVarName := PrivateVar{Name: "SymbolsFor" + t.Name.Name, Package: "local"}
-			supportVar := Variable(supportVarName, GenericFunction("enum", DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
+			supportVar := Variable(supportVarName, GenericFunction(tagEnumType, DefaultFlags, setsNew, []types.Name{enum.Name}, enum.ValueArgs()...))
 			result.AddVariable(supportVar)
 			fn := Function("enum", DefaultFlags, enumValidator, supportVarName)
 			result.AddFunction(fn)

@@ -34,11 +34,11 @@ type T1 struct {
 
 	HasNoVal HasNoVal `json:"hasNoVal"`
 
-	// +validateFalse="field T1.HasNoValFieldVal"
+	// +k8s:validateFalse="field T1.HasNoValFieldVal"
 	HasNoValFieldVal HasNoVal `json:"hasNoValFieldVal"`
 }
 
-// +validateFalse="type HasTypeVal"
+// +k8s:validateFalse="type HasTypeVal"
 type HasTypeVal struct {
 	// Note: no field validation.
 	S string `json:"s"`
@@ -46,7 +46,7 @@ type HasTypeVal struct {
 
 // Note: no type validation.
 type HasFieldVal struct {
-	// +validateFalse="field HasFieldVal.S"
+	// +k8s:validateFalse="field HasFieldVal.S"
 	S string `json:"s"`
 }
 
@@ -56,7 +56,7 @@ type HasNoVal struct {
 	S string `json:"s"`
 }
 
-// +validateFalse="type HasTypeValNotLinked"
+// +k8s:validateFalse="type HasTypeValNotLinked"
 type HasTypeValNotLinked struct {
 	// Note: no field validation.
 	S string `json:"s"`
@@ -64,7 +64,7 @@ type HasTypeValNotLinked struct {
 
 // Note: no type validation.
 type HasFieldValNotLinked struct {
-	// +validateFalse="field HasFieldValNotLinked.S"
+	// +k8s:validateFalse="field HasFieldValNotLinked.S"
 	S string `json:"s"`
 }
 

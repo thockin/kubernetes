@@ -26,12 +26,12 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateFalse="T1.SP"
+	// +k8s:validateFalse="T1.SP"
 	SP *string `json:"sp"`
-	// +validateFalse="T1.IP"
+	// +k8s:validateFalse="T1.IP"
 	IP *int `json:"ip"`
-	// +validateFalse="T1.BP"
+	// +k8s:validateFalse="T1.BP"
 	BP *bool `json:"bp"`
-	// +validateFalse="T1.FP"
+	// +k8s:validateFalse="T1.FP"
 	FP *float64 `json:"fp"`
 }

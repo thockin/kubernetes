@@ -27,14 +27,14 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +forbidden
+	// +k8s:forbidden
 	S string `json:"s"`
-	// +forbidden
+	// +k8s:forbidden
 	PS *string `json:"ps"`
 
 	// non-pointer struct fields cannot be forbiden
 
-	// +forbidden
+	// +k8s:forbidden
 	PT2 *T2 `json:"pt2"`
 }
 

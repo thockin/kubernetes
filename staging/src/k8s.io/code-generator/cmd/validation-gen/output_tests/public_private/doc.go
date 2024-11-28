@@ -26,17 +26,17 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 var localSchemeBuilder = testscheme.New()
 
 type T1 struct {
-	// +validateFalse="field T1.Public"
+	// +k8s:validateFalse="field T1.Public"
 	Public string `json:"public"`
 
-	// +validateFalse="field T1.private"
+	// +k8s:validateFalse="field T1.private"
 	private string `json:"private"`
 }
 
 type private struct {
-	// +validateFalse="field private.Public"
+	// +k8s:validateFalse="field private.Public"
 	Public string `json:"public"`
 
-	// +validateFalse="field private.private"
+	// +k8s:validateFalse="field private.private"
 	private string `json:"private"`
 }

@@ -26,16 +26,16 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
-	// +validateFalse="field T1.S"
+	// +k8s:validateFalse="field T1.S"
 	S string `json:"s"`
 }
 
 // Note: this has no validations.
 type T2 struct{}
 
-// +validateFalse="type E1"
+// +k8s:validateFalse="type E1"
 type E1 string
 
 // Note: this has no validations.

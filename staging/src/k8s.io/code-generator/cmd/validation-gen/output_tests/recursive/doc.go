@@ -24,36 +24,36 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-// +validateFalse="type T1"
+// +k8s:validateFalse="type T1"
 type T1 struct {
-	// +validateFalse="field T1.PT1"
-	// +optional
+	// +k8s:validateFalse="field T1.PT1"
+	// +k8s:optional
 	PT1 *T1 `json:"pt1"`
 
-	// +validateFalse="field T1.T2"
+	// +k8s:validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateFalse="field T1.PT2"
-	// +optional
+	// +k8s:validateFalse="field T1.PT2"
+	// +k8s:optional
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateFalse="type T2"
+// +k8s:validateFalse="type T2"
 type T2 struct {
-	// +validateFalse="field T2.PT1"
-	// +optional
+	// +k8s:validateFalse="field T2.PT1"
+	// +k8s:optional
 	PT1 *T1 `json:"pt1"`
 
-	// +validateFalse="field T2.PT2"
-	// +optional
+	// +k8s:validateFalse="field T2.PT2"
+	// +k8s:optional
 	PT2 *T2 `json:"pt2"`
 }
 
-// +validateFalse="type E1"
-// +eachVal=+validateFalse="type E1 values"
+// +k8s:validateFalse="type E1"
+// +k8s:eachVal=+k8s:validateFalse="type E1 values"
 type E1 []E1
 
-// +validateFalse="type E2"
-// +eachVal=+validateFalse="type E2 values"
+// +k8s:validateFalse="type E2"
+// +k8s:eachVal=+k8s:validateFalse="type E2 values"
 type E2 []*E2
 
 // NOTE: no validations.

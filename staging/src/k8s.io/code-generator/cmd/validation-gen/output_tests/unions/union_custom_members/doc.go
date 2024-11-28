@@ -28,12 +28,12 @@ var localSchemeBuilder = testscheme.New()
 type U struct {
 	TypeMeta int
 
-	// +unionMember={"memberName": "CustomM1"}
-	// +optional
+	// +k8s:unionMember={"memberName": "CustomM1"}
+	// +k8s:optional
 	M1 *M1 `json:"m1"`
 
-	// +unionMember={"memberName": "CustomM2"}
-	// +optional
+	// +k8s:unionMember={"memberName": "CustomM2"}
+	// +k8s:optional
 	M2 *M2 `json:"m2"`
 
 	T1 *T1 `json:"t1"` // not part of the union

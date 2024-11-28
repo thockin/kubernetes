@@ -28,22 +28,22 @@ var localSchemeBuilder = testscheme.New()
 type T1 struct {
 	TypeMeta int
 
-	// +validateFalse="field T1.S"
+	// +k8s:validateFalse="field T1.S"
 	S string `json:"s"`
-	// +validateFalse="field T1.T2"
+	// +k8s:validateFalse="field T1.T2"
 	T2 T2 `json:"t2"`
-	// +validateFalse="field T1.T3"
+	// +k8s:validateFalse="field T1.T3"
 	T3 T3 `json:"t3"`
 
-	// +validateFalse="field T1.E1"
+	// +k8s:validateFalse="field T1.E1"
 	E1 E1 `json:"e1"`
-	// +validateFalse="field T1.E2"
+	// +k8s:validateFalse="field T1.E2"
 	E2 E2 `json:"e2"`
 }
 
 // Note: this has validations and is linked into T1.
 type T2 struct {
-	// +validateFalse="field T2.S"
+	// +k8s:validateFalse="field T2.S"
 	S string `json:"s"`
 }
 
@@ -54,7 +54,7 @@ type T3 struct {
 
 // Note: this has validations and is not linked into T1.
 type T4 struct {
-	// +validateFalse="field T4.S"
+	// +k8s:validateFalse="field T4.S"
 	S string `json:"s"`
 }
 
@@ -64,14 +64,14 @@ type T5 struct {
 }
 
 // Note: this has validations and is linked into T1.
-// +validateFalse="type E1"
+// +k8s:validateFalse="type E1"
 type E1 string
 
 // Note: this has no validations and is linked into T1.
 type E2 string
 
 // Note: this has validations and is not linked into T1.
-// +validateFalse="field type E3"
+// +k8s:validateFalse="field type E3"
 type E3 string
 
 // Note: this has no validations and is not linked into T1.

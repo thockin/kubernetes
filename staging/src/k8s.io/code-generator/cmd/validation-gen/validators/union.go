@@ -47,13 +47,15 @@ type unionDeclarativeValidator struct {
 }
 
 const (
-	// +union and +unionDiscriminator tag are used by openapi-gen to publish x-kubernetes-union and x-kubernetes-discriminator
-	// extensions into Kubernetes published OpenAPI.
+	// +k8s:union and +k8s:unionDiscriminator tag are used by openapi-gen to
+	// publish x-kubernetes-union and x-kubernetes-discriminator extensions
+	// into Kubernetes published OpenAPI.
 	discriminatorTagName = "k8s:unionDiscriminator"
 	memberTagName        = "k8s:unionMember"
 )
 
-// discriminatorParams defines JSON the parameter value for the +unionDiscriminator tag.
+// discriminatorParams defines JSON the parameter value for the
+// +k8s:unionDiscriminator tag.
 type discriminatorParams struct {
 	// Union sets the name of the union this discriminator belongs to.
 	// This is only needed for go structs that contain more than one union.
@@ -61,7 +63,7 @@ type discriminatorParams struct {
 	Union string `json:"union,omitempty"`
 }
 
-// memberParams defines the JSON parameter value for the +unionMember tag.
+// memberParams defines the JSON parameter value for the +k8s:unionMember tag.
 type memberParams struct {
 	// Union sets the name of the union this member belongs to.
 	// This is only needed for go structs that contain more than one union.
@@ -76,7 +78,7 @@ type memberParams struct {
 }
 
 // union defines how a union validation will be generated, based
-// on +unionMember and +unionDiscriminator tags found in a go struct.
+// on +k8s:unionMember and +k8s:unionDiscriminator tags found in a go struct.
 type union struct {
 	// fields provides field information about all the members of the union.
 	// Each slice element is a [2]string to provide a fieldName and memberName pair, where
