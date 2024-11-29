@@ -48,21 +48,9 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*T3)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_T3(opCtx, obj.(*T3), safe.Cast[*T3](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	scheme.AddValidationFunc((*T4)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T4(opCtx, obj.(*T4), safe.Cast[*T4](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
-	scheme.AddValidationFunc((*T5)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_T5(opCtx, obj.(*T5), safe.Cast[*T5](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -106,11 +94,6 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 	return errs
 }
 
-func Validate_T3(opCtx operation.Context, obj, oldObj *T3, fldPath *field.Path) (errs field.ErrorList) {
-	// field T3.S has no validation
-	return errs
-}
-
 func Validate_T4(opCtx operation.Context, obj, oldObj *T4, fldPath *field.Path) (errs field.ErrorList) {
 	// field T4.S
 	errs = append(errs,
@@ -119,10 +102,5 @@ func Validate_T4(opCtx operation.Context, obj, oldObj *T4, fldPath *field.Path) 
 			return
 		}(&obj.S, safe.Field(oldObj, func(oldObj *T4) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
-	return errs
-}
-
-func Validate_T5(opCtx operation.Context, obj, oldObj *T5, fldPath *field.Path) (errs field.ErrorList) {
-	// field T5.S has no validation
 	return errs
 }

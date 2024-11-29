@@ -36,12 +36,6 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	scheme.AddValidationFunc((*U)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_U(opCtx, obj.(*U), safe.Cast[*U](oldObj), nil)
@@ -49,12 +43,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
-}
-
-func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// field T1.TypeMeta has no validation
-	// field T1.LS has no validation
-	return errs
 }
 
 var unionMembershipForU = validate.NewUnionMembership([2]string{"m1", "CustomM1"}, [2]string{"m2", "CustomM2"})

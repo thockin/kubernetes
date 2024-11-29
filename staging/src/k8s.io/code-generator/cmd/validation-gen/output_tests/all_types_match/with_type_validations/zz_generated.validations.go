@@ -42,21 +42,9 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*E2)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_E2(opCtx, obj.(*E2), safe.Cast[*E2](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	scheme.AddValidationFunc((*T1)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_T1(opCtx, obj.(*T1), safe.Cast[*T1](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
-	scheme.AddValidationFunc((*T2)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_T2(opCtx, obj.(*T2), safe.Cast[*T2](oldObj), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
@@ -67,10 +55,6 @@ func Validate_E1(opCtx operation.Context, obj, oldObj *E1, fldPath *field.Path) 
 	// type E1
 	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type E1")...)
 
-	return errs
-}
-
-func Validate_E2(opCtx operation.Context, obj, oldObj *E2, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
 
@@ -85,9 +69,5 @@ func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) 
 			return
 		}(&obj.S, safe.Field(oldObj, func(oldObj *T1) *string { return &oldObj.S }), fldPath.Child("s"))...)
 
-	return errs
-}
-
-func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) (errs field.ErrorList) {
 	return errs
 }
