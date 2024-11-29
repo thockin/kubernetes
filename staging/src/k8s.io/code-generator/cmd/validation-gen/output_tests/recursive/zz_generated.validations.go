@@ -60,12 +60,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*T3)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_T3(opCtx, obj.(*T3), safe.Cast[*T3](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	return nil
 }
 
@@ -162,10 +156,5 @@ func Validate_T2(opCtx operation.Context, obj, oldObj *T2, fldPath *field.Path) 
 			return
 		}(obj.PT2, safe.Field(oldObj, func(oldObj *T2) *T2 { return oldObj.PT2 }), fldPath.Child("pt2"))...)
 
-	return errs
-}
-
-func Validate_T3(opCtx operation.Context, obj, oldObj *T3, fldPath *field.Path) (errs field.ErrorList) {
-	// field T3.PT3 has no validation
 	return errs
 }

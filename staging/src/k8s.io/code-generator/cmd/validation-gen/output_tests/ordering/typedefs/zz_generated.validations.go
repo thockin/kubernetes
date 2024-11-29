@@ -36,12 +36,6 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*E00)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_E00(opCtx, obj.(*E00), safe.Cast[*E00](oldObj), nil)
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	scheme.AddValidationFunc((*E01)(nil), func(opCtx operation.Context, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_E01(opCtx, obj.(*E01), safe.Cast[*E01](oldObj), nil)
@@ -67,10 +61,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
-}
-
-func Validate_E00(opCtx operation.Context, obj, oldObj *E00, fldPath *field.Path) (errs field.ErrorList) {
-	return errs
 }
 
 func Validate_E01(opCtx operation.Context, obj, oldObj *E01, fldPath *field.Path) (errs field.ErrorList) {

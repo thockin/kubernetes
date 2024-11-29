@@ -762,6 +762,10 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 	sw.Do("// Public to allow building arbitrary schemes.\n", nil)
 	sw.Do("func RegisterValidations(scheme $.|raw$) error {\n", schemePtr)
 	for _, rootType := range g.rootTypes {
+		if !g.hasValidations(g.discovered.typeNodes[rootType]) {
+			continue
+		}
+
 		node := g.discovered.typeNodes[rootType]
 		if node == nil {
 			panic(fmt.Sprintf("found nil node for root-type %v", rootType))
@@ -838,6 +842,10 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 
 // emitValidationFunction emits a validation function for the specified type.
 func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.Type, sw *generator.SnippetWriter) {
+	if !g.hasValidations(g.discovered.typeNodes[t]) {
+		return
+	}
+
 	targs := generator.Args{
 		"inType":     t,
 		"field":      mkSymbolArgs(c, fieldPkgSymbols),
