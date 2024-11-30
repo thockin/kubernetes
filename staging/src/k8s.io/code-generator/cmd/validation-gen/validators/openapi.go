@@ -39,6 +39,7 @@ const (
 	formatTagName    = markerPrefix + ":format"
 	maxLengthTagName = markerPrefix + ":maxLength"
 	maxItemsTagName  = markerPrefix + ":maxItems"
+	minimumTagName   = markerPrefix + ":minimum"
 )
 
 var (
@@ -46,6 +47,7 @@ var (
 	dnsLabelValidator  = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 	maxItemsValidator  = types.Name{Package: libValidationPkg, Name: "MaxItems"}
+	minimumValidator   = types.Name{Package: libValidationPkg, Name: "Minimum"}
 )
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
@@ -60,6 +62,9 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 	}
 	if schema.MaxItems != nil {
 		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, *schema.MaxItems))
+	}
+	if schema.Minimum != nil {
+		result.AddFunction(Function(minimumTagName, DefaultFlags, minimumValidator, *schema.Minimum))
 	}
 	if len(schema.Format) > 0 {
 		formatFunction := FormatValidationFunction(schema.Format)
@@ -101,6 +106,14 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 				Docs:        "This field must be no more than X items long.",
 			},
 		},
+	}, {
+		Tag:         minimumTagName,
+		Description: "Indicates that a numeric field has a minimum value.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+		Payloads: []TagPayloadDoc{{
+			Description: "<integer>",
+			Docs:        "This field must be greater than or equal to x.",
+		}},
 	}}
 }
 
