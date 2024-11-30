@@ -38,6 +38,7 @@ const (
 	formatTagName    = "k8s:format"
 	maxLengthTagName = "k8s:maxLength"
 	maxItemsTagName  = "k8s:maxItems"
+	minimumTagName   = "k8s:minimum"
 )
 
 var (
@@ -45,6 +46,7 @@ var (
 	dnsLabelValidator  = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 	maxLengthValidator = types.Name{Package: libValidationPkg, Name: "MaxLength"}
 	maxItemsValidator  = types.Name{Package: libValidationPkg, Name: "MaxItems"}
+	minimumValidator   = types.Name{Package: libValidationPkg, Name: "Minimum"}
 )
 
 func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
@@ -60,7 +62,14 @@ func (openAPIDeclarativeValidator) ExtractValidations(t *types.Type, comments []
 	if maxItems, found, err := extractOptionalIntValue(commentTags, maxItemsTagName); err != nil {
 		return result, err
 	} else if found {
+		// Note: maxItems short-circuits other validations.
 		result.AddFunction(Function(maxItemsTagName, ShortCircuit, maxItemsValidator, maxItems))
+	}
+
+	if minimum, found, err := extractOptionalIntValue(commentTags, minimumTagName); err != nil {
+		return result, err
+	} else if found {
+		result.AddFunction(Function(minimumTagName, DefaultFlags, minimumValidator, minimum))
 	}
 
 	if formats := commentTags[formatTagName]; len(formats) > 0 {
@@ -125,6 +134,14 @@ func (openAPIDeclarativeValidator) Docs() []TagDoc {
 				Docs:        "This field must be no more than X items long.",
 			},
 		},
+	}, {
+		Tag:         minimumTagName,
+		Description: "Indicates that a numeric field has a minimum value.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+		Payloads: []TagPayloadDoc{{
+			Description: "<integer>",
+			Docs:        "This field must be greater than or equal to x.",
+		}},
 	}}
 }
 

@@ -17,6 +17,7 @@ limitations under the License.
 package validate
 
 import (
+	"golang.org/x/exp/constraints"
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/api/validate/content"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -30,6 +31,17 @@ func MaxLength(_ operation.Context, fldPath *field.Path, value, _ *string, max i
 	}
 	if len(*value) > max {
 		return field.ErrorList{field.Invalid(fldPath, *value, content.MaxLenError(max))}
+	}
+	return nil
+}
+
+// Minimum verifies that the specified value is greater than or equal to min.
+func Minimum[T constraints.Integer](_ operation.Context, fldPath *field.Path, value, _ *T, min T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if *value < min {
+		return field.ErrorList{field.Invalid(fldPath, *value, content.MinError(min))}
 	}
 	return nil
 }
