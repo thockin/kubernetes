@@ -134,6 +134,57 @@ func TestMaxItems(t *testing.T) {
 	}
 }
 
+func TestMinimum(t *testing.T) {
+	cases := []struct {
+		value int
+		min   int
+		err   string // regex
+	}{{
+		value: 0,
+		min:   0,
+	}, {
+		value: 0,
+		min:   1,
+		err:   "fldpath: Invalid value.*must be greater than or equal to",
+	}, {
+		value: 1,
+		min:   1,
+	}, {
+		value: 1,
+		min:   2,
+		err:   "fldpath: Invalid value.*must be greater than or equal to",
+	}, {
+		value: -1,
+		min:   -1,
+	}, {
+		value: -2,
+		min:   -1,
+		err:   "fldpath: Invalid value.*must be greater than or equal to",
+	}}
+
+	for i, tc := range cases {
+		v := tc.value
+		result := Minimum(operation.Context{}, field.NewPath("fldpath"), &v, nil, tc.min)
+		if len(result) > 0 && tc.err == "" {
+			t.Errorf("case %d: unexpected failure: %v", i, fmtErrs(result))
+			continue
+		}
+		if len(result) == 0 && tc.err != "" {
+			t.Errorf("case %d: unexpected success: expected %q", i, tc.err)
+			continue
+		}
+		if len(result) > 0 {
+			if len(result) > 1 {
+				t.Errorf("case %d: unexepected multi-error: %v", i, fmtErrs(result))
+				continue
+			}
+			if re := regexp.MustCompile(tc.err); !re.MatchString(result[0].Error()) {
+				t.Errorf("case %d: wrong error\nexpected: %q\n     got: %v", i, tc.err, fmtErrs(result))
+			}
+		}
+	}
+}
+
 func TestRequiredValue(t *testing.T) {
 	cases := []struct {
 		fn  func(c operation.Context, fp *field.Path) field.ErrorList
