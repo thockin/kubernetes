@@ -26,7 +26,7 @@ import (
 func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
-	st.Value(&T1{S: "x", PS: pointer.To("x"), T2: T2{S: "x"}, PT2: &T2{S: "x"}}).
+	st.Value(&T1{S: "x", PS: pointer.To("x"), PT2: &T2{S: "x"}}).
 		ExpectInvalid(
 			field.Forbidden(field.NewPath("s"), ""),
 			field.Forbidden(field.NewPath("ps"), ""),
@@ -34,6 +34,6 @@ func Test(t *testing.T) {
 			field.Forbidden(field.NewPath("pt2"), ""),
 		)
 
-	st.Value(&T1{S: "", PS: nil, T2: T2{S: ""}, PT2: nil}).
+	st.Value(&T1{S: "", PS: nil, PT2: nil}).
 		ExpectValid()
 }

@@ -32,7 +32,8 @@ type T1 struct {
 	// +forbidden
 	PS *string `json:"ps"`
 
-	T2 T2 `json:"t2"`
+	// non-pointer struct fields cannot be forbiden
+
 	// +forbidden
 	PT2 *T2 `json:"pt2"`
 }
