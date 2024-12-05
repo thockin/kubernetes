@@ -17,11 +17,11 @@ limitations under the License.
 package testscheme
 
 import (
+	"bytes"
+	stdcmp "cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/go-cmp/cmp"
-	fuzz "github.com/google/gofuzz"
 	"io"
 	"math/rand"
 	"os"
@@ -30,6 +30,10 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	fuzz "github.com/google/gofuzz"
 
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -183,7 +187,7 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 				} else {
 					if !cmp.Equal(gotForType, expectedForType) {
 						t.Errorf("validateFalse args, grouped by field path, differed from %s:\n%s\n",
-							testdataFilename, cmp.Diff(gotForType, expectedForType))
+							testdataFilename, cmp.Diff(gotForType, expectedForType, cmpopts.SortMaps(stdcmp.Less[string])))
 						hasErrors = true
 					}
 				}
@@ -192,7 +196,7 @@ func (s *ValidationTestBuilder) ValidateFixtures() {
 		for unexpectedType := range gotKeys.Difference(expectedKeys) {
 			s.T.Run(unexpectedType, func(t *testing.T) {
 				t.Errorf("%q got unexpected validateFalse args, grouped by field path:\n%s\n",
-					unexpectedType, cmp.Diff(nil, got[unexpectedType]))
+					unexpectedType, cmp.Diff(nil, got[unexpectedType], cmpopts.SortMaps(stdcmp.Less[string])))
 				hasErrors = true
 			})
 		}
@@ -251,13 +255,29 @@ func (v *ValidationTester) Opts(opts sets.Set[string]) *ValidationTester {
 	return v
 }
 
+func multiline(errs field.ErrorList) string {
+	if len(errs) == 0 {
+		return "<no errors>"
+	}
+	if len(errs) == 1 {
+		return errs[0].Error()
+	}
+
+	var buf bytes.Buffer
+	for _, err := range errs {
+		buf.WriteString("\n")
+		buf.WriteString(err.Error())
+	}
+	return buf.String()
+}
+
 // ExpectValid validates the value and calls t.Errorf if any validation errors are returned.
 // Returns ValidationTester to support call chaining.
 func (v *ValidationTester) ExpectValid() *ValidationTester {
 	v.T.Run(fmt.Sprintf("%T", v.value), func(t *testing.T) {
 		errs := v.validate()
 		if len(errs) > 0 {
-			t.Errorf("want no errors, got: %v", errs)
+			t.Errorf("want no errors, got: %v", multiline(errs))
 		}
 	})
 	return v
@@ -306,7 +326,7 @@ func (v *ValidationTester) ExpectValidateFalseByPath(validateFalseArgsByField ma
 			sort.Strings(args)
 		}
 		if !cmp.Equal(validateFalseArgsByField, byField) {
-			t.Errorf("validateFalse args, grouped by field path, differed from expected:\n%s\n", cmp.Diff(validateFalseArgsByField, byField))
+			t.Errorf("validateFalse args, grouped by field path, differed from expected:\n%s\n", cmp.Diff(validateFalseArgsByField, byField, cmpopts.SortMaps(stdcmp.Less[string])))
 		}
 
 	})
@@ -345,7 +365,7 @@ func (v *ValidationTester) expectInvalid(matcher matcher, errs ...*field.Error) 
 			got.Insert(matcher(e))
 		}
 		if !got.Equal(want) {
-			t.Errorf("validation errors differed from expected:\n%v\n", cmp.Diff(want, got))
+			t.Errorf("validation errors differed from expected:\n%v\n", cmp.Diff(want, got, cmpopts.SortMaps(stdcmp.Less[string])))
 
 			for x := range got.Difference(want) {
 				fmt.Printf("%q,\n", strings.TrimPrefix(x, "forced failure: "))
