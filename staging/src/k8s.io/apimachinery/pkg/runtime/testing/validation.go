@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-type VersionValidationRunner func(t *testing.T, versionValidationErrors field.ErrorList)
+type VersionValidationRunner func(t *testing.T, gv string, versionValidationErrors field.ErrorList)
 
 // RunValidationForEachVersion runs f as a subtest of t for each version of the given unversioned object.
 // Each subtest is named by GroupVersionKind.  Each call to f is provided the field.ErrorList results
@@ -70,7 +70,7 @@ func runValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[string
 					if err != nil {
 						t.Fatal(err)
 					}
-					fn(t, scheme.Validate(options, versioned, subresources...))
+					fn(t, gv.String(), scheme.Validate(options, versioned, subresources...))
 				}
 			})
 		}
@@ -110,7 +110,7 @@ func runUpdateValidation(t *testing.T, scheme *runtime.Scheme, options sets.Set[
 						}
 					}
 
-					fn(t, scheme.ValidateUpdate(options, versionedNew, versionedOld, subresources...))
+					fn(t, gv.String(), scheme.ValidateUpdate(options, versionedNew, versionedOld, subresources...))
 				}
 			})
 		}
