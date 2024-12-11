@@ -18,6 +18,7 @@ package validation
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"math"
 	"reflect"
@@ -33,7 +34,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -42,12 +42,17 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apimachinery/pkg/util/version"
+	"k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/apiserver/pkg/registry/rest"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/featuregate"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	kubeletapis "k8s.io/kubelet/pkg/apis"
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	podtest "k8s.io/kubernetes/pkg/api/pod/testing"
 	"k8s.io/kubernetes/pkg/apis/core"
+	_ "k8s.io/kubernetes/pkg/apis/core/install" // register types with scheme for GVK discovery
+	v1util "k8s.io/kubernetes/pkg/apis/core/v1"
 	"k8s.io/kubernetes/pkg/capabilities"
 	"k8s.io/kubernetes/pkg/features"
 	utilpointer "k8s.io/utils/pointer"
@@ -16636,18 +16641,32 @@ func TestValidateReplicationControllerUpdate(t *testing.T) {
 	for _, tc := range successCases {
 		tc.old.ObjectMeta.ResourceVersion = "1"
 		tc.update.ObjectMeta.ResourceVersion = "1"
-		if errs := ValidateReplicationControllerUpdate(&tc.update, &tc.old, PodValidationOptions{}); len(errs) != 0 {
-			t.Errorf("expected success: %v", errs)
-		}
-	}
+		for _, gateVal := range []bool{false, true} {
+			gate := features.DeclarativeValidation
+			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, gate, gateVal)
 
-	fmtErrs := func(errs field.ErrorList) string {
-		buf := bytes.Buffer{}
-		for _, e := range errs {
-			buf.WriteString(strconv.Quote(e.Error()))
-			buf.WriteString("\n")
+			errs := ValidateReplicationControllerUpdate(&tc.update, &tc.old, PodValidationOptions{})
+			if utilfeature.DefaultFeatureGate.Enabled(gate) {
+				// If declarative validation is enabled, it's the union of
+				// managed and declarative validation that we are testing.
+				newVersioned := v1.ReplicationController{}
+				if err := v1util.Convert_core_ReplicationController_To_v1_ReplicationController(&tc.update, &newVersioned, nil); err != nil {
+					t.Fatalf("failed to convert to v1: %v", err)
+				}
+				oldVersioned := v1.ReplicationController{}
+				if err := v1util.Convert_core_ReplicationController_To_v1_ReplicationController(&tc.old, &oldVersioned, nil); err != nil {
+					t.Fatalf("failed to convert to v1: %v", err)
+				}
+				ctx := request.WithRequestInfo(context.Background(), &request.RequestInfo{
+					APIGroup:   "",
+					APIVersion: "v1",
+				})
+				errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, &newVersioned, &oldVersioned)...)
+			}
+			if len(errs) != 0 {
+				t.Errorf("expected success: %v", errs)
+			}
 		}
-		return buf.String()
 	}
 
 	mkErrs := func(strs ...string) []*regexp.Regexp {
@@ -16697,15 +16716,37 @@ func TestValidateReplicationControllerUpdate(t *testing.T) {
 	for k, tc := range errorCases {
 		tc.old.ObjectMeta.ResourceVersion = "1"
 		tc.update.ObjectMeta.ResourceVersion = "1"
-		errs := ValidateReplicationControllerUpdate(&tc.update, &tc.old, PodValidationOptions{})
-		if len(errs) == 0 {
-			t.Errorf("case %q: expected failure", k)
-		} else if len(errs) != len(tc.errs) {
-			t.Errorf("case %q: expected %d failures, got %d:\n%v", k, len(tc.errs), len(errs), fmtErrs(errs))
-		} else {
-			for i, re := range tc.errs {
-				if want, got := re.String(), errs[i].Error(); !re.MatchString(got) {
-					t.Errorf("case %q: wrong error:\n\texpected: %q\n\t     got: %q", k, want, got)
+		for _, gateVal := range []bool{false, true} {
+			gate := features.DeclarativeValidation
+			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, gate, gateVal)
+
+			errs := ValidateReplicationControllerUpdate(&tc.update, &tc.old, PodValidationOptions{})
+			if utilfeature.DefaultFeatureGate.Enabled(gate) {
+				// If declarative validation is enabled, it's the union of
+				// managed and declarative validation that we are testing.
+				newVersioned := v1.ReplicationController{}
+				if err := v1util.Convert_core_ReplicationController_To_v1_ReplicationController(&tc.update, &newVersioned, nil); err != nil {
+					t.Fatalf("failed to convert to v1: %v", err)
+				}
+				oldVersioned := v1.ReplicationController{}
+				if err := v1util.Convert_core_ReplicationController_To_v1_ReplicationController(&tc.old, &oldVersioned, nil); err != nil {
+					t.Fatalf("failed to convert to v1: %v", err)
+				}
+				ctx := request.WithRequestInfo(context.Background(), &request.RequestInfo{
+					APIGroup:   "",
+					APIVersion: "v1",
+				})
+				errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, &newVersioned, &oldVersioned)...)
+			}
+			if len(errs) == 0 {
+				t.Errorf("case %q(gate=%v): expected failure", k, gateVal)
+			} else if len(errs) != len(tc.errs) {
+				t.Errorf("case %q(gate=%v): expected %d failures, got %d:\n%v", k, gateVal, len(tc.errs), len(errs), fmtErrs(errs))
+			} else {
+				for i, re := range tc.errs {
+					if want, got := re.String(), errs[i].Error(); !re.MatchString(got) {
+						t.Errorf("case %q(gate=%v): wrong error:\n\texpected: %q\n\t     got: %q", k, gateVal, want, got)
+					}
 				}
 			}
 		}
@@ -16743,18 +16784,28 @@ func TestValidateReplicationController(t *testing.T) {
 		mkValidReplicationController(func(rc *core.ReplicationController) { rc.Spec.Replicas = 100 }),
 	}
 	for _, tc := range successCases {
-		if errs := ValidateReplicationController(&tc, PodValidationOptions{}); len(errs) != 0 {
-			t.Errorf("expected success: %v", errs)
-		}
-	}
+		for _, gateVal := range []bool{false, true} {
+			gate := features.DeclarativeValidation
+			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, gate, gateVal)
 
-	fmtErrs := func(errs field.ErrorList) string {
-		buf := bytes.Buffer{}
-		for _, e := range errs {
-			buf.WriteString(strconv.Quote(e.Error()))
-			buf.WriteString("\n")
+			errs := ValidateReplicationController(&tc, PodValidationOptions{})
+			if utilfeature.DefaultFeatureGate.Enabled(gate) {
+				// If declarative validation is enabled, it's the union of
+				// managed and declarative validation that we are testing.
+				versioned := v1.ReplicationController{}
+				if err := v1util.Convert_core_ReplicationController_To_v1_ReplicationController(&tc, &versioned, nil); err != nil {
+					t.Fatalf("failed to convert to v1: %v", err)
+				}
+				ctx := request.WithRequestInfo(context.Background(), &request.RequestInfo{
+					APIGroup:   "",
+					APIVersion: "v1",
+				})
+				errs = append(errs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, &versioned)...)
+			}
+			if len(errs) != 0 {
+				t.Errorf("expected success: %v", errs)
+			}
 		}
-		return buf.String()
 	}
 
 	mkErrs := func(strs ...string) []*regexp.Regexp {
@@ -16847,19 +16898,54 @@ func TestValidateReplicationController(t *testing.T) {
 		},
 	}
 	for k, tc := range errorCases {
-		errs := ValidateReplicationController(&tc.input, PodValidationOptions{})
-		if len(errs) == 0 {
-			t.Errorf("case %q: expected failure", k)
-		} else if len(errs) != len(tc.errs) {
-			t.Errorf("case %q: expected %d failures, got %d:\n%v", k, len(tc.errs), len(errs), fmtErrs(errs))
-		} else {
-			for i, re := range tc.errs {
-				if want, got := re.String(), errs[i].Error(); !re.MatchString(got) {
-					t.Errorf("case %q: wrong error:\n\texpected: %q\n\t     got: %q", k, want, got)
+		for _, gateVal := range []bool{false, true} {
+			gate := features.DeclarativeValidation
+			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, gate, gateVal)
+
+			errs := ValidateReplicationController(&tc.input, PodValidationOptions{})
+			if utilfeature.DefaultFeatureGate.Enabled(gate) {
+				// If declarative validation is enabled, it's the union of
+				// managed and declarative validation that we are testing.
+				versioned := v1.ReplicationController{}
+				if err := v1util.Convert_core_ReplicationController_To_v1_ReplicationController(&tc.input, &versioned, nil); err != nil {
+					t.Fatalf("failed to convert to v1: %v", err)
+				}
+				ctx := request.WithRequestInfo(context.Background(), &request.RequestInfo{
+					APIGroup:   "",
+					APIVersion: "v1",
+				})
+				errs = append(errs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, &versioned)...)
+			}
+			if len(errs) == 0 {
+				t.Errorf("case %q(gate=%v): expected failure", k, gateVal)
+			} else if len(errs) != len(tc.errs) {
+				t.Errorf("case %q(gate=%v): expected %d failures, got %d:\n%v", k, gateVal, len(tc.errs), len(errs), fmtErrs(errs))
+			} else {
+				for i, re := range tc.errs {
+					if want, got := re.String(), errs[i].Error(); !re.MatchString(got) {
+						t.Errorf("case %q(gate=%v): wrong error:\n\texpected: %q\n\t     got: %q", k, gateVal, want, got)
+					}
 				}
 			}
 		}
 	}
+}
+
+// helper for nicer output
+func fmtErrs(errs field.ErrorList) string {
+	if len(errs) == 0 {
+		return "<no errors>"
+	}
+	if len(errs) == 1 {
+		return strconv.Quote(errs[0].Error())
+	}
+	buf := bytes.Buffer{}
+	for _, e := range errs {
+		buf.WriteString("\n")
+		buf.WriteString(strconv.Quote(e.Error()))
+	}
+
+	return buf.String()
 }
 
 func TestValidateNode(t *testing.T) {
