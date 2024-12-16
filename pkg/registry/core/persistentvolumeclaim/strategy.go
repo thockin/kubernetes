@@ -30,11 +30,13 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	pvcutil "k8s.io/kubernetes/pkg/api/persistentvolumeclaim"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // persistentvolumeclaimStrategy implements behavior for PersistentVolumeClaim objects
@@ -84,7 +86,9 @@ func (persistentvolumeclaimStrategy) Validate(ctx context.Context, obj runtime.O
 	pvc := obj.(*api.PersistentVolumeClaim)
 	opts := validation.ValidationOptionsForPersistentVolumeClaim(pvc, nil)
 	allErrs := validation.ValidatePersistentVolumeClaim(pvc, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -128,7 +132,9 @@ func (persistentvolumeclaimStrategy) ValidateUpdate(ctx context.Context, obj, ol
 	opts := validation.ValidationOptionsForPersistentVolumeClaim(newPvc, oldPvc)
 	errorList := validation.ValidatePersistentVolumeClaim(newPvc, opts)
 	errorList = append(errorList, validation.ValidatePersistentVolumeClaimUpdate(newPvc, oldPvc, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return errorList
 }
 

@@ -129,7 +129,9 @@ func nodeConfigSourceInUse(node *api.Node) bool {
 func (nodeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	node := obj.(*api.Node)
 	allErrs := validation.ValidateNode(node)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -146,7 +148,9 @@ func (nodeStrategy) Canonicalize(obj runtime.Object) {
 func (nodeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	errorList := validation.ValidateNode(obj.(*api.Node))
 	allErrs := append(errorList, validation.ValidateNodeUpdate(obj.(*api.Node), old.(*api.Node))...)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 

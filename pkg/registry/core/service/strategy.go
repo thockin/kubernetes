@@ -89,7 +89,9 @@ func (svcStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object
 func (svcStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	service := obj.(*api.Service)
 	allErrs := validation.ValidateServiceCreate(service)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -108,7 +110,9 @@ func (svcStrategy) AllowCreateOnUpdate() bool {
 
 func (strategy svcStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceUpdate(obj.(*api.Service), old.(*api.Service))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 

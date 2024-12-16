@@ -23,9 +23,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // endpointsStrategy implements behavior for Endpoints
@@ -54,7 +56,9 @@ func (endpointsStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 // Validate validates a new endpoints.
 func (endpointsStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsCreate(obj.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -75,7 +79,9 @@ func (endpointsStrategy) AllowCreateOnUpdate() bool {
 // ValidateUpdate is the default update validation for an end user.
 func (endpointsStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsUpdate(obj.(*api.Endpoints), old.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 

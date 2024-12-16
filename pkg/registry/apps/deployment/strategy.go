@@ -33,10 +33,12 @@ import (
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/pod"
 	"k8s.io/kubernetes/pkg/apis/apps"
 	appsvalidation "k8s.io/kubernetes/pkg/apis/apps/validation"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // deploymentStrategy implements behavior for Deployments.
@@ -88,7 +90,9 @@ func (deploymentStrategy) Validate(ctx context.Context, obj runtime.Object) fiel
 	deployment := obj.(*apps.Deployment)
 	opts := pod.GetValidationOptionsFromPodTemplate(&deployment.Spec.Template, nil)
 	allErrs := appsvalidation.ValidateDeployment(deployment, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -153,7 +157,9 @@ func (deploymentStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.O
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 
 	return allErrs
 }
@@ -202,7 +208,9 @@ func (deploymentStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 // ValidateUpdate is the default update validation for an end user updating status
 func (deploymentStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := appsvalidation.ValidateDeploymentStatusUpdate(obj.(*apps.Deployment), old.(*apps.Deployment))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old, "status")...)
+	}
 	return allErrs
 }
 

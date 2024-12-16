@@ -23,9 +23,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/apis/apps"
 	"k8s.io/kubernetes/pkg/apis/apps/validation"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // strategy implements behavior for ConfigMap objects
@@ -63,7 +65,9 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	revision := obj.(*apps.ControllerRevision)
 
 	allErrs := validation.ValidateControllerRevisionCreate(revision)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -82,7 +86,9 @@ func (strategy) AllowUnconditionalUpdate() bool {
 func (strategy) ValidateUpdate(ctx context.Context, newObj, oldObj runtime.Object) field.ErrorList {
 	oldRevision, newRevision := oldObj.(*apps.ControllerRevision), newObj.(*apps.ControllerRevision)
 	allErrs := validation.ValidateControllerRevisionUpdate(newRevision, oldRevision)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, newObj, oldObj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, newObj, oldObj)...)
+	}
 	return allErrs
 }
 

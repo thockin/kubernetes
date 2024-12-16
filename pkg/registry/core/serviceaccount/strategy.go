@@ -24,9 +24,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 	sa "k8s.io/kubernetes/plugin/pkg/admission/serviceaccount"
 )
 
@@ -50,7 +52,9 @@ func (strategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
 
 func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceAccount(obj.(*api.ServiceAccount))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -79,7 +83,9 @@ func cleanSecretReferences(serviceAccount *api.ServiceAccount) {
 
 func (strategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateServiceAccountUpdate(obj.(*api.ServiceAccount), old.(*api.ServiceAccount))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 

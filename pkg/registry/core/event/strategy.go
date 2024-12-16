@@ -30,9 +30,11 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 type eventStrategy struct {
@@ -62,7 +64,9 @@ func (eventStrategy) Validate(ctx context.Context, obj runtime.Object) field.Err
 	groupVersion := requestGroupVersion(ctx)
 	event := obj.(*api.Event)
 	allErrs := validation.ValidateEventCreate(event, groupVersion)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -82,7 +86,9 @@ func (eventStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object
 	event := obj.(*api.Event)
 	oldEvent := old.(*api.Event)
 	allErrs := validation.ValidateEventUpdate(event, oldEvent, groupVersion)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 

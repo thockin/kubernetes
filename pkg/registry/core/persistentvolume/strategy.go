@@ -31,10 +31,12 @@ import (
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	pvutil "k8s.io/kubernetes/pkg/api/persistentvolume"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	"k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 	volumevalidation "k8s.io/kubernetes/pkg/volume/validation"
 )
 
@@ -80,7 +82,9 @@ func (persistentvolumeStrategy) Validate(ctx context.Context, obj runtime.Object
 	opts := validation.ValidationOptionsForPersistentVolume(persistentvolume, nil)
 	errorList := validation.ValidatePersistentVolume(persistentvolume, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(persistentvolume)...)
-	errorList = append(errorList, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		errorList = append(errorList, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return errorList
 }
 
@@ -112,7 +116,9 @@ func (persistentvolumeStrategy) ValidateUpdate(ctx context.Context, obj, old run
 	errorList := validation.ValidatePersistentVolume(newPv, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(newPv)...)
 	errorList = append(errorList, validation.ValidatePersistentVolumeUpdate(newPv, oldPv, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return errorList
 }
 
