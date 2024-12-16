@@ -24,10 +24,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	"k8s.io/kubernetes/pkg/api/pod"
 	api "k8s.io/kubernetes/pkg/apis/core"
 	corevalidation "k8s.io/kubernetes/pkg/apis/core/validation"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // podTemplateStrategy implements behavior for PodTemplates
@@ -57,7 +59,9 @@ func (podTemplateStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	template := obj.(*api.PodTemplate)
 	opts := pod.GetValidationOptionsFromPodTemplate(&template.Template, nil)
 	allErrs := corevalidation.ValidatePodTemplate(template, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -99,7 +103,9 @@ func (podTemplateStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 	// Allow downward api usage of hugepages on pod update if feature is enabled or if the old pod already had used them.
 	opts := pod.GetValidationOptionsFromPodTemplate(&template.Template, &oldTemplate.Template)
 	allErrs := corevalidation.ValidatePodTemplateUpdate(template, oldTemplate, opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 

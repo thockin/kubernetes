@@ -18,6 +18,7 @@ package statefulset
 
 import (
 	"context"
+
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
@@ -142,7 +143,9 @@ func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
 
 	allErrs := validation.ValidateStatefulSet(statefulSet, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, nil, legacyscheme.Scheme, obj)...)
+	}
 	return allErrs
 }
 
@@ -172,7 +175,9 @@ func (statefulSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 
 	opts := pod.GetValidationOptionsFromPodTemplate(&newStatefulSet.Spec.Template, &oldStatefulSet.Spec.Template)
 	allErrs := validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	if utilfeature.DefaultFeatureGate.Enabled(features.DeclarativeValidation) {
+		allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, obj, old)...)
+	}
 	return allErrs
 }
 
