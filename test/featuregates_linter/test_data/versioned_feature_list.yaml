@@ -331,7 +331,7 @@
   - default: true
     lockToDefault: false
     preRelease: Beta
-    version: "1.33"
+    version: "1.32"
 - name: CrossNamespaceVolumeDataSource
   versionedSpecs:
   - default: false
