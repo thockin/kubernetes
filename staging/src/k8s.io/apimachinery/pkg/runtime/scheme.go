@@ -379,7 +379,7 @@ func (s *Scheme) Validate(options sets.Set[string], object Object, subresources 
 // is not run when this is called.  Only the generated zz_generated.validations.go validation code is run.
 func (s *Scheme) ValidateUpdate(options sets.Set[string], object, oldObject Object, subresources ...string) field.ErrorList {
 	if fn, ok := s.validationFuncs[reflect.TypeOf(object)]; ok {
-		return fn(operation.Context{Operation: operation.Update, Options: options}, oldObject, object, subresources...)
+		return fn(operation.Context{Operation: operation.Update, Options: options}, object, oldObject, subresources...)
 	}
 	return nil
 }
