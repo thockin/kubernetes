@@ -18,7 +18,6 @@ package validators
 
 import (
 	"fmt"
-	"strings"
 
 	"k8s.io/gengo/v2"
 	"k8s.io/gengo/v2/types"
@@ -42,14 +41,20 @@ const (
 )
 
 func (o optionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
-	enabledTagValues, hasEnabledTags := gengo.ExtractCommentTags("+", comments)[ifOptionEnabledTag]
-	disabledTagValues, hasDisabledTags := gengo.ExtractCommentTags("+", comments)[ifOptionDisabledTag]
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{ifOptionEnabledTag, ifOptionDisabledTag}, comments)
+	if err != nil {
+		return Validations{}, err
+	}
+
+	enabledTags, hasEnabledTags := tags[ifOptionEnabledTag]
+	disabledTags, hasDisabledTags := tags[ifOptionDisabledTag]
 	if !hasEnabledTags && !hasDisabledTags {
 		return Validations{}, nil
 	}
+
 	var functions []FunctionGen
 	var variables []VariableGen
-	for _, v := range enabledTagValues {
+	for _, v := range enabledTags {
 		optionName, validations, err := o.parseIfOptionsTag(t, v)
 		if err != nil {
 			return Validations{}, err
@@ -59,7 +64,7 @@ func (o optionDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 		}
 		variables = append(variables, validations.Variables...)
 	}
-	for _, v := range disabledTagValues {
+	for _, v := range disabledTags {
 		optionName, validations, err := o.parseIfOptionsTag(t, v)
 		if err != nil {
 			return Validations{}, err
@@ -75,28 +80,33 @@ func (o optionDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	}, nil
 }
 
-func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tagValue string) (string, Validations, error) {
-	parts := strings.SplitN(tagValue, "=", 2)
-	if len(parts) != 2 {
-		return "", Validations{}, fmt.Errorf("invalid value %q for option %q", tagValue, parts[0])
+func (o optionDeclarativeValidator) parseIfOptionsTag(t *types.Type, tag gengo.Tag) (string, Validations, error) {
+	if len(tag.Args) != 1 {
+		return "", Validations{}, fmt.Errorf("tag %q requires 1 argument", tag.Name)
 	}
-	optionName := parts[0]
-	embeddedValidation := parts[1]
-	validations, err := o.cfg.EmbedValidator.ExtractValidations(t, []string{embeddedValidation})
+	validations, err := o.cfg.EmbedValidator.ExtractValidations(t, []string{tag.Value})
 	if err != nil {
 		return "", Validations{}, err
 	}
-	return optionName, validations, nil
+	return tag.Args[0], validations, nil
 }
 
 func (optionDeclarativeValidator) Docs() []TagDoc {
 	return []TagDoc{{
-		Tag:         ifOptionEnabledTag,
+		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionEnabledTag),
 		Description: "Declares a validation that only applies when an option is enabled.",
 		Contexts:    []TagContext{TagContextType, TagContextField},
 		Payloads: []TagPayloadDoc{{
-			Description: "<option-name>=<validation-tag>",
+			Description: "<validation-tag>",
 			Docs:        "This validation tag will be evaluated only if the validation option is enabled.",
+		}},
+	}, {
+		Tag:         fmt.Sprintf("%s(<option-name>)", ifOptionDisabledTag),
+		Description: "Declares a validation that only applies when an option is disabled.",
+		Contexts:    []TagContext{TagContextType, TagContextField},
+		Payloads: []TagPayloadDoc{{
+			Description: "<validation-tag>",
+			Docs:        "This validation tag will be evaluated only if the validation option is disabled.",
 		}},
 	}}
 }
