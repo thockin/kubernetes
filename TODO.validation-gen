@@ -1,10 +1,7 @@
 P0:
-- "inner" validation
-- Add metadata.name/generateName validation (+nameFormat?). (Blocked on: "inner" validation TODO)
 - Validation logic for:
     - format
     - schema (maxLen, maxItems, ...)
-    - enums
     - listMap key uniqueness and requiredness
     - listMap key requiredness
     - SMD/SSA validation (+listType, +listMapKey, +patchMergeKey, +patchStrategy)
@@ -19,28 +16,19 @@ P0:
       - if obj.X is value Y, then validate obj.Z
     - IntOrString
     - immutable (update)
-    - update validations // ValidateUpdate support [LARGE CHANGE!]
-      - Plumb oldObject in through all the validation calls
-      - Define how update validators are authored (CEL transition rules have explored WHEN a update rule should trigger)
     - field found in listfield Y (e.g. volume mount name)
     - dependencies - field X is allowed IFF field Y
-- Add opt-in/opt-out controls
-  - Ability to opt-out of declarative validation for:
-    - type
-    - field (and subfields)
-    - specific tag(s)
 - Fix subresources
   - "spec" and "status" are hard coded in generator, drive them off of a `+subresource=status` tag?
   - Do we need to do anything special for "scale"?
 - How to deal with fields which are +optional and +default - they need a
   required-check, but only on server-side, never client-side.
-- How to handle feature gates and options structs
+- Do we really need enabled-tags and disabled-tags logic?  If so, document.
+  - rename "disabled-tags" to "disabled-tag" and document as repeated
 
 
 P1: 
 - Add CEL validation rules
-- Use "+k8s:" as tag prefix
-  - openapi-gen currently uses "+k8s:validations" so we need to do work there too
 - Pick location for validator library
   - k8s.io/apimachinery/pkg/util/validation introduces risk of drift if someone uses code-generator and a different rev of apimachinery
 - When calling a validation function in another pkg, we need to make sure it exists
@@ -54,14 +42,15 @@ P1:
 - Migrate core group to declarative validation
   - xref: Alex's WIP for jobs: https://github.com/alexzielenski/kubectl-validate/blob/jobset/jobset/patches/apis/jobset.x-k8s.io/v1alpha2.json
   - Enable declarative validation for strategies and test
-- Decide test regimen for validators lib
 - Fix bug where generating apps API group enables enum generation on core API group
 - Error when calling eachVal on non-list types or ignore?
 - failure tests for error messages
 - Test for registration / init func
 - Generator unit tests need updating
-- If a field is not +required and not +optional, do we pass nil values to
-  validators?  Do they all need to nil-check?
+- We may need to nest "built-in" tags.
+  - +eachVal=+subField(Foo)=+minimum=6
+  - +subfield(Foo)=+eachField=+minimum=6
+  - +subfield(Foo)=+subfield(Bar)=+eachVal=+subField(Qux)=+minimum=6
 
 P2: 
 - Deduplicate `jsontagutil.go`. It was copy-pasted in from applyconfig-gen
@@ -69,18 +58,10 @@ P2:
 - Use Go-standard-style names for generated functions
 - Clear out 3 remaining "Migrate to declarative validator" TODOs in `pkg/apis/core/validation/validation_test.go`
   for scalar testing that should be put in declarative validator test code
-- rename "disabled-tags" to "disabled-tag" and document as repeated
 - Linear or bin-search ListMap rather thsan build a map?
 - enums: pass the sorted list of value rather than a set, do a linear/binary search
 - Revisit whether eachKey/eachVal can be a single function call
 - Think of a better name and home for operation.Context
-
-
-Completed:
-- Validation logic for:
-    - required
-    - non-discriminated unions (exactly one of)
-    - discriminated unions
 
 
 Later:
@@ -117,5 +98,3 @@ Later:
                           if out.Kind != types.Unknown {
   ```
 - Exclude all fields that do not have a json struct tag with a name from validation.
-- Add a Doc() function to the validators interface so that we can declare and expose documentation about the available
-  validations.
