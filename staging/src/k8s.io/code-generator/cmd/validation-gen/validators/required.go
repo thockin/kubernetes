@@ -51,6 +51,12 @@ func (requiredDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	if !required {
 		return Validations{}, nil
 	}
+	return doRequired(t)
+}
+
+// doRequired as a function allows for optional+default to be treated as
+// required without duplicating code.
+func doRequired(t *types.Type) (Validations, error) {
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we
@@ -171,7 +177,20 @@ func InitOptionalDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 type optionalDeclarativeValidator struct{}
 
 const (
+	// All of our tags are expressed from the perspective of a client of the
+	// API, but the code we generate is for the server. Optional is tricky.
+	//
+	// A field which is marked as optional and does not have a default is
+	// strictly optional. A client is allowed to not set it and the server will
+	// not give it a default value. Code which consumes it must handle that it
+	// might not have any value at all.
+	//
+	// A field which is marked as optional but has a default is optional to
+	// clients, but required to the server. A client is allowed to not set it
+	// but the server will give it a default value. Code which consumes it can
+	// assume that it always has a value.
 	optionalTagName = "k8s:optional"
+	defaultTagName  = "default" // FIXME: should be k8s:default?
 )
 
 var (
@@ -186,6 +205,12 @@ func (optionalDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 	if !optional {
 		return Validations{}, nil
 	}
+	_, hasDefault := gengo.ExtractCommentTags("+", comments)[defaultTagName]
+	if hasDefault {
+		// See comments on optionalTagName.
+		return doRequired(t)
+	}
+
 	// Most validators don't care whether the value they are validating was
 	// originally defined as a value-type or a pointer-type in the API.  This
 	// one does.  Since Go doesn't do partial specialization of templates, we

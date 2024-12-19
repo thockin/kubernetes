@@ -94,6 +94,10 @@ func Validate_ReplicationControllerSpec(opCtx operation.Context, obj, oldObj *co
 	// field corev1.ReplicationControllerSpec.Replicas
 	errs = append(errs,
 		func(obj, oldObj *int32, fldPath *field.Path) (errs field.ErrorList) {
+			if e := validate.RequiredPointer(opCtx, fldPath, obj, oldObj); len(e) != 0 {
+				errs = append(errs, e...)
+				return // do not proceed
+			}
 			errs = append(errs, validate.Minimum(opCtx, fldPath, obj, oldObj, 0)...)
 			return
 		}(obj.Replicas, safe.Field(oldObj, func(oldObj *corev1.ReplicationControllerSpec) *int32 { return oldObj.Replicas }), fldPath.Child("replicas"))...)
