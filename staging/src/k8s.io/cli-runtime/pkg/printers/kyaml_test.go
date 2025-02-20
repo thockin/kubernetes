@@ -22,7 +22,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	fuzz "github.com/google/gofuzz"
+	"sigs.k8s.io/randfill"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 )
@@ -182,8 +182,8 @@ func TestKYAMLPrinterRoundTrip(t *testing.T) {
 	for i := 0; i < 1000; i++ {
 		// Create and fuzz an instance.
 		original := &AllTypesStruct{}
-		f := fuzz.New().NilChance(0.5).NumElements(1, 5).MaxDepth(3)
-		f.Fuzz(original)
+		f := randfill.New().NilChance(0.5).NumElements(1, 5).MaxDepth(3)
+		f.Fill(original)
 
 		// Render to YAML.
 		var buf bytes.Buffer

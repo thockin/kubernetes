@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	fuzz "github.com/google/gofuzz"
+	"sigs.k8s.io/randfill"
 	"github.com/stretchr/testify/assert"
 
 	v1 "k8s.io/api/core/v1"
@@ -95,16 +95,16 @@ func TestSummaryProvider(t *testing.T) {
 }
 
 func getFsStats() *statsapi.FsStats {
-	f := fuzz.New().NilChance(0)
+	f := randfill.New().NilChance(0)
 	v := &statsapi.FsStats{}
-	f.Fuzz(v)
+	f.Fill(v)
 	return v
 }
 
 func getContainerStats() *statsapi.ContainerStats {
-	f := fuzz.New().NilChance(0)
+	f := randfill.New().NilChance(0)
 	v := &statsapi.ContainerStats{}
-	f.Fuzz(v)
+	f.Fill(v)
 	return v
 }
 
