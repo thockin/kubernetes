@@ -40,7 +40,7 @@ func ipSloppy(opCtx operation.Context, fldPath *field.Path, value, _ *string) (n
 	ip := netutils.ParseIPSloppy(*value)
 	if ip == nil {
 		return nil, field.ErrorList{
-			field.Invalid(fldPath, *value, "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
+			field.Invalid(fldPath, *value, "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)").WithOrigin("format=ip-sloppy"),
 		}
 	}
 	return ip, nil
