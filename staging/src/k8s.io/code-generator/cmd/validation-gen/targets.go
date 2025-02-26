@@ -46,45 +46,94 @@ var (
 )
 
 func extractTag(comments []string) ([]string, bool) {
-	m := gengo.ExtractCommentTags("+", comments)
-	v, found := m[tagName]
-	return v, found
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{tagName}, comments)
+	if err != nil {
+		klog.Fatalf("Failed to extract tags: %v", err)
+	}
+	values, found := tags[tagName]
+	if !found || len(values) == 0 {
+		return nil, false
+	}
+
+	result := make([]string, len(values))
+	for i, tag := range values {
+		result[i] = tag.Value
+	}
+	return result, true
 }
 
 func extractInputTag(comments []string) []string {
-	return gengo.ExtractCommentTags("+", comments)[inputTagName]
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{inputTagName}, comments)
+	if err != nil {
+		klog.Fatalf("Failed to extract input tags: %v", err)
+	}
+	values, found := tags[inputTagName]
+	if !found {
+		return nil
+	}
+
+	result := make([]string, len(values))
+	for i, tag := range values {
+		result[i] = tag.Value
+	}
+	return result
 }
 
 func checkTag(comments []string, require ...string) bool {
-	values := gengo.ExtractCommentTags("+", comments)[tagName]
-	if len(require) == 0 {
-		return len(values) == 1 && values[0] == ""
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{tagName}, comments)
+	if err != nil {
+		klog.Fatalf("Failed to extract tags: %v", err)
 	}
-	return reflect.DeepEqual(values, require)
+	values, found := tags[tagName]
+	if !found {
+		return false
+	}
+
+	if len(require) == 0 {
+		return len(values) == 1 && values[0].Value == ""
+	}
+
+	valueStrings := make([]string, len(values))
+	for i, tag := range values {
+		valueStrings[i] = tag.Value
+	}
+
+	return reflect.DeepEqual(valueStrings, require)
 }
 
 func schemeRegistryTag(pkg *types.Package) types.Name {
-	values := gengo.ExtractCommentTags("+", pkg.Comments)[schemeRegistryTagName]
-	switch len(values) {
-	case 0:
-		return schemeType // default
-	case 1:
-		return types.ParseFullyQualifiedName(values[0])
-	default:
-		panic(fmt.Sprintf("Package %q contains more than usage of %q", pkg.Path, schemeRegistryTagName))
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{schemeRegistryTagName}, pkg.Comments)
+	if err != nil {
+		klog.Fatalf("Failed to extract scheme registry tags: %v", err)
 	}
+	values, found := tags[schemeRegistryTagName]
+	if !found || len(values) == 0 {
+		return schemeType // default
+	}
+	if len(values) > 1 {
+		panic(fmt.Sprintf("Package %q contains more than one usage of %q", pkg.Path, schemeRegistryTagName))
+	}
+	return types.ParseFullyQualifiedName(values[0].Value)
 }
 
 var testFixtureTagValues = sets.New("validateFalse")
 
 func testFixtureTag(pkg *types.Package) sets.Set[string] {
 	result := sets.New[string]()
-	values := gengo.ExtractCommentTags("+", pkg.Comments)[testFixtureTagName]
-	for _, value := range values {
-		if !testFixtureTagValues.Has(value) {
-			panic(fmt.Sprintf("Package %q: %s must be one of '%s', but got: %s", pkg.Path, testFixtureTagName, testFixtureTagValues.UnsortedList(), values[0]))
+	tags, err := gengo.ExtractFunctionStyleCommentTags("+", []string{testFixtureTagName}, pkg.Comments)
+	if err != nil {
+		klog.Fatalf("Failed to extract test fixture tags: %v", err)
+	}
+	values, found := tags[testFixtureTagName]
+	if !found {
+		return result
+	}
+
+	for _, tag := range values {
+		if !testFixtureTagValues.Has(tag.Value) {
+			panic(fmt.Sprintf("Package %q: %s must be one of '%s', but got: %s", pkg.Path, testFixtureTagName, testFixtureTagValues.UnsortedList(), tag.Value))
 		}
-		result.Insert(value)
+		result.Insert(tag.Value)
 	}
 	return result
 }
