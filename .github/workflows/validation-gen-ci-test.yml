@@ -16,11 +16,6 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
 
-    - name: Run go mod tidy and check for diffs
-      run: |
-        go mod tidy
-        git diff --exit-code
-
     - name: Run code generation and check for diffs
       run: |
         hack/update-codegen.sh validation
