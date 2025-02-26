@@ -18,15 +18,21 @@ package operation
 
 import "k8s.io/apimachinery/pkg/util/sets"
 
-// Context provides contextual information about a validation request and the API
+// Operation provides contextual information about a validation request and the API
 // operation being validated.
 // This type is intended for use with generate validation code and may be enhanced
 // in the future to include other information needed to validate requests.
-type Context struct {
-	Operation Operation
+type Operation struct {
+	// Type is the category of operation being validated.  This does not
+	// differentiate between HTTP verbs like PUT and PATCH, but rather merges
+	// those into a single "Update" category.
+	Type Type
+
 	// Options declare the options enabled for validation.
+	//
 	// Options should be set according to a resource validation strategy before validation
 	// is performed, and must be treated as read-only during validation.
+	//
 	// Options are identified by string names. Option string names may match the name of a feature
 	// gate, in which case the presence of the name in the set indicates that the feature is
 	// considered enabled for the resource being validated.  Note that a resource may have a
@@ -36,12 +42,12 @@ type Context struct {
 	Options sets.Set[string]
 }
 
-// Operation is the request operation to be validated.
-type Operation uint32
+// Code is the request operation to be validated.
+type Type uint32
 
 const (
 	// Create indicates the request being validated is for a resource create operation.
-	Create Operation = iota
+	Create Type = iota
 
 	// Update indicates the request being validated is for a resource update operation.
 	Update
