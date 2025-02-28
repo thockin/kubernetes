@@ -70,6 +70,8 @@ P1:
   - e.g. always pass non-pointer `value` and pointer `oldValue`; return
     internal error if a pointer field is nil and not checked for
     `required`/`optional`.
+- Add generator failure testing. For example, we should ensure that the generator panics if a type
+  is unimported and "+k8s:skipUnimported" is not set.
 
 P2: 
 - Deduplicate `jsontagutil.go`. It was copy-pasted in from applyconfig-gen
