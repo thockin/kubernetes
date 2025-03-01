@@ -302,6 +302,7 @@ func IsValidPortName(port string) []string {
 }
 
 // IsValidIP tests that the argument is a valid IP address.
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate.IPSloppy instead.
 func IsValidIP(fldPath *field.Path, value string) field.ErrorList {
 	return validate.IPSloppy(context.TODO(), operation.Operation{}, fldPath, &value, nil)
 }

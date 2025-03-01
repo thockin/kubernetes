@@ -40,6 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	fldtst "k8s.io/apimachinery/pkg/util/validation/field/testing"
 )
 
 // Scheme is similar to runtime.Scheme, but for validation testing purposes. Scheme only supports validation,
@@ -433,6 +434,17 @@ func (v *ValidationTester) ExpectRegexpsByPath(regexpStringsByPath map[string][]
 				t.Errorf("field %q had unsatisfied expectations: %q", field, expSet.UnsortedList())
 			}
 		}
+	})
+	return v
+}
+
+func (v *ValidationTester) ExpectMatches(matcher *fldtst.Matcher, expected field.ErrorList) *ValidationTester {
+	v.T.Helper()
+
+	v.T.Run(fmt.Sprintf("%T", v.value), func(t *testing.T) {
+		t.Helper()
+		actual := v.validate()
+		fldtst.MatchErrors(t, expected, actual, matcher)
 	})
 	return v
 }

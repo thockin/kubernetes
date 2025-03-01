@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	fldtst "k8s.io/apimachinery/pkg/util/validation/field/testing"
 	"k8s.io/utils/ptr"
 )
 
@@ -50,14 +51,14 @@ func Test(t *testing.T) {
 		DNSLabelPtrField:     ptr.To(""),
 		IPTypedefField:       "",
 		DNSLabelTypedefField: "",
-	}).ExpectInvalid(
-		field.Invalid(field.NewPath("ipField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("ipPtrField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelField"), "", "must contain at least 1 character"),
-		field.Invalid(field.NewPath("dnsLabelPtrField"), "", "must contain at least 1 character"),
-		field.Invalid(field.NewPath("ipTypedefField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelTypedefField"), "", "must contain at least 1 character"),
-	)
+	}).ExpectMatches(fldtst.Match().ByType().ByField().ByOrigin(), field.ErrorList{
+		field.Invalid(field.NewPath("ipField"), nil, "").WithOrigin("format=ip-sloppy"),
+		field.Invalid(field.NewPath("ipPtrField"), nil, "").WithOrigin("format=ip-sloppy"),
+		field.Invalid(field.NewPath("dnsLabelField"), nil, ""),
+		field.Invalid(field.NewPath("dnsLabelPtrField"), nil, ""),
+		field.Invalid(field.NewPath("ipTypedefField"), nil, "").WithOrigin("format=ip-sloppy"),
+		field.Invalid(field.NewPath("dnsLabelTypedefField"), nil, ""),
+	})
 
 	st.Value(&Struct{
 		IPField:              "Not an IP",
@@ -66,15 +67,12 @@ func Test(t *testing.T) {
 		DNSLabelPtrField:     ptr.To("Not a DNS label"),
 		IPTypedefField:       "Not an IP",
 		DNSLabelTypedefField: "Not a DNS label",
-	}).ExpectInvalid(
-		field.Invalid(field.NewPath("ipField"), "Not an IP", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("ipPtrField"), "Not an IP", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelField"), "Not a DNS label", "must start and end with lower-case alphanumeric characters"),
-		field.Invalid(field.NewPath("dnsLabelField"), "Not a DNS label", "must contain only lower-case alphanumeric characters or '-'"),
-		field.Invalid(field.NewPath("dnsLabelPtrField"), "Not a DNS label", "must start and end with lower-case alphanumeric characters"),
-		field.Invalid(field.NewPath("dnsLabelPtrField"), "Not a DNS label", "must contain only lower-case alphanumeric characters or '-'"),
-		field.Invalid(field.NewPath("ipTypedefField"), "Not an IP", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelTypedefField"), "Not a DNS label", "must start and end with lower-case alphanumeric characters"),
-		field.Invalid(field.NewPath("dnsLabelTypedefField"), "Not a DNS label", "must contain only lower-case alphanumeric characters or '-'"),
-	)
+	}).ExpectMatches(fldtst.Match().ByType().ByField().ByOrigin(), field.ErrorList{
+		field.Invalid(field.NewPath("ipField"), nil, "").WithOrigin("format=ip-sloppy"),
+		field.Invalid(field.NewPath("ipPtrField"), nil, "").WithOrigin("format=ip-sloppy"),
+		field.Invalid(field.NewPath("dnsLabelField"), nil, ""),
+		field.Invalid(field.NewPath("dnsLabelPtrField"), nil, ""),
+		field.Invalid(field.NewPath("ipTypedefField"), nil, "").WithOrigin("format=ip-sloppy"),
+		field.Invalid(field.NewPath("dnsLabelTypedefField"), nil, ""),
+	})
 }

@@ -326,8 +326,13 @@ func TestIsValidIP(t *testing.T) {
 			} else {
 				if len(errs) != 1 {
 					t.Errorf("expected %q to have 1 error but got: %v", tc.in, errs)
-				} else if !strings.Contains(errs[0].Detail, tc.err) {
-					t.Errorf("expected error for %q to contain %q but got: %q", tc.in, tc.err, errs[0].Detail)
+				} else {
+					if !strings.Contains(errs[0].Detail, tc.err) {
+						t.Errorf("expected error for %q to contain %q but got: %q", tc.in, tc.err, errs[0].Detail)
+					}
+					if exp := "format=ip-sloppy"; errs[0].Origin != exp {
+						t.Errorf("expected error for %q to have Origin %q but got: %q", tc.in, exp, errs[0].Origin)
+					}
 				}
 			}
 
