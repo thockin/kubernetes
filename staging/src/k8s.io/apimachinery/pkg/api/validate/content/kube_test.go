@@ -30,8 +30,7 @@ func TestIsQualifiedName(t *testing.T) {
 	const totalFailError = "must consist of a name .* and an optional DNS subdomain prefix"
 	const prefixMinSizeError = "prefix part: must contain at least 1 character"
 	const prefixMaxSizeError = "prefix part: must be no more than 253 characters"
-	const prefixStartEndError = "prefix part: each part must start and end with lower-case alphanumeric characters"
-	const prefixInteriorError = "prefix part: each part must contain only lower-case alphanumeric characters or '-'"
+	const prefixDNSLabelError = "prefix part:.* must consist of lower case alphanumeric.* must start and end with an alphanumeric"
 
 	cases := []struct {
 		input  string
@@ -66,8 +65,8 @@ func TestIsQualifiedName(t *testing.T) {
 		{"cantendwithadash-", mkMsgs(nameStartEndError)},
 		{"-cantstartwithadash-", mkMsgs(nameStartEndError)},
 		{"only/one/slash", mkMsgs(totalFailError)},
-		{"Example.com/abc", mkMsgs(prefixStartEndError)},
-		{"example_com/abc", mkMsgs(prefixInteriorError)},
+		{"Example.com/abc", mkMsgs(prefixDNSLabelError)},
+		{"example_com/abc", mkMsgs(prefixDNSLabelError)},
 		{"example.com/", mkMsgs(nameMinSizeError)},
 		{"/simple", mkMsgs(prefixMinSizeError)},
 		{strings.Repeat("a", 64), mkMsgs(nameMaxSizeError)},
