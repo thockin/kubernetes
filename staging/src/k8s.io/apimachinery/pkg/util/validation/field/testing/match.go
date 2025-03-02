@@ -71,6 +71,7 @@ type Matcher struct {
 	matchType                bool
 	matchField               bool
 	matchValue               bool
+	matchValueIfNotNil       bool
 	matchOrigin              bool
 	matchDetail              func(want, got string) bool
 	requireOriginWhenInvalid bool
@@ -85,8 +86,12 @@ func (m *Matcher) Matches(want, got *field.Error) bool {
 	if m.matchField && want.Field != got.Field {
 		return false
 	}
-	if m.matchValue && !reflect.DeepEqual(want.BadValue, got.BadValue) {
-		return false
+	if m.matchValue || m.matchValueIfNotNil {
+		if m.matchValue || want.BadValue != nil {
+			if !reflect.DeepEqual(want.BadValue, got.BadValue) {
+				return false
+			}
+		}
 	}
 	if m.matchOrigin {
 		if want.Origin != got.Origin {
@@ -123,7 +128,7 @@ func (m *Matcher) Render(e *field.Error) string {
 		comma()
 		buf.WriteString(fmt.Sprintf("Field=%q", e.Field))
 	}
-	if m.matchValue {
+	if m.matchValue || m.matchValueIfNotNil {
 		comma()
 		buf.WriteString(fmt.Sprintf("Value=%v", e.BadValue))
 	}
@@ -158,6 +163,13 @@ func (m *Matcher) ByField() *Matcher {
 // ByValue configures the matcher to match errors by the errant value.
 func (m *Matcher) ByValue() *Matcher {
 	m.matchValue = true
+	return m
+}
+
+// ByValueIfNotNil configures the matcher to match errors by the errant value,
+// but only if the expected value is not nil.
+func (m *Matcher) ByValueIfNotNil() *Matcher {
+	m.matchValueIfNotNil = true
 	return m
 }
 

@@ -40,6 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	fldtest "k8s.io/apimachinery/pkg/util/validation/field/testing"
+	fldtst "k8s.io/apimachinery/pkg/util/validation/field/testing"
 	"k8s.io/apimachinery/pkg/util/version"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/component-base/featuregate"
@@ -54,6 +55,7 @@ import (
 )
 
 const (
+	//FIXME: kill these?
 	dnsLabelErrMsg                    = "must consist of lower-case alphanumeric characters or '-'"
 	dnsSubdomainLabelErrMsg           = "a lowercase RFC 1123 subdomain"
 	envVarNameErrMsg                  = "a valid environment variable name must consist of"
@@ -19940,9 +19942,8 @@ func TestValidateResourceQuota(t *testing.T) {
 	}
 
 	testCases := map[string]struct {
-		rq        core.ResourceQuota
-		errDetail string
-		errField  string
+		rq           core.ResourceQuota
+		expectedErrs field.ErrorList
 	}{
 		"no-scope": {
 			rq: core.ResourceQuota{
@@ -20017,64 +20018,87 @@ func TestValidateResourceQuota(t *testing.T) {
 			},
 		},
 		"zero-length Name": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: "foo"}, Spec: spec},
-			errDetail: "name or generateName is required",
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "", Namespace: "foo"}, Spec: spec},
+			expectedErrs: field.ErrorList{
+				field.Required(field.NewPath("metadata.name"), "name or generateName is required"),
+			},
 		},
 		"zero-length Namespace": {
-			rq:       core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: ""}, Spec: spec},
-			errField: "metadata.namespace",
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: ""}, Spec: spec},
+			expectedErrs: field.ErrorList{
+				field.Required(field.NewPath("metadata.namespace"), ""),
+			},
 		},
 		"invalid Name": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "^Invalid", Namespace: "foo"}, Spec: spec},
-			errDetail: dnsSubdomainLabelErrMsg,
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "^Invalid", Namespace: "foo"}, Spec: spec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("metadata.name"), nil, "lower-case alphanumeric characters"),
+			},
 		},
 		"invalid Namespace": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "invalid.dnslabel"}, Spec: spec},
-			errDetail: dnsLabelErrMsg,
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: spec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("metadata.namespace"), nil, "lower-case alphanumeric characters"),
+			},
 		},
 		"negative-limits": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: negativeSpec},
-			errDetail: isNegativeErrorMsg,
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: negativeSpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.hard").Key("cpu"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("memory"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("pods"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("services"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("replicationcontrollers"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("resourcequotas"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("configmaps"), nil, isNegativeErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("secrets"), nil, isNegativeErrorMsg),
+			},
 		},
 		"fractional-api-resource": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: fractionalPodSpec},
-			errDetail: isNotIntegerErrorMsg,
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: fractionalPodSpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.hard").Key("pods"), nil, isNotIntegerErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("services"), nil, isNotIntegerErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("replicationcontrollers"), nil, isNotIntegerErrorMsg),
+				field.Invalid(field.NewPath("spec.hard").Key("resourcequotas"), nil, isNotIntegerErrorMsg),
+			},
 		},
 		"invalid-quota-resource": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidQuotaResourceSpec},
-			errDetail: isInvalidQuotaResource,
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidQuotaResourceSpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.hard").Key("storage"), nil, isInvalidQuotaResource),
+			},
 		},
 		"invalid-quota-terminating-pair": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidTerminatingScopePairsSpec},
-			errDetail: "conflicting scopes",
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidTerminatingScopePairsSpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.scopes"), nil, "conflicting scopes"),
+			},
 		},
 		"invalid-quota-besteffort-pair": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidBestEffortScopePairsSpec},
-			errDetail: "conflicting scopes",
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidBestEffortScopePairsSpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.scopes"), nil, "conflicting scopes"),
+			},
 		},
 		"invalid-quota-scope-name": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidScopeNameSpec},
-			errDetail: "unsupported scope",
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidScopeNameSpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.scopes"), nil, "unsupported scope"),
+			},
 		},
 		"invalid-cross-namespace-affinity": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidCrossNamespaceAffinitySpec},
-			errDetail: "must be 'Exists' when scope is any of ResourceQuotaScopeTerminating, ResourceQuotaScopeNotTerminating, ResourceQuotaScopeBestEffort, ResourceQuotaScopeNotBestEffort or ResourceQuotaScopeCrossNamespacePodAffinity",
+			rq: core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "foo"}, Spec: invalidCrossNamespaceAffinitySpec},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("spec.scopeSelector.matchExpressions.operator"), nil, "must be 'Exists' when scope is any of"),
+			},
 		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			errs := ValidateResourceQuota(&tc.rq)
-			if len(tc.errDetail) == 0 && len(tc.errField) == 0 && len(errs) != 0 {
-				t.Errorf("expected success: %v", errs)
-			} else if (len(tc.errDetail) != 0 || len(tc.errField) != 0) && len(errs) == 0 {
-				t.Errorf("expected failure")
-			} else {
-				for i := range errs {
-					if !strings.Contains(errs[i].Detail, tc.errDetail) {
-						t.Errorf("expected error detail either empty or %s, got %s", tc.errDetail, errs[i].Detail)
-					}
-				}
-			}
+			matcher := fldtst.Match().ByType().ByField().ByDetailSubstring().ByOrigin()
+			fldtst.MatchErrors(t, tc.expectedErrs, errs, matcher)
 		})
 	}
 }
@@ -21206,7 +21230,6 @@ func TestValidateSchedulingGates(t *testing.T) {
 	}{{
 		name:            "nil gates",
 		schedulingGates: nil,
-		wantFieldErrors: field.ErrorList{},
 	}, {
 		name: "empty string in gates",
 		schedulingGates: []core.PodSchedulingGate{
@@ -21214,8 +21237,7 @@ func TestValidateSchedulingGates(t *testing.T) {
 			{Name: ""},
 		},
 		wantFieldErrors: field.ErrorList{
-			field.Invalid(fieldPath.Index(1), "", "name part must contain at least 1 character"),
-			field.Invalid(fieldPath.Index(1), "", "name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')"),
+			field.Invalid(fieldPath.Index(1), "", "").WithOrigin("format=qualified-name"),
 		},
 	}, {
 		name: "legal gates",
@@ -21223,14 +21245,15 @@ func TestValidateSchedulingGates(t *testing.T) {
 			{Name: "foo"},
 			{Name: "bar"},
 		},
-		wantFieldErrors: field.ErrorList{},
 	}, {
 		name: "illegal gates",
 		schedulingGates: []core.PodSchedulingGate{
 			{Name: "foo"},
 			{Name: "\nbar"},
 		},
-		wantFieldErrors: []*field.Error{field.Invalid(fieldPath.Index(1), "\nbar", "name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')")},
+		wantFieldErrors: field.ErrorList{
+			field.Invalid(fieldPath.Index(1), nil, "").WithOrigin("format=qualified-name"),
+		},
 	}, {
 		name: "duplicated gates (single duplication)",
 		schedulingGates: []core.PodSchedulingGate{
@@ -21238,7 +21261,9 @@ func TestValidateSchedulingGates(t *testing.T) {
 			{Name: "bar"},
 			{Name: "bar"},
 		},
-		wantFieldErrors: []*field.Error{field.Duplicate(fieldPath.Index(2), "bar")},
+		wantFieldErrors: field.ErrorList{
+			field.Duplicate(fieldPath.Index(2), "bar"),
+		},
 	}, {
 		name: "duplicated gates (multiple duplications)",
 		schedulingGates: []core.PodSchedulingGate{
@@ -21259,9 +21284,8 @@ func TestValidateSchedulingGates(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			errs := validateSchedulingGates(tt.schedulingGates, fieldPath)
-			if diff := cmp.Diff(tt.wantFieldErrors, errs, cmpopts.IgnoreFields(field.Error{}, "Detail", "Origin")); diff != "" {
-				t.Errorf("unexpected field errors (-want, +got):\n%s", diff)
-			}
+			matcher := fldtest.Match().ByType().ByField().ByValueIfNotNil().ByOrigin()
+			fldtst.MatchErrors(t, tt.wantFieldErrors, errs, matcher)
 		})
 	}
 }
@@ -22182,8 +22206,8 @@ func TestValidateWindowsSecurityContextOptions(t *testing.T) {
 	testCases := []struct {
 		testName string
 
-		windowsOptions         *core.WindowsSecurityContextOptions
-		expectedErrorSubstring string
+		windowsOptions *core.WindowsSecurityContextOptions
+		expectedErrs   field.ErrorList
 	}{{
 		testName: "a nil pointer",
 	}, {
@@ -22201,19 +22225,25 @@ func TestValidateWindowsSecurityContextOptions(t *testing.T) {
 			// invalid because of the underscore
 			GMSACredentialSpecName: toPtr("not_a-valid-gmsa-crep-spec-name"),
 		},
-		expectedErrorSubstring: dnsSubdomainLabelErrMsg,
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.gmsaCredentialSpecName"), nil, "lower-case alphanumeric characters"),
+		},
 	}, {
 		testName: "empty GMSA cred spec contents",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			GMSACredentialSpec: toPtr(""),
 		},
-		expectedErrorSubstring: "gmsaCredentialSpec cannot be an empty string",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.gmsaCredentialSpec"), nil, "gmsaCredentialSpec cannot be an empty string"),
+		},
 	}, {
 		testName: "GMSA cred spec contents that are too long",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			GMSACredentialSpec: toPtr(strings.Repeat("a", maxGMSACredentialSpecLength+1)),
 		},
-		expectedErrorSubstring: "gmsaCredentialSpec size must be under",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.gmsaCredentialSpec"), nil, "gmsaCredentialSpec size must be under"),
+		},
 	}, {
 		testName: "RunAsUserName is nil",
 		windowsOptions: &core.WindowsSecurityContextOptions{
@@ -22249,104 +22279,113 @@ func TestValidateWindowsSecurityContextOptions(t *testing.T) {
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr(""),
 		},
-		expectedErrorSubstring: "runAsUserName cannot be an empty string",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName cannot be an empty string"),
+		},
 	}, {
 		testName: "RunAsUserName containing a control character",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("Container\tUser"),
 		},
-		expectedErrorSubstring: "runAsUserName cannot contain control characters",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName cannot contain control characters"),
+		},
 	}, {
 		testName: "RunAsUserName containing too many backslashes",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("Container\\Foo\\Lish"),
 		},
-		expectedErrorSubstring: "runAsUserName cannot contain more than one backslash",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName cannot contain more than one backslash"),
+		},
 	}, {
 		testName: "RunAsUserName containing backslash but empty Domain",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("\\User"),
 		},
-		expectedErrorSubstring: "runAsUserName's Domain doesn't match the NetBios nor the DNS format",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's Domain doesn't match the NetBios nor the DNS format"),
+		},
 	}, {
 		testName: "RunAsUserName containing backslash but empty User",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("Container\\"),
 		},
-		expectedErrorSubstring: "runAsUserName's User cannot be empty",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's User cannot be empty"),
+		},
 	}, {
 		testName: "RunAsUserName's NetBios Domain is too long",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("NetBios " + strings.Repeat("a", 8) + "\\user"),
 		},
-		expectedErrorSubstring: "runAsUserName's Domain doesn't match the NetBios",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's Domain doesn't match the NetBios"),
+		},
 	}, {
 		testName: "RunAsUserName's DNS Domain is too long",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			// even if this tests the max Domain length, the Domain should still be "valid".
 			RunAsUserName: toPtr(strings.Repeat(strings.Repeat("a", 63)+".", 4)[:253] + ".com\\user"),
 		},
-		expectedErrorSubstring: "runAsUserName's Domain length must be under",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's Domain length must be under"),
+		},
 	}, {
 		testName: "RunAsUserName's User is too long",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr(strings.Repeat("a", maxRunAsUserNameUserLength+1)),
 		},
-		expectedErrorSubstring: "runAsUserName's User length must not be longer than",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's User length must not be longer than"),
+		},
 	}, {
 		testName: "RunAsUserName's User cannot contain only spaces or periods",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("... ..."),
 		},
-		expectedErrorSubstring: "runAsUserName's User cannot contain only periods or spaces",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's User cannot contain only periods or spaces"),
+		},
 	}, {
 		testName: "RunAsUserName's NetBios Domain cannot start with a dot",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr(".FooLish\\User"),
 		},
-		expectedErrorSubstring: "runAsUserName's Domain doesn't match the NetBios",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's Domain doesn't match the NetBios"),
+		},
 	}, {
 		testName: "RunAsUserName's NetBios Domain cannot contain invalid characters",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("Foo? Lish?\\User"),
 		},
-		expectedErrorSubstring: "runAsUserName's Domain doesn't match the NetBios",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's Domain doesn't match the NetBios"),
+		},
 	}, {
 		testName: "RunAsUserName's DNS Domain cannot contain invalid characters",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr(strings.Repeat("a", 32) + ".com-\\user"),
 		},
-		expectedErrorSubstring: "runAsUserName's Domain doesn't match the NetBios nor the DNS format",
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's Domain doesn't match the NetBios nor the DNS format"),
+		},
 	}, {
 		testName: "RunAsUserName's User cannot contain invalid characters",
 		windowsOptions: &core.WindowsSecurityContextOptions{
 			RunAsUserName: toPtr("Container/User"),
 		},
-		expectedErrorSubstring: "runAsUserName's User cannot contain the following characters",
-	},
-	}
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("field.runAsUserName"), nil, "runAsUserName's User cannot contain the following characters"),
+		},
+	}}
 
 	for _, testCase := range testCases {
 		t.Run("validateWindowsSecurityContextOptions with"+testCase.testName, func(t *testing.T) {
 			errs := validateWindowsSecurityContextOptions(testCase.windowsOptions, field.NewPath("field"))
-
-			switch len(errs) {
-			case 0:
-				if testCase.expectedErrorSubstring != "" {
-					t.Errorf("expected a failure containing the substring: %q", testCase.expectedErrorSubstring)
-				}
-			case 1:
-				if testCase.expectedErrorSubstring == "" {
-					t.Errorf("didn't expect a failure, got: %q", errs[0].Error())
-				} else if !strings.Contains(errs[0].Error(), testCase.expectedErrorSubstring) {
-					t.Errorf("expected a failure with the substring %q, got %q instead", testCase.expectedErrorSubstring, errs[0].Error())
-				}
-			default:
-				t.Errorf("got %d failures", len(errs))
-				for i, err := range errs {
-					t.Errorf("error %d: %q", i, err.Error())
-				}
-			}
+			matcher := fldtst.Match().ByType().ByField().ByOrigin().ByDetailSubstring()
+			fldtst.MatchErrors(t, testCase.expectedErrs, errs, matcher)
 		})
 	}
 }
@@ -24394,58 +24433,43 @@ func TestValidateAppArmorProfileFormat(t *testing.T) {
 }
 
 func TestValidatePVSecretReference(t *testing.T) {
-	rootFld := field.NewPath("name")
-	type args struct {
-		secretRef *core.SecretReference
-		fldPath   *field.Path
-	}
 	tests := []struct {
-		name          string
-		args          args
-		expectError   bool
-		expectedError string
+		name         string
+		ref          *core.SecretReference
+		expectedErrs field.ErrorList
 	}{{
-		name:          "invalid secret ref name",
-		args:          args{&core.SecretReference{Name: "$%^&*#", Namespace: "default"}, rootFld},
-		expectError:   true,
-		expectedError: "name.name: Invalid value: \"$%^&*#\": " + dnsSubdomainLabelErrMsg,
+		name: "invalid secret: bad name",
+		ref:  &core.SecretReference{Name: "$%^&*#", Namespace: "default"},
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("ref.name"), nil, "").WithOrigin(""),
+		},
 	}, {
-		name:          "invalid secret ref namespace",
-		args:          args{&core.SecretReference{Name: "valid", Namespace: "invalid.dnslabel"}, rootFld},
-		expectError:   true,
-		expectedError: "name.namespace: Invalid value: \"invalid.dnslabel\": " + dnsLabelErrMsg,
+		name: "invalid secret: bad namespace",
+		ref:  &core.SecretReference{Name: "valid", Namespace: "$%^&*#"},
+		expectedErrs: field.ErrorList{
+			field.Invalid(field.NewPath("ref.namespace"), nil, "").WithOrigin("format=dns-label"),
+		},
 	}, {
-		name:          "invalid secret: missing namespace",
-		args:          args{&core.SecretReference{Name: "valid"}, rootFld},
-		expectError:   true,
-		expectedError: "name.namespace: Required value",
+		name: "invalid secret: missing name",
+		ref:  &core.SecretReference{Name: "", Namespace: "default"},
+		expectedErrs: field.ErrorList{
+			field.Required(field.NewPath("ref.name"), ""),
+		},
 	}, {
-		name:          "invalid secret : missing name",
-		args:          args{&core.SecretReference{Namespace: "default"}, rootFld},
-		expectError:   true,
-		expectedError: "name.name: Required value",
+		name: "invalid secret: missing namespace",
+		ref:  &core.SecretReference{Name: "valid", Namespace: ""},
+		expectedErrs: field.ErrorList{
+			field.Required(field.NewPath("ref.namespace"), ""),
+		},
 	}, {
-		name:          "valid secret",
-		args:          args{&core.SecretReference{Name: "valid", Namespace: "default"}, rootFld},
-		expectError:   false,
-		expectedError: "",
-	},
-	}
+		name: "valid secret",
+		ref:  &core.SecretReference{Name: "valid", Namespace: "default"},
+	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errs := validatePVSecretReference(tt.args.secretRef, tt.args.fldPath)
-			if tt.expectError && len(errs) == 0 {
-				t.Errorf("Unexpected success")
-			}
-			if tt.expectError && len(errs) != 0 {
-				str := errs[0].Error()
-				if str != "" && !strings.Contains(str, tt.expectedError) {
-					t.Errorf("%s: expected error detail either empty or %q, got %q", tt.name, tt.expectedError, str)
-				}
-			}
-			if !tt.expectError && len(errs) != 0 {
-				t.Errorf("Unexpected error(s): %v", errs)
-			}
+			errs := validatePVSecretReference(tt.ref, field.NewPath("ref"))
+			matcher := fldtst.Match().ByType().ByField().ByOrigin()
+			fldtest.MatchErrors(t, tt.expectedErrs, errs, matcher)
 		})
 	}
 }

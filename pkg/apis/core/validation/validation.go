@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -35,7 +36,9 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/api/validate"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -130,12 +133,9 @@ func ValidateAnnotations(annotations map[string]string, fldPath *field.Path) fie
 	return apimachineryvalidation.ValidateAnnotations(annotations, fldPath)
 }
 
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate.DNSLabel instead.
 func ValidateDNS1123Label(value string, fldPath *field.Path) field.ErrorList {
-	allErrs := field.ErrorList{}
-	for _, msg := range validation.IsDNS1123Label(value) {
-		allErrs = append(allErrs, field.Invalid(fldPath, value, msg).WithOrigin("format=dns-label"))
-	}
-	return allErrs
+	return validate.DNSLabel(context.TODO(), operation.Operation{}, fldPath, &value, nil)
 }
 
 // ValidateQualifiedName validates if name is what Kubernetes calls a "qualified name".
@@ -7634,9 +7634,7 @@ func validateWindowsSecurityContextOptions(windowsOptions *core.WindowsSecurityC
 
 	if windowsOptions.GMSACredentialSpecName != nil {
 		// gmsaCredentialSpecName must be the name of a custom resource
-		for _, msg := range validation.IsDNS1123Subdomain(*windowsOptions.GMSACredentialSpecName) {
-			allErrs = append(allErrs, field.Invalid(fieldPath.Child("gmsaCredentialSpecName"), windowsOptions.GMSACredentialSpecName, msg))
-		}
+		allErrs = append(allErrs, ValidateDNS1123Subdomain(*windowsOptions.GMSACredentialSpecName, fieldPath.Child("gmsaCredentialSpecName"))...)
 	}
 
 	if windowsOptions.GMSACredentialSpec != nil {
