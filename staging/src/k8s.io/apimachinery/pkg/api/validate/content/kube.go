@@ -19,17 +19,15 @@ package content
 import (
 	"regexp"
 	"strings"
-	"unicode"
 )
 
-// This regex describes the interior of a qualified name's name part, which is
-// slightly different than the rules for the first and last characters. For
-// better errors, we handle them seperately.
-const qualifiedNameInteriorFmt string = "[-A-Za-z0-9_.]+"
+const qnameCharFmt string = "[A-Za-z0-9]"
+const qnameExtCharFmt string = "[-A-Za-z0-9_.]"
+const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
+const qualifiedNameErrMsg string = "must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character"
 const qualifiedNameMaxLength int = 63
-const qualifiedNameErrMsg string = "must consist of a name which starts and ends with alphanumeric characters and consist of alphanumeric characters, '-', '_' or '.', and an optional DNS subdomain prefix and '/' (e.g. \"my.name\", \"MyName\", \"example.com/my-name\")"
 
-var qualifedNameRegexp = regexp.MustCompile("^" + qualifiedNameInteriorFmt + "$")
+var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
 
 // IsQualifiedName tests whether the value passed is what Kubernetes calls a
 // "qualified name".  This is a format used in various places throughout the
@@ -37,7 +35,6 @@ var qualifedNameRegexp = regexp.MustCompile("^" + qualifiedNameInteriorFmt + "$"
 // Otherwise an empty list (or nil) is returned.
 func IsQualifiedName(value string) []string {
 	var errs []string
-
 	parts := strings.Split(value, "/")
 	var name string
 	switch len(parts) {
@@ -47,34 +44,44 @@ func IsQualifiedName(value string) []string {
 		var prefix string
 		prefix, name = parts[0], parts[1]
 		if len(prefix) == 0 {
-			errs = append(errs, "prefix part: "+EmptyError())
+			errs = append(errs, "prefix part "+EmptyError())
 		} else if msgs := IsDNS1123Subdomain(prefix); len(msgs) != 0 {
-			errs = append(errs, prefixEach(msgs, "prefix part: ")...)
+			errs = append(errs, prefixEach(msgs, "prefix part ")...)
 		}
 	default:
-		return append(errs, qualifiedNameErrMsg)
+		return append(errs, "a qualified name "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc")+
+			" with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')")
 	}
 
-	errs = append(errs, prefixEach(isQualifiedNameName(name), "name part: ")...)
+	if len(name) == 0 {
+		errs = append(errs, "name part "+EmptyError())
+	} else if len(name) > qualifiedNameMaxLength {
+		errs = append(errs, "name part "+MaxLenError(qualifiedNameMaxLength))
+	}
+	if !qualifiedNameRegexp.MatchString(name) {
+		errs = append(errs, "name part "+RegexError(qualifiedNameErrMsg, qualifiedNameFmt, "MyName", "my.name", "123-abc"))
+	}
 	return errs
 }
 
-// isQualifiedNameName verifies just the name part of a qualified name.
-func isQualifiedNameName(name string) []string {
-	var errs []string
+const labelValueFmt string = "(" + qualifiedNameFmt + ")?"
+const labelValueErrMsg string = "a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character"
 
-	if len(name) == 0 {
-		errs = append(errs, EmptyError())
-	} else if len(name) > qualifiedNameMaxLength {
-		errs = append(errs, MaxLenError(qualifiedNameMaxLength))
-	} else {
-		runes := []rune(name)
-		if !isAlNum(runes[0]) || !isAlNum(runes[len(runes)-1]) {
-			errs = append(errs, "must start and end with alphanumeric characters")
-		}
-		if len(runes) > 2 && !qualifedNameRegexp.MatchString(string(runes[1:len(runes)-1])) {
-			errs = append(errs, "must contain only alphanumeric characters, '-', '_', or '.'")
-		}
+// LabelValueMaxLength is a label's max length
+const LabelValueMaxLength int = 63
+
+var labelValueRegexp = regexp.MustCompile("^" + labelValueFmt + "$")
+
+// IsLabelValue tests whether the value passed is a valid label value.  If
+// the value is not valid, a list of error strings is returned.  Otherwise an
+// empty list (or nil) is returned.
+func IsLabelValue(value string) []string {
+	var errs []string
+	if len(value) > LabelValueMaxLength {
+		errs = append(errs, MaxLenError(LabelValueMaxLength))
+	}
+	if !labelValueRegexp.MatchString(value) {
+		errs = append(errs, RegexError(labelValueErrMsg, labelValueFmt, "MyValue", "my_value", "12345"))
 	}
 	return errs
 }
@@ -84,31 +91,4 @@ func prefixEach(msgs []string, prefix string) []string {
 		msgs[i] = prefix + msgs[i]
 	}
 	return msgs
-}
-
-func isAlNum(r rune) bool {
-	if r > unicode.MaxASCII {
-		return false
-	}
-	if unicode.IsLetter(r) {
-		return true
-	}
-	if unicode.IsDigit(r) {
-		return true
-	}
-	return false
-}
-
-// LabelValueMaxLength is a Kubernetes label value's max length.
-const LabelValueMaxLength int = qualifiedNameMaxLength
-
-// IsLabelValue tests whether the value passed is a valid label value.  If
-// the value is not valid, a list of error strings is returned.  Otherwise an
-// empty list (or nil) is returned.
-func IsLabelValue(value string) []string {
-	var errs []string
-	if len(value) > 0 {
-		errs = append(errs, isQualifiedNameName(value)...)
-	}
-	return errs
 }

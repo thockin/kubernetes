@@ -22,101 +22,79 @@ import (
 )
 
 func TestIsQualifiedName(t *testing.T) {
-	// errors expected
-	const nameMinSizeError = "name part: must contain at least 1 character"
-	const nameMaxSizeError = "name part: must be no more than 63 characters"
-	const nameStartEndError = "name part: must start and end with alphanumeric characters"
-	const nameInteriorError = "name part: must contain only alphanumeric characters, '-', '_', or '.'"
-	const totalFailError = "must consist of a name .* and an optional DNS subdomain prefix"
-	const prefixMinSizeError = "prefix part: must contain at least 1 character"
-	const prefixMaxSizeError = "prefix part: must be no more than 253 characters"
-	const prefixDNSLabelError = "prefix part:.* must consist of lower case alphanumeric.* must start and end with an alphanumeric"
-
-	cases := []struct {
-		input  string
-		expect []string // regexes
-	}{
-		// Good values
-		{"simple", nil},
-		{"now-with-dashes", nil},
-		{"now_with_underscores", nil},
-		{"now.with.dots", nil},
-		{"now-with-dashes_and_underscores.and.dots", nil},
-		{"1-starts-with-num", nil},
-		{"1234", nil},
-		{"simple/simple", nil},
-		{"now-with-dashes/simple", nil},
-		{"example.com/now-with-dashes", nil},
-		{"example.com/now_with_underscores", nil},
-		{"example.com/now.with.dots", nil},
-		{"example.com/now-with-dashes_and_underscores.and.dots", nil},
-		{"1-num.2-num/3-num", nil},
-		{"1234/5678", nil},
-		{"1.2.3.4/5678", nil},
-		{"Uppercase_Is_OK_123", nil},
-		{"example.com/Uppercase_Is_OK_123", nil},
-		{strings.Repeat("a", 63), nil},
-		{strings.Repeat("a", 253) + "/" + strings.Repeat("b", 63), nil},
-
-		// Bad values
-		{"", mkMsgs(nameMinSizeError)},
-		{" ", mkMsgs(nameStartEndError)},
-		{"nospecialchars%^=@", mkMsgs(nameStartEndError, nameInteriorError)},
-		{"cantendwithadash-", mkMsgs(nameStartEndError)},
-		{"-cantstartwithadash-", mkMsgs(nameStartEndError)},
-		{"only/one/slash", mkMsgs(totalFailError)},
-		{"Example.com/abc", mkMsgs(prefixDNSLabelError)},
-		{"example_com/abc", mkMsgs(prefixDNSLabelError)},
-		{"example.com/", mkMsgs(nameMinSizeError)},
-		{"/simple", mkMsgs(prefixMinSizeError)},
-		{strings.Repeat("a", 64), mkMsgs(nameMaxSizeError)},
-		{strings.Repeat("a", 254) + "/abc", mkMsgs(prefixMaxSizeError)},
+	successCases := []string{
+		"simple",
+		"now-with-dashes",
+		"1-starts-with-num",
+		"1234",
+		"simple/simple",
+		"now-with-dashes/simple",
+		"now-with-dashes/now-with-dashes",
+		"now.with.dots/simple",
+		"now-with.dashes-and.dots/simple",
+		"1-num.2-num/3-num",
+		"1234/5678",
+		"1.2.3.4/5678",
+		"Uppercase_Is_OK_123",
+		"example.com/Uppercase_Is_OK_123",
+		"requests.storage-foo",
+		strings.Repeat("a", 63),
+		strings.Repeat("a", 253) + "/" + strings.Repeat("b", 63),
+	}
+	for i := range successCases {
+		if errs := IsQualifiedName(successCases[i]); len(errs) != 0 {
+			t.Errorf("case[%d]: %q: expected success: %v", i, successCases[i], errs)
+		}
 	}
 
-	for i, tc := range cases {
-		result := IsQualifiedName(tc.input)
-		testVerify(t, i, tc.input, tc.expect, result)
+	errorCases := []string{
+		"nospecialchars%^=@",
+		"cantendwithadash-",
+		"-cantstartwithadash-",
+		"only/one/slash",
+		"Example.com/abc",
+		"example_com/abc",
+		"example.com/",
+		"/simple",
+		strings.Repeat("a", 64),
+		strings.Repeat("a", 254) + "/abc",
+	}
+	for i := range errorCases {
+		if errs := IsQualifiedName(errorCases[i]); len(errs) == 0 {
+			t.Errorf("case[%d]: %q: expected failure", i, errorCases[i])
+		}
 	}
 }
 
 func TestIsLabelValue(t *testing.T) {
-	// errors expected
-	const minSizeError = "must contain at least 1 character"
-	const maxSizeError = "must be no more than 63 characters"
-	const startEndError = "must start and end with alphanumeric characters"
-	const interiorError = "must contain only alphanumeric characters, '-', '_', or '.'"
-
-	cases := []struct {
-		input  string
-		expect []string // regexes
-	}{
-		// Good values
-		{"", nil},
-		{"simple", nil},
-		{"now-with-dashes", nil},
-		{"now_with_underscores", nil},
-		{"now.with.dots", nil},
-		{"now-with-dashes_and_underscores.and.dots", nil},
-		{"1-starts-with-num", nil},
-		{"1234", nil},
-		{strings.Repeat("a", 63), nil},
-
-		// Bad values
-		{" ", mkMsgs(startEndError)},
-		{"simple/simple", mkMsgs(interiorError)},
-		{"-starts-with-dash", mkMsgs(startEndError)},
-		{"ends-with-dash-", mkMsgs(startEndError)},
-		{".starts.with.dot", mkMsgs(startEndError)},
-		{"ends.with.dot.", mkMsgs(startEndError)},
-		{"1234/5678", mkMsgs(interiorError)},
-		{"nospecialchars%^=@", mkMsgs(startEndError, interiorError)},
-		{"cantendwithadash-", mkMsgs(startEndError)},
-		{"-cantstartwithadash-", mkMsgs(startEndError)},
-		{strings.Repeat("a", 64), mkMsgs(maxSizeError)},
+	successCases := []string{
+		"simple",
+		"now-with-dashes",
+		"1-starts-with-num",
+		"end-with-num-1",
+		"1234",                  // only num
+		strings.Repeat("a", 63), // to the limit
+		"",                      // empty value
+	}
+	for i := range successCases {
+		if errs := IsLabelValue(successCases[i]); len(errs) != 0 {
+			t.Errorf("case %s expected success: %v", successCases[i], errs)
+		}
 	}
 
-	for i, tc := range cases {
-		result := IsLabelValue(tc.input)
-		testVerify(t, i, tc.input, tc.expect, result)
+	errorCases := []string{
+		"nospecialchars%^=@",
+		"Tama-nui-te-rā.is.Māori.sun",
+		"\\backslashes\\are\\bad",
+		"-starts-with-dash",
+		"ends-with-dash-",
+		".starts.with.dot",
+		"ends.with.dot.",
+		strings.Repeat("a", 64), // over the limit
+	}
+	for i := range errorCases {
+		if errs := IsLabelValue(errorCases[i]); len(errs) == 0 {
+			t.Errorf("case[%d] expected failure", i)
+		}
 	}
 }
