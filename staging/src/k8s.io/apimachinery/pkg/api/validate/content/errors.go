@@ -28,7 +28,7 @@ func MaxLenError(length int) string {
 
 // EmptyError returns a string explanation of an "empty string" validation.
 func EmptyError() string {
-	return "must contain at least 1 character"
+	return "must be non-empty"
 }
 
 // RegexError returns a string explanation of a regex validation failure.
