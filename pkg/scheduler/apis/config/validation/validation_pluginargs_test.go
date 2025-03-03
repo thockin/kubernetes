@@ -692,7 +692,7 @@ func TestValidateFitArgs(t *testing.T) {
 				IgnoredResources: []string{"example.com/"},
 				ScoringStrategy:  defaultScoringStrategy,
 			},
-			expect: "name part must be non-empty",
+			expect: "name part must contain at least 1 character",
 		},
 		{
 			name: "IgnoredResources: name has too many slash",
@@ -722,7 +722,7 @@ func TestValidateFitArgs(t *testing.T) {
 				IgnoredResourceGroups: []string{"example.com/"},
 				ScoringStrategy:       defaultScoringStrategy,
 			},
-			expect: "name part must be non-empty",
+			expect: "name part must contain at least 1 character",
 		},
 		{
 			name: "IgnoredResourceGroups: name is too long",
