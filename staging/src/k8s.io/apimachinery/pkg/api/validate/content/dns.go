@@ -16,58 +16,115 @@ limitations under the License.
 
 package content
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+	"unicode"
+)
 
-const dns1123LabelFmt string = "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
-const dns1123LabelFmtWithUnderscore string = "_?[a-z0-9]([-_a-z0-9]*[a-z0-9])?"
+// This regex describes the interior of a label, which is slightly different
+// than the rules for the first and last characters. For better errors, we
+// handle them seperately.
+const dns1123LabelInteriorFmt string = "[-a-z0-9]+"
+const dns1123LabelMaxLength int = 63
 
-const dns1123LabelErrMsg string = "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+// DNS1123LabelMaxLength is a DNS label's max length (RFC 1123).
+const DNS1123LabelMaxLength int = dns1123LabelMaxLength
 
-// DNS1123LabelMaxLength is a label's max length in DNS (RFC 1123)
-const DNS1123LabelMaxLength int = 63
+var dnsLabelRegexp = regexp.MustCompile("^" + dns1123LabelInteriorFmt + "$")
 
-var dns1123LabelRegexp = regexp.MustCompile("^" + dns1123LabelFmt + "$")
-
-// IsDNS1123Label tests for a string that conforms to the definition of a label in
-// DNS (RFC 1123).
+// IsDNS1123Label returns error messages if the specified value is not
+// a valid DNS "label" (approximately RFC 1123).
 func IsDNS1123Label(value string) []string {
-	var errs []string
-	if len(value) > DNS1123LabelMaxLength {
-		errs = append(errs, MaxLenError(DNS1123LabelMaxLength))
+	if len(value) > dns1123LabelMaxLength {
+		// Don't run further validation if we know it is too long.
+		return []string{MaxLenError(dns1123LabelMaxLength)}
 	}
-	if !dns1123LabelRegexp.MatchString(value) {
-		if dns1123SubdomainRegexp.MatchString(value) {
-			// It was a valid subdomain and not a valid label.  Since we
-			// already checked length, it must be dots.
-			errs = append(errs, "must not contain dots")
-		} else {
-			errs = append(errs, RegexError(dns1123LabelErrMsg, dns1123LabelFmt, "my-name", "123-abc"))
+	return isDNS1123LabelExceptMaxLength(value)
+}
+
+func isAlNumLower(r rune) bool {
+	if r > unicode.MaxASCII {
+		return false
+	}
+	if unicode.IsLetter(r) && unicode.IsLower(r) {
+		return true
+	}
+	if unicode.IsDigit(r) {
+		return true
+	}
+	return false
+}
+
+// Due to historical reasons, we need to be able to validate the format of a
+// label without checking the max length.
+func isDNS1123LabelExceptMaxLength(value string) []string {
+	if len(value) == 0 {
+		// No point in going further.
+		return []string{EmptyError()}
+	}
+
+	var errs []string
+
+	runes := []rune(value)
+	if !isAlNumLower(runes[0]) || !isAlNumLower(runes[len(runes)-1]) {
+		errs = append(errs, "must start and end with lower-case alphanumeric characters")
+	}
+	if len(runes) > 2 && !dnsLabelRegexp.MatchString(string(runes[1:len(runes)-1])) {
+		errs = append(errs, "must contain only lower-case alphanumeric characters or '-'")
+	}
+	return errs
+}
+
+const dns1123SubdomainMaxLength int = 253
+
+// DNS1123SubdomainMaxLength is a DNS subdomain's max length (RFC 1123).
+const DNS1123SubdomainMaxLength int = dns1123SubdomainMaxLength
+
+// IsDNS1123Subdomain returns error messages if the specified value is not
+// a valid DNS "subdomain" (approximately RFC 1123).
+// subdomain in DNS (RFC 1123).
+func IsDNS1123Subdomain(value string) []string {
+	if len(value) > DNS1123SubdomainMaxLength {
+		// Don't run further validation if we know it is too long.
+		return []string{MaxLenError(dns1123SubdomainMaxLength)}
+	}
+	if len(value) == 0 {
+		// No point in going further.
+		return []string{EmptyError()}
+	}
+
+	var errs []string
+
+	trimmed := strings.Trim(value, ".")
+	if trimmed != value {
+		errs = append(errs, "must start and end with lower-case alphanumeric characters")
+	}
+
+	value = strings.Trim(value, ".")
+	if len(value) > 0 {
+		parts := strings.Split(value, ".")
+		for _, part := range parts {
+			if msgs := isDNS1123LabelExceptMaxLength(part); len(msgs) > 0 {
+				// We don't need duplicate errors, but each part might have
+				// different errors. Making a set for such little data is expensive.
+				for _, msg := range msgs {
+					msg := "each part " + msg
+					if !msgExists(errs, msg) {
+						errs = append(errs, msg)
+					}
+				}
+			}
 		}
 	}
 	return errs
 }
 
-const dns1123SubdomainFmt string = dns1123LabelFmt + "(\\." + dns1123LabelFmt + ")*"
-const dns1123SubdomainErrorMsg string = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
-
-const dns1123SubdomainFmtWithUnderscore string = dns1123LabelFmtWithUnderscore + "(\\." + dns1123LabelFmtWithUnderscore + ")*"
-const dns1123SubdomainErrorMsgFG string = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '_', '-' or '.', and must start and end with an alphanumeric character"
-
-// DNS1123SubdomainMaxLength is a subdomain's max length in DNS (RFC 1123)
-const DNS1123SubdomainMaxLength int = 253
-
-var dns1123SubdomainRegexp = regexp.MustCompile("^" + dns1123SubdomainFmt + "$")
-var dns1123SubdomainRegexpWithUnderscore = regexp.MustCompile("^" + dns1123SubdomainFmtWithUnderscore + "$")
-
-// IsDNS1123Subdomain tests for a string that conforms to the definition of a
-// subdomain in DNS (RFC 1123).
-func IsDNS1123Subdomain(value string) []string {
-	var errs []string
-	if len(value) > DNS1123SubdomainMaxLength {
-		errs = append(errs, MaxLenError(DNS1123SubdomainMaxLength))
+func msgExists(haystack []string, needle string) bool {
+	for _, msg := range haystack {
+		if msg == needle {
+			return true
+		}
 	}
-	if !dns1123SubdomainRegexp.MatchString(value) {
-		errs = append(errs, RegexError(dns1123SubdomainErrorMsg, dns1123SubdomainFmt, "example.com"))
-	}
-	return errs
+	return false
 }

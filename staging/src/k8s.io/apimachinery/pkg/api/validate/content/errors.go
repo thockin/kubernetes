@@ -30,19 +30,3 @@ func MaxLenError(length int) string {
 func EmptyError() string {
 	return "must contain at least 1 character"
 }
-
-// RegexError returns a string explanation of a regex validation failure.
-func RegexError(msg string, re string, examples ...string) string {
-	if len(examples) == 0 {
-		return msg + " (regex used for validation is '" + re + "')"
-	}
-	msg += " (e.g. "
-	for i := range examples {
-		if i > 0 {
-			msg += " or "
-		}
-		msg += "'" + examples[i] + "', "
-	}
-	msg += "regex used for validation is '" + re + "')"
-	return msg
-}

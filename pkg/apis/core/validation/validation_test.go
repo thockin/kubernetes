@@ -54,7 +54,7 @@ import (
 )
 
 const (
-	dnsLabelErrMsg                    = "a lowercase RFC 1123 label must consist of"
+	dnsLabelErrMsg                    = "must consist of lower-case alphanumeric characters or '-'"
 	dnsSubdomainLabelErrMsg           = "a lowercase RFC 1123 subdomain"
 	envVarNameErrMsg                  = "a valid environment variable name must consist of"
 	relaxedEnvVarNameFmtErrMsg string = "a valid environment variable name must consist only of printable ASCII characters other than '='"
@@ -1154,7 +1154,6 @@ func TestValidateLocalVolumes(t *testing.T) {
 				testLocalVolume("foo", simpleVolumeNodeAffinity("foo", "bar"))),
 		},
 	}
-
 	for name, scenario := range scenarios {
 		opts := ValidationOptionsForPersistentVolume(scenario.volume, nil)
 		errs := ValidatePersistentVolume(scenario.volume, opts)
@@ -3763,12 +3762,12 @@ func TestValidateVolumes(t *testing.T) {
 			errs: []verr{{
 				etype:  field.ErrorTypeInvalid,
 				field:  "name",
-				detail: "must not contain dots",
+				detail: "must consist of lower-case alphanumeric characters or '-'",
 			}},
 		}, {
 			name: "name not a DNS label",
 			vol: core.Volume{
-				Name:         "Not a DNS label!",
+				Name:         "invalid.dnslabel",
 				VolumeSource: core.VolumeSource{EmptyDir: &core.EmptyDirVolumeSource{}},
 			},
 			errs: []verr{{
@@ -15080,7 +15079,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}, {
 		name: "invalid namespace",
 		tweakSvc: func(s *core.Service) {
-			s.Namespace = "-123"
+			s.Namespace = "invalid.dnslabel"
 		},
 		numErrs: 1,
 	}, {
@@ -15185,7 +15184,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}, {
 		name: "invalid port name",
 		tweakSvc: func(s *core.Service) {
-			s.Spec.Ports[0].Name = "INVALID"
+			s.Spec.Ports[0].Name = "invalid.dnslabel"
 		},
 		numErrs: 1,
 	}, {
@@ -15197,7 +15196,7 @@ func TestValidateServiceCreate(t *testing.T) {
 	}, {
 		name: "invalid protocol",
 		tweakSvc: func(s *core.Service) {
-			s.Spec.Ports[0].Protocol = "INVALID"
+			s.Spec.Ports[0].Protocol = "Invalid"
 		},
 		numErrs: 1,
 	}, {
@@ -19300,7 +19299,7 @@ func TestValidateLimitRange(t *testing.T) {
 			dnsSubdomainLabelErrMsg,
 		},
 		"invalid-namespace": {
-			core.LimitRange{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: core.LimitRangeSpec{}},
+			core.LimitRange{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "invalid.dnslabel"}, Spec: core.LimitRangeSpec{}},
 			dnsLabelErrMsg,
 		},
 		"duplicate-limit-type": {
@@ -20030,7 +20029,7 @@ func TestValidateResourceQuota(t *testing.T) {
 			errDetail: dnsSubdomainLabelErrMsg,
 		},
 		"invalid Namespace": {
-			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "^Invalid"}, Spec: spec},
+			rq:        core.ResourceQuota{ObjectMeta: metav1.ObjectMeta{Name: "abc", Namespace: "invalid.dnslabel"}, Spec: spec},
 			errDetail: dnsLabelErrMsg,
 		},
 		"negative-limits": {
@@ -24412,9 +24411,9 @@ func TestValidatePVSecretReference(t *testing.T) {
 		expectedError: "name.name: Invalid value: \"$%^&*#\": " + dnsSubdomainLabelErrMsg,
 	}, {
 		name:          "invalid secret ref namespace",
-		args:          args{&core.SecretReference{Name: "valid", Namespace: "$%^&*#"}, rootFld},
+		args:          args{&core.SecretReference{Name: "valid", Namespace: "invalid.dnslabel"}, rootFld},
 		expectError:   true,
-		expectedError: "name.namespace: Invalid value: \"$%^&*#\": " + dnsLabelErrMsg,
+		expectedError: "name.namespace: Invalid value: \"invalid.dnslabel\": " + dnsLabelErrMsg,
 	}, {
 		name:          "invalid secret: missing namespace",
 		args:          args{&core.SecretReference{Name: "valid"}, rootFld},
