@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
@@ -27,10 +28,9 @@ import (
 )
 
 const (
-	maxLengthErrMsg        = "must be no more than"
-	namePartStartsErrMsg   = "name part: must start"
-	namePartContainsErrMsg = "name part: must contain"
-	nameConsistsErrMsg     = "must consist of"
+	maxLengthErrMsg = "must be no more than"
+	namePartErrMsg  = "name part must consist of"
+	nameErrMsg      = "a qualified name must consist of"
 )
 
 // Ensure custom name functions are allowed
@@ -55,61 +55,37 @@ func TestValidateObjectMetaCustomName(t *testing.T) {
 
 // Ensure namespace names follow dns label format
 func TestValidateObjectMetaNamespaces(t *testing.T) {
-	cases := []struct {
-		namespace     string
-		invalid       bool
-		errorContains string
-	}{{
-		namespace: "foo",
-	}, {
-		namespace: "foo-bar",
-	}, {
-		namespace: "f4r",
-	}, {
-		namespace: "1234",
-	}, {
-		namespace:     strings.Repeat("x", 64),
-		invalid:       true,
-		errorContains: "must be no more than",
-	}, {
-		namespace:     "Capital-first-letter",
-		invalid:       true,
-		errorContains: "must start and end with lower-case alphanumeric",
-	}, {
-		namespace:     "capital-last-letteR",
-		invalid:       true,
-		errorContains: "must start and end with lower-case alphanumeric",
-	}, {
-		namespace:     "capital-INTERIOR-letters",
-		invalid:       true,
-		errorContains: "must contain only lower-case alphanumeric",
-	}, {
-		namespace:     "foo.bar",
-		invalid:       true,
-		errorContains: "must contain only lower-case alphanumeric",
-	}}
-
-	for _, tc := range cases {
-		errs := ValidateObjectMeta(
-			&metav1.ObjectMeta{Name: "test", Namespace: tc.namespace},
-			true,
-			func(s string, prefix bool) []string {
-				return nil
-			},
-			field.NewPath("field"))
-		if tc.invalid && len(errs) == 0 {
-			t.Errorf("unexpected success for %q", tc.namespace)
-		} else if !tc.invalid && len(errs) != 0 {
-			t.Errorf("unexpected errors for %q: %v", tc.namespace, errs)
-		} else if tc.invalid {
-			if len(errs) != 1 {
-				t.Errorf("expected 1 error for %q: %v", tc.namespace, errs)
-			} else {
-				if !strings.Contains(errs[0].Error(), tc.errorContains) {
-					t.Errorf("unexpected error for %q: %v", tc.namespace, errs)
-				}
-			}
-		}
+	errs := ValidateObjectMeta(
+		&metav1.ObjectMeta{Name: "test", Namespace: "foo.bar"},
+		true,
+		func(s string, prefix bool) []string {
+			return nil
+		},
+		field.NewPath("field"))
+	if len(errs) != 1 {
+		t.Fatalf("unexpected errors: %v", errs)
+	}
+	if !strings.Contains(errs[0].Error(), `Invalid value: "foo.bar"`) {
+		t.Errorf("unexpected error message: %v", errs)
+	}
+	maxLength := 63
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	b := make([]rune, maxLength+1)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	errs = ValidateObjectMeta(
+		&metav1.ObjectMeta{Name: "test", Namespace: string(b)},
+		true,
+		func(s string, prefix bool) []string {
+			return nil
+		},
+		field.NewPath("field"))
+	if len(errs) != 2 {
+		t.Fatalf("unexpected errors: %v", errs)
+	}
+	if !strings.Contains(errs[0].Error(), "Invalid value") || !strings.Contains(errs[1].Error(), "Invalid value") {
+		t.Errorf("unexpected error message: %v", errs)
 	}
 }
 
@@ -493,25 +469,18 @@ func TestValidateAnnotations(t *testing.T) {
 		annotations map[string]string
 		expect      string
 	}{
-		{map[string]string{"nospecialchars^=@": "bar"}, namePartContainsErrMsg},
-		{map[string]string{"cantendwithadash-": "bar"}, namePartStartsErrMsg},
-		{map[string]string{"only/one/slash": "bar"}, nameConsistsErrMsg},
+		{map[string]string{"nospecialchars^=@": "bar"}, namePartErrMsg},
+		{map[string]string{"cantendwithadash-": "bar"}, namePartErrMsg},
+		{map[string]string{"only/one/slash": "bar"}, nameErrMsg},
 		{map[string]string{strings.Repeat("a", 254): "bar"}, maxLengthErrMsg},
 	}
 	for i := range nameErrorCases {
 		errs := ValidateAnnotations(nameErrorCases[i].annotations, field.NewPath("field"))
-		if len(errs) == 0 {
+		if len(errs) != 1 {
 			t.Errorf("case[%d]: expected failure", i)
 		} else {
-			found := false
-			for _, err := range errs {
-				if strings.Contains(err.Detail, nameErrorCases[i].expect) {
-					found = true
-					break
-				}
-			}
-			if !found {
-				t.Errorf("case[%d]: error details do not include %q: %q", i, nameErrorCases[i].expect, errs)
+			if !strings.Contains(errs[0].Detail, nameErrorCases[i].expect) {
+				t.Errorf("case[%d]: error details do not include %q: %q", i, nameErrorCases[i].expect, errs[0].Detail)
 			}
 		}
 	}

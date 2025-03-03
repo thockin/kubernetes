@@ -179,52 +179,10 @@ func TestIsValidPortName(t *testing.T) {
 	}
 }
 
-func TestIsQualifiedName(t *testing.T) {
-	successCases := []string{
-		"simple",
-		"now-with-dashes",
-		"1-starts-with-num",
-		"1234",
-		"simple/simple",
-		"now-with-dashes/simple",
-		"now-with-dashes/now-with-dashes",
-		"now.with.dots/simple",
-		"now-with.dashes-and.dots/simple",
-		"1-num.2-num/3-num",
-		"1234/5678",
-		"1.2.3.4/5678",
-		"Uppercase_Is_OK_123",
-		"example.com/Uppercase_Is_OK_123",
-		"requests.storage-foo",
-		strings.Repeat("a", 63),
-		strings.Repeat("a", 253) + "/" + strings.Repeat("b", 63),
-	}
-	for i := range successCases {
-		if errs := IsQualifiedName(successCases[i]); len(errs) != 0 {
-			t.Errorf("case[%d]: %q: expected success: %v", i, successCases[i], errs)
-		}
-	}
-
-	errorCases := []string{
-		"nospecialchars%^=@",
-		"cantendwithadash-",
-		"-cantstartwithadash-",
-		"only/one/slash",
-		"Example.com/abc",
-		"example_com/abc",
-		"example.com/",
-		"/simple",
-		strings.Repeat("a", 64),
-		strings.Repeat("a", 254) + "/abc",
-	}
-	for i := range errorCases {
-		if errs := IsQualifiedName(errorCases[i]); len(errs) == 0 {
-			t.Errorf("case[%d]: %q: expected failure", i, errorCases[i])
-		}
-	}
-}
-
 func TestIsValidIP(t *testing.T) {
+	// IsValidIP is a wrapper of validate.IPSloppy, but it's not just an alias,
+	// so we will retain these tests until all callers of IsValidIP are
+	// removed.
 	for _, tc := range []struct {
 		name   string
 		in     string
@@ -733,11 +691,11 @@ func TestIsFullyQualifiedName(t *testing.T) {
 	}, {
 		name:       "name should not include scheme",
 		targetName: "http://foo.k8s.io",
-		err:        "each part must contain only lower-case alphanumeric characters or '-'",
+		err:        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters",
 	}, {
 		name:       "email should be invalid",
 		targetName: "example@foo.k8s.io",
-		err:        "each part must contain only lower-case alphanumeric characters or '-'",
+		err:        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters",
 	}, {
 		name:       "name cannot be empty",
 		targetName: "",
@@ -745,7 +703,7 @@ func TestIsFullyQualifiedName(t *testing.T) {
 	}, {
 		name:       "name must conform to RFC 1123",
 		targetName: "A.B.C",
-		err:        "each part must start and end with lower-case alphanumeric characters",
+		err:        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters",
 	}}
 	for _, tc := range messageTests {
 		err := IsFullyQualifiedName(field.NewPath(""), tc.targetName).ToAggregate()

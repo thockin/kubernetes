@@ -424,20 +424,8 @@ func IsConfigMapKey(value string) []string {
 var MaxLenError = content.MaxLenError
 
 // RegexError returns a string explanation of a regex validation failure.
-func RegexError(msg string, fmt string, examples ...string) string {
-	if len(examples) == 0 {
-		return msg + " (regex used for validation is '" + fmt + "')"
-	}
-	msg += " (e.g. "
-	for i := range examples {
-		if i > 0 {
-			msg += " or "
-		}
-		msg += "'" + examples[i] + "', "
-	}
-	msg += "regex used for validation is '" + fmt + "')"
-	return msg
-}
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate/content.RegexError instead.
+var RegexError = content.RegexError
 
 // EmptyError returns a string explanation of a "must not be empty" validation
 // failure.
