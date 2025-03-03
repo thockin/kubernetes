@@ -180,6 +180,9 @@ func TestIsValidPortName(t *testing.T) {
 }
 
 func TestIsValidIP(t *testing.T) {
+	// IsValidIP is a wrapper of validate.IPSloppy, but it's not just an alias,
+	// so we will retain these tests until all callers of IsValidIP are
+	// removed.
 	for _, tc := range []struct {
 		name   string
 		in     string
