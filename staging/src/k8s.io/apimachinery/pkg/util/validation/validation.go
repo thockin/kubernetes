@@ -388,9 +388,8 @@ var RegexError = content.RegexError
 
 // EmptyError returns a string explanation of a "must not be empty" validation
 // failure.
-func EmptyError() string {
-	return "must be non-empty"
-}
+// Deprecated: Use k8s.io/apimachinery/pkg/api/validate/content.EmptyError instead.
+var EmptyError = content.EmptyError
 
 // InclusiveRangeError returns a string explanation of a numeric "must be
 // between" validation failure.

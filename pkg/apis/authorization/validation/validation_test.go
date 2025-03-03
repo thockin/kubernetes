@@ -245,7 +245,7 @@ func TestValidateSARSpec(t *testing.T) {
 				},
 			},
 		},
-		msg: `spec.resourceAttributes.labelSelector.requirements[0].key: Invalid value: "": name part must be non-empty`,
+		msg: `spec.resourceAttributes.labelSelector.requirements[0].key: Invalid value: "": name part must contain at least 1 character`,
 	}, {
 		name: "resource attributes: label selector invalid label name",
 		obj: authorizationapi.SubjectAccessReviewSpec{

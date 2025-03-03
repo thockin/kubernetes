@@ -961,7 +961,7 @@ func TestValidateJob(t *testing.T) {
 			},
 			opts: JobValidationOptions{RequirePrefixedLabels: true},
 		},
-		`spec.podFailurePolicy.rules[0].onPodConditions[0].type: Invalid value: "": name part must be non-empty`: {
+		`spec.podFailurePolicy.rules[0].onPodConditions[0].type: Invalid value: "": name part must contain at least 1 character`: {
 			job: batch.Job{
 				ObjectMeta: validJobObjectMeta,
 				Spec: batch.JobSpec{

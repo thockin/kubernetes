@@ -84,7 +84,7 @@ func TestValidateServerStorageVersion(t *testing.T) {
 			DecodableVersions: []string{"v1alpha1", "v1"},
 			ServedVersions:    []string{"/v3"},
 		},
-		expectedErr: `[].servedVersions[0]: Invalid value: "/v3": group part: must be non-empty`,
+		expectedErr: `[].servedVersions[0]: Invalid value: "/v3": group part: must contain at least 1 character`,
 	}, {
 		ssv: apiserverinternal.ServerStorageVersion{
 			APIServerID:       "fea",
@@ -92,7 +92,7 @@ func TestValidateServerStorageVersion(t *testing.T) {
 			DecodableVersions: []string{"mygroup.com/v2", "/v3"},
 			ServedVersions:    []string{"mygroup.com/v2", "/v3"},
 		},
-		expectedErr: `[].decodableVersions[1]: Invalid value: "/v3": group part: must be non-empty`,
+		expectedErr: `[].decodableVersions[1]: Invalid value: "/v3": group part: must contain at least 1 character`,
 	}, {
 		ssv: apiserverinternal.ServerStorageVersion{
 			APIServerID:       "fea",
@@ -100,7 +100,7 @@ func TestValidateServerStorageVersion(t *testing.T) {
 			DecodableVersions: []string{"mygroup.com/v2", "/v3"},
 			ServedVersions:    []string{"mygroup.com/"},
 		},
-		expectedErr: `[].servedVersions[0]: Invalid value: "mygroup.com/": version part: must be non-empty`,
+		expectedErr: `[].servedVersions[0]: Invalid value: "mygroup.com/": version part: must contain at least 1 character`,
 	}, {
 		ssv: apiserverinternal.ServerStorageVersion{
 			APIServerID:       "fea",
@@ -108,7 +108,7 @@ func TestValidateServerStorageVersion(t *testing.T) {
 			DecodableVersions: []string{"mygroup.com/v2", "mygroup.com/"},
 			ServedVersions:    []string{"mygroup.com/v2", "mygroup.com/"},
 		},
-		expectedErr: `[].decodableVersions[1]: Invalid value: "mygroup.com/": version part: must be non-empty`,
+		expectedErr: `[].decodableVersions[1]: Invalid value: "mygroup.com/": version part: must contain at least 1 character`,
 	}, {
 		ssv: apiserverinternal.ServerStorageVersion{
 			APIServerID:       "fea",
@@ -116,7 +116,7 @@ func TestValidateServerStorageVersion(t *testing.T) {
 			DecodableVersions: []string{"mygroup.com/v2", "/v3"},
 			ServedVersions:    []string{"mygroup.com/v2", "/v3"},
 		},
-		expectedErr: `[].encodingVersion: Invalid value: "/v3": group part: must be non-empty`,
+		expectedErr: `[].encodingVersion: Invalid value: "/v3": group part: must contain at least 1 character`,
 	}, {
 		ssv: apiserverinternal.ServerStorageVersion{
 			APIServerID:       "fea",

@@ -11408,7 +11408,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid soft pod affinity, key in MatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAffinity: &core.PodAffinity{
@@ -11435,7 +11435,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid hard pod affinity, key in MatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAffinity: &core.PodAffinity{
@@ -11459,7 +11459,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid soft pod anti-affinity, key in MatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAntiAffinity: &core.PodAntiAffinity{
@@ -11486,7 +11486,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid hard pod anti-affinity, key in MatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAntiAffinity: &core.PodAntiAffinity{
@@ -11510,7 +11510,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid soft pod affinity, key in MismatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAffinity: &core.PodAffinity{
@@ -11537,7 +11537,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid hard pod affinity, key in MismatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAffinity: &core.PodAffinity{
@@ -11561,7 +11561,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid soft pod anti-affinity, key in MismatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAntiAffinity: &core.PodAntiAffinity{
@@ -11588,7 +11588,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"invalid hard pod anti-affinity, key in MismatchLabelKeys isn't correctly defined": {
-			expectedError: "prefix part must be non-empty",
+			expectedError: "prefix part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAffinity(&core.Affinity{
 					PodAntiAffinity: &core.PodAntiAffinity{
@@ -11893,7 +11893,7 @@ func TestValidatePod(t *testing.T) {
 			),
 		},
 		"must be a non-empty container name in seccomp annotation": {
-			expectedError: "name part must be non-empty",
+			expectedError: "name part must contain at least 1 character",
 			spec: *podtest.MakePod("123",
 				podtest.SetAnnotations(map[string]string{
 					core.SeccompContainerAnnotationKeyPrefix: "foo",
@@ -21843,7 +21843,7 @@ func TestValidateSchedulingGates(t *testing.T) {
 			{Name: ""},
 		},
 		wantFieldErrors: field.ErrorList{
-			field.Invalid(fieldPath.Index(1), "", "name part must be non-empty"),
+			field.Invalid(fieldPath.Index(1), "", "name part must contain at least 1 character"),
 			field.Invalid(fieldPath.Index(1), "", "name part must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]')"),
 		},
 	}, {
