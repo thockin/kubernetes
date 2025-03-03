@@ -53,10 +53,10 @@ func Test(t *testing.T) {
 	}).ExpectInvalid(
 		field.Invalid(field.NewPath("ipField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
 		field.Invalid(field.NewPath("ipPtrField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelField"), "", "must be non-empty"),
-		field.Invalid(field.NewPath("dnsLabelPtrField"), "", "must be non-empty"),
+		field.Invalid(field.NewPath("dnsLabelField"), "", "must contain at least 1 character"),
+		field.Invalid(field.NewPath("dnsLabelPtrField"), "", "must contain at least 1 character"),
 		field.Invalid(field.NewPath("ipTypedefField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelTypedefField"), "", "must be non-empty"),
+		field.Invalid(field.NewPath("dnsLabelTypedefField"), "", "must contain at least 1 character"),
 	)
 
 	st.Value(&Struct{
