@@ -73,6 +73,7 @@ func (stv subfieldTagValidator) GetValidations(context Context, tag codetags.Tag
 		Scope:  ScopeField,
 		Type:   submemb.Type,
 		Parent: t,
+		Member: submemb,
 		Path:   context.Path.Child(subname),
 	}
 	if validations, err := stv.validator.ExtractValidations(subContext, *tag.ValueTag); err != nil {
