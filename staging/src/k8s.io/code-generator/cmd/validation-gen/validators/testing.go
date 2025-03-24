@@ -73,7 +73,10 @@ func (frtv fixedResultTagValidator) GetValidations(context Context, _ []string, 
 	if err != nil {
 		return result, fmt.Errorf("can't decode tag payload: %w", err)
 	}
-	result.AddFunction(Function(frtv.TagName(), tag.flags, fixedResultValidator, frtv.result, tag.msg).WithTypeArgs(tag.typeArgs...))
+	fg := Function(frtv.TagName(), tag.flags, fixedResultValidator, frtv.result, tag.msg)
+	fg.TypeArgs = tag.typeArgs
+	fg.Cohort = tag.cohort
+	result.AddFunction(fg)
 
 	return result, nil
 }
@@ -86,6 +89,7 @@ type fixedResultPayload struct {
 	flags    FunctionFlags
 	msg      string
 	typeArgs []types.Name
+	cohort   string
 }
 
 func (fixedResultTagValidator) parseTagPayload(in string) (fixedResultPayload, error) {
@@ -93,6 +97,7 @@ func (fixedResultTagValidator) parseTagPayload(in string) (fixedResultPayload, e
 		Flags   []string `json:"flags"`
 		Msg     string   `json:"msg"`
 		TypeArg string   `json:"typeArg,omitempty"`
+		Cohort  string   `json:"cohort,omitempty"`
 	}
 	// We expect either a string (maybe empty) or a JSON object.
 	if len(in) == 0 {
@@ -129,7 +134,12 @@ func (fixedResultTagValidator) parseTagPayload(in string) (fixedResultPayload, e
 		typeArgs = []types.Name{{Package: "", Name: tn}}
 	}
 
-	return fixedResultPayload{flags, pl.Msg, typeArgs}, nil
+	return fixedResultPayload{
+		flags:    flags,
+		msg:      pl.Msg,
+		typeArgs: typeArgs,
+		cohort:   pl.Cohort,
+	}, nil
 }
 
 func (frtv fixedResultTagValidator) Docs() TagDoc {
@@ -165,6 +175,10 @@ func (frtv fixedResultTagValidator) Docs() TagDoc {
 				Key:   "typeArg",
 				Value: "<string>",
 				Docs:  "The type arg in generated code (must be the value-type, not pointer).",
+			}, {
+				Key:   "cohort",
+				Value: "<string>",
+				Docs:  "An optional cohort name to group multiple validations.",
 			}},
 		}}
 		if frtv.result {
