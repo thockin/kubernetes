@@ -5867,6 +5867,7 @@ var supportedServiceIPFamilyPolicy = sets.New(
 // ValidateService tests if required fields/annotations of a Service are valid.
 func ValidateService(service, oldService *core.Service) field.ErrorList {
 	metaPath := field.NewPath("metadata")
+	//FIXME: can't use .MarkCoveredByDeclarative() because that gets all of them, and only name/generateName is covered.
 	allErrs := ValidateObjectMeta(&service.ObjectMeta, true, ValidateServiceName, metaPath)
 
 	topologyHintsVal, topologyHintsSet := service.Annotations[core.DeprecatedAnnotationTopologyAwareHints]
