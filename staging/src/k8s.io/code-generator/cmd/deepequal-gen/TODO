@@ -1,0 +1,4 @@
+use memcmp for slices
+good names for helpers
+only emit 1 helper per type
+sort for deterministic output
