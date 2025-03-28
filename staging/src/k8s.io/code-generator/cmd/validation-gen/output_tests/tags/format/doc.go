@@ -44,6 +44,15 @@ type Struct struct {
 
 	// Note: no validation here
 	DNSLabelTypedefField DNSLabelStringType `json:"dnsLabelTypedefField"`
+
+	// +k8s:format=dns-subdomain
+	DNSSubdomainField string `json:"dnsSubdomainField"`
+
+	// +k8s:format=dns-subdomain
+	DNSSubdomainPtrField *string `json:"dnsSubdomainPtrField"`
+
+	// Note: no validation here
+	DNSSubdomainTypedefField DNSSubdomainStringType `json:"dnsSubdomainTypedefField"`
 }
 
 // +k8s:format=ip-sloppy
@@ -51,3 +60,6 @@ type IPStringType string
 
 // +k8s:format=dns-label
 type DNSLabelStringType string
+
+// +k8s:format=dns-subdomain
+type DNSSubdomainStringType string

@@ -103,3 +103,102 @@ func TestDNS1123Label(t *testing.T) {
 		})
 	}
 }
+
+func TestDNS1123Subdomain(t *testing.T) {
+	ctx := context.Background()
+	fldPath := field.NewPath("test")
+
+	testCases := []struct {
+		name     string
+		input    string
+		wantErrs field.ErrorList
+	}{{
+		name:     "valid single label",
+		input:    "valid-label",
+		wantErrs: nil,
+	}, {
+		name:     "valid subdomain",
+		input:    "this-is.a-valid.subdomain",
+		wantErrs: nil,
+	}, {
+		name:     "valid single character elements",
+		input:    "a.b.c",
+		wantErrs: nil,
+	}, {
+		name:     "valid elements with numbers",
+		input:    "123.abc-123.456-def",
+		wantErrs: nil,
+	}, {
+		name:     "all number elements",
+		input:    "1.2.3.4",
+		wantErrs: nil,
+	}, {
+		name:  "invalid: uppercase characters",
+		input: "Invalid.Subdomain",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name:  "invalid: starts with dash",
+		input: "this-is.-an-invalid.subdomain",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name:  "invalid: ends with dash",
+		input: "this-is.an-invalid-.subdomain",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name:  "invalid: contains double dots",
+		input: "invalid..subdomain",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name:  "invalid: contains special characters",
+		input: "inv@lid.subdoma!n",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name:  "invalid: too long single label",
+		input: "a" + strings.Repeat("b", 252) + "c", // 254 characters
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name: "invalid: too long multiple labels",
+		input: strings.Join([]string{
+			strings.Repeat("a", 60), // 61 with the "."
+			strings.Repeat("b", 60), // 122 with the "."
+			strings.Repeat("c", 60), // 183 with the "."
+			strings.Repeat("d", 60), // 244 with the "."
+			strings.Repeat("e", 10), // 254 characters
+		}, "."),
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}, {
+		name:     "valid: max length single label",     // supported for compat
+		input:    "a" + strings.Repeat("b", 251) + "c", // 253 characters
+		wantErrs: nil,
+	}, {
+		name:  "invalid: empty string",
+		input: "",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, nil, "").WithOrigin("format=dns-subdomain"),
+		},
+	}}
+
+	matcher := field.ErrorMatcher{}.ByType().ByField().ByOrigin()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			value := tc.input
+			gotErrs := DNSSubdomain(ctx, operation.Operation{}, fldPath, &value, nil)
+
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
+	}
+}

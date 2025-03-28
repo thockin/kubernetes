@@ -46,8 +46,9 @@ func (formatTagValidator) ValidScopes() sets.Set[Scope] {
 }
 
 var (
-	ipSloppyValidator = types.Name{Package: libValidationPkg, Name: "IPSloppy"}
-	dnsLabelValidator = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
+	ipSloppyValidator     = types.Name{Package: libValidationPkg, Name: "IPSloppy"}
+	dnsLabelValidator     = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
+	dnsSubdomainValidator = types.Name{Package: libValidationPkg, Name: "DNSSubdomain"}
 )
 
 func (formatTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
@@ -71,6 +72,9 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 	if format == "dns-label" {
 		return Function(formatTagName, DefaultFlags, dnsLabelValidator), nil
 	}
+	if format == "dns-subdomain" {
+		return Function(formatTagName, DefaultFlags, dnsSubdomainValidator), nil
+	}
 	// TODO: Flesh out the list of validation functions
 
 	return FunctionGen{}, fmt.Errorf("unsupported validation format %q", format)
@@ -86,7 +90,10 @@ func (ftv formatTagValidator) Docs() TagDoc {
 			Docs:        "This field holds an IPv4 or IPv6 address value. IPv4 octets may have leading zeros.",
 		}, {
 			Description: "dns-label",
-			Docs:        "This field holds a DNS label value.",
+			Docs:        "This field holds a DNS label value (approximately RFC 1123).",
+		}, {
+			Description: "dns-label",
+			Docs:        "This field holds a DNS subdomain value (approximately RFC 1123).",
 		}},
 	}
 }
