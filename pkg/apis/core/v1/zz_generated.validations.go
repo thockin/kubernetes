@@ -73,7 +73,9 @@ func Validate_ReplicationController(ctx context.Context, op operation.Operation,
 				if e := validate.Subfield(ctx, op, fldPath, obj, oldObj, "generateName", func(o *metav1.ObjectMeta) *string { return &o.GenerateName }, validate.OptionalValue); len(e) != 0 {
 					return // do not proceed
 				}
-				errs = append(errs, validate.Subfield(ctx, op, fldPath, obj, oldObj, "generateName", func(o *metav1.ObjectMeta) *string { return &o.GenerateName }, validate.DNSSubdomain)...)
+				errs = append(errs, validate.Subfield(ctx, op, fldPath, obj, oldObj, "generateName", func(o *metav1.ObjectMeta) *string { return &o.GenerateName }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+					return validate.GenerateName(ctx, op, fldPath, obj, oldObj, validate.DNSSubdomain)
+				})...)
 			}()
 			return
 		}(fldPath.Child("metadata"), &obj.ObjectMeta, safe.Field(oldObj, func(oldObj *corev1.ReplicationController) *metav1.ObjectMeta { return &oldObj.ObjectMeta }))...)
