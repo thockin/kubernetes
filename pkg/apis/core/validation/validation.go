@@ -256,12 +256,6 @@ type ValidateNameFunc apimachineryvalidation.ValidateNameFunc
 // trailing dashes are allowed.
 var ValidatePodName = apimachineryvalidation.NameIsDNSSubdomain
 
-// ValidateReplicationControllerName can be used to check whether the given replication
-// controller name is valid.
-// Prefix indicates this name will be used as part of generation, in which case
-// trailing dashes are allowed.
-var ValidateReplicationControllerName = apimachineryvalidation.NameIsDNSSubdomain
-
 // ValidateServiceName can be used to check whether the given service name is valid.
 // Prefix indicates this name will be used as part of generation, in which case
 // trailing dashes are allowed.
@@ -6253,7 +6247,7 @@ func ValidateServiceStatusUpdate(service, oldService *core.Service) field.ErrorL
 
 // ValidateReplicationController tests if required fields in the replication controller are set.
 func ValidateReplicationController(controller *core.ReplicationController, opts PodValidationOptions) field.ErrorList {
-	allErrs := ValidateObjectMeta(&controller.ObjectMeta, true, ValidateReplicationControllerName, field.NewPath("metadata"))
+	allErrs := ValidateObjectMeta(&controller.ObjectMeta, true, apimachineryvalidation.NameIsDNSSubdomain, field.NewPath("metadata"))
 	allErrs = append(allErrs, ValidateReplicationControllerSpec(&controller.Spec, nil, field.NewPath("spec"), opts)...)
 	return allErrs
 }
