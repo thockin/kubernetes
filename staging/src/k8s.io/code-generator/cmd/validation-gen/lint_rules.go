@@ -16,6 +16,8 @@ limitations under the License.
 
 package main
 
+import "k8s.io/gengo/v2/types"
+
 var ruleOptionalAndRequired = conflictingTagsRule(
 	"fields cannot be both optional and required",
 	"+k8s:optional", "+k8s:required")
@@ -24,7 +26,17 @@ var ruleRequiredAndDefault = conflictingTagsRule(
 	"fields with default values are always optional",
 	"+k8s:required", "+default")
 
+// FIXME: when lint recurses it triggers this on every field of (e.g.) pod.
+// FIXME: hasValiations() is for the whole type, so still triggers on PodTemplate
+// FIXME: need to check if this FIELD has validations
+// FIXME: could check for +optional OR +k8s:optional?
+// FIXME: Also need a nolint tag for output_tests?
+var rulePointersOptional = kindRequiresTagRule(
+	"pointer fields must be optional",
+	types.Pointer, "+optional")
+
 var defaultLintRules = []lintRule{
 	ruleOptionalAndRequired,
 	ruleRequiredAndDefault,
+	rulePointersOptional,
 }

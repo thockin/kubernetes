@@ -303,6 +303,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			return cmp.Compare(a.Name.String(), b.Name.String())
 		})
 
+		//FIXME: why is this per-input and not just once?
 		td := NewTypeDiscoverer(validator, inputToPkg)
 		for _, t := range rootTypes {
 			klog.V(4).InfoS("pre-processing", "type", t)

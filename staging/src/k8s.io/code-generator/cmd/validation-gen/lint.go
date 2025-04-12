@@ -36,10 +36,11 @@ type linter struct {
 	lintErrors map[*types.Type][]error
 }
 
-// lintRule is a function that validates a slice of comments.
-// It returns a string as an error message if the comments are invalid,
-// and an error there is an error happened during the linting process.
-type lintRule func(comments []string) (string, error)
+// lintRule is a function that validates a field or type.
+// It returns a string as an error message if this field or type has failed
+// this lint rule, and an error there is an error happened during the linting
+// process.
+type lintRule func(t *types.Type, comments []string) (string, error)
 
 func (l *linter) AddError(t *types.Type, field, msg string) {
 	var err error
@@ -70,7 +71,7 @@ func (l *linter) lintType(t *types.Type) error {
 
 	if t.CommentLines != nil {
 		klog.V(5).Infof("linting type %s", t.Name.String())
-		lintErrs, err := l.lintComments(t.CommentLines)
+		lintErrs, err := l.runLintRules(t, t.CommentLines)
 		if err != nil {
 			return err
 		}
@@ -87,8 +88,10 @@ func (l *linter) lintType(t *types.Type) error {
 	case types.Struct:
 		// Recursively lint each member of the struct.
 		for _, member := range t.Members {
-			klog.V(5).Infof("linting comments for field %s of type %s", member.String(), t.Name.String())
-			lintErrs, err := l.lintComments(member.CommentLines)
+			klog.V(5).Infof("linting field %s of type %s", member.String(), t.Name.String())
+			//FIXME: need to look at the typenode for t, fields[member.name],
+			//look at fieldValidations and node.typeValidations
+			lintErrs, err := l.runLintRules(member.Type, member.CommentLines)
 			if err != nil {
 				return err
 			}
@@ -116,11 +119,14 @@ func (l *linter) lintType(t *types.Type) error {
 	return nil
 }
 
-// lintComments runs all registered rules on a slice of comments.
-func (l *linter) lintComments(comments []string) ([]string, error) {
+// runLintRules runs all registered rules on a slice of comments.  For type
+// definitions, the comments are from the type, but for struct members, the
+// comments are from the field definition, which is not the same as the field's
+// type definition.
+func (l *linter) runLintRules(t *types.Type, comments []string) ([]string, error) {
 	var lintErrs []string
 	for _, rule := range l.rules {
-		if msg, err := rule(comments); err != nil {
+		if msg, err := rule(t, comments); err != nil {
 			return nil, err
 		} else if msg != "" {
 			lintErrs = append(lintErrs, msg)
@@ -136,7 +142,7 @@ func conflictingTagsRule(msg string, tags ...string) lintRule {
 		panic("conflictingTagsRule: at least 2 tags must be specified")
 	}
 
-	return func(comments []string) (string, error) {
+	return func(_ *types.Type, comments []string) (string, error) {
 		found := make(map[string]bool)
 		for _, comment := range comments {
 			for _, tag := range tags {
@@ -154,5 +160,22 @@ func conflictingTagsRule(msg string, tags ...string) lintRule {
 			return fmt.Sprintf("conflicting tags: {%s}: %s", strings.Join(keys, ", "), msg), nil
 		}
 		return "", nil
+	}
+}
+
+// kindRequiresTagRule creates a lintRule which checks that a given Kind has a
+// specific tag.
+func kindRequiresTagRule(msg string, kind types.Kind, tag string) lintRule {
+	return func(t *types.Type, comments []string) (string, error) {
+		if t.Kind != kind {
+			return "", nil
+		}
+
+		for _, comment := range comments {
+			if strings.HasPrefix(comment, tag) {
+				return "", nil
+			}
+		}
+		return fmt.Sprintf("%s types must be %s: %s", kind, tag, msg), nil
 	}
 }
