@@ -29,7 +29,7 @@ import (
 // This is for string enums only.
 func Enum[T ~string](_ context.Context, op operation.Operation, fldPath *field.Path, value, _ *T, symbols sets.Set[T]) field.ErrorList {
 	if value == nil {
-		return nil
+		return nilPointerError(fldPath)
 	}
 	if !symbols.Has(*value) {
 		symbolList := symbols.UnsortedList()

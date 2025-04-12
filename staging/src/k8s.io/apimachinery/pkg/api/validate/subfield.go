@@ -30,6 +30,10 @@ type GetFieldFunc[Tstruct any, Tfield any] func(*Tstruct) Tfield
 // Subfield validates a subfield of a struct against a validator function.
 func Subfield[Tstruct any, Tfield any](ctx context.Context, op operation.Operation, fldPath *field.Path, newStruct, oldStruct *Tstruct,
 	fldName string, getField GetFieldFunc[Tstruct, Tfield], validator ValidateFunc[Tfield]) field.ErrorList {
+	if newStruct == nil {
+		return nilPointerError(fldPath)
+	}
+
 	var errs field.ErrorList
 	newVal := getField(newStruct)
 	var oldVal Tfield
