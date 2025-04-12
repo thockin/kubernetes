@@ -149,16 +149,43 @@ func ValidateObjectMeta(objMeta *metav1.ObjectMeta, requiresNamespace bool, name
 	return ValidateObjectMetaAccessor(metadata, requiresNamespace, nameFn, fldPath)
 }
 
+// ValidateObjectMeta2 validates an object's metadata on creation. It expects that name generation has already
+// been performed.
+// It doesn't return an error for rootscoped resources with namespace, because namespace should already be cleared before.
+//
+// This is similar to ValidateObjectMeta, but uses a different signature for the name validation function.
+func ValidateObjectMeta2(objMeta *metav1.ObjectMeta, requiresNamespace bool, nameFn ValidateNameFunc2, fldPath *field.Path) field.ErrorList {
+	metadata, err := meta.Accessor(objMeta)
+	if err != nil {
+		var allErrs field.ErrorList
+		allErrs = append(allErrs, field.Invalid(fldPath, objMeta, err.Error()))
+		return allErrs
+	}
+	return ValidateObjectMetaAccessor2(metadata, requiresNamespace, nameFn, fldPath)
+}
+
 // ValidateObjectMetaAccessor validates an object's metadata on creation. It expects that name generation has already
 // been performed.
 // It doesn't return an error for rootscoped resources with namespace, because namespace should already be cleared before.
 func ValidateObjectMetaAccessor(meta metav1.Object, requiresNamespace bool, nameFn ValidateNameFunc, fldPath *field.Path) field.ErrorList {
+	nameFn2 := func(fldPath *field.Path, name string, prefix bool) field.ErrorList {
+		allErrs := field.ErrorList{}
+		for _, msg := range nameFn(name, prefix) {
+			allErrs = append(allErrs, field.Invalid(fldPath, name, msg))
+		}
+		return allErrs
+	}
+	return ValidateObjectMetaAccessor2(meta, requiresNamespace, nameFn2, fldPath)
+}
+
+// ValidateObjectMetaAccessor validates an object's metadata on creation. It expects that name generation has already
+// been performed.
+// It doesn't return an error for rootscoped resources with namespace, because namespace should already be cleared before.
+func ValidateObjectMetaAccessor2(meta metav1.Object, requiresNamespace bool, nameFn ValidateNameFunc2, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if len(meta.GetGenerateName()) != 0 {
-		for _, msg := range nameFn(meta.GetGenerateName(), true) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("generateName"), meta.GetGenerateName(), msg))
-		}
+		allErrs = append(allErrs, nameFn(fldPath.Child("generateName"), meta.GetGenerateName(), true)...)
 	}
 	// If the generated name validates, but the calculated value does not, it's a problem with generation, and we
 	// report it here. This may confuse users, but indicates a programming bug and still must be validated.
@@ -166,9 +193,7 @@ func ValidateObjectMetaAccessor(meta metav1.Object, requiresNamespace bool, name
 	if len(meta.GetName()) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "name or generateName is required"))
 	} else {
-		for _, msg := range nameFn(meta.GetName(), false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), meta.GetName(), msg))
-		}
+		allErrs = append(allErrs, nameFn(fldPath.Child("name"), meta.GetName(), false)...)
 	}
 	if requiresNamespace {
 		if len(meta.GetNamespace()) == 0 {

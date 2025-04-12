@@ -251,6 +251,12 @@ func ValidateEndpointsSpecificAnnotations(annotations map[string]string, fldPath
 // value that were not valid.  Otherwise this returns an empty list or nil.
 type ValidateNameFunc apimachineryvalidation.ValidateNameFunc
 
+// ValidateNameFunc2 validates that the provided name is valid for a given
+// resource type. Prefix is true if the name will have a value appended to it.
+//
+// This is similar to ValidateNameFunc, except for the return type.
+type ValidateNameFunc2 = apimachineryvalidation.ValidateNameFunc2
+
 // ValidatePodName can be used to check whether the given pod name is valid.
 // Prefix indicates this name will be used as part of generation, in which case
 // trailing dashes are allowed.
@@ -381,7 +387,31 @@ func ValidateImmutableAnnotation(newVal string, oldVal string, annotation string
 // It doesn't return an error for rootscoped resources with namespace, because namespace should already be cleared before.
 // TODO: Remove calls to this method scattered in validations of specific resources, e.g., ValidatePodUpdate.
 func ValidateObjectMeta(meta *metav1.ObjectMeta, requiresNamespace bool, nameFn ValidateNameFunc, fldPath *field.Path) field.ErrorList {
-	allErrs := apimachineryvalidation.ValidateObjectMeta(meta, requiresNamespace, apimachineryvalidation.ValidateNameFunc(nameFn), fldPath)
+	callValidateObjMeta := func() field.ErrorList {
+		return apimachineryvalidation.ValidateObjectMeta(meta, requiresNamespace, apimachineryvalidation.ValidateNameFunc(nameFn), fldPath)
+	}
+	return validateObjectMetaInner(meta, callValidateObjMeta, fldPath)
+}
+
+// ValidateObjectMeta2 validates an object's metadata on creation. It expects
+// that name generation has already been performed. It doesn't return an error
+// for rootscoped resources with namespace, because namespace should already be
+// cleared.
+//
+// This is similar to ValidateObjectMeta, but the nameFn argument returns a
+// field.ErrorList.
+func ValidateObjectMeta2(meta *metav1.ObjectMeta, requiresNamespace bool, nameFn ValidateNameFunc2, fldPath *field.Path) field.ErrorList {
+	callValidateObjMeta := func() field.ErrorList {
+		return apimachineryvalidation.ValidateObjectMeta2(meta, requiresNamespace, nameFn, fldPath)
+	}
+	return validateObjectMetaInner(meta, callValidateObjMeta, fldPath)
+}
+
+// implements both forms of ValidateObjectMeta.
+func validateObjectMetaInner(meta *metav1.ObjectMeta, callValidateObjMeta func() field.ErrorList, fldPath *field.Path) field.ErrorList {
+	// do most of the objMeta validation
+	allErrs := callValidateObjMeta()
+
 	// run additional checks for the finalizer name
 	for i := range meta.Finalizers {
 		allErrs = append(allErrs, validateKubeFinalizerName(string(meta.Finalizers[i]), fldPath.Child("finalizers").Index(i))...)
@@ -6246,7 +6276,7 @@ func ValidateServiceStatusUpdate(service, oldService *core.Service) field.ErrorL
 
 // ValidateReplicationController tests if required fields in the replication controller are set.
 func ValidateReplicationController(controller *core.ReplicationController, opts PodValidationOptions) field.ErrorList {
-	allErrs := ValidateObjectMeta(&controller.ObjectMeta, true, apimachineryvalidation.NameIsDNSSubdomain, field.NewPath("metadata"))
+	allErrs := ValidateObjectMeta2(&controller.ObjectMeta, true, apimachineryvalidation.ValidateNameAsDNSSubdomain, field.NewPath("metadata"))
 	allErrs = append(allErrs, ValidateReplicationControllerSpec(&controller.Spec, nil, field.NewPath("spec"), opts)...)
 	return allErrs
 }
