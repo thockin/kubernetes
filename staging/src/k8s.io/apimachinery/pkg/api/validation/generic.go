@@ -17,8 +17,11 @@ limitations under the License.
 package validation
 
 import (
+	"context"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/operation"
+	"k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -33,12 +36,29 @@ const IsNegativeErrorMsg string = `must be greater than or equal to 0`
 // value that were not valid.  Otherwise this returns an empty list or nil.
 type ValidateNameFunc func(name string, prefix bool) []string
 
+// ValidateNameFunc2 validates that the provided name is valid for a given
+// resource type. Prefix is true if the name will have a value appended to it.
+//
+// This is similar to ValidateNameFunc, except that it produces a
+// field.ErrorList.
+type ValidateNameFunc2 func(fldPath *field.Path, name string, prefix bool) field.ErrorList
+
 // NameIsDNSSubdomain is a ValidateNameFunc for names that must be a DNS subdomain.
 func NameIsDNSSubdomain(name string, prefix bool) []string {
 	if prefix {
 		name = maskTrailingDash(name)
 	}
 	return validation.IsDNS1123Subdomain(name)
+}
+
+// ValidateNameAsDNSSubdomain is a ValidateNameFunc2 for names that must be a DNS subdomain.
+// This is a bridge between the older "imperative" validation style and the
+// newer "declarative" validation style.
+func ValidateNameAsDNSSubdomain(fldPath *field.Path, name string, prefix bool) field.ErrorList {
+	if prefix {
+		name = maskTrailingDash(name)
+	}
+	return validate.DNSSubdomain(context.Background(), operation.Operation{}, fldPath, &name, nil)
 }
 
 // NameIsDNSLabel is a ValidateNameFunc for names that must be a DNS 1123 label.
