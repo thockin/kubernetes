@@ -18,6 +18,7 @@ package validate
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -26,3 +27,11 @@ import (
 // ValidateFunc is a function that validates a value, possibly considering the
 // old value (if any).
 type ValidateFunc[T any] func(ctx context.Context, op operation.Operation, fldPath *field.Path, newValue, oldValue T) field.ErrorList
+
+// nilPointerError should be called when a validator finds a nil pointer which
+// is not allowed.
+func nilPointerError(fldPath *field.Path) field.ErrorList {
+	return field.ErrorList{
+		field.InternalError(fldPath, fmt.Errorf("unexpected nil pointer")),
+	}
+}

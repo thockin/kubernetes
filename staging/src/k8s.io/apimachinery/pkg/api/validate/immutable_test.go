@@ -40,17 +40,6 @@ func TestImmutable(t *testing.T) {
 		fn   func(operation.Operation, *field.Path) field.ErrorList
 		fail bool
 	}{{
-		name: "nil both values",
-		fn: func(op operation.Operation, fld *field.Path) field.ErrorList {
-			return Immutable[int](context.Background(), op, fld, nil, nil)
-		},
-	}, {
-		name: "nil value",
-		fn: func(op operation.Operation, fld *field.Path) field.ErrorList {
-			return Immutable(context.Background(), op, fld, nil, ptr.To(123))
-		},
-		fail: true,
-	}, {
 		name: "nil oldValue",
 		fn: func(op operation.Operation, fld *field.Path) field.ErrorList {
 			return Immutable(context.Background(), op, fld, ptr.To(123), nil)

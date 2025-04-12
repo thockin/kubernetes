@@ -29,13 +29,13 @@ import (
 // the caller needs to compare types that are not trivially comparable, they
 // should use ImmutableNonComparable instead.
 func Immutable[T comparable](_ context.Context, op operation.Operation, fldPath *field.Path, value, oldValue *T) field.ErrorList {
+	if value == nil {
+		return nilPointerError(fldPath)
+	}
 	if op.Type != operation.Update {
 		return nil
 	}
-	if value == nil && oldValue == nil {
-		return nil
-	}
-	if value == nil || oldValue == nil || *value != *oldValue {
+	if oldValue == nil || *value != *oldValue {
 		return field.ErrorList{
 			field.Forbidden(fldPath, "field is immutable"),
 		}
@@ -47,6 +47,9 @@ func Immutable[T comparable](_ context.Context, op operation.Operation, fldPath 
 // the course of an update operation.  It does nothing if the old value is not
 // provided. Unlike Immutable, this function can be used with types that are
 // not directly comparable, at the cost of performance.
+//
+// TODO: This can't do a nil-pointer check unless we change it into two
+// functions, one which explicitly takes pointer types and one not.
 func ImmutableNonComparable[T any](_ context.Context, op operation.Operation, fldPath *field.Path, value, oldValue T) field.ErrorList {
 	if op.Type != operation.Update {
 		return nil

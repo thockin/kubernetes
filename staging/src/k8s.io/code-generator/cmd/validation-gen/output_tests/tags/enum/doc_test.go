@@ -28,9 +28,12 @@ func Test(t *testing.T) {
 	st.Value(&Struct{
 		// All zero vals
 	}).ExpectRegexpsByPath(map[string][]string{
-		"enum0Field": []string{"Unsupported value: \"\"$"},
-		"enum1Field": []string{"Unsupported value: \"\": supported values: \"e1v1\""},
-		"enum2Field": []string{"Unsupported value: \"\": supported values: \"e2v1\", \"e2v2\""},
+		"enum0Field":    []string{"Unsupported value: \"\"$"},
+		"enum0PtrField": []string{"Internal error"}, // nil
+		"enum1Field":    []string{"Unsupported value: \"\": supported values: \"e1v1\""},
+		"enum1PtrField": []string{"Internal error"}, // nil
+		"enum2Field":    []string{"Unsupported value: \"\": supported values: \"e2v1\", \"e2v2\""},
+		"enum2PtrField": []string{"Internal error"}, // nil
 	})
 
 	st.Value(&Struct{

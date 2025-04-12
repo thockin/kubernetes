@@ -37,7 +37,7 @@ import (
 // like required/optional and max-length.
 func DNSLabel[T ~string](_ context.Context, op operation.Operation, fldPath *field.Path, value, _ *T) field.ErrorList {
 	if value == nil {
-		return nil
+		return nilPointerError(fldPath)
 	}
 	var allErrs field.ErrorList
 	for _, msg := range content.IsDNS1123Label((string)(*value)) {
@@ -58,7 +58,7 @@ func DNSLabel[T ~string](_ context.Context, op operation.Operation, fldPath *fie
 // like required/optional and max-length.
 func DNSSubdomain[T ~string](_ context.Context, op operation.Operation, fldPath *field.Path, value, _ *T) field.ErrorList {
 	if value == nil {
-		return nil
+		return nilPointerError(fldPath)
 	}
 	var allErrs field.ErrorList
 	for _, msg := range content.IsDNS1123Subdomain((string)(*value)) {
@@ -71,7 +71,7 @@ func DNSSubdomain[T ~string](_ context.Context, op operation.Operation, fldPath 
 // function when being treated as a Kubernetes generateName prefix.
 func GenerateName[T ~string](ctx context.Context, op operation.Operation, fldPath *field.Path, value, _ *T, fn ValidateFunc[*T]) field.ErrorList {
 	if value == nil {
-		return nil
+		return nilPointerError(fldPath)
 	}
 	modified := T(maskTrailingDash((string)(*value)))
 	return fn(ctx, op, fldPath, &modified, nil)

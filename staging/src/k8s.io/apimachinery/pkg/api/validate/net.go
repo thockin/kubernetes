@@ -36,7 +36,7 @@ func IPSloppy[T ~string](ctx context.Context, op operation.Operation, fldPath *f
 
 func ipSloppy(ctx context.Context, op operation.Operation, fldPath *field.Path, value, _ *string) (net.IP, field.ErrorList) {
 	if value == nil {
-		return nil, nil
+		return nil, nilPointerError(fldPath)
 	}
 	ip := netutils.ParseIPSloppy(*value)
 	if ip == nil {

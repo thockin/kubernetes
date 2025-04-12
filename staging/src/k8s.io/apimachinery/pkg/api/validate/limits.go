@@ -29,7 +29,7 @@ import (
 // characters.
 func MaxLength[T ~string](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, max int) field.ErrorList {
 	if value == nil {
-		return nil
+		return nilPointerError(fldPath)
 	}
 	if len(*value) > max {
 		return field.ErrorList{field.Invalid(fldPath, *value, content.MaxLenError(max)).WithOrigin("maxLength")}
@@ -37,7 +37,8 @@ func MaxLength[T ~string](_ context.Context, _ operation.Operation, fldPath *fie
 	return nil
 }
 
-// MaxItems verifies that the specified slice is not longer than max items.
+// MaxItems verifies that the specified slice is not longer than max items.  A
+// nil slice is treated as a zero-length slice.
 func MaxItems[T any](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ []T, max int) field.ErrorList {
 	if len(value) > max {
 		return field.ErrorList{field.TooMany(fldPath, len(value), max)}
@@ -48,7 +49,7 @@ func MaxItems[T any](_ context.Context, _ operation.Operation, fldPath *field.Pa
 // Minimum verifies that the specified value is greater than or equal to min.
 func Minimum[T constraints.Integer](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, min T) field.ErrorList {
 	if value == nil {
-		return nil
+		return nilPointerError(fldPath)
 	}
 	if *value < min {
 		return field.ErrorList{field.Invalid(fldPath, *value, content.MinError(min)).WithOrigin("minimum")}
