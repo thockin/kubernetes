@@ -202,3 +202,109 @@ func TestDNS1123Subdomain(t *testing.T) {
 		})
 	}
 }
+
+func TestMaskTrailingDash(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{{
+		name:     "empty",
+		input:    "",
+		expected: "",
+	}, {
+		name:     "dash",
+		input:    "-",
+		expected: "-",
+	}, {
+		name:     "no dash",
+		input:    "foo",
+		expected: "foo",
+	}, {
+		name:     "leading dash",
+		input:    "-foo",
+		expected: "-foo",
+	}, {
+		name:     "trailing dash",
+		input:    "foo-",
+		expected: "fox",
+	}, {
+		name:     "one byte with trailing dash",
+		input:    "b-",
+		expected: "x",
+	}, {
+		name:     "multiple trailing dash",
+		input:    "foo---",
+		expected: "foo-x",
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := maskTrailingDash(tc.input)
+			if result != tc.expected {
+				t.Errorf("expected: %q, got: %q", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestGenerateName(t *testing.T) {
+	ctx := context.Background()
+	fldPath := field.NewPath("test")
+
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{{
+		name:     "empty",
+		input:    "",
+		expected: "",
+	}, {
+		name:     "dash",
+		input:    "-",
+		expected: "-",
+	}, {
+		name:     "no dash",
+		input:    "foo",
+		expected: "foo",
+	}, {
+		name:     "leading dash",
+		input:    "-foo",
+		expected: "-foo",
+	}, {
+		name:     "trailing dash",
+		input:    "foo-",
+		expected: "fox",
+	}, {
+		name:     "one byte with trailing dash",
+		input:    "b-",
+		expected: "x",
+	}, {
+		name:     "multiple trailing dash",
+		input:    "foo---",
+		expected: "foo-x",
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			wasCalled := false
+			fn := func(_ context.Context, _ operation.Operation, _ *field.Path, val, _ *string) field.ErrorList {
+				wasCalled = true
+				if *val != tc.expected {
+					t.Errorf("expected: %q, got: %q", tc.expected, *val)
+				}
+				return nil
+			}
+
+			value := tc.input
+			gotErrs := GenerateName(ctx, operation.Operation{}, fldPath, &value, nil, fn)
+			if len(gotErrs) != 0 {
+				t.Errorf("unexpected errors: %v", gotErrs)
+			}
+			if wasCalled != true {
+				t.Errorf("function was not called")
+			}
+		})
+	}
+}
