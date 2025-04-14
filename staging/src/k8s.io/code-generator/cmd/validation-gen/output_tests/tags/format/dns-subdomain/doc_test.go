@@ -27,68 +27,32 @@ func Test(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
 	st.Value(&Struct{
-		IPField:                  "1.2.3.4",
-		IPPtrField:               ptr.To("1.2.3.4"),
-		IPTypedefField:           "1.2.3.4",
-		DNSLabelField:            "foo-bar",
-		DNSLabelPtrField:         ptr.To("foo-bar"),
-		DNSLabelTypedefField:     "foo-bar",
 		DNSSubdomainField:        "foo.bar",
 		DNSSubdomainPtrField:     ptr.To("foo.bar"),
 		DNSSubdomainTypedefField: "foo.bar",
 	}).ExpectValid()
 
 	st.Value(&Struct{
-		IPField:                  "abcd::1234",
-		IPPtrField:               ptr.To("abcd::1234"),
-		IPTypedefField:           "abcd::1234",
-		DNSLabelField:            "1234",
-		DNSLabelPtrField:         ptr.To("1234"),
-		DNSLabelTypedefField:     "1234",
 		DNSSubdomainField:        "1.2.3.4",
 		DNSSubdomainPtrField:     ptr.To("1.2.3.4"),
 		DNSSubdomainTypedefField: "1.2.3.4",
 	}).ExpectValid()
 
 	st.Value(&Struct{
-		IPField:                  "",
-		IPPtrField:               ptr.To(""),
-		IPTypedefField:           "",
-		DNSLabelField:            "",
-		DNSLabelPtrField:         ptr.To(""),
-		DNSLabelTypedefField:     "",
 		DNSSubdomainField:        "",
 		DNSSubdomainPtrField:     ptr.To(""),
 		DNSSubdomainTypedefField: "",
 	}).ExpectMatches(field.ErrorMatcher{}.ByType().ByField().ByOrigin(), field.ErrorList{
-		field.Invalid(field.NewPath("ipField"), nil, "").WithOrigin("format=ip-sloppy"),
-		field.Invalid(field.NewPath("ipPtrField"), nil, "").WithOrigin("format=ip-sloppy"),
-		field.Invalid(field.NewPath("ipTypedefField"), nil, "").WithOrigin("format=ip-sloppy"),
-		field.Invalid(field.NewPath("dnsLabelField"), nil, "").WithOrigin("format=dns-label"),
-		field.Invalid(field.NewPath("dnsLabelPtrField"), nil, "").WithOrigin("format=dns-label"),
-		field.Invalid(field.NewPath("dnsLabelTypedefField"), nil, "").WithOrigin("format=dns-label"),
 		field.Invalid(field.NewPath("dnsSubdomainField"), nil, "").WithOrigin("format=dns-subdomain"),
 		field.Invalid(field.NewPath("dnsSubdomainPtrField"), nil, "").WithOrigin("format=dns-subdomain"),
 		field.Invalid(field.NewPath("dnsSubdomainTypedefField"), nil, "").WithOrigin("format=dns-subdomain"),
 	})
 
 	st.Value(&Struct{
-		IPField:                  "Not an IP",
-		IPPtrField:               ptr.To("Not an IP"),
-		IPTypedefField:           "Not an IP",
-		DNSLabelField:            "Not a DNS label",
-		DNSLabelPtrField:         ptr.To("Not a DNS label"),
-		DNSLabelTypedefField:     "Not a DNS label",
 		DNSSubdomainField:        "Not a DNS subdomain",
 		DNSSubdomainPtrField:     ptr.To("Not a DNS subdomain"),
 		DNSSubdomainTypedefField: "Not a DNS subdomain",
 	}).ExpectMatches(field.ErrorMatcher{}.ByType().ByField().ByOrigin(), field.ErrorList{
-		field.Invalid(field.NewPath("ipField"), nil, "").WithOrigin("format=ip-sloppy"),
-		field.Invalid(field.NewPath("ipPtrField"), nil, "").WithOrigin("format=ip-sloppy"),
-		field.Invalid(field.NewPath("ipTypedefField"), nil, "").WithOrigin("format=ip-sloppy"),
-		field.Invalid(field.NewPath("dnsLabelField"), nil, "").WithOrigin("format=dns-label"),
-		field.Invalid(field.NewPath("dnsLabelPtrField"), nil, "").WithOrigin("format=dns-label"),
-		field.Invalid(field.NewPath("dnsLabelTypedefField"), nil, "").WithOrigin("format=dns-label"),
 		field.Invalid(field.NewPath("dnsSubdomainField"), nil, "").WithOrigin("format=dns-subdomain"),
 		field.Invalid(field.NewPath("dnsSubdomainPtrField"), nil, "").WithOrigin("format=dns-subdomain"),
 		field.Invalid(field.NewPath("dnsSubdomainTypedefField"), nil, "").WithOrigin("format=dns-subdomain"),
