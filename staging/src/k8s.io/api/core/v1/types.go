@@ -5241,6 +5241,8 @@ type ReplicationController struct {
 	// +optional
 	// +k8s:subfield(name)=+k8s:optional
 	// +k8s:subfield(name)=+k8s:format=dns-subdomain
+	// +k8s:subfield(generateName)=+k8s:optional
+	// +k8s:subfield(generateName)=+k8s:format=generate-name(dns-subdomain)
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	// Spec defines the specification of the desired behavior of the replication controller.

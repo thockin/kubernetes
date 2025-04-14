@@ -124,6 +124,84 @@ func TestDeclarativeValidateForDeclarative(t *testing.T) {
 				field.Invalid(field.NewPath("metadata.name"), nil, "").WithOrigin("format=dns-subdomain"),
 			},
 		},
+		// metadata.generateName
+		"both name and generateName": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = rc.Name
+			}),
+		},
+		"generateName: label format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = "this-is-a-label"
+			}),
+		},
+		"generateName: subdomain format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = "this.is.a.subdomain"
+			}),
+		},
+		"generateName: invalid label format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = "-this-is-not-a-label"
+			}),
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("metadata.generateName"), nil, "").WithOrigin("format=dns-subdomain"),
+			},
+		},
+		"generateName: invalid subdomain format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = ".this.is.not.a.subdomain"
+			}),
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("metadata.generateName"), nil, "").WithOrigin("format=dns-subdomain"),
+			},
+		},
+		"generateName: label format with trailing dash": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = "this-is-a-label-"
+			}),
+		},
+		"generateName: subdomain format with trailing dash": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = "this.is.a.subdomain-"
+			}),
+		},
+		"generateName: long label format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = strings.Repeat("x", 253)
+			}),
+		},
+		"generateName: long subdomain format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = strings.Repeat("x.", 126) + "x"
+			}),
+		},
+		"generateName: long label format with trailing dash": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = strings.Repeat("x", 253) + "-"
+			}),
+		},
+		"generateName: long subdomain format with trailing dash": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = strings.Repeat("x.", 126) + "x-"
+			}),
+		},
+		"generateName: too long label format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = strings.Repeat("x", 254)
+			}),
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("metadata.generateName"), nil, "").WithOrigin("format=dns-subdomain"),
+			},
+		},
+		"generateName: too long subdomain format": {
+			input: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName = strings.Repeat("x.", 126) + "xx"
+			}),
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("metadata.generateName"), nil, "").WithOrigin("format=dns-subdomain"),
+			},
+		},
 		// spec.replicas
 		"replicas: nil": {
 			input: mkValidReplicationController(func(rc *api.ReplicationController) {
@@ -220,6 +298,15 @@ func TestValidateUpdateForDeclarative(t *testing.T) {
 			expectedErrs: field.ErrorList{
 				field.Invalid(field.NewPath("metadata.name"), nil, ""),
 			},
+		},
+		// metadata.generateName
+		"generateName: changed": {
+			old: mkValidReplicationController(),
+			update: mkValidReplicationController(func(rc *api.ReplicationController) {
+				rc.GenerateName += "x"
+			}),
+			// This is, oddly, mutable.  We should probably ratchet this off
+			// and make it immutable.
 		},
 		// spec.replicas
 		"replicas: nil": {
