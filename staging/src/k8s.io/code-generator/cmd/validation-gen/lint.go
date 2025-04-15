@@ -31,9 +31,9 @@ import (
 type Linter struct {
 	linted map[*types.Type]bool
 	rules  []lintRule
-	// Errors is all the errors, grouped by type, that occurred during the
+	// Errors is all the errors, grouped by file:line, that occurred during the
 	// linting process.
-	Errors map[*types.Type][]error
+	Errors map[types.Position][]LintError
 }
 
 // lintRule is a function that validates a slice of comments.
@@ -41,14 +41,20 @@ type Linter struct {
 // and an error there is an error happened during the linting process.
 type lintRule func(comments []string) (string, error)
 
-func (l *Linter) AddError(t *types.Type, field, msg string) {
-	var err error
-	if field == "" {
-		err = fmt.Errorf("%s", msg)
-	} else {
-		err = fmt.Errorf("field %s: %s", field, msg)
+func (l *Linter) addError(pos types.Position, t *types.Type, field, msg string) {
+	err := LintError{
+		Type:  t,
+		Field: field,
+		Err:   msg,
 	}
-	l.Errors[t] = append(l.Errors[t], err)
+	l.Errors[pos] = append(l.Errors[pos], err)
+}
+
+// LintError is a single lint failure.
+type LintError struct {
+	Type  *types.Type
+	Field string
+	Err   string
 }
 
 func NewLinter(rules ...lintRule) *Linter {
@@ -58,7 +64,7 @@ func NewLinter(rules ...lintRule) *Linter {
 	return &Linter{
 		linted: make(map[*types.Type]bool),
 		rules:  rules,
-		Errors: map[*types.Type][]error{},
+		Errors: map[types.Position][]LintError{},
 	}
 }
 
@@ -69,13 +75,13 @@ func (l *Linter) LintType(t *types.Type) error {
 	l.linted[t] = true
 
 	if t.CommentLines != nil {
-		klog.V(5).Infof("linting type %s", t.Name.String())
-		lintErrs, err := l.lintComments(t.CommentLines)
+		klog.V(5).InfoS("linting type", "type", t)
+		msgs, err := l.lintComments(t.CommentLines)
 		if err != nil {
 			return err
 		}
-		for _, lintErr := range lintErrs {
-			l.AddError(t, "", lintErr)
+		for _, msg := range msgs {
+			l.addError(t.Pos, t, "", msg)
 		}
 	}
 	switch t.Kind {
@@ -87,13 +93,13 @@ func (l *Linter) LintType(t *types.Type) error {
 	case types.Struct:
 		// Recursively lint each member of the struct.
 		for _, member := range t.Members {
-			klog.V(5).Infof("linting comments for field %s of type %s", member.String(), t.Name.String())
-			lintErrs, err := l.lintComments(member.CommentLines)
+			klog.V(5).InfoS("linting field", "name", member.Name, "parent", t)
+			msgs, err := l.lintComments(member.CommentLines)
 			if err != nil {
 				return err
 			}
-			for _, lintErr := range lintErrs {
-				l.AddError(t, member.Name, lintErr)
+			for _, msg := range msgs {
+				l.addError(member.Pos, t, member.Name, msg)
 			}
 			if err := l.LintType(member.Type); err != nil {
 				return err
@@ -118,16 +124,16 @@ func (l *Linter) LintType(t *types.Type) error {
 
 // lintComments runs all registered rules on a slice of comments.
 func (l *Linter) lintComments(comments []string) ([]string, error) {
-	var lintErrs []string
+	var msgs []string
 	for _, rule := range l.rules {
 		if msg, err := rule(comments); err != nil {
 			return nil, err
 		} else if msg != "" {
-			lintErrs = append(lintErrs, msg)
+			msgs = append(msgs, msg)
 		}
 	}
 
-	return lintErrs, nil
+	return msgs, nil
 }
 
 // conflictingTagsRule creates a lintRule which checks for conflicting tags.

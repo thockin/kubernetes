@@ -366,6 +366,8 @@ func (td *typeDiscoverer) discover(t *types.Type, fldPath *field.Path) (*typeNod
 		return node, nil
 	}
 
+	klog.V(5).InfoS("discovered type", "type", t, "pos", t.Pos)
+
 	// If we are descending into a named type, reboot the field path for better
 	// logging.  Otherwise the field path might come in as something like
 	// <type1>.<field1>.<field2> which is true, but not super useful.
@@ -612,7 +614,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 			jsonName = commentTags.Name
 		}
 
-		klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
+		klog.V(5).InfoS("discovered field", "name", name, "jsonName", jsonName, "type", memb.Type, "pos", memb.Pos, "parent", thisNode.valueType.Name)
 
 		// Discover the field type.
 		childPath := fldPath.Child(name)

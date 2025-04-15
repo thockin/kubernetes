@@ -17,6 +17,7 @@ limitations under the License.
 package types
 
 import (
+	"fmt"
 	gotypes "go/types"
 	"strings"
 )
@@ -364,6 +365,9 @@ type Type struct {
 
 	// The underlying Go type.
 	GoType gotypes.Type
+
+	// The position of this type definition.
+	Pos Position
 }
 
 // String returns the name of the type.
@@ -431,6 +435,9 @@ type Member struct {
 
 	// The type of this member.
 	Type *Type
+
+	// The position of this member.
+	Pos Position
 }
 
 // String returns the name and type of the member.
@@ -459,6 +466,25 @@ type Signature struct {
 	// If there are comment lines immediately before this
 	// signature/method/function declaration, they will be recorded here.
 	CommentLines []string
+}
+
+// Position is a specific file and line number, e.g. where a Type is defined.
+type Position struct {
+	// File is the absolute path to a file.
+	File string
+	// Line is the line number within the file.
+	Line int
+}
+
+func (p Position) String() string {
+	/*
+		cwd, err := os.Getwd()
+		_ = err
+		rel, err := filepath.Rel(cwd, p.File)
+		_ = err
+	*/
+	//FIXME: need to handle errors or just not try to do a relative path
+	return fmt.Sprintf("%s:%d", p.File, p.Line)
 }
 
 // Built in types.

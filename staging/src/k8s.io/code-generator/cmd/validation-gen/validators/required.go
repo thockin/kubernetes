@@ -66,7 +66,8 @@ func (requirednessTagValidator) ValidScopes() sets.Set[Scope] {
 
 func (rtv requirednessTagValidator) GetValidations(context Context, _ []string, _ string) (Validations, error) {
 	if context.Type.Kind == types.Alias {
-		panic("alias type should already have been unwrapped")
+		//FIXME: triggers on typedef field
+		panic(fmt.Sprintf("alias type %v should already have been unwrapped", context.Type))
 	}
 	switch rtv.mode {
 	case requirednessRequired:

@@ -665,6 +665,7 @@ func (p *Parser) walkType(u types.Universe, useName *types.Name, in gotypes.Type
 				Tags:         t.Tag(i),
 				Type:         p.walkType(u, nil, f.Type()),
 				CommentLines: p.docComment(f.Pos()),
+				Pos:          p.positionFromGo(f.Pos()),
 			}
 			out.Members = append(out.Members, m)
 		}
@@ -769,6 +770,7 @@ func (p *Parser) walkType(u types.Universe, useName *types.Name, in gotypes.Type
 			}
 			out.Kind = types.Alias
 			out.Underlying = p.walkType(u, nil, t.Underlying())
+			out.Pos = p.positionFromGo(t.Obj().Pos())
 		case *gotypes.Struct, *gotypes.Interface:
 			name := goNameToName(t.String())
 			tpMap := map[string]*types.Type{}
@@ -791,6 +793,7 @@ func (p *Parser) walkType(u types.Universe, useName *types.Name, in gotypes.Type
 			}
 			out = p.walkType(u, &name, t.Underlying())
 			out.TypeParams = tpMap
+			out.Pos = p.positionFromGo(t.Obj().Pos())
 		default:
 			// gotypes package makes everything "named" with an
 			// underlying anonymous type--we remove that annoying
@@ -884,5 +887,14 @@ func (p *Parser) addConstant(u types.Universe, useName *types.Name, in *gotypes.
 	}
 
 	out.ConstValue = &constval
+	return out
+}
+
+func (p *Parser) positionFromGo(pos token.Pos) types.Position {
+	in := p.fset.Position(pos)
+	out := types.Position{
+		File: in.Filename,
+		Line: in.Line,
+	}
 	return out
 }

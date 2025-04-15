@@ -309,14 +309,10 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 		})
 
 		for _, t := range rootTypes {
-			klog.V(4).InfoS("pre-processing", "type", t)
+			klog.V(4).InfoS("root-type", "type", t)
 			if err := td.DiscoverType(t); err != nil {
 				klog.Fatalf("failed to generate validations: %v", err)
 			}
-		}
-
-		for _, t := range rootTypes {
-			klog.V(4).InfoS("linting root-type", "type", t)
 			if err := linter.LintType(t); err != nil {
 				klog.Fatalf("failed to lint type %q: %v", t.Name, err)
 			}
@@ -357,10 +353,27 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	if len(linter.Errors) > 0 {
 		buf := strings.Builder{}
 
-		for t, errs := range linter.Errors {
-			buf.WriteString(fmt.Sprintf("  type %v:\n", t))
+		idx := []types.Position{}
+		for pos := range linter.Errors {
+			idx = append(idx, pos)
+		}
+		slices.SortFunc(idx, func(a, b types.Position) int {
+			if r := cmp.Compare(a.File, b.File); r != 0 {
+				return r
+			}
+			return cmp.Compare(a.Line, b.Line)
+		})
+
+		for _, pos := range idx {
+			errs := linter.Errors[pos]
+			buf.WriteString(fmt.Sprintf("  %v:\n", pos))
 			for _, err := range errs {
-				buf.WriteString(fmt.Sprintf("    %s\n", err.Error()))
+				if err.Field == "" {
+					buf.WriteString(fmt.Sprintf("    type %s:\n", err.Type.Name.Name))
+				} else {
+					buf.WriteString(fmt.Sprintf("    field %s.%s:\n", err.Type.Name.Name, err.Field))
+				}
+				buf.WriteString(fmt.Sprintf("      %s\n", err.Err))
 			}
 		}
 		if args.LintOnly {
