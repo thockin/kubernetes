@@ -51,6 +51,16 @@ type Path struct {
 	index  string // if name == "", this is a subscript (index or map key) of the previous element
 	parent *Path  // nil if this is the root element
 }
+type Path2 struct {
+	// FIXME: decide a size
+	arr   [4]path2Element // big enough for most cases
+	elems []path2Element
+}
+type path2Element struct {
+	name string // the name of this field or "" if this is an index
+	//FIXME: put the key in the same item as name
+	index string // if name == "", this is a subscript (index or map key) of the previous element
+}
 
 // NewPath creates a root Path object.
 func NewPath(name string, moreNames ...string) *Path {
@@ -60,12 +70,28 @@ func NewPath(name string, moreNames ...string) *Path {
 	}
 	return r
 }
+func NewPath2(name string, moreNames ...string) Path2 {
+	p := Path2{}
+	p.elems = p.arr[:0]
+	p.elems = append(p.elems, path2Element{name: name})
+	for _, anotherName := range moreNames {
+		p.elems = append(p.elems, path2Element{name: anotherName})
+	}
+	return p
+}
 
 // Root returns the root element of this Path.
 func (p *Path) Root() *Path {
 	for ; p.parent != nil; p = p.parent {
 		// Do nothing.
 	}
+	return p
+}
+func (p Path2) Root() Path2 {
+	if len(p.elems) == 0 {
+		return p
+	}
+	p.elems = p.arr[:1]
 	return p
 }
 
@@ -75,17 +101,32 @@ func (p *Path) Child(name string, moreNames ...string) *Path {
 	r.Root().parent = p
 	return r
 }
+func (p Path2) Child(name string, moreNames ...string) Path2 {
+	p.elems = append(p.elems, path2Element{name: name})
+	for _, anotherName := range moreNames {
+		p.elems = append(p.elems, path2Element{name: anotherName})
+	}
+	return p
+}
 
 // Index indicates that the previous Path is to be subscripted by an int.
 // This sets the same underlying value as Key.
 func (p *Path) Index(index int) *Path {
 	return &Path{index: strconv.Itoa(index), parent: p}
 }
+func (p Path2) Index(index int) Path2 {
+	p.elems = append(p.elems, path2Element{index: strconv.Itoa(index)})
+	return p
+}
 
 // Key indicates that the previous Path is to be subscripted by a string.
 // This sets the same underlying value as Index.
 func (p *Path) Key(key string) *Path {
 	return &Path{index: key, parent: p}
+}
+func (p Path2) Key(key string) Path2 {
+	p.elems = append(p.elems, path2Element{index: key})
+	return p
 }
 
 // String produces a string representation of the Path.
@@ -111,6 +152,29 @@ func (p *Path) String() string {
 			buf.WriteString(p.name)
 		} else {
 			fmt.Fprintf(buf, "[%s]", p.index)
+		}
+	}
+	return buf.String()
+}
+func (p Path2) String() string {
+	if len(p.elems) == 0 {
+		return "<nil>"
+	}
+	// FIXME: decide a size
+	raw := [128]byte{} // big enough for most cases
+	buf := bytes.NewBuffer(raw[:0])
+	for i := range p.elems {
+		e := &p.elems[i]
+		if i > 0 && len(e.name) > 0 {
+			// This is either the root or it is a subscript.
+			buf.WriteRune('.')
+		}
+		if len(e.name) > 0 {
+			buf.WriteString(e.name)
+		} else {
+			buf.WriteRune('[')
+			buf.WriteString(e.index)
+			buf.WriteRune(']')
 		}
 	}
 	return buf.String()
