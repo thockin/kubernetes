@@ -25,15 +25,15 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// linter is a struct that holds the state of the linting process.
+// Linter is a struct that holds the state of the linting process.
 // It contains a map of types that have been linted, a list of linting rules,
 // and a list of errors that occurred during the linting process.
-type linter struct {
+type Linter struct {
 	linted map[*types.Type]bool
 	rules  []lintRule
-	// lintErrors is all the errors, grouped by type, that occurred during the
+	// Errors is all the errors, grouped by type, that occurred during the
 	// linting process.
-	lintErrors map[*types.Type][]error
+	Errors map[*types.Type][]error
 }
 
 // lintRule is a function that validates a slice of comments.
@@ -41,28 +41,28 @@ type linter struct {
 // and an error there is an error happened during the linting process.
 type lintRule func(comments []string) (string, error)
 
-func (l *linter) AddError(t *types.Type, field, msg string) {
+func (l *Linter) AddError(t *types.Type, field, msg string) {
 	var err error
 	if field == "" {
 		err = fmt.Errorf("%s", msg)
 	} else {
 		err = fmt.Errorf("field %s: %s", field, msg)
 	}
-	l.lintErrors[t] = append(l.lintErrors[t], err)
+	l.Errors[t] = append(l.Errors[t], err)
 }
 
-func newLinter(rules ...lintRule) *linter {
+func NewLinter(rules ...lintRule) *Linter {
 	if len(rules) == 0 {
 		rules = defaultLintRules
 	}
-	return &linter{
-		linted:     make(map[*types.Type]bool),
-		rules:      rules,
-		lintErrors: map[*types.Type][]error{},
+	return &Linter{
+		linted: make(map[*types.Type]bool),
+		rules:  rules,
+		Errors: map[*types.Type][]error{},
 	}
 }
 
-func (l *linter) lintType(t *types.Type) error {
+func (l *Linter) LintType(t *types.Type) error {
 	if _, ok := l.linted[t]; ok {
 		return nil
 	}
@@ -81,7 +81,7 @@ func (l *linter) lintType(t *types.Type) error {
 	switch t.Kind {
 	case types.Alias:
 		// Recursively lint the underlying type of the alias.
-		if err := l.lintType(t.Underlying); err != nil {
+		if err := l.LintType(t.Underlying); err != nil {
 			return err
 		}
 	case types.Struct:
@@ -95,21 +95,21 @@ func (l *linter) lintType(t *types.Type) error {
 			for _, lintErr := range lintErrs {
 				l.AddError(t, member.Name, lintErr)
 			}
-			if err := l.lintType(member.Type); err != nil {
+			if err := l.LintType(member.Type); err != nil {
 				return err
 			}
 		}
 	case types.Slice, types.Array, types.Pointer:
 		// Recursively lint the element type of the slice or array.
-		if err := l.lintType(t.Elem); err != nil {
+		if err := l.LintType(t.Elem); err != nil {
 			return err
 		}
 	case types.Map:
 		// Recursively lint the key and element types of the map.
-		if err := l.lintType(t.Key); err != nil {
+		if err := l.LintType(t.Key); err != nil {
 			return err
 		}
-		if err := l.lintType(t.Elem); err != nil {
+		if err := l.LintType(t.Elem); err != nil {
 			return err
 		}
 	}
@@ -117,7 +117,7 @@ func (l *linter) lintType(t *types.Type) error {
 }
 
 // lintComments runs all registered rules on a slice of comments.
-func (l *linter) lintComments(comments []string) ([]string, error) {
+func (l *Linter) lintComments(comments []string) ([]string, error) {
 	var lintErrs []string
 	for _, rule := range l.rules {
 		if msg, err := rule(comments); err != nil {

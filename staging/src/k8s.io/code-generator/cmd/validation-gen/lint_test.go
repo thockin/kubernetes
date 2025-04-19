@@ -102,7 +102,7 @@ func TestLintCommentsRuleInvocation(t *testing.T) {
 			for i, rule := range tt.rules {
 				rules[i] = mkCountRule(&counter, rule)
 			}
-			l := newLinter(rules...)
+			l := NewLinter(rules...)
 			for _, commentLines := range tt.commentLineGroups {
 				_, err := l.lintComments(commentLines)
 				gotErr := err != nil
@@ -425,13 +425,13 @@ func TestLintType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			counter := 0
 			rules := []lintRule{mkCountRule(&counter, ruleAlwaysPass)}
-			l := newLinter(rules...)
-			if err := l.lintType(tt.typeToLint); err != nil {
+			l := NewLinter(rules...)
+			if err := l.LintType(tt.typeToLint); err != nil {
 				t.Fatal(err)
 			}
-			gotErr := len(l.lintErrors) > 0
+			gotErr := len(l.Errors) > 0
 			if gotErr != tt.expectError {
-				t.Errorf("LintType() errors = %v, expectError %v", l.lintErrors, tt.expectError)
+				t.Errorf("LintType() errors = %v, expectError %v", l.Errors, tt.expectError)
 			}
 			if counter != tt.wantCount {
 				t.Errorf("expected %d rule invocations, got %d", tt.wantCount, counter)

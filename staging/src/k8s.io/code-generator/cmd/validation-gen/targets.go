@@ -245,7 +245,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 	td := NewTypeDiscoverer(validator, inputToPkg)
 
 	// Create a linter to collect errors as we go.
-	linter := newLinter()
+	linter := NewLinter()
 
 	// Build a cache of type->callNode for every type we need.
 	for _, input := range context.Inputs {
@@ -317,7 +317,7 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 
 		for _, t := range rootTypes {
 			klog.V(4).InfoS("linting root-type", "type", t)
-			if err := linter.lintType(t); err != nil {
+			if err := linter.LintType(t); err != nil {
 				klog.Fatalf("failed to lint type %q: %v", t.Name, err)
 			}
 		}
@@ -354,10 +354,10 @@ func GetTargets(context *generator.Context, args *Args) []generator.Target {
 			})
 	}
 
-	if len(linter.lintErrors) > 0 {
+	if len(linter.Errors) > 0 {
 		buf := strings.Builder{}
 
-		for t, errs := range linter.lintErrors {
+		for t, errs := range linter.Errors {
 			buf.WriteString(fmt.Sprintf("  type %v:\n", t))
 			for _, err := range errs {
 				buf.WriteString(fmt.Sprintf("    %s\n", err.Error()))
