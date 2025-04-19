@@ -45,7 +45,7 @@ func Test(t *testing.T) {
 	}).ExpectValid()
 
 	st.Value(&Struct{
-		GenerateNameField:        "-1234-",
+		GenerateNameField:        "1234-",
 		GenerateNamePtrField:     ptr.To("1234-"),
 		GenerateNameTypedefField: "1234-",
 	}).ExpectValid()
