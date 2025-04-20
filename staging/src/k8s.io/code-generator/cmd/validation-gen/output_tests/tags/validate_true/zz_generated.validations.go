@@ -52,7 +52,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.StringField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "field Struct.StringField")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, true, "field Struct.StringField")...)
 			return
 		}(fldPath.Child("stringField"), &obj.StringField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.StringField }))...)
 

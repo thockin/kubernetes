@@ -25,7 +25,7 @@ import (
 
 // FixedResult asserts a fixed boolean result.  This is mostly useful for
 // testing.
-func FixedResult[T any](_ context.Context, op operation.Operation, fldPath *field.Path, value, _ T, result bool, arg string) field.ErrorList {
+func FixedResult[T any](_ context.Context, op operation.Operation, fldPath *field.Path, value T, _ *T, result bool, arg string) field.ErrorList {
 	if result {
 		return nil
 	}

@@ -48,7 +48,11 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *T1) (errs field.ErrorList) {
 	// type T1
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type T1")...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "type T1")...)
 
 	// field T1.TypeMeta has no validation
 	return errs

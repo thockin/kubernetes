@@ -25,9 +25,9 @@ import (
 
 // RequiredValue verifies that the specified value is not the zero-value for
 // its type.
-func RequiredValue[T comparable](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T) field.ErrorList {
+func RequiredValue[T comparable](_ context.Context, _ operation.Operation, fldPath *field.Path, value T, _ *T) field.ErrorList {
 	var zero T
-	if *value != zero {
+	if value != zero {
 		return nil
 	}
 	return field.ErrorList{field.Required(fldPath, "")}
@@ -42,7 +42,7 @@ func RequiredPointer[T any](_ context.Context, _ operation.Operation, fldPath *f
 }
 
 // RequiredSlice verifies that the specified slice is not empty.
-func RequiredSlice[T any](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ []T) field.ErrorList {
+func RequiredSlice[T any](_ context.Context, _ operation.Operation, fldPath *field.Path, value []T, _ *[]T) field.ErrorList {
 	if len(value) > 0 {
 		return nil
 	}
@@ -50,7 +50,7 @@ func RequiredSlice[T any](_ context.Context, _ operation.Operation, fldPath *fie
 }
 
 // RequiredMap verifies that the specified map is not empty.
-func RequiredMap[K comparable, T any](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ map[K]T) field.ErrorList {
+func RequiredMap[K comparable, T any](_ context.Context, _ operation.Operation, fldPath *field.Path, value map[K]T, _ *map[K]T) field.ErrorList {
 	if len(value) > 0 {
 		return nil
 	}

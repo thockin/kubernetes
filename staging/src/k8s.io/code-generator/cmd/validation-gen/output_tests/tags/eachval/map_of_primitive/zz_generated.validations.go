@@ -51,21 +51,29 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 
 	// field Struct.MapField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj map[string]string) (errs field.ErrorList) {
-			errs = append(errs, validate.EachMapVal(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		func(fldPath *field.Path, obj, oldObj *map[string]string) (errs field.ErrorList) {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.EachMapVal(ctx, op, fldPath, *obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.MapField[*]")
 			})...)
 			return
-		}(fldPath.Child("mapField"), obj.MapField, safe.Field(oldObj, func(oldObj *Struct) map[string]string { return oldObj.MapField }))...)
+		}(fldPath.Child("mapField"), &obj.MapField, safe.Field(oldObj, func(oldObj *Struct) *map[string]string { return &oldObj.MapField }))...)
 
 	// field Struct.MapTypedefField
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj map[string]StringType) (errs field.ErrorList) {
-			errs = append(errs, validate.EachMapVal(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
+		func(fldPath *field.Path, obj, oldObj *map[string]StringType) (errs field.ErrorList) {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.EachMapVal(ctx, op, fldPath, *obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *StringType) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.MapTypedefField[*]")
 			})...)
 			return
-		}(fldPath.Child("mapTypedefField"), obj.MapTypedefField, safe.Field(oldObj, func(oldObj *Struct) map[string]StringType { return oldObj.MapTypedefField }))...)
+		}(fldPath.Child("mapTypedefField"), &obj.MapTypedefField, safe.Field(oldObj, func(oldObj *Struct) *map[string]StringType { return &oldObj.MapTypedefField }))...)
 
 	return errs
 }

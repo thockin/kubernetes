@@ -51,8 +51,12 @@ var unionMembershipForStructunion2 = validate.NewDiscriminatedUnionMembership("d
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
-	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, obj, oldObj, unionMembershipForStructunion1, obj.D1, obj.U1M1, obj.U1M2)...)
-	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, obj, oldObj, unionMembershipForStructunion2, obj.D2, obj.U2M1, obj.U2M2)...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, *obj, oldObj, unionMembershipForStructunion1, obj.D1, obj.U1M1, obj.U1M2)...)
+	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, *obj, oldObj, unionMembershipForStructunion2, obj.D2, obj.U2M1, obj.U2M2)...)
 
 	// field Struct.TypeMeta has no validation
 	// field Struct.D1 has no validation

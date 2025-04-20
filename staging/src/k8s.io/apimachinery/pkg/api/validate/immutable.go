@@ -28,14 +28,14 @@ import (
 // an update operation.  It does nothing if the old value is not provided. If
 // the caller needs to compare types that are not trivially comparable, they
 // should use ImmutableNonComparable instead.
-func Immutable[T comparable](_ context.Context, op operation.Operation, fldPath *field.Path, value, oldValue *T) field.ErrorList {
+func Immutable[T comparable](_ context.Context, op operation.Operation, fldPath *field.Path, value T, oldValue *T) field.ErrorList {
 	if op.Type != operation.Update {
 		return nil
 	}
-	if value == nil && oldValue == nil {
+	if oldValue == nil {
 		return nil
 	}
-	if value == nil || oldValue == nil || *value != *oldValue {
+	if value != *oldValue {
 		return field.ErrorList{
 			field.Forbidden(fldPath, "field is immutable"),
 		}
@@ -47,11 +47,14 @@ func Immutable[T comparable](_ context.Context, op operation.Operation, fldPath 
 // the course of an update operation.  It does nothing if the old value is not
 // provided. Unlike Immutable, this function can be used with types that are
 // not directly comparable, at the cost of performance.
-func ImmutableNonComparable[T any](_ context.Context, op operation.Operation, fldPath *field.Path, value, oldValue T) field.ErrorList {
+func ImmutableNonComparable[T any](_ context.Context, op operation.Operation, fldPath *field.Path, value T, oldValue *T) field.ErrorList {
 	if op.Type != operation.Update {
 		return nil
 	}
-	if !equality.Semantic.DeepEqual(value, oldValue) {
+	if oldValue == nil {
+		return nil
+	}
+	if !equality.Semantic.DeepEqual(value, *oldValue) {
 		return field.ErrorList{
 			field.Forbidden(fldPath, "field is immutable"),
 		}

@@ -49,7 +49,11 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_E1(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *E1) (errs field.ErrorList) {
 	// type E1
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type E1")...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "type E1")...)
 
 	return errs
 }
@@ -60,7 +64,11 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	// field T1.S1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *primitives.T1) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult[*primitives.T1](ctx, op, fldPath, obj, oldObj, false, "T1.S1")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult[*primitives.T1](ctx, op, fldPath, *obj, oldObj, false, "T1.S1")...)
 			errs = append(errs, primitives.Validate_T1(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("s1"), obj.S1, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return oldObj.S1 }))...)
@@ -68,7 +76,11 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	// field T1.PS1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *primitives.T1) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult[*primitives.T1](ctx, op, fldPath, obj, oldObj, false, "PT1.PS1")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult[*primitives.T1](ctx, op, fldPath, *obj, oldObj, false, "PT1.PS1")...)
 			errs = append(errs, primitives.Validate_T1(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("ps1"), obj.PS1, safe.Field(oldObj, func(oldObj *T1) *primitives.T1 { return oldObj.PS1 }))...)
@@ -76,7 +88,11 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	// field T1.E1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *E1) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult[*E1](ctx, op, fldPath, obj, oldObj, false, "T1.E1")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult[*E1](ctx, op, fldPath, *obj, oldObj, false, "T1.E1")...)
 			errs = append(errs, Validate_E1(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("e1"), &obj.E1, safe.Field(oldObj, func(oldObj *T1) *E1 { return &oldObj.E1 }))...)
@@ -84,7 +100,11 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	// field T1.PE1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *E1) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult[*E1](ctx, op, fldPath, obj, oldObj, true, "T1.PE1")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult[*E1](ctx, op, fldPath, *obj, oldObj, true, "T1.PE1")...)
 			errs = append(errs, Validate_E1(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("pe1"), obj.PE1, safe.Field(oldObj, func(oldObj *T1) *E1 { return oldObj.PE1 }))...)
@@ -92,14 +112,22 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	// field T1.I1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult[*int](ctx, op, fldPath, obj, oldObj, false, "T1.I1")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult[*int](ctx, op, fldPath, *obj, oldObj, false, "T1.I1")...)
 			return
 		}(fldPath.Child("i1"), &obj.I1, safe.Field(oldObj, func(oldObj *T1) *int { return &oldObj.I1 }))...)
 
 	// field T1.PI1
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult[*int](ctx, op, fldPath, obj, oldObj, true, "T1.PI1")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult[*int](ctx, op, fldPath, *obj, oldObj, true, "T1.PI1")...)
 			return
 		}(fldPath.Child("pi1"), obj.PI1, safe.Field(oldObj, func(oldObj *T1) *int { return oldObj.PI1 }))...)
 

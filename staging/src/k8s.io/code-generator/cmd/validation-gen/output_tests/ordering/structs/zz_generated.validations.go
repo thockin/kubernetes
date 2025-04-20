@@ -94,28 +94,44 @@ func Validate_T00(ctx context.Context, op operation.Operation, fldPath *field.Pa
 
 func Validate_T01(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *T01) (errs field.ErrorList) {
 	// type T01
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T01, no flags")...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T01, no flags")...)
 
 	// field T01.TypeMeta has no validation
 
 	// field T01.S
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T01.S, no flags")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T01.S, no flags")...)
 			return
 		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *T01) *string { return &oldObj.S }))...)
 
 	// field T01.PS
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T01.PS, no flags")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T01.PS, no flags")...)
 			return
 		}(fldPath.Child("ps"), obj.PS, safe.Field(oldObj, func(oldObj *T01) *string { return oldObj.PS }))...)
 
 	// field T01.T
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T01.T, no flags")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T01.T, no flags")...)
 			errs = append(errs, Validate_Tother(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("t"), &obj.T, safe.Field(oldObj, func(oldObj *T01) *Tother { return &oldObj.T }))...)
@@ -123,7 +139,11 @@ func Validate_T01(ctx context.Context, op operation.Operation, fldPath *field.Pa
 	// field T01.PT
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T01.PT, no flags")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T01.PT, no flags")...)
 			errs = append(errs, Validate_Tother(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("pt"), obj.PT, safe.Field(oldObj, func(oldObj *T01) *Tother { return oldObj.PT }))...)
@@ -133,7 +153,11 @@ func Validate_T01(ctx context.Context, op operation.Operation, fldPath *field.Pa
 
 func Validate_T02(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *T02) (errs field.ErrorList) {
 	// type T02
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T02, ShortCircuit"); len(e) != 0 {
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T02, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
@@ -143,7 +167,11 @@ func Validate_T02(ctx context.Context, op operation.Operation, fldPath *field.Pa
 	// field T02.S
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T02.S, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T02.S, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
@@ -153,7 +181,11 @@ func Validate_T02(ctx context.Context, op operation.Operation, fldPath *field.Pa
 	// field T02.PS
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T02.PS, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T02.PS, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
@@ -163,7 +195,11 @@ func Validate_T02(ctx context.Context, op operation.Operation, fldPath *field.Pa
 	// field T02.T
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T02.T, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T02.T, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
@@ -174,7 +210,11 @@ func Validate_T02(ctx context.Context, op operation.Operation, fldPath *field.Pa
 	// field T02.PT
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T02.PT, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T02.PT, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
@@ -187,44 +227,60 @@ func Validate_T02(ctx context.Context, op operation.Operation, fldPath *field.Pa
 
 func Validate_T03(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *T03) (errs field.ErrorList) {
 	// type T03
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03, ShortCircuit"); len(e) != 0 {
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03, no flags")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03, no flags")...)
 
 	// field T03.TypeMeta has no validation
 
 	// field T03.S
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.S, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.S, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.S, no flags")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.S, no flags")...)
 			return
 		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *T03) *string { return &oldObj.S }))...)
 
 	// field T03.PS
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.PS, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.PS, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.PS, no flags")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.PS, no flags")...)
 			return
 		}(fldPath.Child("ps"), obj.PS, safe.Field(oldObj, func(oldObj *T03) *string { return oldObj.PS }))...)
 
 	// field T03.T
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.T, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.T, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.T, no flags")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.T, no flags")...)
 			errs = append(errs, Validate_Tother(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("t"), &obj.T, safe.Field(oldObj, func(oldObj *T03) *Tother { return &oldObj.T }))...)
@@ -232,11 +288,15 @@ func Validate_T03(ctx context.Context, op operation.Operation, fldPath *field.Pa
 	// field T03.PT
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.PT, ShortCircuit"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.PT, ShortCircuit"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T03.PT, no flags")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T03.PT, no flags")...)
 			errs = append(errs, Validate_Tother(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("pt"), obj.PT, safe.Field(oldObj, func(oldObj *T03) *Tother { return oldObj.PT }))...)
@@ -246,68 +306,68 @@ func Validate_T03(ctx context.Context, op operation.Operation, fldPath *field.Pa
 
 func Validate_TMultiple(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *TMultiple) (errs field.ErrorList) {
 	// type TMultiple
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple, ShortCircuit 1"); len(e) != 0 {
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple, ShortCircuit 2"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple, ShortCircuit 2"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // do not proceed
-	}
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple, no flags 1")...)
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T0, string payload")...)
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple, no flags 2")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple, no flags 1")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T0, string payload")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple, no flags 2")...)
 
 	// field TMultiple.TypeMeta has no validation
 
 	// field TMultiple.S
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.S, ShortCircuit 1"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.S, ShortCircuit 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.S, ShortCircuit 2"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.S, no flags 1")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T0, string payload")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.S, no flags 2")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.S, no flags 1")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.S, no flags 2")...)
 			return
 		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *TMultiple) *string { return &oldObj.S }))...)
 
 	// field TMultiple.PS
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PS, ShortCircuit 1"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.PS, ShortCircuit 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PS, ShortCircuit 2"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PS, no flags 1")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T0, string payload")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PS, no flags 2")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.PS, no flags 1")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.PS, no flags 2")...)
 			return
 		}(fldPath.Child("ps"), obj.PS, safe.Field(oldObj, func(oldObj *TMultiple) *string { return oldObj.PS }))...)
 
 	// field TMultiple.T
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.T, ShortCircuit 1"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.T, ShortCircuit 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.T, ShortCircuit 2"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.T, no flags 1")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T0, string payload")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.T, no flags 2")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.T, no flags 1")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.T, no flags 2")...)
 			errs = append(errs, Validate_Tother(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("t"), &obj.T, safe.Field(oldObj, func(oldObj *TMultiple) *Tother { return &oldObj.T }))...)
@@ -315,17 +375,17 @@ func Validate_TMultiple(ctx context.Context, op operation.Operation, fldPath *fi
 	// field TMultiple.PT
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *Tother) (errs field.ErrorList) {
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PT, ShortCircuit 1"); len(e) != 0 {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.PT, ShortCircuit 2"); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PT, ShortCircuit 2"); len(e) != 0 {
-				errs = append(errs, e...)
-				return // do not proceed
-			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PT, no flags 1")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "T0, string payload")...)
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "TMultiple.PT, no flags 2")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.PT, no flags 1")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "T0, string payload")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "TMultiple.PT, no flags 2")...)
 			errs = append(errs, Validate_Tother(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("pt"), obj.PT, safe.Field(oldObj, func(oldObj *TMultiple) *Tother { return oldObj.PT }))...)
@@ -337,7 +397,11 @@ func Validate_Tother(ctx context.Context, op operation.Operation, fldPath *field
 	// field Tother.OS
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "Tother, no flags")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "Tother, no flags")...)
 			return
 		}(fldPath.Child("os"), &obj.OS, safe.Field(oldObj, func(oldObj *Tother) *string { return &oldObj.OS }))...)
 

@@ -66,14 +66,22 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_E01(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *E01) (errs field.ErrorList) {
 	// type E01
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "E01, no flags")...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "E01, no flags")...)
 
 	return errs
 }
 
 func Validate_E02(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *E02) (errs field.ErrorList) {
 	// type E02
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "E02, ShortCircuit"); len(e) != 0 {
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "E02, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
@@ -83,28 +91,32 @@ func Validate_E02(ctx context.Context, op operation.Operation, fldPath *field.Pa
 
 func Validate_E03(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *E03) (errs field.ErrorList) {
 	// type E03
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "E03, ShortCircuit"); len(e) != 0 {
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "E03, ShortCircuit"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "E03, no flags")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "E03, no flags")...)
 
 	return errs
 }
 
 func Validate_EMultiple(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *EMultiple) (errs field.ErrorList) {
 	// type EMultiple
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "EMultiple, ShortCircuit 1"); len(e) != 0 {
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	if e := validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "EMultiple, ShortCircuit 2"); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
 	}
-	if e := validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "EMultiple, ShortCircuit 2"); len(e) != 0 {
-		errs = append(errs, e...)
-		return // do not proceed
-	}
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "EMultiple, no flags 1")...)
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "E0, string payload")...)
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "EMultiple, no flags 2")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "EMultiple, no flags 1")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "E0, string payload")...)
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "EMultiple, no flags 2")...)
 
 	return errs
 }

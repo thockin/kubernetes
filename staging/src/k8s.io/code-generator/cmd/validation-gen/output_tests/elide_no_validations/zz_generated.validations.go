@@ -50,7 +50,11 @@ func Validate_HasFieldVal(ctx context.Context, op operation.Operation, fldPath *
 	// field HasFieldVal.S
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field HasFieldVal.S")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "field HasFieldVal.S")...)
 			return
 		}(fldPath.Child("s"), &obj.S, safe.Field(oldObj, func(oldObj *HasFieldVal) *string { return &oldObj.S }))...)
 
@@ -59,7 +63,11 @@ func Validate_HasFieldVal(ctx context.Context, op operation.Operation, fldPath *
 
 func Validate_HasTypeVal(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *HasTypeVal) (errs field.ErrorList) {
 	// type HasTypeVal
-	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type HasTypeVal")...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "type HasTypeVal")...)
 
 	// field HasTypeVal.S has no validation
 	return errs
@@ -87,7 +95,11 @@ func Validate_T1(ctx context.Context, op operation.Operation, fldPath *field.Pat
 	// field T1.HasNoValFieldVal
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *HasNoVal) (errs field.ErrorList) {
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field T1.HasNoValFieldVal")...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, *obj, oldObj, false, "field T1.HasNoValFieldVal")...)
 			return
 		}(fldPath.Child("hasNoValFieldVal"), &obj.HasNoValFieldVal, safe.Field(oldObj, func(oldObj *T1) *HasNoVal { return &oldObj.HasNoValFieldVal }))...)
 

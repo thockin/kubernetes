@@ -48,14 +48,22 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Max0Type) (errs field.ErrorList) {
 	// type Max0Type
-	errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 0)...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.MaxLength(ctx, op, fldPath, *obj, oldObj, 0)...)
 
 	return errs
 }
 
 func Validate_Max10Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Max10Type) (errs field.ErrorList) {
 	// type Max10Type
-	errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 10)...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.MaxLength(ctx, op, fldPath, *obj, oldObj, 10)...)
 
 	return errs
 }
@@ -66,28 +74,44 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max0Field
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 0)...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.MaxLength(ctx, op, fldPath, *obj, oldObj, 0)...)
 			return
 		}(fldPath.Child("max0Field"), &obj.Max0Field, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.Max0Field }))...)
 
 	// field Struct.Max10Field
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 10)...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.MaxLength(ctx, op, fldPath, *obj, oldObj, 10)...)
 			return
 		}(fldPath.Child("max10Field"), &obj.Max10Field, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.Max10Field }))...)
 
 	// field Struct.Max0UnvalidatedTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *UnvalidatedStringType) (errs field.ErrorList) {
-			errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 0)...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.MaxLength(ctx, op, fldPath, *obj, oldObj, 0)...)
 			return
 		}(fldPath.Child("max0UnvalidatedTypedefField"), &obj.Max0UnvalidatedTypedefField, safe.Field(oldObj, func(oldObj *Struct) *UnvalidatedStringType { return &oldObj.Max0UnvalidatedTypedefField }))...)
 
 	// field Struct.Max10UnvalidatedTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *UnvalidatedStringType) (errs field.ErrorList) {
-			errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 10)...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.MaxLength(ctx, op, fldPath, *obj, oldObj, 10)...)
 			return
 		}(fldPath.Child("max10UnvalidatedTypedefField"), &obj.Max10UnvalidatedTypedefField, safe.Field(oldObj, func(oldObj *Struct) *UnvalidatedStringType { return &oldObj.Max10UnvalidatedTypedefField }))...)
 

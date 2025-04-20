@@ -77,10 +77,14 @@ func Validate_ReplicationControllerList(ctx context.Context, op operation.Operat
 
 	// field corev1.ReplicationControllerList.Items
 	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj []corev1.ReplicationController) (errs field.ErrorList) {
-			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, Validate_ReplicationController)...)
+		func(fldPath *field.Path, obj, oldObj *[]corev1.ReplicationController) (errs field.ErrorList) {
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, *obj, oldObj, nil, Validate_ReplicationController)...)
 			return
-		}(fldPath.Child("items"), obj.Items, safe.Field(oldObj, func(oldObj *corev1.ReplicationControllerList) []corev1.ReplicationController { return oldObj.Items }))...)
+		}(fldPath.Child("items"), &obj.Items, safe.Field(oldObj, func(oldObj *corev1.ReplicationControllerList) *[]corev1.ReplicationController { return &oldObj.Items }))...)
 
 	return errs
 }
@@ -94,7 +98,11 @@ func Validate_ReplicationControllerSpec(ctx context.Context, op operation.Operat
 				errs = append(errs, e...)
 				return // do not proceed
 			}
-			errs = append(errs, validate.Minimum(ctx, op, fldPath, obj, oldObj, 0)...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.Minimum(ctx, op, fldPath, *obj, oldObj, 0)...)
 			return
 		}(fldPath.Child("replicas"), obj.Replicas, safe.Field(oldObj, func(oldObj *corev1.ReplicationControllerSpec) *int32 { return oldObj.Replicas }))...)
 
@@ -102,7 +110,11 @@ func Validate_ReplicationControllerSpec(ctx context.Context, op operation.Operat
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *int32) (errs field.ErrorList) {
 			// optional value-type fields with zero-value defaults are purely documentation
-			errs = append(errs, validate.Minimum(ctx, op, fldPath, obj, oldObj, 0)...)
+			if obj == nil {
+				errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+				return
+			}
+			errs = append(errs, validate.Minimum(ctx, op, fldPath, *obj, oldObj, 0)...)
 			return
 		}(fldPath.Child("minReadySeconds"), &obj.MinReadySeconds, safe.Field(oldObj, func(oldObj *corev1.ReplicationControllerSpec) *int32 { return &oldObj.MinReadySeconds }))...)
 

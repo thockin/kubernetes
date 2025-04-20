@@ -300,6 +300,11 @@ const (
 	// accumulated as an error, but should trigger other aspects of the failure
 	// path (e.g. early return when combined with ShortCircuit).
 	NonError
+
+	// RawType indicates that this validator wants to receive the raw type
+	// (potentially a pointer) rather than the concrete value type that most
+	// validators look at.
+	RawType
 )
 
 // Conditions defines what conditions must be true for a resource to be validated.

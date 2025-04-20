@@ -50,7 +50,11 @@ var unionMembershipForStruct = validate.NewUnionMembership([2]string{"m1", "M1"}
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
-	errs = append(errs, validate.Union(ctx, op, fldPath, obj, oldObj, unionMembershipForStruct, obj.M1, obj.M2)...)
+	if obj == nil {
+		errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))
+		return
+	}
+	errs = append(errs, validate.Union(ctx, op, fldPath, *obj, oldObj, unionMembershipForStruct, obj.M1, obj.M2)...)
 
 	// field Struct.TypeMeta has no validation
 	// field Struct.NonUnionField has no validation

@@ -239,7 +239,7 @@ type childNode struct {
 // with the type, and not any specific instance of that type (e.g. when used as
 // a field in a struct.
 type typeNode struct {
-	valueType *types.Type // never a pointer, but may be a map, slice, struct, etc.
+	valueType *types.Type // never a pointer, but may be a map, slice, struct, alias, etc.
 	funcName  types.Name  // populated when this type is has a validation function
 
 	fields     []*childNode // populated when this type is a struct
@@ -773,6 +773,20 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 	return nil
 }
 
+// FIXME: uncear which is correct when
+func realType(t *types.Type) *types.Type {
+	for {
+		if t.Kind == types.Alias {
+			t = t.Underlying
+		} else if t.Kind == types.Pointer {
+			t = t.Elem
+		} else {
+			break
+		}
+	}
+	return t
+}
+
 // nonPtrType removes any pointerness from the type.
 func nonPtrType(t *types.Type) *types.Type {
 	for t.Kind == types.Pointer {
@@ -910,25 +924,21 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 	}
 
 	targs := generator.Args{
-		"inType":     t,
-		"field":      mkSymbolArgs(c, fieldPkgSymbols),
-		"operation":  mkSymbolArgs(c, operationPkgSymbols),
-		"context":    mkSymbolArgs(c, contextPkgSymbols),
-		"objTypePfx": "*",
-	}
-	if isNilableType(t) {
-		targs["objTypePfx"] = ""
+		"inType":    t,
+		"field":     mkSymbolArgs(c, fieldPkgSymbols),
+		"operation": mkSymbolArgs(c, operationPkgSymbols),
+		"context":   mkSymbolArgs(c, contextPkgSymbols),
 	}
 
 	node := g.discovered.typeNodes[t]
 	if node == nil {
-		panic(fmt.Sprintf("found nil node for root-type %v", t))
+		panic(fmt.Sprintf("found nil typenode for type %v", t))
 	}
 	sw.Do("func $.inType|objectvalidationfn$(", targs)
 	sw.Do("    ctx $.context.Context|raw$, ", targs)
 	sw.Do("    op $.operation.Operation|raw$, ", targs)
 	sw.Do("    fldPath *$.field.Path|raw$, ", targs)
-	sw.Do("    obj, oldObj $.objTypePfx$$.inType|raw$) ", targs)
+	sw.Do("    obj, oldObj *$.inType|raw$) ", targs)
 	sw.Do("(errs $.field.ErrorList|raw$) {\n", targs)
 	fakeChild := &childNode{
 		node:      node,
@@ -969,7 +979,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		}
 		sw.Do("// type $.inType|raw$\n", targs)
 		emitComments(validations.Comments, sw)
-		emitCallsToValidators(c, validations.Functions, sw)
+		emitCallsToValidators(c, thisChild.childType, validations.Functions, sw)
 		sw.Do("\n", nil)
 		didSome = true
 	}
@@ -998,7 +1008,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			validations := fld.fieldValidations
 			if !validations.Empty() {
 				emitComments(validations.Comments, bufsw)
-				emitCallsToValidators(c, validations.Functions, bufsw)
+				emitCallsToValidators(c, fld.childType, validations.Functions, bufsw)
 			}
 
 			// If the node is nil, this must be a type in a package we are not
@@ -1092,29 +1102,44 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typ
 // Emitted code assumes that the value in question is always a pair of nilable
 // variables named "obj" and "oldObj", and the field path to this value is
 // named "fldPath".
-func emitCallsToValidators(c *generator.Context, validations []validators.FunctionGen, sw *generator.SnippetWriter) {
+// FIXME: all comments are now sus
+func emitCallsToValidators(c *generator.Context, t *types.Type, validations []validators.FunctionGen, sw *generator.SnippetWriter) {
 	// Helper func
-	sort := func(in []validators.FunctionGen) []validators.FunctionGen {
-		sooner := make([]validators.FunctionGen, 0, len(in))
-		later := make([]validators.FunctionGen, 0, len(in))
+	//FIXME: explain
+	sort := func(in []validators.FunctionGen) ([]validators.FunctionGen, []validators.FunctionGen) {
+		first := make([]validators.FunctionGen, 0, len(in))
+		middle := make([]validators.FunctionGen, 0, len(in))
+		last := make([]validators.FunctionGen, 0, len(in))
 
 		for _, fg := range in {
 			isShortCircuit := (fg.Flags.IsSet(validators.ShortCircuit))
+			isRawType := (fg.Flags.IsSet(validators.RawType))
 
 			if isShortCircuit {
-				sooner = append(sooner, fg)
+				if isRawType {
+					first = append(first, fg)
+				} else {
+					middle = append(first, fg)
+				}
 			} else {
-				later = append(later, fg)
+				last = append(last, fg)
 			}
 		}
-		result := sooner
-		result = append(result, later...)
-		return result
+		return first, append(middle, last...)
 	}
 
-	validations = sort(validations)
+	sooner, later := sort(validations)
+	validations = append(sooner, later...)
 
-	for _, v := range validations {
+	for i, v := range validations {
+		// Not really needed if optional/required is used everywhere?
+		if i == len(sooner) {
+			//FIXME: better error and comment, and templating for fmt.
+			sw.Do("if obj == nil {\n", nil)
+			sw.Do("    errs = append(errs, field.InternalError(fldPath, fmt.Errorf(`nil pointer`)))\n", nil)
+			sw.Do("    return\n", nil)
+			sw.Do("}\n", nil)
+		}
 		isShortCircuit := v.Flags.IsSet(validators.ShortCircuit)
 		isNonError := v.Flags.IsSet(validators.NonError)
 
@@ -1135,7 +1160,14 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				}
 				sw.Do("]", nil)
 			}
-			sw.Do("(ctx, op, fldPath, obj, oldObj", targs)
+
+			// FIXME: This is clumsy - handle aliases or document why not
+			if t.Kind == types.Pointer && v.Flags.IsSet(validators.RawType) {
+				sw.Do("(ctx, op, fldPath, obj, oldObj", targs)
+			} else {
+				//FIXME: when to check nil and do InternalError?
+				sw.Do("(ctx, op, fldPath, *obj, oldObj", targs)
+			}
 			for _, arg := range v.Args {
 				sw.Do(", ", nil)
 				toGolangSourceDataLiteral(sw, c, arg)
@@ -1391,6 +1423,7 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 }
 
 // isNilableType returns true if the argument type can be compared to nil.
+// FIXME: nix this?
 func isNilableType(t *types.Type) bool {
 	t = unalias(t)
 	switch t.Kind {
@@ -1416,27 +1449,10 @@ func isNilableType(t *types.Type) bool {
 // type prefix is applied, and a variable "x" remains "x" when the expression
 // prefix is applied.
 func getLeafTypeAndPrefixes(inType *types.Type) (*types.Type, string, string) {
-	leafType := inType
-	typePfx := ""
-	exprPfx := ""
-
-	nPtrs := 0
-	for leafType.Kind == types.Pointer {
-		nPtrs++
-		leafType = leafType.Elem
+	if inType.Kind == types.Pointer {
+		return inType.Elem, "*", ""
 	}
-	if !isNilableType(leafType) {
-		typePfx = "*"
-		if nPtrs == 0 {
-			exprPfx = "&"
-		} else {
-			exprPfx = strings.Repeat("*", nPtrs-1)
-		}
-	} else {
-		exprPfx = strings.Repeat("*", nPtrs)
-	}
-
-	return leafType, typePfx, exprPfx
+	return inType, "*", "&"
 }
 
 // FixtureTests generates a test file that checks all validateFalse validations.
