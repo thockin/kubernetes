@@ -502,6 +502,7 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 		// For non-map and non-set list, we don't lookup the correlated element in the old list.
 		// The matchArg and equivArg are both nil.
 	}
+
 	for _, vfn := range validations.Functions {
 		f := Function(eachValTagName, vfn.Flags, validateEachSliceVal, matchArg, equivArg, WrapperFunction{vfn, nt.Elem})
 		result.AddFunction(f)
