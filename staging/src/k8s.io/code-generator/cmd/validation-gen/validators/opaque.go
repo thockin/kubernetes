@@ -19,7 +19,7 @@ package validators
 import "k8s.io/apimachinery/pkg/util/sets"
 
 const (
-	opaqueTypeTagName = "k8s:opaqueType"
+	opaqueTypeTagName = "opaqueType"
 )
 
 type opaqueTypeTagValidator struct{}

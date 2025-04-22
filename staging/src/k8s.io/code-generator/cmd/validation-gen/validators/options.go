@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	ifOptionEnabledTag  = "k8s:ifOptionEnabled"
-	ifOptionDisabledTag = "k8s:ifOptionDisabled"
+	ifOptionEnabledTag  = "ifOptionEnabled"
+	ifOptionDisabledTag = "ifOptionDisabled"
 )
 
 func init() {
@@ -63,7 +63,7 @@ func (iotv ifOptionTagValidator) GetValidations(context Context, args []string, 
 	result := Validations{}
 
 	fakeComments := []string{payload}
-	if validations, err := iotv.validator.ExtractValidations(context, fakeComments); err != nil {
+	if validations, err := iotv.validator.ExtractValidations(context, "", fakeComments); err != nil {
 		return Validations{}, err
 	} else {
 		for _, fn := range validations.Functions {

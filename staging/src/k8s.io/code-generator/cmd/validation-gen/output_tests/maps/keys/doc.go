@@ -30,23 +30,23 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.MapField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapField(keys)"
+	// +k8s:eachKey=validateFalse="field Struct.MapField(keys)"
 	MapField map[string]string `json:"mapField"`
 
 	// +k8s:validateFalse="field Struct.MapTypedefField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapTypedefField(keys)"
+	// +k8s:eachKey=validateFalse="field Struct.MapTypedefField(keys)"
 	MapTypedefField map[UnvalidatedStringType]string `json:"mapTypedefField"`
 
 	// +k8s:validateFalse="field Struct.MapValidatedTypedefField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapValidatedTypedefField(keys)"
+	// +k8s:eachKey=validateFalse="field Struct.MapValidatedTypedefField(keys)"
 	MapValidatedTypedefField map[ValidatedStringType]string `json:"mapValidatedTypedefField"`
 
 	// +k8s:validateFalse="field Struct.MapTypeField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapTypeField(keys)"
+	// +k8s:eachKey=validateFalse="field Struct.MapTypeField(keys)"
 	MapTypeField UnvalidatedMapType `json:"mapTypeField"`
 
 	// +k8s:validateFalse="field Struct.ValidatedMapTypeField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.ValidatedMapTypeField(keys)"
+	// +k8s:eachKey=validateFalse="field Struct.ValidatedMapTypeField(keys)"
 	ValidatedMapTypeField ValidatedMapType `json:"validatedMapTypeField"`
 }
 
@@ -60,5 +60,5 @@ type ValidatedStringType string
 type UnvalidatedMapType map[string]string
 
 // +k8s:validateFalse="ValidatedMapType"
-// +k8s:eachKey=+k8s:validateFalse="type ValidatedMapType(keys)"
+// +k8s:eachKey=validateFalse="type ValidatedMapType(keys)"
 type ValidatedMapType map[string]string

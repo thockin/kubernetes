@@ -27,11 +27,11 @@ import (
 
 const (
 	// These tags return a fixed pass/fail state.
-	validateTrueTagName  = "k8s:validateTrue"
-	validateFalseTagName = "k8s:validateFalse"
+	validateTrueTagName  = "validateTrue"
+	validateFalseTagName = "validateFalse"
 
 	// This tag always returns an error from ExtractValidations.
-	validateErrorTagName = "k8s:validateError"
+	validateErrorTagName = "validateError"
 )
 
 func init() {

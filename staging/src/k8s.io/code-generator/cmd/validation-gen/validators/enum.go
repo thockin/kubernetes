@@ -29,7 +29,7 @@ import (
 	"k8s.io/gengo/v2/types"
 )
 
-const enumTagName = "k8s:enum"
+const enumTagName = "enum"
 
 func init() {
 	RegisterTagValidator(&enumTagValidator{})

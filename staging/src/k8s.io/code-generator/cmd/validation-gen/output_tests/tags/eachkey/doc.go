@@ -27,19 +27,19 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:eachKey=+k8s:validateFalse="Struct.MapField(keys)"
+	// +k8s:eachKey=validateFalse="Struct.MapField(keys)"
 	MapField map[string]string `json:"mapField"`
 
-	// +k8s:eachKey=+k8s:validateFalse="Struct.MapTypedefField(keys)"
+	// +k8s:eachKey=validateFalse="Struct.MapTypedefField(keys)"
 	MapTypedefField map[UnvalidatedStringType]string `json:"mapTypedefField"`
 
-	// +k8s:eachKey=+k8s:validateFalse="Struct.MapValidatedTypedefField(keys)"
+	// +k8s:eachKey=validateFalse="Struct.MapValidatedTypedefField(keys)"
 	MapValidatedTypedefField map[ValidatedStringType]string `json:"mapValidatedTypedefField"`
 
-	// +k8s:eachKey=+k8s:validateFalse="Struct.MapTypeField(keys)"
+	// +k8s:eachKey=validateFalse="Struct.MapTypeField(keys)"
 	MapTypeField UnvalidatedMapType `json:"mapTypeField"`
 
-	// +k8s:eachKey=+k8s:validateFalse="Struct.ValidatedMapTypeField(keys)"
+	// +k8s:eachKey=validateFalse="Struct.ValidatedMapTypeField(keys)"
 	ValidatedMapTypeField ValidatedMapType `json:"validatedMapTypeField"`
 }
 
@@ -52,5 +52,5 @@ type ValidatedStringType string
 // Note: no validations.
 type UnvalidatedMapType map[string]string
 
-// +k8s:eachKey=+k8s:validateFalse="ValidatedMapType(keys)"
+// +k8s:eachKey=validateFalse="ValidatedMapType(keys)"
 type ValidatedMapType map[string]string

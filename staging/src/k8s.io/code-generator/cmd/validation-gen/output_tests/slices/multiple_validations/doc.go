@@ -32,8 +32,8 @@ type Struct struct {
 
 	// +k8s:validateFalse="field Struct.ListField #1"
 	// +k8s:validateFalse="field Struct.ListField #2"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*] #1"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*] #2"
+	// +k8s:eachVal=validateFalse="field Struct.ListField[*] #1"
+	// +k8s:eachVal=validateFalse="field Struct.ListField[*] #2"
 	ListField []string `json:"listField"`
 
 	UnvalidatedListField []string `json:"UnvalidatedListField"`

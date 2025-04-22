@@ -26,10 +26,10 @@ import (
 )
 
 const (
-	listTypeTagName   = "k8s:listType"
-	ListMapKeyTagName = "k8s:listMapKey"
-	eachValTagName    = "k8s:eachVal"
-	eachKeyTagName    = "k8s:eachKey"
+	listTypeTagName   = "listType"
+	ListMapKeyTagName = "listMapKey"
+	eachValTagName    = "eachVal"
+	eachKeyTagName    = "eachKey"
 )
 
 // We keep the eachVal and eachKey validators around because the main
@@ -248,7 +248,7 @@ func (evtv eachValTagValidator) GetValidations(context Context, _ []string, payl
 	case types.Map:
 		elemContext.Scope = ScopeMapVal
 	}
-	if validations, err := evtv.validator.ExtractValidations(elemContext, fakeComments); err != nil {
+	if validations, err := evtv.validator.ExtractValidations(elemContext, "", fakeComments); err != nil {
 		return Validations{}, err
 	} else {
 		if len(validations.Variables) > 0 {
@@ -395,7 +395,7 @@ func (ektv eachKeyTagValidator) GetValidations(context Context, _ []string, payl
 		Parent: t,
 		Path:   context.Path.Child("(keys)"),
 	}
-	if validations, err := ektv.validator.ExtractValidations(elemContext, fakeComments); err != nil {
+	if validations, err := ektv.validator.ExtractValidations(elemContext, "", fakeComments); err != nil {
 		return Validations{}, err
 	} else {
 		if len(validations.Variables) > 0 {

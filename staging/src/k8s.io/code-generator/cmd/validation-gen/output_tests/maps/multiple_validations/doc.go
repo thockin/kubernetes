@@ -31,10 +31,10 @@ type Struct struct {
 
 	// +k8s:validateFalse="field Struct.MapField #1"
 	// +k8s:validateFalse="field Struct.MapField #2"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapField(keys) #1"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapField(keys) #2"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*] #1"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*] #2"
+	// +k8s:eachKey=validateFalse="field Struct.MapField(keys) #1"
+	// +k8s:eachKey=validateFalse="field Struct.MapField(keys) #2"
+	// +k8s:eachVal=validateFalse="field Struct.MapField[*] #1"
+	// +k8s:eachVal=validateFalse="field Struct.MapField[*] #2"
 	MapField map[string]string `json:"mapField"`
 
 	UnvalidatedMapField []string `json:"UnvalidatedMapField"`

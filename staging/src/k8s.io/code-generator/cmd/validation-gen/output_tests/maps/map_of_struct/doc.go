@@ -30,11 +30,11 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.MapField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*]"
+	// +k8s:eachVal=validateFalse="field Struct.MapField[*]"
 	MapField map[string]OtherStruct `json:"mapField"`
 
 	// +k8s:validateFalse="field Struct.MapTypedefField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefField[*]"
+	// +k8s:eachVal=validateFalse="field Struct.MapTypedefField[*]"
 	MapTypedefField map[string]OtherTypedefStruct `json:"mapTypedefField"`
 
 	UnvalidatedMapField map[string]string `json:"UnvalidatedMapField"`

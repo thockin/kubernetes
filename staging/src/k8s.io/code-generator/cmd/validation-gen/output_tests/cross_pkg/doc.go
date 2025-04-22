@@ -87,22 +87,22 @@ type T1 struct {
 	OtherStructPtr *other.StructType `json:"otherStructPtr"`
 
 	// +k8s:validateTrue="field T1.SliceOfOtherStruct"
-	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStruct values"
-	// +k8s:eachVal=+k8s:opaqueType
+	// +k8s:eachVal=validateTrue="field T1.SliceOfOtherStruct values"
+	// +k8s:eachVal=opaqueType
 	SliceOfOtherStruct []other.StructType `json:"sliceOfOtherStruct"`
 
 	// +k8s:validateTrue="field T1.ListMapOfOtherStruct"
-	// +k8s:eachVal=+k8s:validateTrue="field T1.SliceOfOtherStruct values"
+	// +k8s:eachVal=validateTrue="field T1.SliceOfOtherStruct values"
 	// +k8s:listType=map
 	// +k8s:listMapKey=stringField
-	// +k8s:eachVal=+k8s:opaqueType
+	// +k8s:eachVal=opaqueType
 	ListMapOfOtherStruct []other.StructType `json:"listMapOfOtherStruct"`
 
 	// +k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct"
-	// +k8s:eachKey=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct keys"
-	// +k8s:eachVal=+k8s:validateTrue="field T1.MapOfOtherStringToOtherStruct values"
-	// +k8s:eachKey=+k8s:opaqueType
-	// +k8s:eachVal=+k8s:opaqueType
+	// +k8s:eachKey=validateTrue="field T1.MapOfOtherStringToOtherStruct keys"
+	// +k8s:eachVal=validateTrue="field T1.MapOfOtherStringToOtherStruct values"
+	// +k8s:eachKey=opaqueType
+	// +k8s:eachVal=opaqueType
 	MapOfOtherStringToOtherStruct map[other.StringType]other.StructType `json:"mapOfOtherStringToOtherStruct"`
 }
 
@@ -112,11 +112,11 @@ type T1 struct {
 
 /*
 // +k8s:validateTrue="type TypedefSliceOther"
-// +k8s:eachVal=+k8s:opaqueType
+// +k8s:eachVal=opaqueType
 type TypedefSliceOther []other.StructType
 
 // +k8s:validateTrue="type TypedefMapOther"
-// +k8s:eachKey=+k8s:opaqueType
-// +k8s:eachVal=+k8s:opaqueType
+// +k8s:eachKey=opaqueType
+// +k8s:eachVal=opaqueType
 type TypedefMapOther map[other.StringType]other.StructType
 */

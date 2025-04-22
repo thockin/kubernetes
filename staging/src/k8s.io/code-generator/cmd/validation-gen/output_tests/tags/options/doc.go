@@ -27,19 +27,19 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:ifOptionEnabled(FeatureX)=+k8s:validateFalse="field Struct.XEnabledField"
+	// +k8s:ifOptionEnabled(FeatureX)=validateFalse="field Struct.XEnabledField"
 	XEnabledField string `json:"xEnabledField"`
 
-	// +k8s:ifOptionDisabled(FeatureX)=+k8s:validateFalse="field Struct.XDisabledField"
+	// +k8s:ifOptionDisabled(FeatureX)=validateFalse="field Struct.XDisabledField"
 	XDisabledField string `json:"xDisabledField"`
 
-	// +k8s:ifOptionEnabled(FeatureY)=+k8s:validateFalse="field Struct.YEnabledField"
+	// +k8s:ifOptionEnabled(FeatureY)=validateFalse="field Struct.YEnabledField"
 	YEnabledField string `json:"yEnabledField"`
 
-	// +k8s:ifOptionDisabled(FeatureY)=+k8s:validateFalse="field Struct.YDisabledField"
+	// +k8s:ifOptionDisabled(FeatureY)=validateFalse="field Struct.YDisabledField"
 	YDisabledField string `json:"yDisabledField"`
 
-	// +k8s:ifOptionEnabled(FeatureX)=+k8s:validateFalse="field Struct.XYMixedField/X"
-	// +k8s:ifOptionDisabled(FeatureY)=+k8s:validateFalse="field Struct.XYMixedField/Y"
+	// +k8s:ifOptionEnabled(FeatureX)=validateFalse="field Struct.XYMixedField/X"
+	// +k8s:ifOptionDisabled(FeatureY)=validateFalse="field Struct.XYMixedField/Y"
 	XYMixedField string `json:"xyMixedField"`
 }

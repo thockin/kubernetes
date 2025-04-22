@@ -28,14 +28,14 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int `json:"typeMeta"`
 
-	// +k8s:subfield(structField)=+k8s:subfield(stringField)=+k8s:validateFalse="StructField.StructField"
-	// +k8s:subfield(sliceField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:validateFalse="StructField.SliceField"
-	// +k8s:subfield(mapField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:validateFalse="StructField.MapField"
+	// +k8s:subfield(structField)=subfield(stringField)=validateFalse="StructField.StructField"
+	// +k8s:subfield(sliceField)=eachVal=subfield(stringField)=validateFalse="StructField.SliceField"
+	// +k8s:subfield(mapField)=eachVal=subfield(stringField)=validateFalse="StructField.MapField"
 	StructField OtherStruct `json:"structField"`
 
-	// +k8s:subfield(structField)=+k8s:subfield(stringField)=+k8s:validateFalse="StructPtrField.StructField"
-	// +k8s:subfield(sliceField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:validateFalse="StructPtrField.SliceField"
-	// +k8s:subfield(mapField)=+k8s:eachVal=+k8s:subfield(stringField)=+k8s:validateFalse="StructPtrField.MapField"
+	// +k8s:subfield(structField)=subfield(stringField)=validateFalse="StructPtrField.StructField"
+	// +k8s:subfield(sliceField)=eachVal=subfield(stringField)=validateFalse="StructPtrField.SliceField"
+	// +k8s:subfield(mapField)=eachVal=subfield(stringField)=validateFalse="StructPtrField.MapField"
 	StructPtrField *OtherStruct `json:"structPtrField"`
 }
 

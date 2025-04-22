@@ -25,9 +25,9 @@ import (
 )
 
 const (
-	maxLengthTagName = "k8s:maxLength"
-	maxItemsTagName  = "k8s:maxItems"
-	minimumTagName   = "k8s:minimum"
+	maxLengthTagName = "maxLength"
+	maxItemsTagName  = "maxItems"
+	minimumTagName   = "minimum"
 )
 
 func init() {

@@ -30,13 +30,13 @@ type Struct struct {
 	// +k8s:listType=map
 	// +k8s:listMapKey=key1Field
 	// +k8s:listMapKey=key2Field
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	ListField []OtherStruct `json:"listField"`
 
 	// +k8s:listType=map
 	// +k8s:listMapKey=key1Field
 	// +k8s:listMapKey=key2Field
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	ListTypedefField []OtherTypedefStruct `json:"listTypedefField"`
 }
 

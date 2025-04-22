@@ -27,10 +27,10 @@ var localSchemeBuilder = testscheme.New()
 type Struct struct {
 	TypeMeta int
 
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListField[*]"
+	// +k8s:eachVal=validateFalse="field Struct.ListField[*]"
 	ListField []string `json:"listField"`
 
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListTypedefField[*]"
+	// +k8s:eachVal=validateFalse="field Struct.ListTypedefField[*]"
 	ListTypedefField []StringType `json:"listTypedefField"`
 }
 

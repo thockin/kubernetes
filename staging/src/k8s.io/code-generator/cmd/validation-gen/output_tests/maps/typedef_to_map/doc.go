@@ -29,7 +29,7 @@ var localSchemeBuilder = testscheme.New()
 type UnvalidatedType map[string]string
 
 // +k8s:validateFalse="type MapType"
-// +k8s:eachVal=+k8s:validateFalse="type MapType[*]"
+// +k8s:eachVal=validateFalse="type MapType[*]"
 type MapType map[string]string
 
 // Note: no validation here
@@ -39,7 +39,7 @@ type UnvalidatedPtrType map[string]*string
 type StringType string
 
 // +k8s:validateFalse="type MapTypedefType"
-// +k8s:eachVal=+k8s:validateFalse="type MapTypedefType[*]"
+// +k8s:eachVal=validateFalse="type MapTypedefType[*]"
 type MapTypedefType map[string]StringType
 
 // +k8s:validateFalse="type Struct"
@@ -47,10 +47,10 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:validateFalse="field Struct.MapField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapField[*]"
+	// +k8s:eachVal=validateFalse="field Struct.MapField[*]"
 	MapField MapType `json:"mapField"`
 
 	// +k8s:validateFalse="field Struct.MapTypedefField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapTypedefField[*]"
+	// +k8s:eachVal=validateFalse="field Struct.MapTypedefField[*]"
 	MapTypedefField MapTypedefType `json:"mapTypedefField"`
 }

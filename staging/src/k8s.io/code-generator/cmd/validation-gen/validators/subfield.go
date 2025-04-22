@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	subfieldTagName = "k8s:subfield"
+	subfieldTagName = "subfield"
 )
 
 func init() {
@@ -78,7 +78,7 @@ func (stv subfieldTagValidator) GetValidations(context Context, args []string, p
 		Parent: t,
 		Path:   context.Path.Child(subname),
 	}
-	if validations, err := stv.validator.ExtractValidations(subContext, fakeComments); err != nil {
+	if validations, err := stv.validator.ExtractValidations(subContext, "", fakeComments); err != nil {
 		return Validations{}, err
 	} else {
 		if len(validations.Variables) > 0 {

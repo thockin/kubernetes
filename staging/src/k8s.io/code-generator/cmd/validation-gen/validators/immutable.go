@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	immutableTagName = "k8s:immutable"
+	immutableTagName = "immutable"
 )
 
 func init() {

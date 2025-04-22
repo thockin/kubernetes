@@ -102,8 +102,8 @@ func (utv unionTypeValidator) GetValidations(context Context) (Validations, erro
 }
 
 const (
-	unionDiscriminatorTagName = "k8s:unionDiscriminator"
-	unionMemberTagName        = "k8s:unionMember"
+	unionDiscriminatorTagName = "unionDiscriminator"
+	unionMemberTagName        = "unionMember"
 )
 
 type unionDiscriminatorTagValidator struct {
@@ -237,7 +237,7 @@ func (umtv unionMemberTagValidator) Docs() TagDoc {
 }
 
 // discriminatorParams defines JSON the parameter value for the
-// +k8s:unionDiscriminator tag.
+// `unionDiscriminator` tag.
 type discriminatorParams struct {
 	// Union sets the name of the union this discriminator belongs to.
 	// This is only needed for go structs that contain more than one union.
@@ -245,7 +245,7 @@ type discriminatorParams struct {
 	Union string `json:"union,omitempty"`
 }
 
-// memberParams defines the JSON parameter value for the +k8s:unionMember tag.
+// memberParams defines the JSON parameter value for the `unionMember` tag.
 type memberParams struct {
 	// Union sets the name of the union this member belongs to.
 	// This is only needed for go structs that contain more than one union.
@@ -260,7 +260,7 @@ type memberParams struct {
 }
 
 // union defines how a union validation will be generated, based
-// on +k8s:unionMember and +k8s:unionDiscriminator tags found in a go struct.
+// on `unionMember` and `unionDiscriminator` tags found in a go struct.
 type union struct {
 	// fields provides field information about all the members of the union.
 	// Each slice element is a [2]string to provide a fieldName and memberName pair, where

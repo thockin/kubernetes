@@ -46,29 +46,29 @@ type Struct struct {
 type ImmutableStruct struct {
 	TypeMeta int
 
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SliceComparableField []ComparableStruct `json:"sliceComparableField"`
 
 	// +k8s:listType=set
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SliceSetComparableField []ComparableStruct `json:"sliceSetComparableField"`
 
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SliceNonComparableField []NonComparableStruct `json:"sliceNonComparableField"`
 
 	// +k8s:listType=set
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SliceSetNonComparableField []NonComparableStruct `json:"sliceSetNonComparableField"`
 
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SlicePrimitiveField []int `json:"slicePrimitiveField"`
 
 	// +k8s:listType=set
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SliceSetPrimitiveField []int `json:"sliceSetPrimitiveField"`
 
 	// +k8s:listType=set
-	// +k8s:eachVal=+k8s:immutable
+	// +k8s:eachVal=immutable
 	SliceSetFalselyComparableField []FalselyComparableStruct `json:"sliceSetFalselyComparableField"`
 }
 

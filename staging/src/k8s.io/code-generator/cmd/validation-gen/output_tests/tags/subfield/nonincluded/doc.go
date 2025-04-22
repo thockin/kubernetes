@@ -28,7 +28,7 @@ import (
 var localSchemeBuilder = testscheme.New()
 
 type Struct struct {
-	// +k8s:subfield(stringField)=+k8s:validateFalse="subfield Struct.(other.StructType).StringField"
+	// +k8s:subfield(stringField)=validateFalse="subfield Struct.(other.StructType).StringField"
 	// +k8s:opaqueType
 	other.StructType
 }

@@ -46,37 +46,37 @@ type Struct struct {
 	OpaqueStructPtrField *OtherStruct `json:"opaqueStructPtrField"`
 
 	// +k8s:validateFalse="field Struct.SliceOfStructField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.SliceOfStructField vals"
+	// +k8s:eachVal=validateFalse="field Struct.SliceOfStructField vals"
 	SliceOfStructField []OtherStruct `json:"sliceOfStructField"`
 
 	// +k8s:validateFalse="field Struct.SliceOfOpaqueStructField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.SliceOfOpaqueStructField vals"
-	// +k8s:eachVal=+k8s:opaqueType
+	// +k8s:eachVal=validateFalse="field Struct.SliceOfOpaqueStructField vals"
+	// +k8s:eachVal=opaqueType
 	SliceOfOpaqueStructField []OtherStruct `json:"sliceOfOpaqueStructField"`
 
 	// +k8s:validateFalse="field Struct.ListMapOfStructField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListMapOfStructField vals"
+	// +k8s:eachVal=validateFalse="field Struct.ListMapOfStructField vals"
 	// +k8s:listType=map
 	// +k8s:listMapKey=stringField
 	ListMapOfStructField []OtherStruct `json:"listMapOfStructField"`
 
 	// +k8s:validateFalse="field Struct.ListMapOfOpaqueStructField"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.ListMapOfOpaqueStructField vals"
+	// +k8s:eachVal=validateFalse="field Struct.ListMapOfOpaqueStructField vals"
 	// +k8s:listType=map
 	// +k8s:listMapKey=stringField
-	// +k8s:eachVal=+k8s:opaqueType
+	// +k8s:eachVal=opaqueType
 	ListMapOfOpaqueStructField []OtherStruct `json:"listMapOfOpaqueStructField"`
 
 	// +k8s:validateFalse="field Struct.MapOfStringToStructField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapOfStringToStructField keys"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapOfStringToStructField vals"
+	// +k8s:eachKey=validateFalse="field Struct.MapOfStringToStructField keys"
+	// +k8s:eachVal=validateFalse="field Struct.MapOfStringToStructField vals"
 	MapOfStringToStructField map[OtherString]OtherStruct `json:"mapOfStringToStructField"`
 
 	// +k8s:validateFalse="field Struct.MapOfStringToOpaqueStructField"
-	// +k8s:eachKey=+k8s:validateFalse="field Struct.MapOfStringToOpaqueStructField keys"
-	// +k8s:eachVal=+k8s:validateFalse="field Struct.MapOfStringToOpaqueStructField vals"
-	// +k8s:eachKey=+k8s:opaqueType
-	// +k8s:eachVal=+k8s:opaqueType
+	// +k8s:eachKey=validateFalse="field Struct.MapOfStringToOpaqueStructField keys"
+	// +k8s:eachVal=validateFalse="field Struct.MapOfStringToOpaqueStructField vals"
+	// +k8s:eachKey=opaqueType
+	// +k8s:eachVal=opaqueType
 	MapOfStringToOpaqueStructField map[OtherString]OtherStruct `json:"mapOfStringToOpaqueStructField"`
 }
 
@@ -95,10 +95,10 @@ type OtherString string
 // +k8s:opaqueType.
 
 // +k8s:validateTrue="type TypedefSliceOther"
-// +k8s:eachVal=+k8s:opaqueType
+// +k8s:eachVal=opaqueType
 type TypedefSliceOther []OtherStruct
 
 // +k8s:validateTrue="type TypedefMapOther"
-// +k8s:eachKey=+k8s:opaqueType
-// +k8s:eachVal=+k8s:opaqueType
+// +k8s:eachKey=opaqueType
+// +k8s:eachVal=opaqueType
 type TypedefMapOther map[OtherString]OtherStruct

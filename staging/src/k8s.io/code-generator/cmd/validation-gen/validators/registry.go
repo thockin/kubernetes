@@ -106,7 +106,7 @@ func (reg *registry) init(c *generator.Context) {
 // found in the associated comment block.  Any matching validators produce zero
 // or more validations, which will later be rendered by the code-generation
 // logic.
-func (reg *registry) ExtractValidations(context Context, comments []string) (Validations, error) {
+func (reg *registry) ExtractValidations(context Context, tagPrefix string, comments []string) (Validations, error) {
 	if !reg.initialized.Load() {
 		panic("registry.init() was not called")
 	}
@@ -114,7 +114,7 @@ func (reg *registry) ExtractValidations(context Context, comments []string) (Val
 	validations := Validations{}
 
 	// Extract tags and run matching tag-validators first.
-	tags, err := gengo.ExtractFunctionStyleCommentTags("+", reg.tagIndex, comments)
+	tags, err := gengo.ExtractFunctionStyleCommentTags(tagPrefix, reg.tagIndex, comments)
 	if err != nil {
 		return Validations{}, fmt.Errorf("failed to parse tags: %w", err)
 	}
@@ -160,19 +160,19 @@ func (reg *registry) sortTagsIntoPhases(tags map[string][]gengo.Tag) [][]string 
 	//
 	//    // +k8s:validateFalse="111"
 	//    // +k8s:validateFalse="222"
-	//    // +k8s:ifOptionEnabled(Foo)=+k8s:validateFalse="333"
+	//    // +k8s:ifOptionEnabled(Foo)=validateFalse="333"
 	//
 	// Tag extraction will retain the relative order between 111 and 222, but
-	// 333 is extracted as tag "k8s:ifOptionEnabled".  Those are all in a map,
+	// 333 is extracted as tag "ifOptionEnabled".  Those are all in a map,
 	// which we iterate (in a random order).  When it reaches the emit stage,
 	// the "ifOptionEnabled" part is gone, and we will have 3 FunctionGen
-	// objects, all with tag "k8s:validateFalse", in a non-deterministic order
+	// objects, all with tag "validateFalse", in a non-deterministic order
 	// because of the map iteration.  If we sort them at that point, we won't
 	// have enough information to do something smart, unless we look at the
 	// args, which are opaque to us.
 	//
-	// Sorting it earlier means we can sort "k8s:ifOptionEnabled" against
-	// "k8s:validateFalse".  All of the records within each of those is
+	// Sorting it earlier means we can sort "ifOptionEnabled" against
+	// "validateFalse".  All of the records within each of those is
 	// relatively ordered, so the result here would be to put "ifOptionEnabled"
 	// before "validateFalse" (lexicographical is better than random).
 	sortedTags := []string{}
@@ -225,7 +225,7 @@ type Validator interface {
 	// found in the associated comment block.  Any matching validators produce zero
 	// or more validations, which will later be rendered by the code-generation
 	// logic.
-	ExtractValidations(context Context, comments []string) (Validations, error)
+	ExtractValidations(context Context, tagPrefix string, comments []string) (Validations, error)
 
 	// Docs returns documentation for each known tag.
 	Docs() []TagDoc
