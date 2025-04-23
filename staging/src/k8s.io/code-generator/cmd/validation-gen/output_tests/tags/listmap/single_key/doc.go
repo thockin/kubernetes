@@ -28,6 +28,9 @@ type Struct struct {
 	TypeMeta int
 
 	// +k8s:listType=map
+	FooField []OtherStruct `json:"listField"`
+
+	// +k8s:listType=map
 	// +k8s:listMapKey=keyField
 	// +k8s:eachVal=+k8s:immutable
 	ListField []OtherStruct `json:"listField"`

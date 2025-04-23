@@ -44,6 +44,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
+	// field Struct.FooField has no validation
 
 	// field Struct.ListField
 	errs = append(errs,

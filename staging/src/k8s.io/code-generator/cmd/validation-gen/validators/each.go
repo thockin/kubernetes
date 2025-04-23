@@ -50,6 +50,8 @@ func init() {
 
 	globalEachKey = &eachKeyTagValidator{nil}
 	RegisterTagValidator(globalEachKey)
+
+	RegisterTypeValidator(listTypeValidator{shared})
 }
 
 // This applies to all tags in this file.
@@ -168,6 +170,8 @@ func (lmktv listMapKeyTagValidator) GetValidations(context Context, _ []string, 
 		return Validations{}, fmt.Errorf("no field for JSON name %q", payload)
 	} else if k := realType(memb.Type).Kind; k != types.Builtin {
 		return Validations{}, fmt.Errorf("only primitive types can be list-map keys, not %s", k)
+	} else if isPointer(memb.Type) {
+		return Validations{}, fmt.Errorf("pointer types cannot be list-map keys")
 	} else {
 		fieldName = memb.Name
 	}
@@ -181,6 +185,16 @@ func (lmktv listMapKeyTagValidator) GetValidations(context Context, _ []string, 
 	// This tag doesn't generate any validations.  It just accumulates
 	// information for other tags to use.
 	return Validations{}, nil
+}
+
+func isPointer(t *types.Type) bool {
+	if t.Kind == types.Pointer {
+		return true
+	}
+	if t.Kind == types.Alias {
+		return isPointer(t.Underlying)
+	}
+	return false
 }
 
 func (lmktv listMapKeyTagValidator) Docs() TagDoc {
@@ -294,6 +308,8 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 			}
 			buf := strings.Builder{}
 			buf.WriteString("return ")
+			// Note: this does not handle pointer fields, which are not
+			// supposed to be used as listMap keys.
 			for i, fld := range listMap.keyFields {
 				if i > 0 {
 					buf.WriteString(" && ")
@@ -409,4 +425,30 @@ func (ektv eachKeyTagValidator) Docs() TagDoc {
 		}},
 	}
 	return doc
+}
+
+// FIXME: need to add a FieldValidator type
+type listTypeValidator struct {
+	byFieldPath map[string]*listMap
+}
+
+func (listTypeValidator) Init(_ Config) {}
+
+func (listTypeValidator) Name() string {
+	return "listTypeValidator"
+}
+
+func (ltv listTypeValidator) GetValidations(context Context) (Validations, error) {
+	fldPath := context.Path
+
+	// Flag errors which might have escaped the tag validation.
+	if lm, found := ltv.byFieldPath[fldPath.String()]; found {
+		if lm.declaredAsMap && len(lm.keyFields) == 0 {
+			return Validations{}, fmt.Errorf("found listType=map without listMapKey")
+		}
+		if !lm.declaredAsMap && len(lm.keyFields) != 0 {
+			return Validations{}, fmt.Errorf("found listMapKey without listType=map")
+		}
+	}
+	return Validations{}, nil
 }
