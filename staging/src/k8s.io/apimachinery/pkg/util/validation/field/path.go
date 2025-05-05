@@ -53,13 +53,8 @@ type Path struct {
 }
 type Path2 struct {
 	// FIXME: decide a size
-	arr   [4]path2Element // big enough for most cases
-	elems []path2Element
-}
-type path2Element struct {
-	name string // the name of this field or "" if this is an index
-	//FIXME: put the key in the same item as name
-	index string // if name == "", this is a subscript (index or map key) of the previous element
+	arr   [8]string // big enough for most cases
+	elems []string
 }
 
 // NewPath creates a root Path object.
@@ -73,9 +68,9 @@ func NewPath(name string, moreNames ...string) *Path {
 func NewPath2(name string, moreNames ...string) Path2 {
 	p := Path2{}
 	p.elems = p.arr[:0]
-	p.elems = append(p.elems, path2Element{name: name})
+	p.elems = append(p.elems, name)
 	for _, anotherName := range moreNames {
-		p.elems = append(p.elems, path2Element{name: anotherName})
+		p.elems = append(p.elems, anotherName)
 	}
 	return p
 }
@@ -102,9 +97,9 @@ func (p *Path) Child(name string, moreNames ...string) *Path {
 	return r
 }
 func (p Path2) Child(name string, moreNames ...string) Path2 {
-	p.elems = append(p.elems, path2Element{name: name})
+	p.elems = append(p.elems, name)
 	for _, anotherName := range moreNames {
-		p.elems = append(p.elems, path2Element{name: anotherName})
+		p.elems = append(p.elems, anotherName)
 	}
 	return p
 }
@@ -115,7 +110,7 @@ func (p *Path) Index(index int) *Path {
 	return &Path{index: strconv.Itoa(index), parent: p}
 }
 func (p Path2) Index(index int) Path2 {
-	p.elems = append(p.elems, path2Element{index: strconv.Itoa(index)})
+	p.elems[len(p.elems)-1] += "[" + strconv.Itoa(index) + "]"
 	return p
 }
 
@@ -125,7 +120,7 @@ func (p *Path) Key(key string) *Path {
 	return &Path{index: key, parent: p}
 }
 func (p Path2) Key(key string) Path2 {
-	p.elems = append(p.elems, path2Element{index: key})
+	p.elems[len(p.elems)-1] += "[" + key + "]"
 	return p
 }
 
@@ -161,21 +156,14 @@ func (p Path2) String() string {
 		return "<nil>"
 	}
 	// FIXME: decide a size
-	raw := [128]byte{} // big enough for most cases
+	raw := [64]byte{} // big enough for most cases
 	buf := bytes.NewBuffer(raw[:0])
-	for i := range p.elems {
-		e := &p.elems[i]
-		if i > 0 && len(e.name) > 0 {
+	for i, e := range p.elems {
+		if i > 0 {
 			// This is either the root or it is a subscript.
 			buf.WriteRune('.')
 		}
-		if len(e.name) > 0 {
-			buf.WriteString(e.name)
-		} else {
-			buf.WriteRune('[')
-			buf.WriteString(e.index)
-			buf.WriteRune(']')
-		}
+		buf.WriteString(e)
 	}
 	return buf.String()
 }

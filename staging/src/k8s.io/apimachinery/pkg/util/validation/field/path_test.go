@@ -201,7 +201,7 @@ func f1(p *Path, n int) string {
 	if n == 0 {
 		return p.String()
 	}
-	return f1(p.Child("child"), n-1)
+	return f1(p.Child("child").Index(0), n-1)
 }
 
 //go:noinline
@@ -209,7 +209,7 @@ func f2(p Path2, n int) string {
 	if n == 0 {
 		return p.String()
 	}
-	return f2(p.Child("child"), n-1)
+	return f2(p.Child("child").Index(0), n-1)
 }
 
 /*
