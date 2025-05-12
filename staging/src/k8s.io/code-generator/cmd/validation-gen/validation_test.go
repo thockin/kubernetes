@@ -57,6 +57,18 @@ func mapOf(t *types.Type) *types.Type {
 	}
 }
 
+func arrayOf(t *types.Type) *types.Type {
+	return &types.Type{
+		Name: types.Name{
+			Package: "",
+			Name:    "[2]" + t.Name.String(),
+		},
+		Kind: types.Array,
+		Len:  2,
+		Elem: t,
+	}
+}
+
 func aliasOf(name string, t *types.Type) *types.Type {
 	return &types.Type{
 		Name: types.Name{
@@ -367,7 +379,7 @@ func TestGetLeafTypeAndPrefixes(t *testing.T) {
 	}
 }
 
-func TestSafeComparable(t *testing.T) {
+func TestIsDirectComparable(t *testing.T) {
 	cases := []struct {
 		in     *types.Type
 		expect bool
@@ -416,6 +428,18 @@ func TestSafeComparable(t *testing.T) {
 					},
 				},
 			},
+			expect: false,
+		}, {
+			in:     arrayOf(stringType),
+			expect: true,
+		}, {
+			in:     arrayOf(aliasOf("s", stringType)),
+			expect: true,
+		}, {
+			in:     arrayOf(ptrTo(stringType)),
+			expect: false,
+		}, {
+			in:     arrayOf(mapOf(stringType)),
 			expect: false,
 		},
 	}
