@@ -450,3 +450,11 @@ func TestIsDirectComparable(t *testing.T) {
 		}
 	}
 }
+
+var stringType = &types.Type{
+	Name: types.Name{
+		Package: "",
+		Name:    "string",
+	},
+	Kind: types.Builtin,
+}
