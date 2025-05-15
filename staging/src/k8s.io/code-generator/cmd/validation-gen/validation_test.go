@@ -366,3 +366,63 @@ func TestGetLeafTypeAndPrefixes(t *testing.T) {
 		}
 	}
 }
+
+func TestSafeComparable(t *testing.T) {
+	cases := []struct {
+		in     *types.Type
+		expect bool
+	}{
+		{
+			in:     stringType,
+			expect: true,
+		}, {
+			in:     ptrTo(stringType),
+			expect: false,
+		}, {
+			in:     sliceOf(stringType),
+			expect: false,
+		}, {
+			in:     mapOf(stringType),
+			expect: false,
+		}, {
+			in:     aliasOf("s", stringType),
+			expect: true,
+		}, {
+			in: &types.Type{
+				Name: types.Name{
+					Package: "",
+					Name:    "struct_comparable_member",
+				},
+				Kind: types.Struct,
+				Members: []types.Member{
+					{
+						Name: "s",
+						Type: stringType,
+					},
+				},
+			},
+			expect: true,
+		}, {
+			in: &types.Type{
+				Name: types.Name{
+					Package: "",
+					Name:    "struct_uncomparable_member",
+				},
+				Kind: types.Struct,
+				Members: []types.Member{
+					{
+						Name: "s",
+						Type: ptrTo(stringType),
+					},
+				},
+			},
+			expect: false,
+		},
+	}
+
+	for _, tc := range cases {
+		if got, want := isDirectComparable(tc.in), tc.expect; got != want {
+			t.Errorf("%q: expected %v, got %v", tc.in, want, got)
+		}
+	}
+}
