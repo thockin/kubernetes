@@ -88,7 +88,7 @@ fi
 # By default, the latest image from the image family will be used unless an
 # explicit image will be set.
 GCI_VERSION=${KUBE_GCI_VERSION:-}
-IMAGE_FAMILY=${KUBE_IMAGE_FAMILY:-cos-109-lts}
+IMAGE_FAMILY=${KUBE_IMAGE_FAMILY:-cos-stable}
 export MASTER_IMAGE=${KUBE_GCE_MASTER_IMAGE:-}
 export MASTER_IMAGE_FAMILY=${KUBE_GCE_MASTER_IMAGE_FAMILY:-${IMAGE_FAMILY}}
 export MASTER_IMAGE_PROJECT=${KUBE_GCE_MASTER_PROJECT:-cos-cloud}
@@ -117,6 +117,7 @@ export UBUNTU_INSTALL_RUNC_VERSION=${KUBE_UBUNTU_INSTALL_RUNC_VERSION:-}
 # is set to empty then we do not override the version(s) and just
 # use whatever is in the default installation of containerd package
 export COS_INSTALL_CONTAINERD_VERSION=${KUBE_COS_INSTALL_CONTAINERD_VERSION:-}
+#COS_INSTALL_CONTAINERD_VERSION="v2.1.0"
 export COS_INSTALL_RUNC_VERSION=${KUBE_COS_INSTALL_RUNC_VERSION:-}
 
 # MASTER_EXTRA_METADATA is the extra instance metadata on master instance separated by commas.
