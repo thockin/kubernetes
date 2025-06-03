@@ -165,7 +165,6 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 			}
 		}
 	}
-
 	// Run type-validators after tag validators are done.
 	if context.Scope == ScopeType {
 		// Run all type-validators.
