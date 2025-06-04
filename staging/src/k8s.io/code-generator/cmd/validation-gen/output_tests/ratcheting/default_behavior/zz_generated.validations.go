@@ -141,7 +141,7 @@ func Validate_NestedDirectComparableStruct(ctx context.Context, op operation.Ope
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil // no changes
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field intField")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field directComparableStructField")...)
 			errs = append(errs, Validate_DirectComparableStruct(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("directComparableStructField"), &obj.DirectComparableStructField, safe.Field(oldObj, func(oldObj *NestedDirectComparableStruct) *DirectComparableStruct {
@@ -164,7 +164,7 @@ func Validate_NestedNonDirectComparableStruct(ctx context.Context, op operation.
 			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
 				return nil // no changes
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field intField")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field nonDirectComparableStructField")...)
 			errs = append(errs, Validate_NonDirectComparableStruct(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("nonDirectComparableStructField"), &obj.NonDirectComparableStructField, safe.Field(oldObj, func(oldObj *NestedNonDirectComparableStruct) *NonDirectComparableStruct {
@@ -187,7 +187,7 @@ func Validate_NonDirectComparableStruct(ctx context.Context, op operation.Operat
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil // no changes
 			}
-			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field intField")...)
+			errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field intPtrField")...)
 			return
 		}(fldPath.Child("intPtrField"), obj.IntPtrField, safe.Field(oldObj, func(oldObj *NonDirectComparableStruct) *int { return oldObj.IntPtrField }))...)
 
