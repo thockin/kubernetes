@@ -159,6 +159,7 @@ func Validate_StructSlice(ctx context.Context, op operation.Operation, fldPath *
 			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, func(a ComparableStructWithKey, b ComparableStructWithKey) bool { return a.Key == b.Key }, validate.DirectEqual, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ComparableStructWithKey) field.ErrorList {
 				return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field MapSliceComparableField[*]")
 			})...)
+			errs = append(errs, validate.Unique(ctx, op, fldPath, obj, oldObj, func(a DirectComparableStructWithKey, b DirectComparableStructWithKey) bool { return a.Key == b.Key })...)
 			return
 		}(fldPath.Child("mapSliceComparableField"), obj.MapSliceComparableField, safe.Field(oldObj, func(oldObj *StructSlice) []ComparableStructWithKey { return oldObj.MapSliceComparableField }))...)
 
