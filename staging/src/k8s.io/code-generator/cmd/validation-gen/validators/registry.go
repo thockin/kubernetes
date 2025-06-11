@@ -42,7 +42,8 @@ type registry struct {
 	tagValidators map[string]TagValidator // keyed by tagname
 	tagIndex      []string                // all tag names
 
-	typeValidators []TypeValidator
+	typeValidators  []TypeValidator
+	fieldValidators []FieldValidator
 }
 
 func (reg *registry) addTagValidator(tv TagValidator) {
@@ -71,6 +72,17 @@ func (reg *registry) addTypeValidator(tv TypeValidator) {
 	globalRegistry.typeValidators = append(globalRegistry.typeValidators, tv)
 }
 
+func (reg *registry) addFieldValidator(fv FieldValidator) {
+	if reg.initialized.Load() {
+		panic("registry was modified after init")
+	}
+
+	reg.lock.Lock()
+	defer reg.lock.Unlock()
+
+	globalRegistry.fieldValidators = append(globalRegistry.fieldValidators, fv)
+}
+
 func (reg *registry) init(c *generator.Context) {
 	if reg.initialized.Load() {
 		panic("registry.init() was called twice")
@@ -94,6 +106,13 @@ func (reg *registry) init(c *generator.Context) {
 		tv.Init(cfg)
 	}
 	slices.SortFunc(reg.typeValidators, func(a, b TypeValidator) int {
+		return cmp.Compare(a.Name(), b.Name())
+	})
+
+	for _, fv := range reg.fieldValidators {
+		fv.Init(cfg)
+	}
+	slices.SortFunc(reg.fieldValidators, func(a, b FieldValidator) int {
 		return cmp.Compare(a.Name(), b.Name())
 	})
 
@@ -150,6 +169,18 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 		for _, tv := range reg.typeValidators {
 			if theseValidations, err := tv.GetValidations(context); err != nil {
 				return Validations{}, fmt.Errorf("type validator %q: %w", tv.Name(), err)
+			} else {
+				validations.Add(theseValidations)
+			}
+		}
+	}
+
+	// Run field-validators after tag validators are done.
+	if context.Scope == ScopeField {
+		// Run all field-validators.
+		for _, fv := range reg.fieldValidators {
+			if theseValidations, err := fv.GetValidations(context); err != nil {
+				return Validations{}, fmt.Errorf("field validator %q: %w", fv.Name(), err)
 			} else {
 				validations.Add(theseValidations)
 			}
@@ -214,15 +245,34 @@ func (reg *registry) Docs() []TagDoc {
 }
 
 // RegisterTagValidator must be called by any validator which wants to run when
-// a specific tag is found.
+// a specific tag is found. TagValidators are evaluated before TypeValidators
+// or FieldValidators. In general, TagValidators should not depend on other
+// TagValidators having been run already - users might specify tags in the
+// wrong order. The one exception to this rule is that some TagValidators may
+// be designated as "late" validators, which means they will be run after all
+// non-late TagValidators. No guarantees are made about the order of execution
+// of LateTagValidators. Instead, TagValidators can accumulate information
+// internally and use a TypeValidator or FieldValidator to finish the job.
 func RegisterTagValidator(tv TagValidator) {
 	globalRegistry.addTagValidator(tv)
 }
 
 // RegisterTypeValidator must be called by any validator which wants to run
-// against every type definition.
+// against every type definition. TypeValidators are evaluated after all
+// TagValidators and after the type has been fully processed (including all
+// child fields). TypeValidators MUST NOT depend on other TypeValidators having
+// been run already.
 func RegisterTypeValidator(tv TypeValidator) {
 	globalRegistry.addTypeValidator(tv)
+}
+
+// RegisterFieldValidator must be called by any validator which wants to run
+// against every field definition. FieldValidators are evaluated after all
+// TagValidators and after the field has been fully processed (including all
+// child fields). FieldValidators MUST NOT depend on other FieldValidators
+// having been run already.
+func RegisterFieldValidator(fv FieldValidator) {
+	globalRegistry.addFieldValidator(fv)
 }
 
 // Validator represents an aggregation of validator plugins.
