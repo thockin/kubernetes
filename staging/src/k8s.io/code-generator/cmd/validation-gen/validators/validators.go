@@ -170,6 +170,9 @@ type Context struct {
 	// or map-value, this is the type of the whole list or map. When Scope is
 	// ScopeType, this is nil.
 	Parent *types.Type
+	//FIXME: I think this can replace parent entirely?  NObody else seems to
+	// use it?
+	ParentPath *field.Path
 
 	// Member provides details about a field within a struct when Scope is
 	// ScopeField.  For all other values of Scope, this will be nil.

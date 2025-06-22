@@ -41,6 +41,13 @@ type Struct struct {
 	// +k8s:subfield(sliceField)=+k8s:validateFalse="subfield Struct.StructPtrField.SliceField"
 	// +k8s:subfield(mapField)=+k8s:validateFalse="subfield Struct.StructPtrField.MapField"
 	StructPtrField *OtherStruct `json:"structPtrField"`
+
+	// FIXME: move to a test dir which is specifically about this integration point
+	// +k8s:subfield(stringField1)=+k8s:optional
+	// +k8s:subfield(stringField1)=+k8s:unionMember
+	// +k8s:subfield(stringField2)=+k8s:optional
+	// +k8s:subfield(stringField2)=+k8s:unionMember
+	Union UnionChildStruct `json:"union"`
 }
 
 type OtherStruct struct {
@@ -53,4 +60,9 @@ type OtherStruct struct {
 
 type SmallStruct struct {
 	StringField string `json:"stringField"`
+}
+
+type UnionChildStruct struct {
+	StringField1 *string `json:"stringField1"`
+	StringField2 *string `json:"stringField2"`
 }

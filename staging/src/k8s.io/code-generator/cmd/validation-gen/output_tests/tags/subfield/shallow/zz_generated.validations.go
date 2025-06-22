@@ -99,5 +99,20 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 			return
 		}(fldPath.Child("structPtrField"), obj.StructPtrField, safe.Field(oldObj, func(oldObj *Struct) *OtherStruct { return oldObj.StructPtrField }))...)
 
+	// field Struct.Union
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *UnionChildStruct) (errs field.ErrorList) {
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
+			if e := validate.Subfield(ctx, op, fldPath, obj, oldObj, "stringField1", func(o *UnionChildStruct) *string { return o.StringField1 }, validate.OptionalPointer); len(e) != 0 {
+				return // do not proceed
+			}
+			if e := validate.Subfield(ctx, op, fldPath, obj, oldObj, "stringField2", func(o *UnionChildStruct) *string { return o.StringField2 }, validate.OptionalPointer); len(e) != 0 {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("union"), &obj.Union, safe.Field(oldObj, func(oldObj *Struct) *UnionChildStruct { return &oldObj.Union }))...)
+
 	return errs
 }
