@@ -48,6 +48,8 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
+var unionMembershipForUnionChildStruct = validate.NewUnionMembership([2]string{"stringField1", "StringField1"}, [2]string{"stringField2", "StringField2"})
+
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
@@ -111,6 +113,7 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 			if e := validate.Subfield(ctx, op, fldPath, obj, oldObj, "stringField2", func(o *UnionChildStruct) *string { return o.StringField2 }, validate.OptionalPointer); len(e) != 0 {
 				return // do not proceed
 			}
+			errs = append(errs, validate.Union(ctx, op, fldPath, obj, oldObj, unionMembershipForUnionChildStruct, func(obj *UnionChildStruct) any { return obj.StringField1 }, func(obj *UnionChildStruct) any { return obj.StringField2 })...)
 			return
 		}(fldPath.Child("union"), &obj.Union, safe.Field(oldObj, func(oldObj *Struct) *UnionChildStruct { return &oldObj.Union }))...)
 

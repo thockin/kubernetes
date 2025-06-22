@@ -38,33 +38,36 @@ func init() {
 	// between them.  The tags are on struct fields, but the validation
 	// actually pertains to the struct itself.
 	shared := map[string]unions{}
-	RegisterTypeValidator(unionTypeValidator{shared})
+	RegisterTypeValidator(unionTypeOrFieldValidator{shared})
+	RegisterFieldValidator(unionTypeOrFieldValidator{shared})
 	RegisterTagValidator(unionDiscriminatorTagValidator{shared})
 	RegisterTagValidator(unionMemberTagValidator{shared})
 }
 
-type unionTypeValidator struct {
+type unionTypeOrFieldValidator struct {
 	shared map[string]unions
 }
 
-func (unionTypeValidator) Init(_ Config) {}
+func (unionTypeOrFieldValidator) Init(_ Config) {}
 
-func (unionTypeValidator) Name() string {
-	return "unionTypeValidator"
+func (unionTypeOrFieldValidator) Name() string {
+	return "unionTypeOrFieldValidator"
 }
 
-func (utv unionTypeValidator) GetValidations(context Context) (Validations, error) {
+func BAR() {}
+func (utfv unionTypeOrFieldValidator) GetValidations(context Context) (Validations, error) {
 	result := Validations{}
 
 	// Gengo does not treat struct definitions as aliases, which is
 	// inconsistent but unlikely to change. That means we don't REALLY need to
 	// handle it here, but let's be extra careful and extract the most concrete
 	// type possible.
-	if util.NonPointer(util.NativeType(context.Type)).Kind != types.Struct {
+	//FIXME: map?
+	if k := util.NonPointer(util.NativeType(context.Type)).Kind; k != types.Struct && k != types.Slice {
 		return result, nil
 	}
 
-	unions := utv.shared[context.Path.String()]
+	unions := utfv.shared[context.Path.String()]
 	if len(unions) == 0 {
 		return result, nil
 	}
@@ -81,6 +84,7 @@ func (utv unionTypeValidator) GetValidations(context Context) (Validations, erro
 			// TODO: Avoid the "local" here. This was added to to avoid errors caused when the package is an empty string.
 			//       The correct package would be the output package but is not known here. This does not show up in generated code.
 			// TODO: Append a consistent hash suffix to avoid generated name conflicts?
+			//FIXME: name needed for this based on path?
 			supportVarName := PrivateVar{Name: "UnionMembershipFor" + context.Type.Name.Name + unionName, Package: "local"}
 			ptrType := types.PointerTo(context.Type)
 
@@ -188,7 +192,7 @@ func (udtv unionDiscriminatorTagValidator) GetValidations(context Context, tag c
 	}
 
 	// This tag does not actually emit any validations, it just accumulates
-	// information. The validation is done by the unionTypeValidator.
+	// information. The validation is done by the unionTypeOrFieldValidator.
 	return Validations{}, nil
 }
 
@@ -248,7 +252,7 @@ func (umtv unionMemberTagValidator) GetValidations(context Context, tag codetags
 	u.fieldMembers = append(u.fieldMembers, context.Member)
 
 	// This tag does not actually emit any validations, it just accumulates
-	// information. The validation is done by the unionTypeValidator.
+	// information. The validation is done by the unionTypeOrFieldValidator.
 	return Validations{}, nil
 }
 
