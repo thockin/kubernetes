@@ -48,6 +48,18 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
+func Validate_ListType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj ListType) (errs field.ErrorList) {
+	// type ListType
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
+	errs = append(errs, validate.Unique(ctx, op, fldPath, obj, oldObj, func(a OtherStruct, b OtherStruct) bool {
+		return a.Key1Field == b.Key1Field && a.Key2Field == b.Key2Field
+	})...)
+
+	return errs
+}
+
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
