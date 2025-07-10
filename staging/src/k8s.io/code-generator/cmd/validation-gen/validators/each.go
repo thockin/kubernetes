@@ -503,6 +503,7 @@ func (evtv eachValTagValidator) getListValidations(fldPath *field.Path, t *types
 		// The matchArg and equivArg are both nil.
 	}
 
+	nt := util.NativeType(t)
 	for _, vfn := range validations.Functions {
 		f := Function(eachValTagName, vfn.Flags, validateEachSliceVal, matchArg, equivArg, WrapperFunction{vfn, nt.Elem})
 		result.AddFunction(f)
