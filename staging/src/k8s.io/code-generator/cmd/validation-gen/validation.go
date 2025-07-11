@@ -406,7 +406,8 @@ func (td *typeDiscoverer) discoverType(t *types.Type, fldPath *field.Path) (*typ
 						// Note: the first argument to Function() is really
 						// only for debugging.
 						v, err := validators.ForEachVal(fldPath, thisNode.valueType,
-							validators.Function("iterateListValues", validators.DefaultFlags, funcName))
+							validators.Function("iterateListValues", validators.DefaultFlags, funcName).
+								WithComment("iterate the list and call the type's validation function"))
 						if err != nil {
 							return nil, fmt.Errorf("generating list iteration: %w", err)
 						} else {
@@ -437,7 +438,8 @@ func (td *typeDiscoverer) discoverType(t *types.Type, fldPath *field.Path) (*typ
 						// Note: the first argument to Function() is really
 						// only for debugging.
 						v, err := validators.ForEachKey(fldPath, underlying.childType,
-							validators.Function("iterateMapKeys", validators.DefaultFlags, funcName))
+							validators.Function("iterateMapKeys", validators.DefaultFlags, funcName).
+								WithComment("iterate the map and call the key type's validation function"))
 						if err != nil {
 							return nil, fmt.Errorf("generating map key iteration: %w", err)
 						} else {
@@ -467,7 +469,8 @@ func (td *typeDiscoverer) discoverType(t *types.Type, fldPath *field.Path) (*typ
 						// Note: the first argument to Function() is really
 						// only for debugging.
 						v, err := validators.ForEachVal(fldPath, underlying.childType,
-							validators.Function("iterateMapValues", validators.DefaultFlags, funcName))
+							validators.Function("iterateMapValues", validators.DefaultFlags, funcName).
+								WithComment("iterate the map and call the value type's validation function"))
 						if err != nil {
 							return nil, fmt.Errorf("generating map value iteration: %w", err)
 						} else {
@@ -650,7 +653,8 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					// Note: the first argument to Function() is really
 					// only for debugging.
 					v, err := validators.ForEachVal(childPath, childType,
-						validators.Function("iterateListValues", validators.DefaultFlags, funcName))
+						validators.Function("iterateListValues", validators.DefaultFlags, funcName).
+							WithComment("iterate the list and call the type's validation function"))
 					if err != nil {
 						return fmt.Errorf("generating list iteration: %w", err)
 					} else {
@@ -681,7 +685,8 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					// Note: the first argument to Function() is really
 					// only for debugging.
 					v, err := validators.ForEachKey(childPath, childType,
-						validators.Function("iterateMapKeys", validators.DefaultFlags, funcName))
+						validators.Function("iterateMapKeys", validators.DefaultFlags, funcName).
+							WithComment("iterate the map and call the key type's validation function"))
 					if err != nil {
 						return fmt.Errorf("generating map key iteration: %w", err)
 					} else {
@@ -711,7 +716,8 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					// Note: the first argument to Function() is really
 					// only for debugging.
 					v, err := validators.ForEachVal(childPath, childType,
-						validators.Function("iterateMapValues", validators.DefaultFlags, funcName))
+						validators.Function("iterateMapValues", validators.DefaultFlags, funcName).
+							WithComment("iterate the map and call the value type's validation function"))
 					if err != nil {
 						return fmt.Errorf("generating map value iteration: %w", err)
 					} else {
@@ -834,6 +840,7 @@ func (g *genValidations) emitRegisterFunction(c *generator.Context, schemeRegist
 
 		// This uses a typed nil pointer, rather than a real instance because
 		// we need the type information, but not an instance of the type.
+		sw.Do("// type $.rootType|name$\n", targs)
 		sw.Do("scheme.AddValidationFunc(", targs)
 		sw.Do("    ($.typePfx$$.rootType|raw$)(nil), ", targs)
 		sw.Do("    func(ctx $.context.Context$, op $.operation.Operation|raw$, obj, oldObj interface{}) $.field.ErrorList|raw$ {\n", targs)
@@ -903,6 +910,8 @@ func (g *genValidations) emitValidationFunction(c *generator.Context, t *types.T
 	if node == nil {
 		panic(fmt.Sprintf("found nil node for root-type %v", t))
 	}
+	sw.Do("// $.inType|objectvalidationfn$ validates an instance of $.inType|name$ according\n", targs)
+	sw.Do("// to declarative validation rules in the API schema.\n", targs)
 	sw.Do("func $.inType|objectvalidationfn$(", targs)
 	sw.Do("    ctx $.context.Context|raw$, ", targs)
 	sw.Do("    op $.operation.Operation|raw$, ", targs)
@@ -1005,6 +1014,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 			if !validations.Empty() {
 				emitComments(validations.Comments, bufsw)
 				emitRatchetingCheck(c, fld.childType, bufsw)
+				bufsw.Do("// call field-attached validations\n", nil)
 				emitCallsToValidators(c, validations.Functions, bufsw)
 				fldRatchetingChecked = true
 			}
@@ -1123,6 +1133,7 @@ func (g *genValidations) emitCallToOtherTypeFunc(c *generator.Context, node *typ
 	targs := generator.Args{
 		"funcName": c.Universe.Type(node.funcName),
 	}
+	sw.Do("// call the type's validation function\n", nil)
 	sw.Do("errs = append(errs, $.funcName|raw$(ctx, op, fldPath, obj, oldObj)...)\n", targs)
 }
 
@@ -1132,6 +1143,7 @@ func emitRatchetingCheck(c *generator.Context, t *types.Type, sw *generator.Snip
 	targs := generator.Args{
 		"operation": mkSymbolArgs(c, operationPkgSymbols),
 	}
+	sw.Do("// don't revalidate unchanged data\n", nil)
 	// If the type is a builtin, we can use a simpler equality check when they are not nil.
 	if util.IsDirectComparable(util.NonPointer(util.NativeType(t))) {
 		// We should never get anything but pointers here, since every other
@@ -1147,7 +1159,7 @@ func emitRatchetingCheck(c *generator.Context, t *types.Type, sw *generator.Snip
 		targs["equality"] = mkSymbolArgs(c, equalityPkgSymbols)
 		sw.Do("if op.Type == $.operation.Update|raw$ && $.equality.Semantic|raw$.DeepEqual(obj, oldObj) {\n", targs)
 	}
-	sw.Do("   return nil // no changes\n", nil)
+	sw.Do("   return nil\n", nil)
 	sw.Do("}\n", nil)
 }
 

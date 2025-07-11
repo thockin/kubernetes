@@ -38,6 +38,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
+	// type Struct
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
 		switch op.Request.SubresourcePath() {
 		case "/":
@@ -48,15 +49,19 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
+// Validate_Struct validates an instance of Struct according
+// to declarative validation rules in the API schema.
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
 	// field Struct.Max0Field
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []int) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
@@ -67,9 +72,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max10Field
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []int) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 10); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
@@ -80,9 +87,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max0TypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []IntType) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
@@ -93,9 +102,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max10TypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj []IntType) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 10); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed

@@ -37,6 +37,7 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
+	// type Struct
 	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
 		switch op.Request.SubresourcePath() {
 		case "/":
@@ -47,35 +48,45 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	return nil
 }
 
+// Validate_IPStringType validates an instance of IPStringType according
+// to declarative validation rules in the API schema.
 func Validate_IPStringType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *IPStringType) (errs field.ErrorList) {
 	// type IPStringType
+	// don't revalidate unchanged data
 	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-		return nil // no changes
+		return nil
 	}
 	errs = append(errs, validate.IPSloppy(ctx, op, fldPath, obj, oldObj)...)
 
 	return errs
 }
 
+// Validate_ShortNameStringType validates an instance of ShortNameStringType according
+// to declarative validation rules in the API schema.
 func Validate_ShortNameStringType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ShortNameStringType) (errs field.ErrorList) {
 	// type ShortNameStringType
+	// don't revalidate unchanged data
 	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-		return nil // no changes
+		return nil
 	}
 	errs = append(errs, validate.ShortName(ctx, op, fldPath, obj, oldObj)...)
 
 	return errs
 }
 
+// Validate_Struct validates an instance of Struct according
+// to declarative validation rules in the API schema.
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// field Struct.TypeMeta has no validation
 
 	// field Struct.IPField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			errs = append(errs, validate.IPSloppy(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("ipField"), &obj.IPField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.IPField }))...)
@@ -83,9 +94,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.IPPtrField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			errs = append(errs, validate.IPSloppy(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("ipPtrField"), obj.IPPtrField, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.IPPtrField }))...)
@@ -93,6 +106,7 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.IPTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *IPStringType) (errs field.ErrorList) {
+			// call the type's validation function
 			errs = append(errs, Validate_IPStringType(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("ipTypedefField"), &obj.IPTypedefField, safe.Field(oldObj, func(oldObj *Struct) *IPStringType { return &oldObj.IPTypedefField }))...)
@@ -100,9 +114,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.ShortNameField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			errs = append(errs, validate.ShortName(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("shortNameField"), &obj.ShortNameField, safe.Field(oldObj, func(oldObj *Struct) *string { return &oldObj.ShortNameField }))...)
@@ -110,9 +126,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.ShortNamePtrField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			// don't revalidate unchanged data
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-				return nil // no changes
+				return nil
 			}
+			// call field-attached validations
 			errs = append(errs, validate.ShortName(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("shortNamePtrField"), obj.ShortNamePtrField, safe.Field(oldObj, func(oldObj *Struct) *string { return oldObj.ShortNamePtrField }))...)
@@ -120,6 +138,7 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.ShortNameTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *ShortNameStringType) (errs field.ErrorList) {
+			// call the type's validation function
 			errs = append(errs, Validate_ShortNameStringType(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("shortNameTypedefField"), &obj.ShortNameTypedefField, safe.Field(oldObj, func(oldObj *Struct) *ShortNameStringType { return &oldObj.ShortNameTypedefField }))...)
