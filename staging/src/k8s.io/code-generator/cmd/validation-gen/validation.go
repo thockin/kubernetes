@@ -352,8 +352,9 @@ func (td *typeDiscoverer) discoverType(t *types.Type, fldPath *field.Path) (*typ
 		context := validators.Context{
 			Scope:      validators.ScopeType,
 			Type:       t,
-			ParentPath: nil,
 			Path:       fldPath,
+			Member:     nil, // NA when discovering a type
+			ParentPath: nil, // NA when discovering a type
 		}
 		extractedTags, err := td.validator.ExtractTags(context, t.CommentLines)
 		if err != nil {
@@ -582,9 +583,9 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		context := validators.Context{
 			Scope:      validators.ScopeField,
 			Type:       childType,
-			ParentPath: fldPath,
-			Member:     &memb,
 			Path:       childPath,
+			Member:     &memb,
+			ParentPath: fldPath,
 		}
 
 		tags, err := td.validator.ExtractTags(context, memb.CommentLines)
