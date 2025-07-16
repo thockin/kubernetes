@@ -1431,6 +1431,16 @@ func toGolangSourceDataLiteral(sw *generator.SnippetWriter, c *generator.Context
 		}
 	case validators.Literal:
 		sw.Do("$.$", v)
+	case validators.FunctionGen:
+		sw.Do("$.|raw$", c.Universe.Type(v.Function))
+		sw.Do("(", nil)
+		for i, arg := range v.Args {
+			if i > 0 {
+				sw.Do(", ", nil)
+			}
+			toGolangSourceDataLiteral(sw, c, arg)
+		}
+		sw.Do(")", nil)
 	case validators.FunctionLiteral:
 		sw.Do("func(", nil)
 		for i, param := range v.Parameters {
