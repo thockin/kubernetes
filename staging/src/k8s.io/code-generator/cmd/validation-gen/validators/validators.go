@@ -212,6 +212,13 @@ type Context struct {
 	// ScopeField.  For all other values of Scope, this will be nil.
 	Member *types.Member
 
+	// ListSelector provides a list of key-value pairs that represent criteria
+	// for selecting one or more items from a list.  When Scope is
+	// ScopeListVal, this will be non-nil.  An empty selector means that
+	// all items in the list should be selected.  For all other values of
+	// Scope, this will be nil.
+	ListSelector []ListSelectorTerm
+
 	// ParentPath provides a path to the parent type or field of the object
 	// being validated, when applicable. enabling unique identification of
 	// validation contexts for the same type in different locations.  When
@@ -221,6 +228,15 @@ type Context struct {
 	// list or map type or field (depending on where the validation tag was
 	// specified). When Scope is ScopeType, this is nil.
 	ParentPath *field.Path
+}
+
+// ListSelectorTerm represents a field name and value pair.
+type ListSelectorTerm struct {
+	// Field is the JSON name of the field to match.
+	Field string
+	// Value is the value to match.  This must be a primitive type which can
+	// be used as list-map keys: string, int, or bool.
+	Value any
 }
 
 // TagDoc describes a comment-tag and its usage.
