@@ -122,6 +122,10 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max0Field
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj Max0Type) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil
+			}
 			// call the type's validation function
 			errs = append(errs, Validate_Max0Type(ctx, op, fldPath, obj, oldObj)...)
 			return
@@ -130,6 +134,10 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max10Field
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj Max10Type) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil
+			}
 			// call the type's validation function
 			errs = append(errs, Validate_Max10Type(ctx, op, fldPath, obj, oldObj)...)
 			return
@@ -138,6 +146,10 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max0TypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj Max0TypedefType) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil
+			}
 			// call the type's validation function
 			errs = append(errs, Validate_Max0TypedefType(ctx, op, fldPath, obj, oldObj)...)
 			return
@@ -146,6 +158,10 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.Max10TypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj Max10TypedefType) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil
+			}
 			// call the type's validation function
 			errs = append(errs, Validate_Max10TypedefType(ctx, op, fldPath, obj, oldObj)...)
 			return
