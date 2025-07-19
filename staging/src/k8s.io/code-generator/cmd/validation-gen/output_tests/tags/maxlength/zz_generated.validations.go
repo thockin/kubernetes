@@ -51,11 +51,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 // Validate_Max0Type validates an instance of Max0Type according
 // to declarative validation rules in the API schema.
 func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Max0Type) (errs field.ErrorList) {
-	// type Max0Type
-	// don't revalidate unchanged data
-	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-		return nil
-	}
 	errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 0)...)
 
 	return errs
@@ -64,11 +59,6 @@ func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *fie
 // Validate_Max10Type validates an instance of Max10Type according
 // to declarative validation rules in the API schema.
 func Validate_Max10Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Max10Type) (errs field.ErrorList) {
-	// type Max10Type
-	// don't revalidate unchanged data
-	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-		return nil
-	}
 	errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 10)...)
 
 	return errs

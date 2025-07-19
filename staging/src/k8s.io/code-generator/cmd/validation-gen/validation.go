@@ -955,9 +955,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 		default:
 			panic(fmt.Sprintf("unexpected type-validations on type %v, kind %s", thisNode.valueType, thisNode.valueType.Kind))
 		}
-		sw.Do("// type $.inType|raw$\n", targs)
 		emitComments(validations.Comments, sw)
-		emitRatchetingCheck(c, thisNode.valueType, sw)
 		emitCallsToValidators(c, validations.Functions, sw)
 		if thisNode.valueType.Kind == types.Alias {
 			underlyingNode := thisNode.underlying.node

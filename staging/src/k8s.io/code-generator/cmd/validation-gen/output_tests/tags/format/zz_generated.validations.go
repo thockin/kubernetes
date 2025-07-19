@@ -51,11 +51,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 // Validate_IPStringType validates an instance of IPStringType according
 // to declarative validation rules in the API schema.
 func Validate_IPStringType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *IPStringType) (errs field.ErrorList) {
-	// type IPStringType
-	// don't revalidate unchanged data
-	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-		return nil
-	}
 	errs = append(errs, validate.IPSloppy(ctx, op, fldPath, obj, oldObj)...)
 
 	return errs
@@ -64,11 +59,6 @@ func Validate_IPStringType(ctx context.Context, op operation.Operation, fldPath 
 // Validate_ShortNameStringType validates an instance of ShortNameStringType according
 // to declarative validation rules in the API schema.
 func Validate_ShortNameStringType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ShortNameStringType) (errs field.ErrorList) {
-	// type ShortNameStringType
-	// don't revalidate unchanged data
-	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
-		return nil
-	}
 	errs = append(errs, validate.ShortName(ctx, op, fldPath, obj, oldObj)...)
 
 	return errs
