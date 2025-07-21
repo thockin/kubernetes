@@ -52,11 +52,11 @@ type validationStrategy interface {
 
 func TestDeclarativeValidateForDeclarative(t *testing.T) {
 	for _, apiVersion := range apiVersions {
-		testDeclarativeValidateForDeclarative(t, apiVersion)
+		testDeclarativeValidation(t, apiVersion)
 	}
 }
 
-func testDeclarativeValidateForDeclarative(t *testing.T, apiVersion string) {
+func testDeclarativeValidation(t *testing.T, apiVersion string) {
 	ctx := genericapirequest.WithRequestInfo(genericapirequest.NewDefaultContext(), &genericapirequest.RequestInfo{
 		APIGroup:   "certificates.k8s.io",
 		APIVersion: apiVersion,
@@ -131,13 +131,13 @@ func testDeclarativeValidateForDeclarative(t *testing.T, apiVersion string) {
 	}
 }
 
-func TestValidateUpdateForDeclarative(t *testing.T) {
+func TestUpdateDeclarativeValidation(t *testing.T) {
 	for _, apiVersion := range apiVersions {
-		testValidateUpdateForDeclarative(t, apiVersion)
+		testUpdateDeclarativeValidation(t, apiVersion)
 	}
 }
 
-func testValidateUpdateForDeclarative(t *testing.T, apiVersion string) {
+func testUpdateDeclarativeValidation(t *testing.T, apiVersion string) {
 	testCases := map[string]struct {
 		old          api.CertificateSigningRequest
 		update       api.CertificateSigningRequest

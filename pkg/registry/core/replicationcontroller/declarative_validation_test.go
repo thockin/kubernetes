@@ -31,7 +31,7 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-func TestDeclarativeValidateForDeclarative(t *testing.T) {
+func TestDeclarativeValidation(t *testing.T) {
 	ctx := genericapirequest.WithRequestInfo(genericapirequest.NewDefaultContext(), &genericapirequest.RequestInfo{
 		APIGroup:   "",
 		APIVersion: "v1",
@@ -120,7 +120,7 @@ func TestDeclarativeValidateForDeclarative(t *testing.T) {
 	}
 }
 
-func TestValidateUpdateForDeclarative(t *testing.T) {
+func TestUpdateDeclarativeValidation(t *testing.T) {
 	ctx := genericapirequest.WithRequestInfo(genericapirequest.NewDefaultContext(), &genericapirequest.RequestInfo{
 		APIGroup:   "",
 		APIVersion: "v1",
