@@ -60,6 +60,9 @@ func Validate_IntType(ctx context.Context, op operation.Operation, fldPath *fiel
 
 func Validate_MapType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj MapType) (errs field.ErrorList) {
 	// type MapType
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
 	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type MapType")...)
 
 	return errs
@@ -77,6 +80,9 @@ func Validate_OtherStruct(ctx context.Context, op operation.Operation, fldPath *
 
 func Validate_SliceType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj SliceType) (errs field.ErrorList) {
 	// type SliceType
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
 	errs = append(errs, validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "type SliceType")...)
 
 	return errs
@@ -273,6 +279,9 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.SliceTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj SliceType) (errs field.ErrorList) {
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
 			if e := validate.ForbiddenSlice(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
@@ -305,6 +314,9 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.MapTypedefField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj MapType) (errs field.ErrorList) {
+			if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+				return nil // no changes
+			}
 			if e := validate.ForbiddenMap(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
 				errs = append(errs, e...)
 				return // do not proceed
