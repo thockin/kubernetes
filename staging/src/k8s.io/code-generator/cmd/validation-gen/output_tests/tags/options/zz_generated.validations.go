@@ -37,11 +37,12 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
+	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		switch op.Request.SubresourcePath() {
+		case "/":
 			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
 	})
 	return nil
 }
@@ -52,8 +53,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.XEnabledField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil // no changes
+			}
 			errs = append(errs, func() field.ErrorList {
-				if op.Options.Has("FeatureX") {
+				if op.HasOption("FeatureX") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XEnabledField")
 				} else {
 					return nil // skip validation
@@ -65,8 +69,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.XDisabledField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil // no changes
+			}
 			errs = append(errs, func() field.ErrorList {
-				if !op.Options.Has("FeatureX") {
+				if !op.HasOption("FeatureX") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XDisabledField")
 				} else {
 					return nil // skip validation
@@ -78,8 +85,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.YEnabledField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil // no changes
+			}
 			errs = append(errs, func() field.ErrorList {
-				if op.Options.Has("FeatureY") {
+				if op.HasOption("FeatureY") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.YEnabledField")
 				} else {
 					return nil // skip validation
@@ -91,8 +101,11 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.YDisabledField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil // no changes
+			}
 			errs = append(errs, func() field.ErrorList {
-				if !op.Options.Has("FeatureY") {
+				if !op.HasOption("FeatureY") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.YDisabledField")
 				} else {
 					return nil // skip validation
@@ -104,15 +117,18 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 	// field Struct.XYMixedField
 	errs = append(errs,
 		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
+			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil // no changes
+			}
 			errs = append(errs, func() field.ErrorList {
-				if !op.Options.Has("FeatureY") {
+				if !op.HasOption("FeatureY") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XYMixedField/Y")
 				} else {
 					return nil // skip validation
 				}
 			}()...)
 			errs = append(errs, func() field.ErrorList {
-				if op.Options.Has("FeatureX") {
+				if op.HasOption("FeatureX") {
 					return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field Struct.XYMixedField/X")
 				} else {
 					return nil // skip validation

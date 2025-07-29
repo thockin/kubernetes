@@ -37,20 +37,29 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
+	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		switch op.Request.SubresourcePath() {
+		case "/":
 			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
 	})
 	return nil
 }
 
-var unionMembershipForStruct = validate.NewDiscriminatedUnionMembership("d")
+var unionMembershipFor_k8s_io_code_generator_cmd_validation_gen_output_tests_tags_union_discriminated_empty_Struct_ = validate.NewDiscriminatedUnionMembership("d")
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
-	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, obj, oldObj, unionMembershipForStruct, obj.D)...)
+	if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+		return nil // no changes
+	}
+	errs = append(errs, validate.DiscriminatedUnion(ctx, op, fldPath, obj, oldObj, unionMembershipFor_k8s_io_code_generator_cmd_validation_gen_output_tests_tags_union_discriminated_empty_Struct_, func(obj *Struct) string {
+		if obj == nil {
+			return ""
+		}
+		return string(obj.D)
+	})...)
 
 	// field Struct.TypeMeta has no validation
 	// field Struct.D has no validation

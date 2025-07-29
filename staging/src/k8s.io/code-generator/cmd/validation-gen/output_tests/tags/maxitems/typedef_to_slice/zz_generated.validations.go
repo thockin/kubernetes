@@ -25,6 +25,7 @@ import (
 	context "context"
 	fmt "fmt"
 
+	equality "k8s.io/apimachinery/pkg/api/equality"
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
@@ -37,17 +38,21 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
+	scheme.AddValidationFunc((*Struct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		switch op.Request.SubresourcePath() {
+		case "/":
 			return Validate_Struct(ctx, op, nil /* fldPath */, obj.(*Struct), safe.Cast[*Struct](oldObj))
 		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
 	})
 	return nil
 }
 
 func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max0Type) (errs field.ErrorList) {
 	// type Max0Type
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
 	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
@@ -58,6 +63,9 @@ func Validate_Max0Type(ctx context.Context, op operation.Operation, fldPath *fie
 
 func Validate_Max0TypedefType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max0TypedefType) (errs field.ErrorList) {
 	// type Max0TypedefType
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
 	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 0); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
@@ -68,6 +76,9 @@ func Validate_Max0TypedefType(ctx context.Context, op operation.Operation, fldPa
 
 func Validate_Max10Type(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max10Type) (errs field.ErrorList) {
 	// type Max10Type
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
 	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 10); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
@@ -78,6 +89,9 @@ func Validate_Max10Type(ctx context.Context, op operation.Operation, fldPath *fi
 
 func Validate_Max10TypedefType(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj Max10TypedefType) (errs field.ErrorList) {
 	// type Max10TypedefType
+	if op.Type == operation.Update && equality.Semantic.DeepEqual(obj, oldObj) {
+		return nil // no changes
+	}
 	if e := validate.MaxItems(ctx, op, fldPath, obj, oldObj, 10); len(e) != 0 {
 		errs = append(errs, e...)
 		return // do not proceed
