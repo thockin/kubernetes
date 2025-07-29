@@ -20,6 +20,8 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/code-generator/cmd/validation-gen/util"
+	"k8s.io/gengo/v2/codetags"
 	"k8s.io/gengo/v2/types"
 )
 
@@ -50,9 +52,15 @@ var (
 	dnsLabelValidator = types.Name{Package: libValidationPkg, Name: "DNSLabel"}
 )
 
-func (formatTagValidator) GetValidations(context Context, _ []string, payload string) (Validations, error) {
+func (formatTagValidator) GetValidations(context Context, tag codetags.Tag) (Validations, error) {
+	// This tag can apply to value and pointer fields, as well as typedefs
+	// (which should never be pointers). We need to check the concrete type.
+	if t := util.NonPointer(util.NativeType(context.Type)); t != types.String {
+		return Validations{}, fmt.Errorf("can only be used on string types (%s)", rootTypeString(context.Type, t))
+	}
+
 	var result Validations
-	if formatFunction, err := getFormatValidationFunction(payload); err != nil {
+	if formatFunction, err := getFormatValidationFunction(tag.Value); err != nil {
 		return result, err
 	} else {
 		result.AddFunction(formatFunction)
@@ -82,11 +90,13 @@ func (ftv formatTagValidator) Docs() TagDoc {
 		Scopes:      ftv.ValidScopes().UnsortedList(),
 		Description: "Indicates that a string field has a particular format.",
 		Payloads: []TagPayloadDoc{{
-			Description: "ip-sloppy",
+			Description: "k8s-ip",
 			Docs:        "This field holds an IPv4 or IPv6 address value. IPv4 octets may have leading zeros.",
 		}, {
-			Description: "dns-label",
-			Docs:        "This field holds a DNS label value.",
+			Description: "k8s-short-name",
+			Docs:        "This field holds a Kubernetes \"short name\", aka a \"DNS label\" value.",
 		}},
+		PayloadsType:     codetags.ValueTypeString,
+		PayloadsRequired: true,
 	}
 }
