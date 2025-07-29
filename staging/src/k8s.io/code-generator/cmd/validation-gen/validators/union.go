@@ -88,14 +88,6 @@ func toSliceAny[T any](t []T) []any {
 	return result
 }
 
-func toSliceAny[T any](t []T) []any {
-	result := make([]any, len(t))
-	for i, v := range t {
-		result[i] = v
-	}
-	return result
-}
-
 const (
 	unionDiscriminatorTagName = "k8s:unionDiscriminator"
 	unionMemberTagName        = "k8s:unionMember"
