@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
-	pathvalidation "k8s.io/apimachinery/pkg/api/validation/path"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -101,14 +101,14 @@ func validateControllerRef(ref *scheduling.TypedLocalObjectReference, fldPath *f
 	if ref.Kind == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("kind"), ""))
 	} else {
-		for _, msg := range pathvalidation.IsValidPathSegmentName(ref.Kind) {
+		for _, msg := range content.IsPathSegmentName(ref.Kind) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), ref.Kind, msg))
 		}
 	}
 	if ref.Name == "" {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), ""))
 	} else {
-		for _, msg := range pathvalidation.IsValidPathSegmentName(ref.Name) {
+		for _, msg := range content.IsPathSegmentName(ref.Name) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msg))
 		}
 	}
