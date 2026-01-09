@@ -497,6 +497,15 @@ function load-or-gen-kube-bearertoken() {
   fi
 }
 
+function authed_curl() {
+    TOKEN=$(curl \
+        -H "Metadata-Flavor: Google" \
+        "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \
+        )
+    ACCESS_TOKEN=$(echo $TOKEN | jq -r .access_token)
+    curl -H "Authorization: Bearer $ACCESS_TOKEN" "$@"
+}
+
 # Figure out which binary use on the server and assure it is available.
 # If KUBE_VERSION is specified use binaries specified by it, otherwise
 # use local dev binaries.
@@ -524,23 +533,23 @@ function tars_from_version() {
     SERVER_BINARY_TAR_URL="https://dl.k8s.io/release/${KUBE_VERSION}/kubernetes-server-linux-amd64.tar.gz"
     # TODO: Clean this up.
     KUBE_MANIFESTS_TAR_URL="${SERVER_BINARY_TAR_URL/server-linux-amd64/manifests}"
-    KUBE_MANIFESTS_TAR_HASH=$(curl -L "${KUBE_MANIFESTS_TAR_URL}" --silent --show-error | ${sha512sum})
+    KUBE_MANIFESTS_TAR_HASH=$(authed_curl -L "${KUBE_MANIFESTS_TAR_URL}" --silent --show-error | ${sha512sum})
     KUBE_MANIFESTS_TAR_HASH=${KUBE_MANIFESTS_TAR_HASH%%[[:blank:]]*}
   elif [[ ${KUBE_VERSION} =~ ${KUBE_CI_VERSION_REGEX} ]]; then
     SERVER_BINARY_TAR_URL="https://storage.googleapis.com/k8s-release-dev/ci/${KUBE_VERSION}/kubernetes-server-linux-amd64.tar.gz"
     # TODO: Clean this up.
     KUBE_MANIFESTS_TAR_URL="${SERVER_BINARY_TAR_URL/server-linux-amd64/manifests}"
-    KUBE_MANIFESTS_TAR_HASH=$(curl "${KUBE_MANIFESTS_TAR_URL}" --silent --show-error | ${sha512sum})
+    KUBE_MANIFESTS_TAR_HASH=$(authed_curl "${KUBE_MANIFESTS_TAR_URL}" --silent --show-error | ${sha512sum})
     KUBE_MANIFESTS_TAR_HASH=${KUBE_MANIFESTS_TAR_HASH%%[[:blank:]]*}
   else
     echo "Version doesn't match regexp" >&2
     exit 1
   fi
-  if ! SERVER_BINARY_TAR_HASH=$(curl -Ss --fail "${SERVER_BINARY_TAR_URL}.sha512"); then
+  if ! SERVER_BINARY_TAR_HASH=$(authed_curl -Ss --fail "${SERVER_BINARY_TAR_URL}.sha512"); then
     echo "Failure trying to curl release .sha512"
   fi
 
-  if ! curl -Ss --head "${SERVER_BINARY_TAR_URL}" >&/dev/null; then
+  if ! authed_curl -Ss --head "${SERVER_BINARY_TAR_URL}" >&/dev/null; then
     echo "Can't find release at ${SERVER_BINARY_TAR_URL}" >&2
     exit 1
   fi
