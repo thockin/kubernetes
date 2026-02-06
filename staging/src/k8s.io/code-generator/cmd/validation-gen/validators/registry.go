@@ -154,10 +154,39 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 	if !reg.initialized.Load() {
 		panic("registry.init() was not called")
 	}
-	validations, err := reg.ExtractTagValidations(context, tags...)
-	if err != nil {
-		return Validations{}, err
+
+	// Reify a Validations by calling any deferred callbacks.
+	reify := func(in Validations) (Validations, error) {
+		// Process deferred validations.
+		deferred := in.Deferred
+		in.Deferred = nil
+		for _, d := range deferred {
+			innerValidations, err := d.Callback()
+			if err != nil {
+				return Validations{}, err
+			}
+			if len(innerValidations.Deferred) > 0 {
+				// If we find a use case for this, we can figure it out then.
+				return Validations{}, fmt.Errorf("deferred validation callback returned additional deferred validations, which is not supported")
+			}
+			in.Add(innerValidations)
+		}
+		return in, nil
 	}
+
+	accumulatedValidations := Validations{}
+
+	// Run tag-validators first.
+	if theseValidations, err := reg.ExtractTagValidations(context, tags...); err != nil {
+		return Validations{}, err
+	} else {
+		if v, err := reify(theseValidations); err != nil {
+			return Validations{}, err
+		} else {
+			accumulatedValidations.Add(v)
+		}
+	}
+
 	// Run type-validators after tag validators are done.
 	if context.Scope == ScopeType {
 		// Run all type-validators.
@@ -165,7 +194,11 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 			if theseValidations, err := tv.GetValidations(context); err != nil {
 				return Validations{}, fmt.Errorf("type validator %q: %w", tv.Name(), err)
 			} else {
-				validations.Add(theseValidations)
+				if v, err := reify(theseValidations); err != nil {
+					return Validations{}, err
+				} else {
+					accumulatedValidations.Add(v)
+				}
 			}
 		}
 	}
@@ -177,20 +210,23 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 			if theseValidations, err := fv.GetValidations(context); err != nil {
 				return Validations{}, fmt.Errorf("field validator %q: %w", fv.Name(), err)
 			} else {
-				validations.Add(theseValidations)
+				if v, err := reify(theseValidations); err != nil {
+					return Validations{}, err
+				} else {
+					accumulatedValidations.Add(v)
+				}
 			}
 		}
 	}
 
-	return validations, nil
+	return accumulatedValidations, nil
 }
 
 func (reg *registry) ExtractTagValidations(context Context, tags ...codetags.Tag) (Validations, error) {
 	if !reg.initialized.Load() {
 		panic("registry.init() was not called")
 	}
-	validations := Validations{}
-	// Run tag-validators first.
+	accumulatedValidations := Validations{}
 	phases := reg.sortTagsIntoPhases(tags)
 	for _, tags := range phases {
 		for _, tag := range tags {
@@ -205,11 +241,11 @@ func (reg *registry) ExtractTagValidations(context Context, tags ...codetags.Tag
 			if theseValidations, err := tv.GetValidations(context, tag); err != nil {
 				return Validations{}, fmt.Errorf("tag %q: %w", tv.TagName(), err)
 			} else {
-				validations.Add(theseValidations)
+				accumulatedValidations.Add(theseValidations)
 			}
 		}
 	}
-	return validations, nil
+	return accumulatedValidations, nil
 }
 
 func (reg *registry) sortTagsIntoPhases(tags []codetags.Tag) [][]codetags.Tag {

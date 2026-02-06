@@ -413,7 +413,8 @@ type Validations struct {
 	// Deferred holds a list of callbacks which will be executed after all other
 	// validation generation is complete. This allows validators to defer
 	// decision making until they have more information (e.g. about other
-	// validators).
+	// validators). Deferred callbacks are NOT expected to return further
+	// deferred validations. If they do, an error will be returned at runtime.
 	Deferred []DeferredGen
 }
 
