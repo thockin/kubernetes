@@ -84,8 +84,6 @@ func (stv subfieldTagValidator) GetValidations(context Context, tag codetags.Tag
 			return Validations{}, fmt.Errorf("variable generation is not supported")
 		}
 
-		result.Variables = append(result.Variables, validations.Variables...)
-
 		nilableStructType := context.Type
 		if !util.IsNilableType(nilableStructType) {
 			nilableStructType = types.PointerTo(nilableStructType)
