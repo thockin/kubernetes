@@ -33,7 +33,6 @@ const (
 
 func init() {
 	shared := map[string]*updateMetadata{}
-	RegisterFieldValidator(updateFieldValidator{byFieldPath: shared})
 	RegisterTagValidator(updateTagCollector{byFieldPath: shared})
 }
 
@@ -90,8 +89,13 @@ func (utc updateTagCollector) GetValidations(context Context, tag codetags.Tag) 
 		return Validations{}, err
 	}
 
-	// Don't generate validations here, just collect
-	return Validations{}, nil
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getUpdateValidations(utc.byFieldPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (utc updateTagCollector) validateConstraintsForType(context Context, constraints []validate.UpdateConstraint) error {
@@ -149,17 +153,6 @@ func (utc updateTagCollector) Docs() TagDoc {
 	}
 }
 
-// updateFieldValidator processes all collected update tags and generates validations
-type updateFieldValidator struct {
-	byFieldPath map[string]*updateMetadata
-}
-
-func (updateFieldValidator) Init(_ Config) {}
-
-func (updateFieldValidator) Name() string {
-	return "updateFieldValidator"
-}
-
 var (
 	updateValueValidator          = types.Name{Package: libValidationPkg, Name: "UpdateValueByCompare"}
 	updatePointerValidator        = types.Name{Package: libValidationPkg, Name: "UpdatePointer"}
@@ -172,8 +165,17 @@ var (
 	noModifyConstraint = types.Name{Package: libValidationPkg, Name: "NoModify"}
 )
 
-func (ufv updateFieldValidator) GetValidations(context Context) (Validations, error) {
-	um := ufv.byFieldPath[context.Path.String()]
+// keep track of things we have already done
+var generatedUpdatePaths = map[string]bool{}
+
+func getUpdateValidations(byFieldPath map[string]*updateMetadata, context Context) (Validations, error) {
+	// If we have processed this path before, we don't want to do it again.
+	if p := context.Path.String(); generatedUpdatePaths[p] {
+		return Validations{}, nil
+	}
+	generatedUpdatePaths[context.Path.String()] = true
+
+	um := byFieldPath[context.Path.String()]
 
 	if um == nil || um.constraints.Len() == 0 {
 		return Validations{}, nil
@@ -187,7 +189,7 @@ func (ufv updateFieldValidator) GetValidations(context Context) (Validations, er
 		return Validations{}, fmt.Errorf("update constraints are currently not supported on list or map fields")
 	}
 
-	v, err := ufv.generateValidation(context, constraints)
+	v, err := generateUpdateValidation(context, constraints)
 	if err != nil {
 		return Validations{}, err
 	}
@@ -205,7 +207,7 @@ func (ufv updateFieldValidator) GetValidations(context Context) (Validations, er
 	return v, nil
 }
 
-func (ufv updateFieldValidator) generateValidation(context Context, constraints []validate.UpdateConstraint) (Validations, error) {
+func generateUpdateValidation(context Context, constraints []validate.UpdateConstraint) (Validations, error) {
 	var result Validations
 
 	// Determine the appropriate validator function based on field type
