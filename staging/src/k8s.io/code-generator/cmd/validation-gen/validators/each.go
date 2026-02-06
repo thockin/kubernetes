@@ -104,18 +104,48 @@ func (evtv eachValTagValidator) GetValidations(context Context, tag codetags.Tag
 	if tag.ValueTag == nil {
 		return Validations{}, fmt.Errorf("missing validation tag")
 	}
-	if validations, err := evtv.validator.ExtractTagValidations(elemContext, *tag.ValueTag); err != nil {
-		return Validations{}, err
-	} else {
-		if validations.Empty() && !validations.OpaqueKeyType && !validations.OpaqueValType && !validations.OpaqueType {
-			return Validations{}, fmt.Errorf("no validation functions found")
-		}
-		if len(validations.Variables) > 0 {
+
+	// process is a recursive helper function that handles both immediate and
+	// deferred validations from a child tag. It ensures that 'Variables' are not
+	// used and properly wraps functions and defers new callbacks for deferred
+	// items.
+	var process func(Validations) (Validations, error) // because it's recursive
+	process = func(in Validations) (Validations, error) {
+		if len(in.Variables) > 0 {
 			return Validations{}, fmt.Errorf("variable generation is not supported")
 		}
-		// Pass the real (possibly alias) type.
-		return evtv.getValidations(context.Path, t, validations)
+		result := Validations{}
+		result.Functions = append(result.Functions, in.Functions...)
+		result.OpaqueType = result.OpaqueType || in.OpaqueType
+		result.OpaqueKeyType = result.OpaqueKeyType || in.OpaqueKeyType
+		result.OpaqueValType = result.OpaqueValType || in.OpaqueValType
+
+		for _, d := range in.Deferred {
+			result.AddDeferred(Deferred(func() (Validations, error) {
+				inner, err := d.Callback()
+				if err != nil {
+					return Validations{}, err
+				}
+				return process(inner)
+			}))
+		}
+		return result, nil
 	}
+
+	validations, err := evtv.validator.ExtractTagValidations(elemContext, *tag.ValueTag)
+	if err != nil {
+		return Validations{}, err
+	}
+	validations, err = process(validations)
+	if err != nil {
+		return Validations{}, err
+	}
+
+	if validations.Empty() && !validations.OpaqueKeyType && !validations.OpaqueValType && !validations.OpaqueType {
+		return Validations{}, fmt.Errorf("no validation functions found")
+	}
+	// Pass the real (possibly alias) type.
+	return evtv.getValidations(context.Path, t, validations)
 }
 
 // t is expected to be the top-most type of the list or map. For example, if
