@@ -42,10 +42,6 @@ func init() {
 	RegisterTagValidator(listMapKeyTagValidator{byPath: globalListMeta})
 	RegisterTagValidator(uniqueTagValidator{byPath: globalListMeta})
 	RegisterTagValidator(customUniqueTagValidator{byPath: globalListMeta})
-
-	// Finish work on the accumulated list metadata.
-	RegisterFieldValidator(listValidator{byPath: globalListMeta})
-	RegisterTypeValidator(listValidator{byPath: globalListMeta})
 }
 
 // This applies to all tags in this file.
@@ -176,9 +172,13 @@ func (lttv listTypeTagValidator) GetValidations(context Context, tag codetags.Ta
 		return Validations{}, fmt.Errorf("unknown list type %q", tag.Value)
 	}
 
-	// This tag doesn't generate any validations.  It just accumulates
-	// information for other tags to use.
-	return Validations{}, nil
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getListValidations(lttv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (lttv listTypeTagValidator) Docs() TagDoc {
@@ -244,9 +244,13 @@ func (lmktv listMapKeyTagValidator) GetValidations(context Context, tag codetags
 	lm.keyMembers = append(lm.keyMembers, memb)
 	lm.keyNames = append(lm.keyNames, tag.Value)
 
-	// This tag doesn't generate any validations.  It just accumulates
-	// information for other tags to use.
-	return Validations{}, nil
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getListValidations(lmktv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (lmktv listMapKeyTagValidator) Docs() TagDoc {
@@ -315,9 +319,13 @@ func (utv uniqueTagValidator) GetValidations(context Context, tag codetags.Tag) 
 		return Validations{}, fmt.Errorf("unknown unique type %q", tag.Value)
 	}
 
-	// This tag doesn't generate any validations.  It just accumulates
-	// information for other tags to use.
-	return Validations{}, nil
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getListValidations(utv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (utv uniqueTagValidator) Docs() TagDoc {
@@ -365,9 +373,13 @@ func (cutv customUniqueTagValidator) GetValidations(context Context, tag codetag
 
 	lm.customUnique = true
 
-	// This tag doesn't generate any validations.  It just accumulates
-	// information for other tags to use.
-	return Validations{}, nil
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getListValidations(cutv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (cutv customUniqueTagValidator) Docs() TagDoc {
@@ -381,30 +393,24 @@ func (cutv customUniqueTagValidator) Docs() TagDoc {
 	return doc
 }
 
-type listValidator struct {
-	byPath map[string]*listMetadata
-}
-
-func (listValidator) Init(_ Config) {}
-
-func (listValidator) Name() string {
-	return "listValidator"
-}
-
 var (
 	validateUnique            = types.Name{Package: libValidationPkg, Name: "Unique"}
 	validateSemanticDeepEqual = types.Name{Package: libValidationPkg, Name: "SemanticDeepEqual"}
 	validateDirectEqual       = types.Name{Package: libValidationPkg, Name: "DirectEqual"}
 )
 
-func (lv listValidator) GetValidations(context Context) (Validations, error) {
+// keep track of things we have already done
+var listsGenerated = map[string]bool{}
+
+// Finish work on the accumulated list metadata.
+func getListValidations(byPath map[string]*listMetadata, context Context) (Validations, error) {
 	nt := util.NativeType(context.Type)
 	if nt.Kind != types.Slice && nt.Kind != types.Array {
 		return Validations{}, nil
 	}
 
 	// Look up the list metadata which is defined on this field or type.
-	lm := lv.byPath[context.Path.String()]
+	lm := byPath[context.Path.String()]
 
 	// NOTE: We don't really support list-of-list or map-of-list, so this does
 	// not consider the case of ScopeListVal or ScopeMapVal. If we want to
@@ -412,8 +418,7 @@ func (lv listValidator) GetValidations(context Context) (Validations, error) {
 	// way we need.
 	if context.Scope == ScopeField {
 		// If this is a field, look up the list metadata for the type.
-		// TypeValidators happen before FieldValidators, so this is safe.
-		tm := lv.byPath[context.Type.String()]
+		tm := byPath[context.Type.String()]
 		if lm != nil && tm != nil {
 			return Validations{}, fmt.Errorf("found list metadata for both a field and its type: %s", context.Path)
 		}
@@ -430,9 +435,39 @@ func (lv listValidator) GetValidations(context Context) (Validations, error) {
 		return Validations{}, nil
 	}
 
+	// If we have processed this path before, we don't want to do it again.
+	// This could be because there are multiple keys or even just a
+	// listType=map and listMapKey=field.
+	if p := context.Path.String(); listsGenerated[p] {
+		return Validations{}, nil
+	}
+	listsGenerated[context.Path.String()] = true
+
+	// make sure a given listMetadata makes sense.
+	check := func(lm *listMetadata) error {
+		// Check some fundamental constraints on list tags.
+
+		// If we have listMapKey but no map semantics, that's an error
+		if len(lm.keyMembers) > 0 && lm.semantic != semanticMap {
+			return fmt.Errorf("found listMapKey without listType=map or unique=map")
+		}
+
+		// If we have map semantics but no keys, that's an error
+		if lm.semantic == semanticMap && len(lm.keyMembers) == 0 {
+			return fmt.Errorf("found listType=map or unique=map without listMapKey")
+		}
+
+		// listType is mandatory.
+		if lm.ownership == "" {
+			return fmt.Errorf("listType must be specified - use listType=atomic, listType=set, or listType=map")
+		}
+
+		return nil
+	}
+
 	// Do this after the above - if we only get one error, the one(s) above
 	// this are more important.
-	if err := lv.check(lm); err != nil {
+	if err := check(lm); err != nil {
 		return Validations{}, err
 	}
 	result := Validations{}
@@ -476,26 +511,4 @@ func (lv listValidator) GetValidations(context Context) (Validations, error) {
 	}
 
 	return result, nil
-}
-
-// make sure a given listMetadata makes sense.
-func (lv listValidator) check(lm *listMetadata) error {
-	// Check some fundamental constraints on list tags.
-
-	// If we have listMapKey but no map semantics, that's an error
-	if len(lm.keyMembers) > 0 && lm.semantic != semanticMap {
-		return fmt.Errorf("found listMapKey without listType=map or unique=map")
-	}
-
-	// If we have map semantics but no keys, that's an error
-	if lm.semantic == semanticMap && len(lm.keyMembers) == 0 {
-		return fmt.Errorf("found listType=map or unique=map without listMapKey")
-	}
-
-	// listType is mandatory.
-	if lm.ownership == "" {
-		return fmt.Errorf("listType must be specified - use listType=atomic, listType=set, or listType=map")
-	}
-
-	return nil
 }
