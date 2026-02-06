@@ -48,12 +48,10 @@ func init() {
 	// For field-based unions: tags are on struct fields, validation is on the struct
 	// For item-based unions: tags are on list items (via +k8s:item), validation is on the list
 
-	// "shared" maps from field path strings (key) to union definitions (value)
+	// "byPath" maps from field path strings (key) to union definitions (value)
 	// key examples:
 	//   - struct union: "MyStruct" (validation on the struct type)
 	//   - list union: "Pipeline.Tasks" (validation on the list field)
-	RegisterTypeValidator(unionTypeOrFieldValidator{unionDefinitions})
-	RegisterFieldValidator(unionTypeOrFieldValidator{unionDefinitions})
 	RegisterTagValidator(unionDiscriminatorTagValidator{unionDefinitions})
 	RegisterTagValidator(unionMemberTagValidator{unionDefinitions})
 }
@@ -77,17 +75,16 @@ func MarkUnionDeclarative(parentPath string, member *types.Member) {
 	}
 }
 
-type unionTypeOrFieldValidator struct {
-	shared map[string]unions
-}
+// keep track of things we have already done
+var generatedUnionPaths = map[string]bool{}
 
-func (unionTypeOrFieldValidator) Init(_ Config) {}
+func getUnionValidations(byPath map[string]unions, context Context) (Validations, error) {
+	// If we have processed this path before, we don't want to do it again.
+	if p := context.Path.String(); generatedUnionPaths[p] {
+		return Validations{}, nil
+	}
+	generatedUnionPaths[context.Path.String()] = true
 
-func (unionTypeOrFieldValidator) Name() string {
-	return "unionTypeOrFieldValidator"
-}
-
-func (utfv unionTypeOrFieldValidator) GetValidations(context Context) (Validations, error) {
 	// TODO: Add support for map items once map item validation is implemented
 
 	// Extract the most concrete type possible.
@@ -95,7 +92,7 @@ func (utfv unionTypeOrFieldValidator) GetValidations(context Context) (Validatio
 		return Validations{}, nil
 	}
 
-	unions := utfv.shared[context.Path.String()]
+	unions := byPath[context.Path.String()]
 	if len(unions) == 0 {
 		return Validations{}, nil
 	}
@@ -110,7 +107,7 @@ const (
 )
 
 type unionDiscriminatorTagValidator struct {
-	shared map[string]unions
+	byPath map[string]unions
 }
 
 func (unionDiscriminatorTagValidator) Init(_ Config) {}
@@ -127,13 +124,19 @@ func (unionDiscriminatorTagValidator) ValidScopes() sets.Set[Scope] {
 }
 
 func (udtv unionDiscriminatorTagValidator) GetValidations(context Context, tag codetags.Tag) (Validations, error) {
-	err := processDiscriminatorValidations(udtv.shared, context, tag)
+	err := processDiscriminatorValidations(udtv.byPath, context, tag)
 	if err != nil {
 		return Validations{}, err
 	}
 	// This tag does not actually emit any validations, it just accumulates
-	// information. The validation is done by the unionTypeOrFieldValidator.
-	return Validations{}, nil
+	// information. The validation is done by the deferred validation.
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getUnionValidations(udtv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (udtv unionDiscriminatorTagValidator) Docs() TagDoc {
@@ -152,7 +155,7 @@ func (udtv unionDiscriminatorTagValidator) Docs() TagDoc {
 }
 
 type unionMemberTagValidator struct {
-	shared map[string]unions
+	byPath map[string]unions
 }
 
 func (unionMemberTagValidator) Init(_ Config) {}
@@ -166,13 +169,19 @@ func (unionMemberTagValidator) ValidScopes() sets.Set[Scope] {
 }
 
 func (umtv unionMemberTagValidator) GetValidations(context Context, tag codetags.Tag) (Validations, error) {
-	err := processMemberValidations(umtv.shared, context, tag)
+	err := processMemberValidations(umtv.byPath, context, tag)
 	if err != nil {
 		return Validations{}, err
 	}
 	// This tag does not actually emit any validations, it just accumulates
-	// information. The validation is done by the unionTypeOrFieldValidator.
-	return Validations{}, nil
+	// information. The validation is done by the deferred validation.
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getUnionValidations(umtv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (umtv unionMemberTagValidator) Docs() TagDoc {
@@ -410,17 +419,17 @@ func createItemExtractor(listType *types.Type, elemType *types.Type, selector []
 // processDiscriminatorValidations processes union discriminator tags. It is a
 // free function, rather than a method so that it can be called from other
 // union-like tags.
-func processDiscriminatorValidations(shared map[string]unions, context Context, tag codetags.Tag) error {
+func processDiscriminatorValidations(byPath map[string]unions, context Context, tag codetags.Tag) error {
 	// This tag can apply to value and pointer fields, as well as typedefs
 	// (which should never be pointers). We need to check the concrete type.
 	if t := util.NonPointer(util.NativeType(context.Type)); t != types.String {
 		return fmt.Errorf("can only be used on string types (%s)", rootTypeString(context.Type, t))
 	}
-	if shared[context.ParentPath.String()] == nil {
-		shared[context.ParentPath.String()] = unions{}
+	if byPath[context.ParentPath.String()] == nil {
+		byPath[context.ParentPath.String()] = unions{}
 	}
 	unionArg, _ := tag.NamedArg("union") // optional
-	u := shared[context.ParentPath.String()].getOrCreate(unionArg.Value)
+	u := byPath[context.ParentPath.String()].getOrCreate(unionArg.Value)
 
 	if context.StabilityLevel != "" {
 		u.stabilityLevel = context.StabilityLevel
@@ -439,12 +448,12 @@ func processDiscriminatorValidations(shared map[string]unions, context Context, 
 // processMemberValidations processes union member tags for fields and list
 // items.  It is a free function, rather than a method so that it can be called
 // from other union-like tags.
-func processMemberValidations(shared map[string]unions, context Context, tag codetags.Tag) error {
+func processMemberValidations(byPath map[string]unions, context Context, tag codetags.Tag) error {
 	switch context.Scope {
 	case ScopeField:
-		return processFieldMemberValidations(shared, context, tag)
+		return processFieldMemberValidations(byPath, context, tag)
 	case ScopeListVal:
-		return processListMemberValidations(shared, context, tag)
+		return processListMemberValidations(byPath, context, tag)
 	}
 	return fmt.Errorf("can only be used on fields and list items: %v", context.Scope)
 }
@@ -452,7 +461,7 @@ func processMemberValidations(shared map[string]unions, context Context, tag cod
 // processFieldMemberValidations processes union member tags for struct fields.
 // It is a free function, rather than a method so that it can be called from
 // other union-like tags.
-func processFieldMemberValidations(shared map[string]unions, context Context, tag codetags.Tag) error {
+func processFieldMemberValidations(byPath map[string]unions, context Context, tag codetags.Tag) error {
 	nt := util.NativeType(context.Member.Type)
 	switch nt.Kind {
 	case types.Pointer, types.Map, types.Slice, types.Builtin:
@@ -474,8 +483,8 @@ func processFieldMemberValidations(shared map[string]unions, context Context, ta
 		return fmt.Errorf("field %q is a union member but has no JSON name", context.Member)
 	}
 
-	if shared[context.ParentPath.String()] == nil {
-		shared[context.ParentPath.String()] = unions{}
+	if byPath[context.ParentPath.String()] == nil {
+		byPath[context.ParentPath.String()] = unions{}
 	}
 
 	// See if the tag specified a member name.
@@ -485,7 +494,7 @@ func processFieldMemberValidations(shared map[string]unions, context Context, ta
 	}
 
 	unionArg, _ := tag.NamedArg("union") // optional
-	u := shared[context.ParentPath.String()].getOrCreate(unionArg.Value)
+	u := byPath[context.ParentPath.String()].getOrCreate(unionArg.Value)
 	u.members = append(u.members, unionMember{fieldName, memberName})
 
 	if context.StabilityLevel != "" {
@@ -499,7 +508,7 @@ func processFieldMemberValidations(shared map[string]unions, context Context, ta
 // processListMemberValidations processes union member tags for list items.  It
 // is a free function, rather than a method so that it can be called from other
 // union-like tags.
-func processListMemberValidations(shared map[string]unions, context Context, tag codetags.Tag) error {
+func processListMemberValidations(byPath map[string]unions, context Context, tag codetags.Tag) error {
 	if context.ListSelector == nil {
 		return fmt.Errorf("list-item union member has no list selector in context")
 	}
@@ -509,8 +518,8 @@ func processListMemberValidations(shared map[string]unions, context Context, tag
 	// human-friendly. eg: `field[{"name": "succeeded"}]`
 	fieldName := lastPathElement(context.Path)
 
-	if shared[context.ParentPath.String()] == nil {
-		shared[context.ParentPath.String()] = unions{}
+	if byPath[context.ParentPath.String()] == nil {
+		byPath[context.ParentPath.String()] = unions{}
 	}
 
 	// See if the tag specified a member name.
@@ -520,7 +529,7 @@ func processListMemberValidations(shared map[string]unions, context Context, tag
 	}
 
 	unionArg, _ := tag.NamedArg("union") // optional
-	u := shared[context.ParentPath.String()].getOrCreate(unionArg.Value)
+	u := byPath[context.ParentPath.String()].getOrCreate(unionArg.Value)
 	u.members = append(u.members, unionMember{fieldName, memberName})
 
 	if context.StabilityLevel != "" {
