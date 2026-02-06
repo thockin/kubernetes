@@ -449,11 +449,29 @@ func Function(tagName string, flags FunctionFlags, function types.Name, extraArg
 	}
 }
 
+// DeferredScope indicates how long a validation should be deferred.
+type DeferredScope string
+
+const (
+	// ThisContext defers validation until the end of the current context (e.g. field or type).
+	ThisContext DeferredScope = "ThisContext"
+	// ParentContext defers validation until the end of the parent context (e.g. to accumulate data across fields in a struct).
+	ParentContext DeferredScope = "ParentContext"
+)
+
 // Deferred creates a DeferredGen for a given callback.
-func Deferred(callback func() (Validations, error)) DeferredGen {
+func Deferred(scope DeferredScope, callback func() (Validations, error)) DeferredGen {
 	return DeferredGen{
+		Scope:    scope,
 		Callback: callback,
 	}
+}
+
+// DeferredGen describes a validation generation task that is deferred until
+// later.
+type DeferredGen struct {
+	Scope    DeferredScope
+	Callback func() (Validations, error)
 }
 
 // FunctionGen describes a function call that should be generated.
@@ -498,12 +516,6 @@ type FunctionGen struct {
 
 	// StabilityLevel indicates the stability level of the corresponding validation.
 	StabilityLevel ValidationStabilityLevel
-}
-
-// DeferredGen describes a validation generation task that is deferred until
-// later.
-type DeferredGen struct {
-	Callback func() (Validations, error)
 }
 
 // WithTypeArgs returns a derived FunctionGen with type arguments.

@@ -80,10 +80,10 @@ var generatedUnionPaths = map[string]bool{}
 
 func getUnionValidations(byPath map[string]unions, context Context) (Validations, error) {
 	// If we have processed this path before, we don't want to do it again.
-	if p := context.Path.String(); generatedUnionPaths[p] {
+	if p := context.ParentPath.String(); generatedUnionPaths[p] {
 		return Validations{}, nil
 	}
-	generatedUnionPaths[context.Path.String()] = true
+	generatedUnionPaths[context.ParentPath.String()] = true
 
 	// TODO: Add support for map items once map item validation is implemented
 
@@ -92,7 +92,7 @@ func getUnionValidations(byPath map[string]unions, context Context) (Validations
 		return Validations{}, nil
 	}
 
-	unions := byPath[context.Path.String()]
+	unions := byPath[context.ParentPath.String()]
 	if len(unions) == 0 {
 		return Validations{}, nil
 	}
@@ -132,7 +132,7 @@ func (udtv unionDiscriminatorTagValidator) GetValidations(context Context, tag c
 	// information. The validation is done by the deferred validation.
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ParentContext, func() (Validations, error) {
 				return getUnionValidations(udtv.byPath, context)
 			}),
 		},
@@ -177,7 +177,7 @@ func (umtv unionMemberTagValidator) GetValidations(context Context, tag codetags
 	// information. The validation is done by the deferred validation.
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ParentContext, func() (Validations, error) {
 				return getUnionValidations(umtv.byPath, context)
 			}),
 		},

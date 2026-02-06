@@ -91,7 +91,7 @@ func (utc updateTagCollector) GetValidations(context Context, tag codetags.Tag) 
 
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ThisContext, func() (Validations, error) {
 				return getUpdateValidations(utc.byFieldPath, context)
 			}),
 		},

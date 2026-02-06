@@ -120,18 +120,28 @@ func (reg *registry) ExtractValidations(context Context, tags ...codetags.Tag) (
 	reify := func(in Validations) (Validations, error) {
 		// Process deferred validations.
 		deferred := in.Deferred
-		in.Deferred = nil
+		in.Deferred = nil // Clear existing deferred
+
+		var newDeferred []DeferredGen // To accumulate ParentContext deferreds
+
 		for _, d := range deferred {
-			innerValidations, err := d.Callback()
-			if err != nil {
-				return Validations{}, err
+			if d.Scope == ThisContext {
+				innerValidations, err := d.Callback()
+				if err != nil {
+					return Validations{}, err
+				}
+				if len(innerValidations.Deferred) > 0 {
+					return Validations{}, fmt.Errorf("deferred validation callback returned additional deferred validations, which is not supported")
+				}
+				in.Add(innerValidations)
+			} else if d.Scope == ParentContext {
+				// Convert to ThisContext and pass up to the caller
+				newDeferred = append(newDeferred, Deferred(ThisContext, d.Callback))
+			} else {
+				return Validations{}, fmt.Errorf("unknown scop for deferred validation: %q", d.Scope)
 			}
-			if len(innerValidations.Deferred) > 0 {
-				// If we find a use case for this, we can figure it out then.
-				return Validations{}, fmt.Errorf("deferred validation callback returned additional deferred validations, which is not supported")
-			}
-			in.Add(innerValidations)
 		}
+		in.Deferred = newDeferred // Set processed deferreds
 		return in, nil
 	}
 

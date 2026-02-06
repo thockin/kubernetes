@@ -78,7 +78,7 @@ func (itv ifTagValidator) GetValidations(context Context, tag codetags.Tag) (Val
 			result.AddFunction(f)
 		}
 		for _, d := range in.Deferred {
-			result.AddDeferred(Deferred(func() (Validations, error) {
+			result.AddDeferred(Deferred(d.Scope, func() (Validations, error) {
 				inner, err := d.Callback()
 				if err != nil {
 					return Validations{}, err

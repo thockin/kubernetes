@@ -174,7 +174,7 @@ func (lttv listTypeTagValidator) GetValidations(context Context, tag codetags.Ta
 
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ThisContext, func() (Validations, error) {
 				return getListValidations(lttv.byPath, context)
 			}),
 		},
@@ -246,7 +246,7 @@ func (lmktv listMapKeyTagValidator) GetValidations(context Context, tag codetags
 
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ThisContext, func() (Validations, error) {
 				return getListValidations(lmktv.byPath, context)
 			}),
 		},
@@ -321,7 +321,7 @@ func (utv uniqueTagValidator) GetValidations(context Context, tag codetags.Tag) 
 
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ThisContext, func() (Validations, error) {
 				return getListValidations(utv.byPath, context)
 			}),
 		},
@@ -375,7 +375,7 @@ func (cutv customUniqueTagValidator) GetValidations(context Context, tag codetag
 
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ThisContext, func() (Validations, error) {
 				return getListValidations(cutv.byPath, context)
 			}),
 		},

@@ -58,10 +58,10 @@ var generatedZeroOrOneOfPaths = map[string]bool{}
 
 func getZeroOrOneOfValidations(byPath map[string]unions, context Context) (Validations, error) {
 	// If we have processed this path before, we don't want to do it again.
-	if p := context.Path.String(); generatedZeroOrOneOfPaths[p] {
+	if p := context.ParentPath.String(); generatedZeroOrOneOfPaths[p] {
 		return Validations{}, nil
 	}
-	generatedZeroOrOneOfPaths[context.Path.String()] = true
+	generatedZeroOrOneOfPaths[context.ParentPath.String()] = true
 
 	// Gengo does not treat struct definitions as aliases, which is
 	// inconsistent but unlikely to change. That means we don't REALLY need to
@@ -71,7 +71,7 @@ func getZeroOrOneOfValidations(byPath map[string]unions, context Context) (Valid
 		return Validations{}, nil
 	}
 
-	unions := byPath[context.Path.String()]
+	unions := byPath[context.ParentPath.String()]
 	if len(unions) == 0 {
 		return Validations{}, nil
 	}
@@ -112,7 +112,7 @@ func (zmtv zeroOrOneOfMemberTagValidator) GetValidations(context Context, tag co
 	// information. The validation is done by the deferred validation.
 	return Validations{
 		Deferred: []DeferredGen{
-			Deferred(func() (Validations, error) {
+			Deferred(ParentContext, func() (Validations, error) {
 				return getZeroOrOneOfValidations(zmtv.byPath, context)
 			}),
 		},
