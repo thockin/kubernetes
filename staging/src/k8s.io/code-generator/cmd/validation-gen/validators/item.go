@@ -146,8 +146,6 @@ func (itv *itemTagValidator) GetValidations(context Context, tag codetags.Tag) (
 	}
 	criteria = sortedCriteria
 
-	result := Validations{}
-
 	// Extract validations from the stored tag
 	itemKey := selectorString(criteria)
 	itemPath := context.Path.Key(itemKey)
@@ -159,13 +157,6 @@ func (itv *itemTagValidator) GetValidations(context Context, tag codetags.Tag) (
 		ListSelector: itemSelector,
 		ParentPath:   context.Path,
 	}
-
-	validations, err := itv.validator.ExtractTagValidations(subContext, *tag.ValueTag)
-	if err != nil {
-		return Validations{}, err
-	}
-
-	result.Variables = append(result.Variables, validations.Variables...)
 
 	// matchArg is the function that is used to select the item in new and
 	// old lists.
@@ -188,13 +179,37 @@ func (itv *itemTagValidator) GetValidations(context Context, tag codetags.Tag) (
 		equivArg = Identifier(validateSemanticDeepEqual)
 	}
 
-	for _, vfn := range validations.Functions {
-		f := Function(itemTagName, vfn.Flags, validateSliceItem, matchArg, equivArg, WrapperFunction{vfn, elemT})
-		f.Cohort = itemKey
-		result.AddFunction(f)
+	// process is a recursive helper function that handles both immediate and
+	// deferred validations from a child tag. It ensures that 'Variables' are not
+	// used and properly wraps functions and defers new callbacks for deferred
+	// items.
+	var process func(Validations) (Validations, error) // because it's recursive
+	process = func(in Validations) (Validations, error) {
+		result := Validations{}
+		result.Variables = append(result.Variables, in.Variables...)
+
+		for _, vfn := range in.Functions {
+			f := Function(itemTagName, vfn.Flags, validateSliceItem, matchArg, equivArg, WrapperFunction{vfn, elemT})
+			f.Cohort = itemKey
+			result.AddFunction(f)
+		}
+		for _, d := range in.Deferred {
+			result.AddDeferred(Deferred(func() (Validations, error) {
+				inner, err := d.Callback()
+				if err != nil {
+					return Validations{}, err
+				}
+				return process(inner)
+			}))
+		}
+		return result, nil
 	}
 
-	return result, nil
+	validations, err := itv.validator.ExtractTagValidations(subContext, *tag.ValueTag)
+	if err != nil {
+		return Validations{}, err
+	}
+	return process(validations)
 }
 
 func criteriaFromArgs(args []codetags.Arg) ([]keyValuePair, error) {
