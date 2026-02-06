@@ -50,23 +50,19 @@ func init() {
 	// ZeroOrOneOf unions are comprised of multiple tags, which need to share information
 	// between them.  The tags are on struct fields, but the validation
 	// actually pertains to the struct itself.
-	shared := zeroOrOneOfDefinitions
-	RegisterTypeValidator(zeroOrOneOfTypeOrFieldValidator{shared})
-	RegisterFieldValidator(zeroOrOneOfTypeOrFieldValidator{shared})
-	RegisterTagValidator(zeroOrOneOfMemberTagValidator{shared})
+	RegisterTagValidator(zeroOrOneOfMemberTagValidator{zeroOrOneOfDefinitions})
 }
 
-type zeroOrOneOfTypeOrFieldValidator struct {
-	shared map[string]unions
-}
+// keep track of things we have already done
+var generatedZeroOrOneOfPaths = map[string]bool{}
 
-func (zeroOrOneOfTypeOrFieldValidator) Init(_ Config) {}
+func getZeroOrOneOfValidations(byPath map[string]unions, context Context) (Validations, error) {
+	// If we have processed this path before, we don't want to do it again.
+	if p := context.Path.String(); generatedZeroOrOneOfPaths[p] {
+		return Validations{}, nil
+	}
+	generatedZeroOrOneOfPaths[context.Path.String()] = true
 
-func (zeroOrOneOfTypeOrFieldValidator) Name() string {
-	return "zeroOrOneOfTypeOrFieldValidator"
-}
-
-func (ztfv zeroOrOneOfTypeOrFieldValidator) GetValidations(context Context) (Validations, error) {
 	// Gengo does not treat struct definitions as aliases, which is
 	// inconsistent but unlikely to change. That means we don't REALLY need to
 	// handle it here, but let's be extra careful and extract the most concrete
@@ -75,7 +71,7 @@ func (ztfv zeroOrOneOfTypeOrFieldValidator) GetValidations(context Context) (Val
 		return Validations{}, nil
 	}
 
-	unions := ztfv.shared[context.Path.String()]
+	unions := byPath[context.Path.String()]
 	if len(unions) == 0 {
 		return Validations{}, nil
 	}
@@ -94,7 +90,7 @@ const (
 )
 
 type zeroOrOneOfMemberTagValidator struct {
-	shared map[string]unions
+	byPath map[string]unions
 }
 
 func (zeroOrOneOfMemberTagValidator) Init(_ Config) {}
@@ -108,13 +104,19 @@ func (zeroOrOneOfMemberTagValidator) ValidScopes() sets.Set[Scope] {
 }
 
 func (zmtv zeroOrOneOfMemberTagValidator) GetValidations(context Context, tag codetags.Tag) (Validations, error) {
-	err := processMemberValidations(zmtv.shared, context, tag)
+	err := processMemberValidations(zmtv.byPath, context, tag)
 	if err != nil {
 		return Validations{}, err
 	}
 	// This tag does not actually emit any validations, it just accumulates
-	// information. The validation is done by the zeroOrOneOfTypeOrFieldValidator.
-	return Validations{}, nil
+	// information. The validation is done by the deferred validation.
+	return Validations{
+		Deferred: []DeferredGen{
+			Deferred(func() (Validations, error) {
+				return getZeroOrOneOfValidations(zmtv.byPath, context)
+			}),
+		},
+	}, nil
 }
 
 func (zmtv zeroOrOneOfMemberTagValidator) Docs() TagDoc {
