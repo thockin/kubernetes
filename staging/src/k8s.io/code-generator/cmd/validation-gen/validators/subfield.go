@@ -69,7 +69,7 @@ func (stv subfieldTagValidator) GetValidations(context Context, tag codetags.Tag
 	if submemb == nil {
 		return Validations{}, fmt.Errorf("no field for json name %q", subname)
 	}
-	result := Validations{}
+
 	subContext := Context{
 		Scope:      ScopeField,
 		Type:       submemb.Type,
@@ -77,56 +77,75 @@ func (stv subfieldTagValidator) GetValidations(context Context, tag codetags.Tag
 		Member:     submemb,
 		ParentPath: context.Path,
 	}
-	if validations, err := stv.validator.ExtractTagValidations(subContext, *tag.ValueTag); err != nil {
-		return Validations{}, err
+
+	nilableStructType := context.Type
+	if !util.IsNilableType(nilableStructType) {
+		nilableStructType = types.PointerTo(nilableStructType)
+	}
+
+	nilableFieldType := submemb.Type
+	fieldExprPrefix := ""
+	if !util.IsNilableType(nilableFieldType) {
+		nilableFieldType = types.PointerTo(nilableFieldType)
+		fieldExprPrefix = "&"
+	}
+
+	// getFn is the function that retrieves the subfield value from the
+	// struct.
+	getFn := FunctionLiteral{
+		Parameters: []ParamResult{{"o", nilableStructType}},
+		Results:    []ParamResult{{"", nilableFieldType}},
+	}
+	getFn.Body = fmt.Sprintf("return %so.%s", fieldExprPrefix, submemb.Name)
+
+	// equivArg is the function that is used to compare the correlated
+	// elements in the old and new lists, for ratcheting.
+	var equivArg any
+
+	// directComparable is used to determine whether we can use the direct
+	// comparison operator "==" or need to use the semantic DeepEqual when
+	// looking up and comparing correlated list elements for validation ratcheting.
+	directComparable := util.IsDirectComparable(util.NonPointer(util.NativeType(submemb.Type)))
+	if directComparable {
+		// It must be a pointer, since other nilable types are not directly
+		// comparable.
+		equivArg = Identifier(validateDirectEqualPtr)
 	} else {
-		if len(validations.Variables) > 0 {
+		equivArg = Identifier(validateSemanticDeepEqual)
+	}
+
+	// process is a recursive helper function that handles both immediate and
+	// deferred validations from a child tag. It ensures that 'Variables' are not
+	// used and properly wraps functions and defers new callbacks for deferred
+	// items.
+	var process func(Validations) (Validations, error) // because it's recursive
+	process = func(in Validations) (Validations, error) {
+		if len(in.Variables) > 0 {
 			return Validations{}, fmt.Errorf("variable generation is not supported")
 		}
-
-		nilableStructType := context.Type
-		if !util.IsNilableType(nilableStructType) {
-			nilableStructType = types.PointerTo(nilableStructType)
-		}
-
-		nilableFieldType := submemb.Type
-		fieldExprPrefix := ""
-		if !util.IsNilableType(nilableFieldType) {
-			nilableFieldType = types.PointerTo(nilableFieldType)
-			fieldExprPrefix = "&"
-		}
-
-		// getFn is the function that retrieves the subfield value from the
-		// struct.
-		getFn := FunctionLiteral{
-			Parameters: []ParamResult{{"o", nilableStructType}},
-			Results:    []ParamResult{{"", nilableFieldType}},
-		}
-		getFn.Body = fmt.Sprintf("return %so.%s", fieldExprPrefix, submemb.Name)
-
-		// equivArg is the function that is used to compare the correlated
-		// elements in the old and new lists, for ratcheting.
-		var equivArg any
-
-		// directComparable is used to determine whether we can use the direct
-		// comparison operator "==" or need to use the semantic DeepEqual when
-		// looking up and comparing correlated list elements for validation ratcheting.
-		directComparable := util.IsDirectComparable(util.NonPointer(util.NativeType(submemb.Type)))
-		if directComparable {
-			// It must be a pointer, since other nilable types are not directly
-			// comparable.
-			equivArg = Identifier(validateDirectEqualPtr)
-		} else {
-			equivArg = Identifier(validateSemanticDeepEqual)
-		}
-
-		for _, vfn := range validations.Functions {
+		result := Validations{}
+		for _, vfn := range in.Functions {
 			f := Function(subfieldTagName, vfn.Flags, validateSubfield, subname, getFn, equivArg, WrapperFunction{vfn, submemb.Type})
 			f.Cohort = subname
 			result.AddFunction(f)
 		}
+		for _, d := range in.Deferred {
+			result.AddDeferred(Deferred(func() (Validations, error) {
+				inner, err := d.Callback()
+				if err != nil {
+					return Validations{}, err
+				}
+				return process(inner)
+			}))
+		}
+		return result, nil
 	}
-	return result, nil
+
+	validations, err := stv.validator.ExtractTagValidations(subContext, *tag.ValueTag)
+	if err != nil {
+		return Validations{}, err
+	}
+	return process(validations)
 }
 
 func (stv subfieldTagValidator) Docs() TagDoc {
