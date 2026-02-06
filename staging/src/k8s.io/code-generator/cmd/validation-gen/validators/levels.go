@@ -79,20 +79,36 @@ func (stv *levelTagValidator) GetValidations(context Context, tag codetags.Tag) 
 	}
 
 	context.StabilityLevel = stv.level
+
+	// process is a recursive helper function that handles both immediate and
+	// deferred validations from a child tag. It ensures that the stability level
+	// is propagated to all functions and that variables are preserved.
+	var process func(Validations) (Validations, error) // because it's recursive
+	process = func(in Validations) (Validations, error) {
+		result := Validations{}
+		result.Variables = append(result.Variables, in.Variables...)
+		for _, fn := range in.Functions {
+			f := fn
+			f.StabilityLevel = stv.level
+			result.AddFunction(f)
+		}
+		for _, d := range in.Deferred {
+			result.AddDeferred(Deferred(func() (Validations, error) {
+				inner, err := d.Callback()
+				if err != nil {
+					return Validations{}, err
+				}
+				return process(inner)
+			}))
+		}
+		return result, nil
+	}
+
 	validations, err := stv.validator.ExtractTagValidations(context, *tag.ValueTag)
 	if err != nil {
 		return Validations{}, err
 	}
-
-	result := Validations{}
-	result.Variables = append(result.Variables, validations.Variables...)
-	for _, fn := range validations.Functions {
-		f := fn
-		f.StabilityLevel = stv.level
-		result.AddFunction(f)
-	}
-
-	return result, nil
+	return process(validations)
 }
 
 func (stv *levelTagValidator) Docs() TagDoc {
