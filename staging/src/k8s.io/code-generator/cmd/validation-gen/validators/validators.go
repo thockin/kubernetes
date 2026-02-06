@@ -409,6 +409,12 @@ type Validations struct {
 	// validated is opaque, and that any validations defined on it should not
 	// be emitted.
 	OpaqueValType bool
+
+	// Deferred holds a list of callbacks which will be executed after all other
+	// validation generation is complete. This allows validators to defer
+	// decision making until they have more information (e.g. about other
+	// validators).
+	Deferred []DeferredGen
 }
 
 func (v *Validations) Empty() bool {
@@ -416,7 +422,7 @@ func (v *Validations) Empty() bool {
 }
 
 func (v *Validations) Len() int {
-	return len(v.Functions) + len(v.Variables) + len(v.Comments)
+	return len(v.Functions) + len(v.Variables) + len(v.Comments) + len(v.Deferred)
 }
 
 func (v *Validations) AddFunction(fn FunctionGen) {
@@ -427,6 +433,10 @@ func (v *Validations) AddVariable(vr VariableGen) {
 	v.Variables = append(v.Variables, vr)
 }
 
+func (v *Validations) AddDeferred(d DeferredGen) {
+	v.Deferred = append(v.Deferred, d)
+}
+
 func (v *Validations) AddComment(comment string) {
 	v.Comments = append(v.Comments, comment)
 }
@@ -435,6 +445,7 @@ func (v *Validations) Add(o Validations) {
 	v.Functions = append(v.Functions, o.Functions...)
 	v.Variables = append(v.Variables, o.Variables...)
 	v.Comments = append(v.Comments, o.Comments...)
+	v.Deferred = append(v.Deferred, o.Deferred...)
 	v.OpaqueType = v.OpaqueType || o.OpaqueType
 	v.OpaqueKeyType = v.OpaqueKeyType || o.OpaqueKeyType
 	v.OpaqueValType = v.OpaqueValType || o.OpaqueValType
@@ -501,6 +512,13 @@ func Function(tagName string, flags FunctionFlags, function types.Name, extraArg
 	}
 }
 
+// Deferred creates a DeferredGen for a given callback.
+func Deferred(callback func() (Validations, error)) DeferredGen {
+	return DeferredGen{
+		Callback: callback,
+	}
+}
+
 // FunctionGen describes a function call that should be generated.
 type FunctionGen struct {
 	// TagName is the tag which triggered this function.
@@ -543,6 +561,12 @@ type FunctionGen struct {
 
 	// StabilityLevel indicates the stability level of the corresponding validation.
 	StabilityLevel ValidationStabilityLevel
+}
+
+// DeferredGen describes a validation generation task that is deferred until
+// later.
+type DeferredGen struct {
+	Callback func() (Validations, error)
 }
 
 // WithTypeArgs returns a derived FunctionGen with type arguments.
