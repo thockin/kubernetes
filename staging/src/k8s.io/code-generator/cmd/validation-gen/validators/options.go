@@ -65,17 +65,35 @@ func (itv ifTagValidator) GetValidations(context Context, tag codetags.Tag) (Val
 	if !ok {
 		return Validations{}, fmt.Errorf("missing required option name positional argument")
 	}
-	result := Validations{}
-	if validations, err := itv.validator.ExtractTagValidations(context, *tag.ValueTag); err != nil {
-		return Validations{}, err
-	} else {
-		for _, fn := range validations.Functions {
+	// process is a recursive helper function that handles both immediate and
+	// deferred validations from a child tag. It ensures that 'Variables' are not
+	// used and properly wraps functions and defers new callbacks for deferred
+	// items.
+	var process func(Validations) (Validations, error) // because it's recursive
+	process = func(in Validations) (Validations, error) {
+		result := Validations{}
+		result.Variables = append(result.Variables, in.Variables...)
+		for _, fn := range in.Functions {
 			f := Function(itv.TagName(), fn.Flags, ifOption, optionArg.Value, itv.enabled, WrapperFunction{Function: fn, ObjType: context.Type})
-			result.Variables = append(result.Variables, validations.Variables...)
 			result.AddFunction(f)
+		}
+		for _, d := range in.Deferred {
+			result.AddDeferred(Deferred(func() (Validations, error) {
+				inner, err := d.Callback()
+				if err != nil {
+					return Validations{}, err
+				}
+				return process(inner)
+			}))
 		}
 		return result, nil
 	}
+
+	validations, err := itv.validator.ExtractTagValidations(context, *tag.ValueTag)
+	if err != nil {
+		return Validations{}, err
+	}
+	return process(validations)
 }
 
 func (itv ifTagValidator) Docs() TagDoc {
